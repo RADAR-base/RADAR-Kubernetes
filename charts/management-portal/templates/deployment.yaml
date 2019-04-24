@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "management-portal.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "management-portal.name" . }}
+    helm.sh/chart: {{ include "management-portal.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "management-portal.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "management-portal.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          - name: SPRING_PROFILES_ACTIVE
+            value: "prod,swagger"
+          - name: SPRING_DATASOURCE_URL
+            value: "jdbc:postgresql://radarbase-postgresql:5432/managementportal"
+          - name: SPRING_DATASOURCE_USERNAME
+            value: {{ .Values.postgres.user }}
+          - name: SPRING_DATASOURCE_PASSWORD
+            value: {{ .Values.postgres.password }}
+          - name: MANAGEMENTPORTAL_MAIL_FROM
+            value: {{ .Values.from_email }}
+          - name: MANAGEMENTPORTAL_COMMON_BASEURL
+            value: {{ .Values.server_name }}
+          - name: MANAGEMENTPORTAL_COMMON_MANAGEMENT_PORTAL_BASE_URL
+            value: https://{{ .Values.server_name }}/managementportal
+          - name: MANAGEMENTPORTAL_FRONTEND_CLIENT_SECRET
+            value: {{ .Values.managementportal.frontend_client_secret }}
+          - name: MANAGEMENTPORTAL_OAUTH_CLIENTS_FILE
+            value: /mp-includes/config/oauth_client_details.csv
+          - name: MANAGEMENTPORTAL_CATALOGUE_SERVER_ENABLE_AUTO_IMPORT
+            value: {{ .Values.managementportal.catalogue_server_enable_auto_import }}
+          - name: MANAGEMENTPORTAL_CATALOGUE_SERVER_SERVER_URL
+            value: http://catalog-server:9010/source-types
+          - name: MANAGEMENTPORTAL_COMMON_ADMIN_PASSWORD
+            value: {{ .Values.managementportal.common_admin_password }}
+          - name: MANAGEMENTPORTAL_COMMON_PRIVACY_POLICY_URL
+            value: {{ .Values.managementportal.common_privacy_policy_url }}
+          - name: SPRING_APPLICATION_JSON
+            value: {"managementportal":{"oauth":{"checkingKeyAliases":["{{ .Values.managementportal.oauth_checking_key_aliases_0 }}","{{ .Values.managementportal.oauth_checking_key_aliases_1 }}"]}}}'
+          - name: JHIPSTER_SLEEP # gives time for the database to boot before the application
+            value: 10
+          - name: JAVA_OPTS  # maximum heap size for the JVM running ManagementPortal, increase this as necessary
+            value: -Xmx256m
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+              command:
+              - /bin/sh
+              - -c
+              - wget --spider localhost:8080/managementportal/oauth/token_key
+            initialDelaySeconds: 5
+            periodSeconds: 90
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+              command:
+              - /bin/sh
+              - -c
+              - wget --spider localhost:8080/managementportal/oauth/token_key
+            initialDelaySeconds: 5
+            periodSeconds: 90
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: vol
+            mountPath: /mp-includes/
+      volumes:
+        - name: vol
+          hostPath:
+            path: /radar/etc/managementportal/
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

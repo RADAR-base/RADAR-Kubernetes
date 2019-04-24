@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "radar-hotstorage.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "radar-hotstorage.name" . }}
+    helm.sh/chart: {{ include "radar-hotstorage.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "radar-hotstorage.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "radar-hotstorage.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          - name: RADAR_USER
+            value: "{{ .Values.hotstorage.username }}"
+          - name: RADAR_PASSWORD
+            value: "{{ .Values.hotstorage.password }}"
+          - name: RADAR_DB
+            value: "{{ .Values.hotstorage.name }}"
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            command:
+              - /bin/sh
+              - -c
+              - mongo -u $HOTSTORAGE_USERNAME -p $HOTSTORAGE_PASSWORD $HOTSTORAGE_NAME --eval db
+            initialDelaySeconds: 5
+            periodSeconds: 60
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            command:
+              - /bin/sh
+              - -c
+              - mongo -u $HOTSTORAGE_USERNAME -p $HOTSTORAGE_PASSWORD $HOTSTORAGE_NAME --eval db
+            initialDelaySeconds: 5
+            periodSeconds: 60
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: db
+              mountPath: /data/db
+            - name: configdb
+              mountPath: /data/configdb
+      volumes:
+        - name: db
+          hostPath:
+            path: {{ .Values.mongodb_dir }}/db
+        - name: configdb
+          hostPath:
+            path: {{ .Values.mongodb_dir }}/configdb
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

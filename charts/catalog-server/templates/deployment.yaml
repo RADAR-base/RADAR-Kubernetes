@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "catalog-server.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "catalog-server.name" . }}
+    helm.sh/chart: {{ include "catalog-server.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "catalog-server.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "catalog-server.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      initContainers:
+      - name: kafka-init
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        env:
+        - name: KAFKA_ZOOKEEPER_CONNECT
+          value: "zookeeper-cp-zookeeper-headless:2181"
+        - name: KAFKA_SCHEMA_REGISTRY
+          value: "http://schema-registry-cp-schema-registry:8081"
+        - name: KAFKA_NUM_BROKERS
+          value: "3"
+        - name: RADAR_NUM_PARTITIONS
+          value: "3"
+        - name: RADAR_NUM_REPLICATION_FACTOR
+          value: "3"
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          args:
+            - radar-schemas-tools
+            - serve
+            - /schema/merged
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          - name: KAFKA_ZOOKEEPER_CONNECT
+            value: "zookeeper-cp-zookeeper-headless:2181"
+          - name: KAFKA_SCHEMA_REGISTRY
+            value: "http://schema-registry-cp-schema-registry:8081"
+          - name: KAFKA_NUM_BROKERS
+            value: "3"
+          - name: RADAR_NUM_PARTITIONS
+            value: "3"
+          - name: RADAR_NUM_REPLICATION_FACTOR
+            value: "3"
+          ports:
+            - name: http
+              containerPort: 9010
+              protocol: TCP
+          livenessProbe:
+            command:
+              - /bin/sh
+              - -c
+              - curl -f localhost:9010/source-types
+            initialDelaySeconds: 5
+            periodSeconds: 60
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            command:
+              - /bin/sh
+              - -c
+              - curl -f localhost:9010/source-types
+            initialDelaySeconds: 5
+            periodSeconds: 60
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /schema/conf
+      volumes:
+        - name: config
+          hostPath:
+            path: /radar/etc/schema
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

@@ -1,0 +1,3 @@
+podManagementPolicy: Parallel
+syncLimit: 2
+initLimit: 5
