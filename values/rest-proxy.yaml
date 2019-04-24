@@ -1,0 +1,5 @@
+cp-schema-registry:
+  url: "schema-registry-cp-schema-registry:8081"
+
+cp-zookeeper:
+  url: "zookeeper-cp-zookeeper-headless:2181"

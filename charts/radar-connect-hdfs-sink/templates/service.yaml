@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "radar-connect-hdfs-sink.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "radar-connect-hdfs-sink.name" . }}
+    helm.sh/chart: {{ include "radar-connect-hdfs-sink.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: {{ include "radar-connect-hdfs-sink.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}

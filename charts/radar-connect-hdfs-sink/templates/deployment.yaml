@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "radar-connect-hdfs-sink.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "radar-connect-hdfs-sink.name" . }}
+    helm.sh/chart: {{ include "radar-connect-hdfs-sink.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "radar-connect-hdfs-sink.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "radar-connect-hdfs-sink.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          - name: CONNECT_BOOTSTRAP_SERVERS
+            value: "PLAINTEXT://kafka-cp-kafka-headless:9092"
+          - name: CONNECT_REST_PORT
+            value: "8083"
+          - name: CONNECT_GROUP_ID
+            value: "default"
+          - name: CONNECT_CONFIG_STORAGE_TOPIC
+            value: "default.config"
+          - name: CONNECT_OFFSET_STORAGE_TOPIC
+            value: "default.offsets"
+          - name: CONNECT_STATUS_STORAGE_TOPIC
+            value: "default.status"
+          - name: CONNECT_KEY_CONVERTER
+            value: "io.confluent.connect.avro.AvroConverter"
+          - name: CONNECT_VALUE_CONVERTER
+            value: "io.confluent.connect.avro.AvroConverter"
+          - name: CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL
+            value: "http://schema-registry-1:8081"
+          - name: CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL
+            value: "http://schema-registry-1:8081"
+          - name: CONNECT_INTERNAL_KEY_CONVERTER
+            value: "org.apache.kafka.connect.json.JsonConverter"
+          - name: CONNECT_INTERNAL_VALUE_CONVERTER
+            value: "org.apache.kafka.connect.json.JsonConverter"
+          - name: CONNECT_OFFSET_STORAGE_FILE_FILENAME
+            value: "/tmp/connect2.offset"
+          - name: CONNECT_REST_ADVERTISED_HOST_NAME
+            value: "radar-hdfs-connector"
+          - name: CONNECT_ZOOKEEPER_CONNECT
+            value: zookeeper-cp-zookeeper-headless:2181
+          - name: CONNECTOR_PROPERTY_FILE_PREFIX
+            value: "sink-hdfs"
+          - name: KAFKA_HEAP_OPTS
+            value: "-Xms256m -Xmx768m"
+          - name: KAFKA_BROKERS
+            value: 3
+          - name: CONNECT_LOG4J_LOGGERS
+            value: "org.reflections=ERROR"
+          ports:
+            - name: http
+              containerPort: 8083
+              protocol: TCP
+          livenessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - curl  -sf localhost:8083/connectors/radar-hdfs-sink-android-15000/status | grep -o '\"state\":\"[^\"]*\"' | tr '\\n' ',' | grep -vq FAILED || exit 1
+            initialDelaySeconds: 5
+            periodSeconds: 60
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+              command:
+              - /bin/sh
+              - -c
+              - curl  -sf localhost:8083/connectors/radar-hdfs-sink-android-15000/status | grep -o '\"state\":\"[^\"]*\"' | tr '\\n' ',' | grep -vq FAILED || exit 1
+            initialDelaySeconds: 5
+            periodSeconds: 60
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
