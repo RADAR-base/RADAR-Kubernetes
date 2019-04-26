@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "radar-rest-sources-authorizer.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "radar-rest-sources-authorizer.name" . }}
+    helm.sh/chart: {{ include "radar-rest-sources-authorizer.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: {{ include "radar-rest-sources-authorizer.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}

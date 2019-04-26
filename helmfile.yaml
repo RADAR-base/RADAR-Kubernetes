@@ -126,6 +126,18 @@ releases:
         hosts: localhost
       replicaCount: 2
       server_name: localhost
+  - name: radar-fitbit-connector
+    chart: ./charts/radar-fitbit-connector
+    values:
+    - image:
+        tag: 2.1.0
+      ingress:
+        hosts: localhost
+      replicaCount: 2
+      zookeeper: zookeeper-cp-zookeeper-headless:2181
+      kafka: PLAINTEXT://cp-kafka-cp-kafka-headless:9092
+      kafka_num_brokers: "3"
+      schema_registry: http://cp-schema-registry-cp-schema-registry:8081
   - name: radar-gateway
     chart: ./charts/radar-gateway
     values:
@@ -140,11 +152,33 @@ releases:
     - image:
         tag: 0.1
       replicaCount: 2
+  - name: radar-integration
+    chart: ./charts/radar-integration
+    values:
+    - image:
+        tag: 0.1.0
+      replicaCount: 2
   - name: radar-mongodb-connector
     chart: ./charts/radar-mongodb-connector
     values:
     - image:
         tag: 0.2.2
+      replicaCount: 2
+      zookeeper: cp-zookeeper-cp-zookeeper-headless:2181
+      kafka: PLAINTEXT://cp-kafka-cp-kafka-headless:9092
+      kafka_num_brokers: "3"
+      schema_registry: http://cp-schema-registry-cp-schema-registry:8081
+  - name: radar-rest-sources-authorizer
+    chart: ./charts/radar-rest-sources-authorizer
+    values:
+    - image:
+        tag: 1.0.0
+      replicaCount: 2
+  - name: radar-rest-sources-backend
+    chart: ./charts/radar-rest-sources-backend
+    values:
+    - image:
+        tag: 1.0.0
       replicaCount: 2
       zookeeper: cp-zookeeper-cp-zookeeper-headless:2181
       kafka: PLAINTEXT://cp-kafka-cp-kafka-headless:9092
