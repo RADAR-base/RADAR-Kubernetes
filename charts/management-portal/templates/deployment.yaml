@@ -35,7 +35,6 @@ spec:
               secretKeyRef:
                 name: {{ template "management-portal.secretName" . }}
                 key: postgresql_password
-            value: {{ .Values.postgres.password }}
           - name: MANAGEMENTPORTAL_MAIL_FROM
             value: {{ .Values.from_email }}
           - name: MANAGEMENTPORTAL_COMMON_BASEURL
