@@ -6,7 +6,7 @@ replicaCount: 2
 
 image:
   repository: radarcns/radar-dashboard
-  tag: 2.1.0
+  tag: latest
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -23,7 +23,7 @@ ingress:
     kubernetes.io/tls-acme: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /$1
   hosts:
-    - host: chart-example.local
+    - host: localhost
       paths:
         - /dashboard/?(.*)
 

@@ -6,7 +6,7 @@ replicaCount: 2
 
 image:
   repository: radarbase/radar-hotstorage
-  tag: 0.1
+  tag: latest
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -14,7 +14,7 @@ fullnameOverride: ""
 
 service:
   type: ClusterIP
-  port: 80
+  port: 27017
 
 ingress:
   enabled: false
@@ -53,4 +53,21 @@ hotstorage:
   password: manoyve
   name: mongodb-database
 
-mongodb_dir: /tmp/mongodb
+## Enable persistence using Persistent Volume Claims
+## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+##
+persistence:
+  enabled: true
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  # storageClass: "-"
+  ##
+  ## If you want to reuse an existing claim, you can pass the name of the PVC using
+  ## the existingClaim variable
+  # existingClaim: your-claim
+  accessMode: ReadWriteOnce
+  size: 10Gi

@@ -47,3 +47,7 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+kafka_num_brokers: 3
+zookeeper: cp-zookeeper-cp-zookeeper-headless:2181
+schema_registry: http://cp-schema-registry-cp-schema-registry:8081

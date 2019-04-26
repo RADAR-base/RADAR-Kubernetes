@@ -30,3 +30,25 @@ Create chart name and version as used by the chart label.
 {{- define "radar-hotstorage.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
+
+{{/*
+Get the password secret.
+*/}}
+{{- define "radar-hotstorage.secretName" -}}
+{{- if .Values.existingSecret }}
+    {{- printf "%s" .Values.existingSecret -}}
+{{- else -}}
+    {{- printf "%s" (include "radar-hotstorage.fullname" .) -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return true if a secret object should be created
+*/}}
+{{- define "radar-hotstorage.createSecret" -}}
+{{- if .Values.existingSecret }}
+{{- else if .Values.existingSecret -}}
+{{- else -}}
+    {{- true -}}
+{{- end -}}
+{{- end -}}

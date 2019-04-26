@@ -6,7 +6,7 @@ replicaCount: 2
 
 image:
   repository: radarbase/radar-backend
-  tag: 0.4.0
+  tag: latest
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -49,6 +49,25 @@ tolerations: []
 affinity: {}
 
 args: monitor
+rest_proxy: http://cp-kafka-rest-cp-kafka-rest:8082
+schema_registry: http://cp-schema-registry-cp-schema-registry:8081
+kafka_num_brokers: "3"
 extraEnv:
   - name: TOPIC_LIST
     value: "application_record_counts"
+
+persistence:
+  enabled: true
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  # storageClass: "-"
+  ##
+  ## If you want to reuse an existing claim, you can pass the name of the PVC using
+  ## the existingClaim variable
+  # existingClaim: your-claim
+  accessMode: ReadWriteOnce
+  size: 1Gi

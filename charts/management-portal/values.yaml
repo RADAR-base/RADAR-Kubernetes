@@ -6,7 +6,7 @@ replicaCount: 2
 
 image:
   repository: radarbase/management-portal
-  tag: 0.5.3
+  tag: latest
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -59,11 +59,13 @@ tolerations: []
 affinity: {}
 
 postgres:
+  host: radarbase-postgresql
   user: postgres
   password: password
 
 from_email: from-email
 server_name: localhost
+catalogue_server: catalog-server
 managementportal:
   catalogue_server_enable_auto_import: false
   common_privacy_policy_url: http://info.thehyve.nl/radar-cns-privacy-policy

@@ -29,7 +29,7 @@ spec:
           - name: HADOOP_HEAPSIZE
             value: "1000"
           - name: HADOOP_NAMENODE1_HOSTNAME
-            value: "hdfs-namenode-1"
+            value: "{{ .Values.hadoop_namenode1_hostname }}"
           {{- toYaml .Values.env | nindent 10 }}
           ports:
             - name: http

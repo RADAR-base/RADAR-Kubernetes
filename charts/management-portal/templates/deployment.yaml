@@ -27,10 +27,14 @@ spec:
           - name: SPRING_PROFILES_ACTIVE
             value: "prod,swagger"
           - name: SPRING_DATASOURCE_URL
-            value: "jdbc:postgresql://radarbase-postgresql:5432/managementportal"
+            value: "jdbc:postgresql://{{ .Values.postgres.host }}:5432/managementportal"
           - name: SPRING_DATASOURCE_USERNAME
             value: {{ .Values.postgres.user }}
           - name: SPRING_DATASOURCE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "management-portal.secretName" . }}
+                key: postgresql_password
             value: {{ .Values.postgres.password }}
           - name: MANAGEMENTPORTAL_MAIL_FROM
             value: {{ .Values.from_email }}
@@ -39,15 +43,21 @@ spec:
           - name: MANAGEMENTPORTAL_COMMON_MANAGEMENT_PORTAL_BASE_URL
             value: https://{{ .Values.server_name }}/managementportal
           - name: MANAGEMENTPORTAL_FRONTEND_CLIENT_SECRET
-            value: {{ .Values.managementportal.frontend_client_secret }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "management-portal.secretName" . }}
+                key: managementportal_frontend_client_secret
           - name: MANAGEMENTPORTAL_OAUTH_CLIENTS_FILE
             value: /mp-includes/config/oauth_client_details.csv
           - name: MANAGEMENTPORTAL_CATALOGUE_SERVER_ENABLE_AUTO_IMPORT
             value: {{ .Values.managementportal.catalogue_server_enable_auto_import }}
           - name: MANAGEMENTPORTAL_CATALOGUE_SERVER_SERVER_URL
-            value: http://catalog-server:9010/source-types
+            value: http://{{ .Values.catalogue_server }}:9010/source-types
           - name: MANAGEMENTPORTAL_COMMON_ADMIN_PASSWORD
-            value: {{ .Values.managementportal.common_admin_password }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "management-portal.secretName" . }}
+                key: managementportal_common_admin_password
           - name: MANAGEMENTPORTAL_COMMON_PRIVACY_POLICY_URL
             value: {{ .Values.managementportal.common_privacy_policy_url }}
           - name: SPRING_APPLICATION_JSON
