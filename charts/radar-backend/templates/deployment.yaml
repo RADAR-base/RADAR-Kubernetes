@@ -26,11 +26,11 @@ spec:
           args: ["{{ .Values.args }}"]
           env:
           - name: KAFKA_REST_PROXY
-            value: "http://rest-proxy-cp-kafka-rest:8082"
+            value: value: "{{ .Values.rest_proxy }}"
           - name: KAFKA_SCHEMA_REGISTRY
-            value: "http://schema-registry-cp-schema-registry:8081"
+            value: "{{ .Values.schema_registry }}"
           - name: KAFKA_BROKERS
-            value: "3"
+            value: "{{ .Values.kafka_num_brokers }}"
 {{- if .Values.extraEnv }}
 {{ toYaml .Values.extraEnv | indent 8 }}
 {{- end }}
@@ -50,8 +50,12 @@ spec:
           hostPath:
             path: /radar/etc/radar-backend/radar.yml
         - name: backend-monitor-disconnect-data
-          hostPath:
-            path: /radar/backend-monitor-disconnect-data
+        {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "radar-backend.fullname" .) }}
+        {{- else }}
+          emptyDir: {}
+        {{ end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

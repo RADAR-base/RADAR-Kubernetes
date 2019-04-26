@@ -24,11 +24,11 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         env:
         - name: KAFKA_ZOOKEEPER_CONNECT
-          value: "zookeeper-cp-zookeeper-headless:2181"
+          value: "{{ .Values.zookeeper }}"
         - name: KAFKA_SCHEMA_REGISTRY
-          value: "http://schema-registry-cp-schema-registry:8081"
+          value: "{{ .Values.schema_registry }}"
         - name: KAFKA_NUM_BROKERS
-          value: "3"
+          value: "{{ .Values.kafka_num_brokers }}"
         - name: RADAR_NUM_PARTITIONS
           value: "3"
         - name: RADAR_NUM_REPLICATION_FACTOR
@@ -43,15 +43,15 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
           - name: KAFKA_ZOOKEEPER_CONNECT
-            value: "zookeeper-cp-zookeeper-headless:2181"
+            value: "{{ .Values.zookeeper }}"
           - name: KAFKA_SCHEMA_REGISTRY
-            value: "http://schema-registry-cp-schema-registry:8081"
+            value: "{{ .Values.schema_registry }}"
           - name: KAFKA_NUM_BROKERS
-            value: "3"
+            value: "{{ .Values.kafka_num_brokers }}"
           - name: RADAR_NUM_PARTITIONS
             value: "3"
           - name: RADAR_NUM_REPLICATION_FACTOR
-            value: "3"
+            value: "{{ .Values.kafka_num_brokers }}"
           ports:
             - name: http
               containerPort: 9010

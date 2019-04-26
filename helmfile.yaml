@@ -1,0 +1,158 @@
+repositories:
+  - name: jetstack
+    url: https://charts.jetstack.io
+
+helmDefaults:
+  verify: true
+  wait: true
+  timeout: 600
+  recreatePods: true
+  force: true
+  atomic: true
+
+releases:
+  - name: cert-manager
+    namespace: cert-manager
+    chart: jetstack/cert-manager
+    version: v0.7.1
+
+  - name: cp-kafka
+    chart: ./cp-helm-charts/charts/cp-kafka
+    values:
+      - "charts/cp-kafka/values.yaml"
+      - cp-zookeeper:
+          url: "cp-zookeeper-cp-zookeeper-headless:2181"
+  - name: cp-kafka-rest
+    chart: ./cp-helm-charts/charts/cp-kafka-rest
+    values:
+      - "charts/cp-kafka-rest/values.yaml"
+      - cp-schema-registry:
+          url: "cp-schema-registry-cp-schema-registry:8081"
+        cp-zookeeper:
+          url: "cp-zookeeper-cp-zookeeper-headless:2181"
+  - name: cp-schema-registry
+    chart: ./cp-helm-charts/charts/cp-schema-registry
+    values:
+      - "charts/cp-schema-registry/values.yaml"
+      - kafka:
+          bootstrapServers: "PLAINTEXT://cp-kafka-cp-kafka-headless:9092"
+  - name: cp-zookeeper
+    chart: ./cp-helm-charts/charts/cp-zookeeper
+    values:
+      - "charts/cp-zookeeper/values.yaml"
+  - name: kafka-manager
+    chart: stable/kafka-manager
+    values:
+      - "charts/kafka-manager/values.yaml"
+      - ingress:
+          hosts: localhost
+        zk_hosts: cp-zookeeper-cp-zookeeper-headless:2181
+  - name: postgres
+    chart: stable/postgres
+    values:
+      - "charts/postgres/values.yaml"
+
+  - name: catalog-server
+    chart: ./charts/catalog-server
+    values:
+    - image:
+        tag: 0.4.3
+      replicaCount: 2
+      kafka_num_brokers: 3
+      zookeeper: cp-zookeeper-cp-zookeeper-headless:2181
+      schema_registry: http://cp-schema-registry-cp-schema-registry:8081
+  - name: hdfs-datanode
+    chart: ./charts/hdfs
+    values:
+    - charts/hdfs/values-datanode.yaml"
+    - image:
+        tag: 3.0.3-alpine
+      replicaCount: 3
+  - name: hdfs-namenode
+    chart: ./charts/hdfs
+    values:
+    - charts/hdfs/values-namenode.yaml"
+    - image:
+        tag: 3.0.3-alpine
+      replicaCount: 1
+  - name: management-portal
+    chart: ./charts/management-portal
+    values:
+    - image:
+        tag: 0.5.3
+      ingress:
+        hosts: localhost
+      replicaCount: 2
+      server_name: localhost
+      postgres:
+        host: radarbase-postgresql
+        password: password
+  - name: radar-backend-momnitor
+    chart: ./charts/radar-backend
+    values:
+    - charts/radar-backend/values-monitor.yaml"
+    - image:
+        tag: 0.4.0
+      replicaCount: 2
+      rest_proxy: http://cp-kafka-rest-cp-kafka-rest:8082
+      schema_registry: http://cp-schema-registry-cp-schema-registry:8081
+      kafka_num_brokers: "3"
+  - name: radar-backend-stream
+    chart: ./charts/radar-backend
+    values:
+    - charts/radar-backend/values-stream.yaml"
+    - image:
+        tag: 0.4.0
+      replicaCount: 2
+      rest_proxy: http://cp-kafka-rest-cp-kafka-rest:8082
+      schema_registry: http://cp-schema-registry-cp-schema-registry:8081
+      kafka_num_brokers: "3"
+  - name: radar-connect-hdfs-sink
+    chart: ./charts/radar-connect-hdfs-sink
+    values:
+    - image:
+        tag: 0.2.0
+      replicaCount: 2
+      zookeeper: cp-zookeeper-cp-zookeeper-headless:2181
+      kafka: PLAINTEXT://cp-kafka-cp-kafka-headless:9092
+      kafka_num_brokers: "3"
+      schema_registry: http://cp-schema-registry-cp-schema-registry:8081
+  - name: radar-dashboard
+    chart: ./charts/radar-dashboard
+    values:
+    - image:
+        tag: 2.1.0
+      ingress:
+        hosts: localhost
+      replicaCount: 2
+      server_name: localhost
+  - name: radar-gateway
+    chart: ./charts/radar-gateway
+    values:
+    - image:
+        tag: 0.3.3
+      ingress:
+        hosts: localhost
+      replicaCount: 2
+  - name: radar-hotstorage
+    chart: ./charts/radar-hotstorage
+    values:
+    - image:
+        tag: 0.1
+      replicaCount: 2
+  - name: radar-mongodb-connector
+    chart: ./charts/radar-mongodb-connector
+    values:
+    - image:
+        tag: 0.2.2
+      replicaCount: 2
+      zookeeper: cp-zookeeper-cp-zookeeper-headless:2181
+      kafka: PLAINTEXT://cp-kafka-cp-kafka-headless:9092
+      kafka_num_brokers: "3"
+      schema_registry: http://cp-schema-registry-cp-schema-registry:8081
+  - name: radar-restapi
+    chart: ./charts/radar-restapi
+    values:
+    - image:
+        tag: 0.3
+      replicaCount: 2

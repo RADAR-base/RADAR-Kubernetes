@@ -6,7 +6,7 @@ replicaCount: 2
 
 image:
   repository: radarbase/kafka-connect-mongodb-sink
-  tag: 0.2.2
+  tag: latest
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -47,3 +47,8 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+zookeeper: zookeeper-cp-zookeeper-headless:2181
+kafka: PLAINTEXT://cp-kafka-cp-kafka-headless:9092
+kafka_num_brokers: "3"
+schema_registry: http://schema-registry-1:8081

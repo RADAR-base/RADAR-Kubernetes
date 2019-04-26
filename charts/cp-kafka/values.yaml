@@ -1,5 +1,4 @@
 customEnv:
-        #KAFKA_ZOOKEEPER_CONNECT: zookeeper-cp-zookeeper-0.zookeeper-cp-zookeeper-headless:2181,zookeeper-cp-zookeeper-1.zookeeper-cp-zookeeper-headless:2181,zookeeper-cp-zookeeper-2.zookeeper-cp-zookeeper-headless:2181
   KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
   KAFKA_LOG_RETENTION_HOURS: "730"
   KAFKA_MESSAGE_MAX_BYTES: "4000048"
@@ -11,11 +10,7 @@ customEnv:
   KAFKA_OFFSETS_RETENTION_MINUTES: "10080"
   KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: "16000"
 
-  #zookeeper:
-  #enabled: false
-  #url: zookeeper
-
 
 cp-zookeeper:
   enabled: false
-  url: "zookeeper-cp-zookeeper-headless:2181"
+  url: "cp-zookeeper-cp-zookeeper-headless:2181"

@@ -1,2 +1,0 @@
-kafka:
-  bootstrapServers: "PLAINTEXT://kafka-cp-kafka-headless:9092"

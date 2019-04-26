@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: radarbase/hdfs
-  tag: 3.0.3-alpine
+  tag: latest
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -49,7 +49,7 @@ tolerations: []
 affinity: {}
 
 args: hdfs-namenode-1
-
+hadoop_namenode1_hostname: hdfs-namenode-1
 env:
   - name: SERVICE_8020_NAME
     value: "namenode"

@@ -6,7 +6,7 @@ replicaCount: 2
 
 image:
   repository: radar-restapi
-  tag: 0.3
+  tag: latest
   pullPolicy: IfNotPresent
 
 nameOverride: ""

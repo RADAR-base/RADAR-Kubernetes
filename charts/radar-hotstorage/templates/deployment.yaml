@@ -27,12 +27,18 @@ spec:
           - name: RADAR_USER
             value: "{{ .Values.hotstorage.username }}"
           - name: RADAR_PASSWORD
-            value: "{{ .Values.hotstorage.password }}"
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "management-portal.secretName" . }}
+                key: hotstorage_password
           - name: RADAR_DB
             value: "{{ .Values.hotstorage.name }}"
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 27017
+              protocol: TCP
+            - name: stats
+              containerPort: 28017
               protocol: TCP
           livenessProbe:
             command:
@@ -58,16 +64,15 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - name: db
-              mountPath: /data/db
-            - name: configdb
-              mountPath: /data/configdb
+              mountPath: /data/
       volumes:
         - name: db
-          hostPath:
-            path: {{ .Values.mongodb_dir }}/db
-        - name: configdb
-          hostPath:
-            path: {{ .Values.mongodb_dir }}/configdb
+        {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "radar-hotstorage.fullname" .) }}
+        {{- else }}
+          emptyDir: {}
+        {{ end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
