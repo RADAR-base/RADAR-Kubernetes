@@ -5,7 +5,7 @@
 replicaCount: 2
 
 image:
-  repository: radar-restapi
+  repository: radarbase/radar-restapi
   tag: latest
   pullPolicy: IfNotPresent
 

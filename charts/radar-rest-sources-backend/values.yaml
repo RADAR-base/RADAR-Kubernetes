@@ -5,7 +5,7 @@
 replicaCount: 2
 
 image:
-  repository: radar-rest-source-auth-backend
+  repository: radarbase/radar-rest-source-auth-backend
   tag: latest
   pullPolicy: IfNotPresent
 
@@ -49,6 +49,6 @@ tolerations: []
 affinity: {}
 
 postgres:
-  host: radarbase-postgresql
+  host: postgresql
   user: postgres
   password: password

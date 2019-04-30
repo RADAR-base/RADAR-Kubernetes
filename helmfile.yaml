@@ -17,6 +17,7 @@ releases:
       - "charts/cp-kafka/values.yaml"
       - cp-zookeeper:
           url: "cp-zookeeper-headless:2181"
+        brokers: "3"
   - name: cp-kafka-rest
     chart: ./cp-helm-charts/charts/cp-kafka-rest
     values:
@@ -43,7 +44,7 @@ releases:
           hosts:
             - localhost
         zk_hosts: cp-zookeeper-headless:2181
-  - name: postgres
+  - name: postgresql
     chart: stable/postgresql
     values:
       - "charts/postgres/values.yaml"
@@ -88,7 +89,7 @@ releases:
       server_name: localhost
       catalogue_server: catalog-server
       postgres:
-        host: postgres-postgresql
+        host: postgresql
         password: password
   - name: radar-backend-monitor
     chart: ./charts/radar-backend
@@ -187,10 +188,9 @@ releases:
     - image:
         tag: 1.0.0
       replicaCount: 2
-      zookeeper: cp-zookeeper-headless:2181
-      kafka: PLAINTEXT://cp-kafka-headless:9092
-      kafka_num_brokers: "3"
-      schema_registry: http://cp-schema-registry:8081
+      postgres:
+        host: postgresql
+        password: password
   - name: radar-restapi
     chart: ./charts/radar-restapi
     values:
