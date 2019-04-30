@@ -28,20 +28,22 @@ spec:
               containerPort: 8080
               protocol: TCP
           livenessProbe:
-            command:
+            exec:
+              command:
               - /bin/sh
               - -c
-              - wget -IX POST http://localhost:8080/redcap/trigger
+              - wget --post-data "" http://localhost:8080/redcap/trigger
             initialDelaySeconds: 5
             periodSeconds: 60
             timeoutSeconds: 5
             successThreshold: 1
             failureThreshold: 3
           readinessProbe:
-            command:
+            exec:
+              command:
               - /bin/sh
               - -c
-              - wget -IX POST http://localhost:8080/redcap/trigger
+              - wget --post-data "" http://localhost:8080/redcap/trigger
             initialDelaySeconds: 5
             periodSeconds: 60
             timeoutSeconds: 5
@@ -51,7 +53,7 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - name: vol
-            mountPath: /usr/local/etc/radar-redcap-int
+              mountPath: /usr/local/etc/radar-redcap-int
       volumes:
         - name: vol
           hostPath:

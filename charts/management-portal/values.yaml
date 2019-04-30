@@ -48,9 +48,9 @@ resources: {}
   # limits:
   #   cpu: 100m
   #   memory: 128Mi
-  requests:
-    cpu: 100m
-    memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
 
 nodeSelector: {}
 
@@ -59,7 +59,7 @@ tolerations: []
 affinity: {}
 
 postgres:
-  host: radarbase-postgresql
+  host: postgres-postgresql
   user: postgres
   password: password
 
@@ -67,7 +67,7 @@ from_email: from-email
 server_name: localhost
 catalogue_server: catalog-server
 managementportal:
-  catalogue_server_enable_auto_import: false
+  catalogue_server_enable_auto_import: "false"
   common_privacy_policy_url: http://info.thehyve.nl/radar-cns-privacy-policy
   oauth_checking_key_aliases_0: radarbase-managementportal-ec
   oauth_checking_key_aliases_1: selfsigned

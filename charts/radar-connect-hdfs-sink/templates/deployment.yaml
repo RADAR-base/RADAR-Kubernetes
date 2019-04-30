@@ -79,6 +79,7 @@ spec:
             successThreshold: 1
             failureThreshold: 3
           readinessProbe:
+            exec:
               command:
               - /bin/sh
               - -c

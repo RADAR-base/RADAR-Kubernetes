@@ -5,7 +5,7 @@
 replicaCount: 2
 
 image:
-  repository: radar-gateway
+  repository: radarbase/radar-gateway
   tag: latest
   pullPolicy: IfNotPresent
 
@@ -50,9 +50,9 @@ resources: {}
   # limits:
   #   cpu: 100m
   #   memory: 128Mi
-  requests:
-    cpu: 100m
-    memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
 
 nodeSelector: {}
 

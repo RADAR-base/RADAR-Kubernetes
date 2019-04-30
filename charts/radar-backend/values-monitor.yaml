@@ -38,9 +38,9 @@ resources: {}
   # limits:
   #   cpu: 100m
   #   memory: 128Mi
-  requests:
-    cpu: 100m
-    memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
 
 nodeSelector: {}
 
@@ -48,7 +48,11 @@ tolerations: []
 
 affinity: {}
 
-args: monitor
+args:
+  - radar-backend
+  - -c
+  - /etc/radar/radar.yml
+  - monitor
 rest_proxy: http://cp-kafka-rest-cp-kafka-rest:8082
 schema_registry: http://cp-schema-registry-cp-schema-registry:8081
 kafka_num_brokers: "3"

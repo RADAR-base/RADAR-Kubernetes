@@ -29,7 +29,7 @@ spec:
           - name: RADAR_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: {{ template "management-portal.secretName" . }}
+                name: {{ template "radar-hotstorage.secretName" . }}
                 key: hotstorage_password
           - name: RADAR_DB
             value: "{{ .Values.hotstorage.name }}"
@@ -41,21 +41,23 @@ spec:
               containerPort: 28017
               protocol: TCP
           livenessProbe:
-            command:
+            exec:
+              command:
               - /bin/sh
               - -c
-              - mongo -u $HOTSTORAGE_USERNAME -p $HOTSTORAGE_PASSWORD $HOTSTORAGE_NAME --eval db
-            initialDelaySeconds: 5
+              - mongo -u $RADAR_USER -p $RADAR_PASSWORD $RADAR_DB --eval db
+            initialDelaySeconds: 15
             periodSeconds: 60
             timeoutSeconds: 5
             successThreshold: 1
             failureThreshold: 3
           readinessProbe:
-            command:
+            exec:
+              command:
               - /bin/sh
               - -c
-              - mongo -u $HOTSTORAGE_USERNAME -p $HOTSTORAGE_PASSWORD $HOTSTORAGE_NAME --eval db
-            initialDelaySeconds: 5
+              - mongo -u $RADAR_USER -p $RADAR_PASSWORD $RADAR_DB --eval db
+            initialDelaySeconds: 15
             periodSeconds: 60
             timeoutSeconds: 5
             successThreshold: 1

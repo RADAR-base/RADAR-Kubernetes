@@ -55,13 +55,13 @@ spec:
           - name: CONNECT_ZOOKEEPER_CONNECT
             value: "{{ .Values.zookeeper }}"
           - name: CONNECT_CONSUMER_MAX_POLL_RECORDS
-            value: 500
+            value: "500"
           - name: CONNECT_CONSUMER_MAX_POLL_INTERVAL_MS
-            value: 300000
+            value: "300000"
           - name: CONNECT_CONSUMER_SESSION_TIMEOUT_MS
-            value: 10000
+            value: "10000"
           - name: CONNECT_CONSUMER_HEARTBEAT_INTERVAL_MS
-            value: 3000
+            value: "3000"
           - name: CONNECT_CONSUMER_HEARTBEAT_INTERVAL_MS
             value: /usr/share/java/kafka-connect/plugins
           - name: CONNECT_LOG4J_ROOT_LOGLEVEL
@@ -75,21 +75,23 @@ spec:
               containerPort: 8083
               protocol: TCP
           livenessProbe:
-            command:
+            exec:
+              command:
               - /bin/sh
               - -c
               - curl -sf localhost:8083/connectors/radar-connector-mongodb-sink/status | grep -o '\"state\":\"[^\"]*\"' | tr '\\n' ',' | grep -vq FAILED || exit 1
-            initialDelaySeconds: 5
+            initialDelaySeconds: 15
             periodSeconds: 60
             timeoutSeconds: 5
             successThreshold: 1
             failureThreshold: 3
           readinessProbe:
-            command:
+            exec:
+              command:
               - /bin/sh
               - -c
               - curl -sf localhost:8083/connectors/radar-connector-mongodb-sink/status | grep -o '\"state\":\"[^\"]*\"' | tr '\\n' ',' | grep -vq FAILED || exit 1
-            initialDelaySeconds: 5
+            initialDelaySeconds: 15
             periodSeconds: 60
             timeoutSeconds: 5
             successThreshold: 1
@@ -98,11 +100,11 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - name: vol
-            mountPath: /etc/kafka-connect/sink.properties
+              mountPath: /etc/kafka-connect/
       volumes:
         - name: vol
           hostPath:
-            path: /radar/etc/mongodb-connector/sink-mongo.properties
+            path: /radar/etc/mongodb-connector/
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

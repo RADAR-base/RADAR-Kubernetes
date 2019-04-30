@@ -1,3 +1,5 @@
+podManagementPolicy: OrderedReady
+
 customEnv:
   KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
   KAFKA_LOG_RETENTION_HOURS: "730"
@@ -13,4 +15,4 @@ customEnv:
 
 cp-zookeeper:
   enabled: false
-  url: "cp-zookeeper-cp-zookeeper-headless:2181"
+  url: "cp-zookeeper-headless:2181"

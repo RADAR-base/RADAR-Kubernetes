@@ -32,7 +32,8 @@ spec:
               containerPort: 80
               protocol: TCP
           livenessProbe:
-            command:
+            exec:
+              command:
               - /bin/sh
               - -c
               - wget --spider localhost/radar-gateway/topics 2>&1 | grep -q 401 || exit 1
@@ -42,7 +43,8 @@ spec:
             successThreshold: 1
             failureThreshold: 3
           readinessProbe:
-            command:
+            exec:
+              command:
               - /bin/sh
               - -c
               - wget --spider localhost/radar-gateway/topics 2>&1 | grep -q 401 || exit 1

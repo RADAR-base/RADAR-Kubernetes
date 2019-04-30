@@ -33,7 +33,8 @@ spec:
               containerPort: 80
               protocol: TCP
           livenessProbe:
-            command:
+            exec:
+              command:
               - /bin/sh
               - -c
               - wget -s http://localhost:80
@@ -43,7 +44,8 @@ spec:
             successThreshold: 1
             failureThreshold: 3
           readinessProbe:
-            command:
+            exec:
+              command:
               - /bin/sh
               - -c
               - wget -s http://localhost:80

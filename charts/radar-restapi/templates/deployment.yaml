@@ -31,7 +31,8 @@ spec:
               containerPort: 8080
               protocol: TCP
           livenessProbe:
-            command:
+            exec:
+              command:
               - /bin/sh
               - -c
               - wget --spider http://localhost:8080/api/openapi.json
@@ -41,7 +42,8 @@ spec:
             successThreshold: 1
             failureThreshold: 3
           readinessProbe:
-            command:
+            exec:
+              command:
               - /bin/sh
               - -c
               - wget --spider http://localhost:8080/api/openapi.json
@@ -54,7 +56,7 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - name: vol
-            mountPath: /usr/local/conf/radar/rest-api
+              mountPath: /usr/local/conf/radar/rest-api
       volumes:
         - name: vol
           hostPath:
