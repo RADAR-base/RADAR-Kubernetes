@@ -1,5 +1,7 @@
 podManagementPolicy: OrderedReady
 
+image: confluentinc/cp-kafka
+
 customEnv:
   KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
   KAFKA_LOG_RETENTION_HOURS: "730"
