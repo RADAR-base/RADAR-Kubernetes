@@ -1,4 +1,4 @@
-zk_hosts: cp-zookeeper-cp-zookeeper-headless:2181
+zk_hosts: cp-zookeeper-headless:2181
 
 ingress:
   enabled: true
@@ -8,5 +8,6 @@ ingress:
     #nginx.ingress.kubernetes.io/auth-type: basic
     #nginx.ingress.kubernetes.io/auth-secret: secretName
     nginx.ingress.kubernetes.io/rewrite-target: /$1
-  hosts: localhost
   path: /kafkamanager/?(.*)
+  hosts:
+    - localhost

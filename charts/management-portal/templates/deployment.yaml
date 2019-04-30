@@ -49,7 +49,7 @@ spec:
           - name: MANAGEMENTPORTAL_OAUTH_CLIENTS_FILE
             value: /mp-includes/config/oauth_client_details.csv
           - name: MANAGEMENTPORTAL_CATALOGUE_SERVER_ENABLE_AUTO_IMPORT
-            value: {{ .Values.managementportal.catalogue_server_enable_auto_import }}
+            value: "{{ .Values.managementportal.catalogue_server_enable_auto_import }}"
           - name: MANAGEMENTPORTAL_CATALOGUE_SERVER_SERVER_URL
             value: http://{{ .Values.catalogue_server }}:9010/source-types
           - name: MANAGEMENTPORTAL_COMMON_ADMIN_PASSWORD
@@ -60,31 +60,33 @@ spec:
           - name: MANAGEMENTPORTAL_COMMON_PRIVACY_POLICY_URL
             value: {{ .Values.managementportal.common_privacy_policy_url }}
           - name: SPRING_APPLICATION_JSON
-            value: {"managementportal":{"oauth":{"checkingKeyAliases":["{{ .Values.managementportal.oauth_checking_key_aliases_0 }}","{{ .Values.managementportal.oauth_checking_key_aliases_1 }}"]}}}'
+            value: '{"managementportal":{"oauth":{"checkingKeyAliases":["{{ .Values.managementportal.oauth_checking_key_aliases_0 }}","{{ .Values.managementportal.oauth_checking_key_aliases_1 }}"]}}}'
           - name: JHIPSTER_SLEEP # gives time for the database to boot before the application
-            value: 10
+            value: "10"
           - name: JAVA_OPTS  # maximum heap size for the JVM running ManagementPortal, increase this as necessary
-            value: -Xmx256m
+            value: "-Xmx256m"
           ports:
             - name: http
               containerPort: 8080
               protocol: TCP
           livenessProbe:
+            exec:
               command:
               - /bin/sh
               - -c
               - wget --spider localhost:8080/managementportal/oauth/token_key
-            initialDelaySeconds: 5
+            initialDelaySeconds: 15
             periodSeconds: 90
             timeoutSeconds: 5
             successThreshold: 1
             failureThreshold: 3
           readinessProbe:
+            exec:
               command:
               - /bin/sh
               - -c
               - wget --spider localhost:8080/managementportal/oauth/token_key
-            initialDelaySeconds: 5
+            initialDelaySeconds: 15
             periodSeconds: 90
             timeoutSeconds: 5
             successThreshold: 1
@@ -93,7 +95,7 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - name: vol
-            mountPath: /mp-includes/
+              mountPath: /mp-includes/
       volumes:
         - name: vol
           hostPath:

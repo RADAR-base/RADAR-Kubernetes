@@ -49,7 +49,7 @@ replication:
   enabled: true
   user: repl_user
   password: repl_password
-  slaveReplicas: 2
+  slaveReplicas: 1
   ## Set synchronous commit mode: on, off, remote_apply, remote_write and local
   ## ref: https://www.postgresql.org/docs/9.6/runtime-config-wal.html#GUC-WAL-LEVEL
   synchronousCommit: "off"

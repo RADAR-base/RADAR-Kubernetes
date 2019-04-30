@@ -33,10 +33,11 @@ spec:
           {{- toYaml .Values.env | nindent 10 }}
           ports:
             - name: http
-              containerPort: 80
+              containerPort: {{ .Values.service.port }}
               protocol: TCP
           livenessProbe:
-            command:
+            exec:
+              command:
               - /bin/sh
               - -c
               - hdfs dfs -test -e /
@@ -46,7 +47,8 @@ spec:
             successThreshold: 1
             failureThreshold: 3
           readinessProbe:
-            command:
+            exec:
+              command:
               - /bin/sh
               - -c
               - hdfs dfs -test -e /
@@ -80,7 +82,7 @@ spec:
       name: {{ .name }}
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: ""
+      # storageClassName: ""
       resources:
         requests:
           storage: {{ .size }}

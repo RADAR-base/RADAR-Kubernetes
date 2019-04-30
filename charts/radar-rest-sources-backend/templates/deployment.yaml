@@ -36,7 +36,7 @@ spec:
           - name: REST_SOURCE_AUTHORIZER_SOURCE_CLIENTS_FILE_PATH
             value: app-includes/rest_source_clients_configs.yml
           - name: APP_SLEEP
-            value: 10   # gives time for the database to boot before the application
+            value: "10"   # gives time for the database to boot before the application
           ports:
             - name: http
               containerPort: 8080
@@ -67,7 +67,7 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - name: vol
-            mountPath: /app-includes/
+              mountPath: /app-includes/
       volumes:
         - name: vol
           hostPath:

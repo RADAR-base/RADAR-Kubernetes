@@ -57,7 +57,8 @@ spec:
               containerPort: 9010
               protocol: TCP
           livenessProbe:
-            command:
+            exec:
+              command:
               - /bin/sh
               - -c
               - curl -f localhost:9010/source-types
@@ -67,7 +68,8 @@ spec:
             successThreshold: 1
             failureThreshold: 3
           readinessProbe:
-            command:
+            exec:
+              command:
               - /bin/sh
               - -c
               - curl -f localhost:9010/source-types
