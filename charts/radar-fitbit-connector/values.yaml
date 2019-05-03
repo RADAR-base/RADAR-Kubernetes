@@ -52,3 +52,6 @@ zookeeper: cp-zookeeper-headless:2181
 kafka: PLAINTEXT://cp-kafka-headless:9092
 kafka_num_brokers: "3"
 schema_registry: http://cp-schema-registry:8081
+
+fitbit_api_client: ""
+fitbit_api_secret: ""

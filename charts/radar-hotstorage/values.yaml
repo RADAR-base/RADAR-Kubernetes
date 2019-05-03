@@ -49,9 +49,9 @@ tolerations: []
 affinity: {}
 
 hotstorage:
-  username: mongodb-user
-  password: manoyve
-  name: mongodb-database
+  username: hotstorage
+  password: password
+  name: hotstorage
 
 ## Enable persistence using Persistent Volume Claims
 ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/

@@ -70,6 +70,26 @@ spec:
             value: "{{ .Values.kafka_num_brokers }}"
           - name: CONNECT_LOG4J_LOGGERS
             value: "org.reflections=ERROR"
+          - name: "CONNECT_NAME" # Kafka consumer configuration
+            value: "radar-connector-mongodb-sink"
+          - name: "CONNECT_CONNECTOR_CLASS" # Kafka connector configuration
+            value: "org.radarcns.connect.mongodb.MongoDbSinkConnector"
+          - name: "CONNECT_TASKS_MAX"
+            value: "1"
+          - name: "CONNECT_TOPICS" # Topics that will be consumed
+            value: "{{ .Values.topics }}"
+          - name: "CONNECT_MONGO_HOST" # MongoDB server
+            value: "{{ .Values.mongodb.host }}"
+          - name: "CONNECT_MONGO_PORT"
+            value: "27017"
+          - name: "CONNECT_MONGO_USERNAME" # MongoDB configuration
+            value: "{{ .Values.mongodb.username }}"
+          - name: "CONNECT_MONGO_PASSWORD"
+            value: {{ .Values.mongodb.password }}
+          - name: "CONNECT_MONGO_DATABASE"
+            value: "{{ .Values.mongodb.database }}"
+          - name: "CONNECT_RECORD_CONVERTER_CLASS" # Factory class to do the actual record conversion
+            value: "org.radarcns.connect.mongodb.serialization.RecordConverterFactory"
           ports:
             - name: http
               containerPort: 8083
@@ -98,13 +118,6 @@ spec:
             failureThreshold: 3
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          volumeMounts:
-            - name: vol
-              mountPath: /etc/kafka-connect/
-      volumes:
-        - name: vol
-          hostPath:
-            path: /radar/etc/mongodb-connector/
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

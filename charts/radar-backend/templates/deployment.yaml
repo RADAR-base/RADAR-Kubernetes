@@ -23,7 +23,7 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: {{ .Values.args }}
+          command: {{ .Values.command }}
           env:
           - name: KAFKA_REST_PROXY
             value: "{{ .Values.rest_proxy }}"
@@ -41,14 +41,14 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-            - name: vol
+            - name: config
               mountPath: /etc/radar/
             - name: backend-monitor-disconnect-data
               mountPath: /var/lib/radar/data
       volumes:
-        - name: vol
-          hostPath:
-            path: /radar/etc/radar-backend/
+        - name: config
+          configMap:
+            name: {{ include "radar-backend.fullname" . }}
         - name: backend-monitor-disconnect-data
         {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:

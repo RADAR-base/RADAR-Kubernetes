@@ -66,12 +66,12 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-            - name: vol
+            - name: config
               mountPath: /app-includes/
       volumes:
-        - name: vol
-          hostPath:
-            path: /radar/etc/rest-source-authorizer/
+        - name: config
+          configMap:
+            name: {{ include "radar-rest-sources-authorizer.fullname" . }}              
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

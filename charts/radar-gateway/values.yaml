@@ -59,3 +59,7 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+managementportal_host: management-portal
+rest_proxy: http://cp-kafka-rest:8082
+schema_registry: http://cp-schema-registry:8081

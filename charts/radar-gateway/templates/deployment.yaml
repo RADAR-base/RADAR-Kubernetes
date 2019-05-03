@@ -56,12 +56,12 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-            - name: vol
+            - name: config
               mountPath: /etc/radar-gateway
       volumes:
-        - name: vol
-          hostPath:
-            path: /radar/etc/gateway
+        - name: config
+          configMap:
+            name: {{ include "radar-gateway.fullname" . }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

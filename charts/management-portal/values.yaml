@@ -59,7 +59,7 @@ tolerations: []
 affinity: {}
 
 postgres:
-  host: postgresql
+  host: postgresql-postgresql
   user: postgres
   password: password
 

@@ -48,3 +48,11 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+managementportal_host: management-portal
+
+mongodb:
+  host: radar-hotstorage
+  username: hotstorage
+  password: password
+  database_name: hotstorage

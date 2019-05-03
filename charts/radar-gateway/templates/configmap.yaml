@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "radar-gateway.fullname" . }}
+  labels:
+    app: {{ template "radar-gateway.name" . }}
+    chart: {{ template "radar-gateway.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  gateway.yml: |
+    baseUri: http://0.0.0.0/radar-gateway/
+    managementPortalUrl: http://{{ .Values.managementportal_host }}:8080/managementportal
+    restProxyUrl: {{ .Values.rest_proxy }}
+    schemaRegistryUrl: {{ .Values.schema_registry }}

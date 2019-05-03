@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "management-portal.fullname" . }}
+  labels:
+    app: {{ template "management-portal.name" . }}
+    chart: {{ template "management-portal.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  oauth_client_details.csv: |
+    client_id;resource_ids;client_secret;scope;authorized_grant_types;redirect_uri;authorities;access_token_validity;refresh_token_validity;additional_information;autoapprove
+    pRMT;res_ManagementPortal,res_gateway;;MEASUREMENT.CREATE,SUBJECT.UPDATE,SUBJECT.READ,PROJECT.READ,SOURCETYPE.READ,SOURCE.READ,SOURCETYPE.READ,SOURCEDATA.READ,USER.READ,ROLE.READ;refresh_token,authorization_code;;;43200;7948800;{"dynamic_registration": true};
+    aRMT;res_ManagementPortal,res_gateway;;MEASUREMENT.CREATE,SUBJECT.UPDATE,SUBJECT.READ,PROJECT.READ,SOURCETYPE.READ,SOURCE.READ,SOURCETYPE.READ,SOURCEDATA.READ,USER.READ,ROLE.READ;refresh_token,authorization_code;;;43200;7948800;{"dynamic_registration": true};
+    THINC-IT;res_ManagementPortal,res_gateway;;MEASUREMENT.CREATE,SUBJECT.UPDATE,SUBJECT.READ,PROJECT.READ,SOURCETYPE.READ,SOURCE.READ,SOURCETYPE.READ,SOURCEDATA.READ,USER.READ,ROLE.READ;refresh_token,authorization_code;;;43200;7948800;{"dynamic_registration": true};
+    radar_restapi;res_ManagementPortal;secret;SUBJECT.READ,PROJECT.READ,SOURCE.READ,SOURCETYPE.READ,SOURCEDATA.READ;client_credentials;;;43200;259200;{};
+    radar_redcap_integrator;res_ManagementPortal;secret;PROJECT.READ,SUBJECT.CREATE,SUBJECT.READ,SUBJECT.UPDATE;client_credentials;;;43200;259200;{};
+    radar_dashboard;res_ManagementPortal,res_RestApi;;SUBJECT.READ,PROJECT.READ,SOURCE.READ,SOURCETYPE.READ,MEASUREMENT.READ;refresh_token,authorization_code;;;43200;259200;{};
