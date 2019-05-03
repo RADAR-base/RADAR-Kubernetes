@@ -96,10 +96,15 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /config/
+            - name: keystore
+              mountPath: /mp-includes/config/
       volumes:
         - name: config
           configMap:
             name: {{ include "management-portal.fullname" . }}
+        - name: keystore
+          secret:
+            secretName: {{ include "management-portal.fullname" . }}-keystore
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

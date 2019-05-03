@@ -26,7 +26,7 @@ spec:
           command: ["radar-gateway", "/etc/radar-gateway/gateway.yml"]
           env:
           - name: RADAR_IS_CONFIG_LOCATION
-            value: "/etc/radar-gateway/radar-is.yml"
+            value: "/etc/radar-gateway/is/radar-is.yml"
           ports:
             - name: http
               containerPort: 80
@@ -58,10 +58,15 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /etc/radar-gateway
+            - name: is
+              mountPath: /etc/radar-gateway/is
       volumes:
         - name: config
           configMap:
             name: {{ include "radar-gateway.fullname" . }}
+        - name: is
+          secret:
+            secretName: {{ include "radar-gateway.fullname" . }}-is
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
