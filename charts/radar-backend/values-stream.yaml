@@ -48,11 +48,10 @@ tolerations: []
 
 affinity: {}
 
-args:
-  - radar-backend
-  - -c
-  - /etc/radar/radar.yml
-  - stream
+command: ["radar-backend", "-c", "/etc/radar/radar.yml", "stream"]
+
+zookeeper: cp-zookeeper-headless:2181
+kafka: cp-kafka-headless:9092
 rest_proxy: http://cp-kafka-rest:8082
 schema_registry: http://cp-schema-registry:8081
 kafka_num_brokers: "3"

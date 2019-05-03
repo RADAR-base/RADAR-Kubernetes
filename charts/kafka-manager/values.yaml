@@ -1,4 +1,4 @@
-zk_hosts: cp-zookeeper-headless:2181
+zkHosts: cp-zookeeper-headless:2181
 
 ingress:
   enabled: true

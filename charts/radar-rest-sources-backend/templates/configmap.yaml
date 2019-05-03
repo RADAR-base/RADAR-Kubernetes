@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "radar-rest-sources-backend.fullname" . }}
+  labels:
+    app: {{ template "radar-rest-sources-backend.name" . }}
+    chart: {{ template "radar-rest-sources-backend.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  rest_source_clients_configs.yml: |
+    rest_source_clients:
+      - source_type: FitBit
+        authorization_endpoint: https://www.fitbit.com/oauth2/authorize
+        token_endpoint: https://api.fitbit.com/oauth2/token
+        client_id: {{ .Values.fitbit_api_client }}
+        client_secret: {{ .Values.fitbit_api_secret }}
+        scope: activity heartrate sleep profile

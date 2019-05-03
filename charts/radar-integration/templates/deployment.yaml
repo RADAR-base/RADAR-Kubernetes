@@ -52,12 +52,12 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-            - name: vol
+            - name: config
               mountPath: /usr/local/etc/radar-redcap-int
       volumes:
-        - name: vol
-          hostPath:
-            path: /radar/etc/redcap-integration
+        - name: config
+          configMap:
+            name: {{ include "radar-integration.fullname" . }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

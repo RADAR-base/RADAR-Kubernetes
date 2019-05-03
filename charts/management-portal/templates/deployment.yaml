@@ -47,7 +47,7 @@ spec:
                 name: {{ template "management-portal.secretName" . }}
                 key: managementportal_frontend_client_secret
           - name: MANAGEMENTPORTAL_OAUTH_CLIENTS_FILE
-            value: /mp-includes/config/oauth_client_details.csv
+            value: /config/oauth_client_details.csv
           - name: MANAGEMENTPORTAL_CATALOGUE_SERVER_ENABLE_AUTO_IMPORT
             value: "{{ .Values.managementportal.catalogue_server_enable_auto_import }}"
           - name: MANAGEMENTPORTAL_CATALOGUE_SERVER_SERVER_URL
@@ -94,12 +94,12 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-            - name: vol
-              mountPath: /mp-includes/
+            - name: config
+              mountPath: /config/
       volumes:
-        - name: vol
-          hostPath:
-            path: /radar/etc/managementportal/
+        - name: config
+          configMap:
+            name: {{ include "management-portal.fullname" . }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

@@ -49,6 +49,10 @@ tolerations: []
 affinity: {}
 
 postgres:
-  host: postgresql
+  host: postgresql-postgresql
   user: postgres
   password: password
+
+
+fitbit_api_client: ""
+fitbit_api_secret: ""

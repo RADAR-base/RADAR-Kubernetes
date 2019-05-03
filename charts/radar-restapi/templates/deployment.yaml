@@ -55,12 +55,12 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-            - name: vol
+            - name: config
               mountPath: /usr/local/conf/radar/rest-api
       volumes:
-        - name: vol
-          hostPath:
-            path: /radar/etc/etc/rest-api
+        - name: config
+          configMap:
+            name: {{ include "radar-restapi.fullname" . }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

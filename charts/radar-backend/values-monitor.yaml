@@ -48,13 +48,12 @@ tolerations: []
 
 affinity: {}
 
-args:
-  - radar-backend
-  - -c
-  - /etc/radar/radar.yml
-  - monitor
-rest_proxy: http://cp-kafka-rest-cp-kafka-rest:8082
-schema_registry: http://cp-schema-registry-cp-schema-registry:8081
+command: ["radar-backend", "-c", "/etc/radar/radar.yml", "monitor"]
+
+zookeeper: cp-zookeeper-headless:2181
+kafka: cp-kafka-headless:9092
+rest_proxy: http://cp-kafka-rest:8082
+schema_registry: http://cp-schema-registry:8081
 kafka_num_brokers: "3"
 extraEnv:
   - name: TOPIC_LIST

@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "radar-integration.fullname" . }}
+  labels:
+    app: {{ template "radar-integration.name" . }}
+    chart: {{ template "radar-integration.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  radar.yml: |
+    version: 0.1-alpha
+    released: 2017-08-29
+
+    # ManagementPortal configuration
+    oauth_client_id: #OAuth2 clientId used by the webApp for making requests
+    oauth_client_secret:  #OAuth2 client secrete
+    management_portal_url: #URL pointing Management Portal
+    token_endpoint: #URL managing tokens
+    project_endpoint: #URL managing project function
+    subject_endpoint: #URL managing subject functions
+
+    # Set of supported projects
+    projects:
+      - redcap_info:
+          url: #URL pointing REDCap instance
+          project_id: #REDCap project identifier
+          enrolment_event: #Unique identifier for the enrolment event
+          integration_form: #Name of integration REDCap form
+          token: #REDCap API Token used to identify the REDCap user against the REDCap instance
+      - mp_info:
+          # Management Portal project identifier
+          project_name: #
