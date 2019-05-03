@@ -11,6 +11,7 @@ kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release
 kubectl create namespace cert-manager
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true
 helmfile -f helmfile-init.yaml sync
+./bin/keystore-init
 helmfile -f helmfile-main.yaml sync 
 helmfile -f helmfile-optional.yaml sync
 ```
