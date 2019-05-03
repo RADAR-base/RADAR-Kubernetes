@@ -1,66 +1,7 @@
-repositories:
-  - name: jetstack
-    url: https://charts.jetstack.io
-
 helmDefaults:
   atomic: true
 
 releases:
-  - name: cert-manager
-    namespace: cert-manager
-    chart: jetstack/cert-manager
-    version: v0.7.1
-
-  - name: cp-kafka
-    chart: ./cp-helm-charts/charts/cp-kafka
-    values:
-      - "charts/cp-kafka/values.yaml"
-      - cp-zookeeper:
-          url: "cp-zookeeper-headless:2181"
-        brokers: "3"
-  - name: cp-kafka-rest
-    chart: ./cp-helm-charts/charts/cp-kafka-rest
-    values:
-      - "charts/cp-kafka-rest/values.yaml"
-      - cp-schema-registry:
-          url: "cp-schema-registry:8081"
-        cp-zookeeper:
-          url: "cp-zookeeper-headless:2181"
-  - name: cp-schema-registry
-    chart: ./cp-helm-charts/charts/cp-schema-registry
-    values:
-      - "charts/cp-schema-registry/values.yaml"
-      - kafka:
-          bootstrapServers: "PLAINTEXT://cp-kafka-headless:9092"
-  - name: cp-zookeeper
-    chart: ./cp-helm-charts/charts/cp-zookeeper
-    values:
-      - "charts/cp-zookeeper/values.yaml"
-  - name: kafka-manager
-    chart: stable/kafka-manager
-    values:
-      - "charts/kafka-manager/values.yaml"
-      - ingress:
-          hosts:
-            - localhost
-        zk_hosts: cp-zookeeper-headless:2181
-  - name: postgresql
-    chart: stable/postgresql
-    values:
-      - "charts/postgres/values.yaml"
-      - replication:
-          password: repl_password
-        postgresqlPassword: password
-
-  - name: catalog-server
-    chart: ./charts/catalog-server
-    values:
-    - image:
-        tag: 0.4.3
-      replicaCount: 1
-      kafka_num_brokers: 3
-      zookeeper: cp-zookeeper-headless:2181
-      schema_registry: http://cp-schema-registry:8081
   - name: hdfs-datanode
     chart: ./charts/hdfs
     values:
@@ -138,18 +79,6 @@ releases:
               - /dashboard/?(.*)
       replicaCount: 1
       server_name: localhost
-  - name: radar-fitbit-connector
-    chart: ./charts/radar-fitbit-connector
-    values:
-    - image:
-        tag: 0.2.0
-      replicaCount: 1
-      zookeeper: cp-zookeeper-headless:2181
-      kafka: PLAINTEXT://cp-kafka-headless:9092
-      kafka_num_brokers: "3"
-      schema_registry: http://cp-schema-registry:8081
-      fitbit_api_client: ""
-      fitbit_api_secret: ""
   - name: radar-gateway
     chart: ./charts/radar-gateway
     values:
@@ -174,12 +103,6 @@ releases:
         username: mongodb-user
         password: password
         name: mongodb-database
-  - name: radar-integration
-    chart: ./charts/radar-integration
-    values:
-    - image:
-        tag: 0.1.0
-      replicaCount: 1
   - name: radar-mongodb-connector
     chart: ./charts/radar-mongodb-connector
     values:
@@ -195,23 +118,6 @@ releases:
         username: mongodb-user
         password: password
         database_name: mongodb-database
-  - name: radar-rest-sources-authorizer
-    chart: ./charts/radar-rest-sources-authorizer
-    values:
-    - image:
-        tag: 1.0.0
-      replicaCount: 1
-      fitbit_api_client: ""
-      fitbit_api_secret: ""
-  - name: radar-rest-sources-backend
-    chart: ./charts/radar-rest-sources-backend
-    values:
-    - image:
-        tag: 1.0.0
-      replicaCount: 1
-      postgres:
-        host: postgresql-postgresql
-        password: password
   - name: radar-restapi
     chart: ./charts/radar-restapi
     values:

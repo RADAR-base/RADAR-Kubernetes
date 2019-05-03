@@ -1,0 +1,63 @@
+repositories:
+  - name: jetstack
+    url: https://charts.jetstack.io
+
+helmDefaults:
+  atomic: true
+
+releases:
+  - name: cert-manager
+    namespace: cert-manager
+    chart: jetstack/cert-manager
+    version: v0.7.1
+
+  - name: cp-kafka
+    chart: ./cp-helm-charts/charts/cp-kafka
+    values:
+      - "charts/cp-kafka/values.yaml"
+      - cp-zookeeper:
+          url: "cp-zookeeper-headless:2181"
+        brokers: "3"
+  - name: cp-kafka-rest
+    chart: ./cp-helm-charts/charts/cp-kafka-rest
+    values:
+      - "charts/cp-kafka-rest/values.yaml"
+      - cp-schema-registry:
+          url: "cp-schema-registry:8081"
+        cp-zookeeper:
+          url: "cp-zookeeper-headless:2181"
+  - name: cp-schema-registry
+    chart: ./cp-helm-charts/charts/cp-schema-registry
+    values:
+      - "charts/cp-schema-registry/values.yaml"
+      - kafka:
+          bootstrapServers: "PLAINTEXT://cp-kafka-headless:9092"
+  - name: cp-zookeeper
+    chart: ./cp-helm-charts/charts/cp-zookeeper
+    values:
+      - "charts/cp-zookeeper/values.yaml"
+  - name: kafka-manager
+    chart: stable/kafka-manager
+    values:
+      - "charts/kafka-manager/values.yaml"
+      - ingress:
+          hosts:
+            - localhost
+        zk_hosts: cp-zookeeper-headless:2181
+  - name: postgresql
+    chart: stable/postgresql
+    values:
+      - "charts/postgres/values.yaml"
+      - replication:
+          password: repl_password
+        postgresqlPassword: password
+
+  - name: catalog-server
+    chart: ./charts/catalog-server
+    values:
+    - image:
+        tag: 0.4.3
+      replicaCount: 1
+      kafka_num_brokers: 3
+      zookeeper: cp-zookeeper-headless:2181
+      schema_registry: http://cp-schema-registry:8081

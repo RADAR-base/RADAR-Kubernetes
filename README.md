@@ -10,5 +10,7 @@ git clone https://github.com/confluentinc/cp-helm-charts
 kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.7/deploy/manifests/00-crds.yaml
 kubectl create namespace cert-manager
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true
-helmfile sync
+helmfile -f helmfile-init.yaml sync
+helmfile -f helmfile-main.yaml sync 
+helmfile -f helmfile-optional.yaml sync
 ```
