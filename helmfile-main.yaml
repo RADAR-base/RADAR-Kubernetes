@@ -130,3 +130,11 @@ releases:
         username: mongodb-user
         password: password
         database_name: mongodb-database
+  - name: smtp
+    chart: ./charts/smtp
+    values:
+    - replicaCount: 1
+      smarthost:
+        address: mail.example.com
+        user: user@example.com
+        password: XXXXXXXX

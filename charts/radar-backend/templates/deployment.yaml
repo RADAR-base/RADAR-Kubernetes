@@ -23,7 +23,11 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: {{ .Values.command }}
+          command:
+            - radar-backend
+            - -c
+            - /etc/radar/radar.yml
+            - {{ .Values.command }}
           env:
           - name: KAFKA_REST_PROXY
             value: "{{ .Values.rest_proxy }}"
