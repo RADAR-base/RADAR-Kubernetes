@@ -1,11 +1,11 @@
-# Default values for radar-backend.
+# Default values for smtp.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-replicaCount: 2
+replicaCount: 1
 
 image:
-  repository: radarbase/radar-backend
+  repository: namshi/smtp
   tag: latest
   pullPolicy: IfNotPresent
 
@@ -48,19 +48,26 @@ tolerations: []
 
 affinity: {}
 
-command: "stream"
-
-zookeeper: cp-zookeeper-headless:2181
-kafka: cp-kafka-headless:9092
-rest_proxy: http://cp-kafka-rest:8082
-schema_registry: http://cp-schema-registry:8081
-kafka_num_brokers: "3"
-extraEnv: {}
-
-smtp:
-  host: smtp
-  port: 25
+relay_networks: ":172.0.0.0/8:192.168.0.0/16"
+smarthost:
+  address: mail.example.com
+  port: "587"
   user: user@example.com
+  password: "XXXXXXXX"
+  aliases: "*.amazonaws.com"
 
 persistence:
-  enabled: false
+  enabled: true
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  # storageClass: "-"
+  ##
+  ## If you want to reuse an existing claim, you can pass the name of the PVC using
+  ## the existingClaim variable
+  # existingClaim: your-claim
+  accessMode: ReadWriteOnce
+  size: 1Gi

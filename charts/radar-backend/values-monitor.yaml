@@ -48,7 +48,7 @@ tolerations: []
 
 affinity: {}
 
-command: ["radar-backend", "-c", "/etc/radar/radar.yml", "monitor"]
+command: "monitor"
 
 zookeeper: cp-zookeeper-headless:2181
 kafka: cp-kafka-headless:9092
@@ -58,6 +58,11 @@ kafka_num_brokers: "3"
 extraEnv:
   - name: TOPIC_LIST
     value: "application_record_counts"
+
+smtp:
+  host: smtp
+  port: 25
+  user: user@example.com
 
 persistence:
   enabled: true

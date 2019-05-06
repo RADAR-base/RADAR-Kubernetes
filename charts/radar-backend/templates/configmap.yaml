@@ -99,9 +99,9 @@ data:
         - project_id: s2
           email_address:
             - notifier2@email
-      email_host: smtp
-      email_port: 25
-      email_user: user@example.com
+      email_host: {{ .Values.smtp.host }}
+      email_port: {{ .Values.smtp.port }}
+      email_user: {{ .Values.smtp.user }}
       topics:
         - android_empatica_e4_battery_level
 
@@ -114,9 +114,9 @@ data:
         - project_id: s2
           email_address:
             - notifier2@email
-      email_host: smtp
-      email_port: 25
-      email_user: user@example.com
+      email_host: {{ .Values.smtp.host }}
+      email_port: {{ .Values.smtp.port }}
+      email_user: {{ .Values.smtp.user }}
       topics:
         - android_empatica_e4_temperature
       timeout: 1800  # seconds after which a stream is set disconnected
