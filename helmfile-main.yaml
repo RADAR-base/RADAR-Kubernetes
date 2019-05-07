@@ -23,11 +23,11 @@ releases:
         tag: 0.5.3
       ingress:
         hosts:
-          - host: localhost
+          - host: {{ requiredEnv "SERVER_NAME" }}
             paths:
               - /managementportal
       replicaCount: 1
-      server_name: localhost
+      server_name: {{ requiredEnv "SERVER_NAME" }}
       catalogue_server: catalog-server
       postgres:
         host: postgresql-postgresql
@@ -74,11 +74,11 @@ releases:
         tag: 2.1.0
       ingress:
         hosts:
-          - host: localhost
+          - host: {{ requiredEnv "SERVER_NAME" }}
             paths:
               - /dashboard/?(.*)
       replicaCount: 1
-      server_name: localhost
+      server_name: {{ requiredEnv "SERVER_NAME" }}
   - name: radar-gateway
     chart: ./charts/radar-gateway
     values:
@@ -86,7 +86,7 @@ releases:
         tag: 0.3.7
       ingress:
         hosts:
-          - host: localhost
+          - host: {{ requiredEnv "SERVER_NAME" }}
             paths:
               - /kafka/?(.*)
       replicaCount: 1
