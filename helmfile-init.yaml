@@ -11,6 +11,11 @@ releases:
     chart: jetstack/cert-manager
     version: v0.7.1
 
+  - name: nginx-ingress
+    chart: stable/nginx-ingress
+    values:
+      - "charts/nginx-ingress/values.yaml"
+
   - name: cp-kafka
     chart: ./cp-helm-charts/charts/cp-kafka
     values:
@@ -42,7 +47,7 @@ releases:
       - "charts/kafka-manager/values.yaml"
       - ingress:
           hosts:
-            - localhost
+            - {{ requiredEnv "SERVER_NAME" }}
         zk_hosts: cp-zookeeper-headless:2181
   - name: postgresql
     chart: stable/postgresql
