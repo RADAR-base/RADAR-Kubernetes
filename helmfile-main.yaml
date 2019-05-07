@@ -107,7 +107,7 @@ releases:
     chart: ./charts/radar-mongodb-connector
     values:
     - image:
-        tag: 0.2.2
+        tag: dev
       replicaCount: 1
       zookeeper: cp-zookeeper-headless:2181
       kafka: PLAINTEXT://cp-kafka-headless:9092
