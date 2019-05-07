@@ -71,7 +71,7 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: {{ include "radar-rest-sources-authorizer.fullname" . }}              
+            name: {{ include "radar-rest-sources-backend.fullname" . }}              
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

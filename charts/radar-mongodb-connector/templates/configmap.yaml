@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "radar-mongodb-connector.fullname" . }}
+  labels:
+    app: {{ template "radar-mongodb-connector.name" . }}
+    chart: {{ template "radar-mongodb-connector.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  sink-mongodb.properties: |
+    # Kafka consumer configuration
+    name=radar-connector-mongodb-sink
+
+    # Kafka connector configuration
+    connector.class=org.radarcns.connect.mongodb.MongoDbSinkConnector
+    tasks.max=1
+
+    # Topics that will be consumed
+    topics={{ .Values.topics }}
+    # MongoDB server
+
+    mongo.uri=mongodb://{{ .Values.mongodb.username }}:{{ .Values.mongodb.password }}@{{ .Values.mongodb.host }}:27017/{{ .Values.mongodb.database_name }}
+
+    # Collection name for putting data into the MongoDB database. The {$topic} token will be replaced
+    # by the Kafka topic name.
+    #mongo.collection.format={$topic}
+
+    # Buffer Capacity for mogodb writer. Default value is 20000
+    # buffer.capacity=20000
+
+    # Factory class to do the actual record conversion
+    record.converter.class=org.radarcns.connect.mongodb.serialization.RecordConverterFactory

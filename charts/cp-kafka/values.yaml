@@ -1,5 +1,3 @@
-podManagementPolicy: OrderedReady
-
 image: confluentinc/cp-kafka
 
 customEnv:

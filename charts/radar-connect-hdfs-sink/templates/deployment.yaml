@@ -63,24 +63,6 @@ spec:
             value: "{{ .Values.kafka_num_brokers }}"
           - name: CONNECT_LOG4J_LOGGERS
             value: "org.reflections=ERROR"
-          - name: CONNECT_NAME
-            value: "radar-hdfs-sink-android-15000"
-          - name: CONNECT_CONNECTOR_CLASS
-            value: "io.confluent.connect.hdfs.HdfsSinkConnector"
-          - name: CONNECT_TASKS_MAX
-            value: "4"
-          - name: CONNECT_TOPICS
-            value: "{{ .Values.topics }}"
-          - name: CONNECT_FLUSH_SIZE
-            value: "80000"
-          - name: CONNECT_ROTATE_INTERVAL_MS
-            value: "900000"
-          - name: CONNECT_HDFS_URL
-            value: "hdfs://{{ .Values.hdfs_url }}:8020"
-          - name: CONNECT_FORMAT_CLASS
-            value: "org.radarcns.sink.hdfs.AvroFormatRadar"
-          - name: CONNECT_TOPICS_DIR
-            value: "topicAndroidNew"
           ports:
             - name: http
               containerPort: 8083
@@ -109,6 +91,13 @@ spec:
             failureThreshold: 3
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/kafka-connect/sink-hdfs
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "radar-connect-hdfs-sink.fullname" . }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
