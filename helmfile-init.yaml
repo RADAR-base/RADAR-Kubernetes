@@ -11,6 +11,21 @@ releases:
     chart: jetstack/cert-manager
     version: v0.7.1
 
+  - name: prometheus-operator
+    chart: stable/prometheus-operator
+    namespace: monitoring
+    values:
+      - "charts/prometheus-operator/values.yaml"
+      - prometheus:
+          ingress:
+            hosts: ["prometheus.{{ requiredEnv "SERVER_NAME" }}"]
+        alertmanager:
+          ingress:
+            hosts: ["alertmanager.{{ requiredEnv "SERVER_NAME" }}"]
+        grafana:
+          ingress:
+            hosts: ["grafana.{{ requiredEnv "SERVER_NAME" }}"]
+
   - name: nginx-ingress
     chart: stable/nginx-ingress
     values:
