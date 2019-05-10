@@ -1,5 +1,5 @@
-helmDefaults:
-  atomic: true
+# helmDefaults:
+#   atomic: true
 
 releases:
   - name: hdfs-datanode
@@ -23,9 +23,7 @@ releases:
         tag: 0.5.3
       ingress:
         hosts:
-          - host: {{ requiredEnv "SERVER_NAME" }}
-            paths:
-              - /managementportal
+         - {{ requiredEnv "SERVER_NAME" }}
       replicaCount: 1
       server_name: {{ requiredEnv "SERVER_NAME" }}
       catalogue_server: catalog-server
@@ -74,9 +72,7 @@ releases:
         tag: 2.1.0
       ingress:
         hosts:
-          - host: {{ requiredEnv "SERVER_NAME" }}
-            paths:
-              - /dashboard/?(.*)
+         - {{ requiredEnv "SERVER_NAME" }}
       replicaCount: 1
       server_name: {{ requiredEnv "SERVER_NAME" }}
   - name: radar-gateway
@@ -86,9 +82,7 @@ releases:
         tag: 0.3.7
       ingress:
         hosts:
-          - host: {{ requiredEnv "SERVER_NAME" }}
-            paths:
-              - /kafka/?(.*)
+         - {{ requiredEnv "SERVER_NAME" }}
       replicaCount: 1
       managementportal_host: management-portal
       rest_proxy: http://cp-kafka-rest:8082
@@ -125,6 +119,9 @@ releases:
         tag: 0.3
       replicaCount: 1
       managementportal_host: management-portal
+      ingress:
+        hosts:
+         - {{ requiredEnv "SERVER_NAME" }}      
       mongodb:
         host: radar-hotstorage
         username: mongodb-user

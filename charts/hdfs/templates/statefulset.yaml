@@ -10,6 +10,7 @@ metadata:
 spec:
   replicas: {{ .Values.replicaCount }}
   serviceName: "{{ include "hdfs.fullname" . }}"
+  podManagementPolicy: Parallel
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "hdfs.name" . }}

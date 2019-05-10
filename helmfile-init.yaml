@@ -2,14 +2,16 @@ repositories:
   - name: jetstack
     url: https://charts.jetstack.io
 
-helmDefaults:
-  atomic: true
+# helmDefaults:
+#   atomic: true
 
 releases:
-  - name: cert-manager
+  - name: cert
     namespace: cert-manager
-    chart: jetstack/cert-manager
-    version: v0.7.1
+    chart: ./charts/cert
+    values:
+      - server_name: {{ requiredEnv "SERVER_NAME" }}
+        maintainer_email: {{ requiredEnv "MAINTAINER_EMAIL" }}
 
   - name: prometheus-operator
     chart: stable/prometheus-operator
@@ -19,12 +21,21 @@ releases:
       - prometheus:
           ingress:
             hosts: ["prometheus.{{ requiredEnv "SERVER_NAME" }}"]
+            tls:
+            - secretName: radar-base-tls
+              hosts: ["prometheus.{{ requiredEnv "SERVER_NAME" }}"]
         alertmanager:
           ingress:
             hosts: ["alertmanager.{{ requiredEnv "SERVER_NAME" }}"]
+            tls:
+            - secretName: radar-base-tls
+              hosts: ["alertmanager.{{ requiredEnv "SERVER_NAME" }}"]
         grafana:
           ingress:
             hosts: ["grafana.{{ requiredEnv "SERVER_NAME" }}"]
+            tls:
+            - secretName: radar-base-tls
+              hosts: ["grafana.{{ requiredEnv "SERVER_NAME" }}"]
 
   - name: nginx-ingress
     chart: stable/nginx-ingress
@@ -63,7 +74,10 @@ releases:
       - ingress:
           hosts:
             - {{ requiredEnv "SERVER_NAME" }}
-        zk_hosts: cp-zookeeper-headless:2181
+          tls:
+          - secretName: radar-base-tls
+            hosts: ["{{ requiredEnv "SERVER_NAME" }}"]
+        zkHosts: cp-zookeeper:2181
   - name: postgresql
     chart: stable/postgresql
     values:
