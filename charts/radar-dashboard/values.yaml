@@ -20,17 +20,14 @@ ingress:
   enabled: true
   annotations:
     kubernetes.io/ingress.class: nginx
-    kubernetes.io/tls-acme: "true"
+    certmanager.k8s.io/acme-challenge-type: http01
+    certmanager.k8s.io/issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/rewrite-target: /$1
+  path: "/dashboard/?(.*)"
   hosts:
-    - host: localhost
-      paths:
-        - /dashboard/?(.*)
-
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+    - localhost
+  tls:
+    secretName: radar-base-tls
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

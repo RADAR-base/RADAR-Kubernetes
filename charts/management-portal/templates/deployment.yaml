@@ -75,7 +75,7 @@ spec:
               - /bin/sh
               - -c
               - wget --spider localhost:8080/managementportal/oauth/token_key
-            initialDelaySeconds: 15
+            initialDelaySeconds: 60
             periodSeconds: 90
             timeoutSeconds: 5
             successThreshold: 1
@@ -86,7 +86,7 @@ spec:
               - /bin/sh
               - -c
               - wget --spider localhost:8080/managementportal/oauth/token_key
-            initialDelaySeconds: 15
+            initialDelaySeconds: 60
             periodSeconds: 90
             timeoutSeconds: 5
             successThreshold: 1
