@@ -15,10 +15,30 @@ spec:
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
+      annotations:
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secrets: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
+        checksum/secrets-keystore: {{ include (print $.Template.BasePath "/secrets-keystore.yaml") . | sha256sum }}
       labels:
         app.kubernetes.io/name: {{ include "management-portal.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                  - key: "app.kubernetes.io/name"
+                    operator: In
+                    values:
+                    - {{ template "management-portal.name" . }}
+                  - key: "app.kubernetes.io/instance"
+                    operator: In
+                    values:
+                    - {{ .Release.Name }}
+              topologyKey: "kubernetes.io/hostname"
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -38,7 +58,7 @@ spec:
           - name: MANAGEMENTPORTAL_MAIL_FROM
             value: {{ .Values.from_email }}
           - name: MANAGEMENTPORTAL_COMMON_BASEURL
-            value: {{ .Values.server_name }}
+            value: https://{{ .Values.server_name }}
           - name: MANAGEMENTPORTAL_COMMON_MANAGEMENT_PORTAL_BASE_URL
             value: https://{{ .Values.server_name }}/managementportal
           - name: MANAGEMENTPORTAL_FRONTEND_CLIENT_SECRET
