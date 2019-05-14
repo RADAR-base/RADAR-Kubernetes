@@ -63,6 +63,14 @@ releases:
       - "charts/cp-schema-registry/values.yaml"
       - kafka:
           bootstrapServers: "PLAINTEXT://cp-kafka-headless:9092"
+        ingress:
+          hosts:
+            - host: {{ requiredEnv "SERVER_NAME" }}
+              paths: ["/schema/"]
+          tls:
+          - secretName: radar-base-tls
+            hosts:
+            - {{ requiredEnv "SERVER_NAME" }}
   - name: cp-zookeeper
     chart: ./cp-helm-charts/charts/cp-zookeeper
     values:
@@ -81,7 +89,7 @@ releases:
   - name: postgresql
     chart: stable/postgresql
     values:
-      - "charts/postgres/values.yaml"
+      - "charts/postgresql/values.yaml"
       - replication:
           password: repl_password
         postgresqlPassword: password

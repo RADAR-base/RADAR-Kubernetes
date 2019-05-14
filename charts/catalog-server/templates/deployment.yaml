@@ -19,6 +19,22 @@ spec:
         app.kubernetes.io/name: {{ include "catalog-server.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                  - key: "app.kubernetes.io/name"
+                    operator: In
+                    values:
+                    - {{ template "catalog-server.name" . }}
+                  - key: "app.kubernetes.io/instance"
+                    operator: In
+                    values:
+                    - {{ .Release.Name }}
+              topologyKey: "kubernetes.io/hostname"
       initContainers:
       - name: kafka-init
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
