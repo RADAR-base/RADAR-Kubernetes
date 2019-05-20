@@ -62,5 +62,5 @@ env:
 
 volumes:
   - name: data
-    size: 1Gi
+    size: 5Gi
     mount: /hadoop/dfs/data

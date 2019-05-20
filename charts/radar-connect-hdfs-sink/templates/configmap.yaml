@@ -18,3 +18,4 @@ data:
     hdfs.url=hdfs://{{ .Values.hdfs_url }}:8020
     format.class=org.radarcns.sink.hdfs.AvroFormatRadar
     topics.dir=topicAndroidNew
+    avro.codec=snappy

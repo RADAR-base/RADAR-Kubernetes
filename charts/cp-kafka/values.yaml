@@ -16,3 +16,6 @@ customEnv:
 cp-zookeeper:
   enabled: false
   url: "cp-zookeeper-headless:2181"
+
+persistence:
+  size: 2Gi
