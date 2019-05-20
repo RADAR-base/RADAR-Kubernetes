@@ -54,7 +54,7 @@ releases:
     values:
       - "charts/cp-kafka-rest/values.yaml"
       - cp-schema-registry:
-          url: "cp-schema-registry:8081"
+          url: "http://cp-schema-registry:8081"
         cp-zookeeper:
           url: "cp-zookeeper-headless:2181"
   - name: cp-schema-registry
