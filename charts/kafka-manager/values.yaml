@@ -89,13 +89,13 @@ service:
 ## Pod resource requests and limits
 ## Ref: http://kubernetes.io/docs/user-guide/compute-resources/
 ##
-resources: {}
+resources:
 #  limits:
 #    cpu: 100m
 #    memory: 128Mi
-#  requests:
-#    cpu: 100m
-#    memory: 128Mi
+ requests:
+   cpu: 100m
+   memory: 128Mi
 
 ## Node labels for pod assignment
 ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
