@@ -6,12 +6,6 @@ global:
   postgresql:
     postgresqlDatabase: managementportal
 
-image:
-  registry: docker.io
-  repository: bitnami/postgresql
-  tag: 10.7.0
-  pullPolicy: Always
-
 ##
 ## Init containers parameters:
 ## volumePermissions: Change the owner of the persist volume mountpoint to RunAsUser:fsGroup

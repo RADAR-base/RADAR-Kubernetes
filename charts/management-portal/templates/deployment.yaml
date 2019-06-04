@@ -84,7 +84,7 @@ spec:
           - name: JHIPSTER_SLEEP # gives time for the database to boot before the application
             value: "10"
           - name: JAVA_OPTS  # maximum heap size for the JVM running ManagementPortal, increase this as necessary
-            value: "-Xmx256m"
+            value: "-Xmx1500m"
           ports:
             - name: http
               containerPort: 8080

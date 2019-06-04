@@ -1,4 +1,6 @@
 prometheus:
+  prometheusSpec:
+    serviceMonitorSelectorNilUsesHelmValues: "false"
   ingress:
     enabled: true
     annotations:
@@ -11,7 +13,7 @@ prometheus:
     - secretName: radar-base-tls
       hosts:
       - localhost
-      
+
 alertmanager:
   ingress:
     enabled: true
