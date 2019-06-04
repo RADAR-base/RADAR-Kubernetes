@@ -15,3 +15,5 @@ helmfile -f helmfile-init.yaml sync
 helmfile -f helmfile-main.yaml sync
 helmfile -f helmfile-optional.yaml sync
 ```
+
+https://www.jeffgeerling.com/blog/2019/expanding-k8s-pvs-eks-on-aws

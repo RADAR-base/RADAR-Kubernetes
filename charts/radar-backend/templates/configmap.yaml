@@ -27,14 +27,14 @@ data:
     #=========================== Schema Registry ===========================#
     #List of Schema Registry instances
     schema_registry:
-        - host: {{ first (splitList ":" .Values.schema_registry) }}
-          port: {{ last (splitList ":" .Values.schema_registry) }}
+        - host: {{ (split ":" (trimPrefix "http://" .Values.schema_registry))._0 }}
+          port: {{ (split ":" (trimPrefix "http://" .Values.schema_registry))._1 }}
           protocol: http
     #=========================== Kafka REST Proxy ===========================#
     #List of kafka Rest proxy instances
     rest_proxy:
-        host: {{ first (splitList ":" .Values.rest_proxy) }}
-        port: {{ last (splitList ":" .Values.rest_proxy) }}
+        host: {{ (split ":" (trimPrefix "http://" .Values.rest_proxy))._0 }}
+        port: {{ (split ":" (trimPrefix "http://" .Values.rest_proxy))._1 }}
         protocol: http
 
     #Kafka internal parameters
@@ -49,7 +49,7 @@ data:
       properties:
         max.request.size: 3500042 #Set message.max.bytes for kafka brokers higher than or equal to this value
         retries: 15
-        session.timeout.ms: 500000
+        session.timeout.ms: 50000
         commit.interval.ms: 300000
         request.timeout.ms: 10860000
         state.cleanup.delay.ms: 10860000
