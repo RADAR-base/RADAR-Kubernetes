@@ -1,0 +1,17 @@
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "radar-gateway.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "radar-gateway.name" . }}
+    helm.sh/chart: {{ include "radar-gateway.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  maxReplicas: 5
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: {{ include "radar-gateway.fullname" . }}
+  targetCPUUtilizationPercentage: 50

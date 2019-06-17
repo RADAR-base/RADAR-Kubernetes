@@ -1,7 +1,3 @@
-repositories:
-  - name: jetstack
-    url: https://charts.jetstack.io
-
 # helmDefaults:
 #   atomic: true
 
@@ -15,6 +11,7 @@ releases:
 
   - name: prometheus-operator
     chart: stable/prometheus-operator
+    version: 5.12.0
     namespace: monitoring
     values:
       - "charts/prometheus-operator/values.yaml"
@@ -39,6 +36,7 @@ releases:
 
   - name: nginx-ingress
     chart: stable/nginx-ingress
+    version: 1.6.16
     values:
       - "charts/nginx-ingress/values.yaml"
 
@@ -66,7 +64,7 @@ releases:
         ingress:
           hosts:
             - host: {{ requiredEnv "SERVER_NAME" }}
-              paths: ["/schema/"]
+              paths: ["/schema/?(.*)"]
           tls:
           - secretName: radar-base-tls
             hosts:
@@ -77,6 +75,7 @@ releases:
       - "charts/cp-zookeeper/values.yaml"
   - name: kafka-manager
     chart: stable/kafka-manager
+    version: 2.1.5
     values:
       - "charts/kafka-manager/values.yaml"
       - ingress:
@@ -88,6 +87,7 @@ releases:
         zkHosts: cp-zookeeper:2181
   - name: postgresql
     chart: stable/postgresql
+    version: 5.3.3
     values:
       - "charts/postgresql/values.yaml"
       - replication:
