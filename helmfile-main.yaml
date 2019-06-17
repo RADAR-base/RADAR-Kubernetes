@@ -79,7 +79,7 @@ releases:
     chart: ./charts/radar-gateway
     values:
     - image:
-        tag: 0.3.7
+        tag: dev
       ingress:
         hosts:
          - {{ requiredEnv "SERVER_NAME" }}
@@ -121,7 +121,7 @@ releases:
       managementportal_host: management-portal
       ingress:
         hosts:
-         - {{ requiredEnv "SERVER_NAME" }}      
+         - {{ requiredEnv "SERVER_NAME" }}
       mongodb:
         host: radar-hotstorage
         username: mongodb-user
