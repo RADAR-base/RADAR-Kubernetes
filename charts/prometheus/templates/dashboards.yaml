@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ printf "%s-%s" (include "prometheus.fullname" $) "nginx" | trunc 63 | trimSuffix "-" }}
+  labels:
+    {{- if $.Values.grafana.sidecar.dashboards.label }}
+    {{ $.Values.grafana.sidecar.dashboards.label }}: "1"
+    {{- end }}
+    app: {{ template "prometheus.name" $ }}-grafana
+{{ include "prometheus.labels" $ | indent 4 }}
+data:
+  nginx.json: {{ .Files.Get "files/nginx.json" | b64enc | quote }} # Based from https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/grafana/dashboards/nginx.json
+  confluent.json: {{ .Files.Get "files/confluent.json" | b64enc | quote }} # Based from https://raw.githubusercontent.com/confluentinc/cp-helm-charts/master/grafana-dashboard/confluent-open-source-grafana-dashboard.json with some modifications
