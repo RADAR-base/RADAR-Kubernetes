@@ -6,34 +6,30 @@ releases:
     chart: ./charts/radar-fitbit-connector
     values:
     - image:
-        tag: 0.2.0
-      replicaCount: 1
-      zookeeper: cp-zookeeper-headless:2181
-      kafka: PLAINTEXT://cp-kafka-headless:9092
-      kafka_num_brokers: "3"
-      schema_registry: http://cp-schema-registry:8081
-      fitbit_api_client: ""
-      fitbit_api_secret: ""
+        tag: "{{ requiredEnv "RADAR_FITBIT_CONNECTOR_IMAGE_TAG" }}"
+      replicaCount: "{{ requiredEnv "RADAR_FITBIT_CONNECTOR_REPLICA_COUNT" }}"
+      kafka_num_brokers: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
+      fitbit_api_client: "{{ requiredEnv "FITBIT_API_CLIENT_ID" }}"
+      fitbit_api_secret: "{{ requiredEnv "FITBIT_API_CLIENT_SECRET" }}"
   - name: radar-integration
     chart: ./charts/radar-integration
     values:
     - image:
-        tag: 0.1.0
-      replicaCount: 1
+        tag: "{{ requiredEnv "RADAR_INTEGRATION_IMAGE_TAG" }}"
+      replicaCount: "{{ requiredEnv "RADAR_INTEGRATION_REPLICA_COUNT" }}"
   - name: radar-rest-sources-authorizer
     chart: ./charts/radar-rest-sources-authorizer
     values:
     - image:
-        tag: 1.0.0
-      replicaCount: 1
-      fitbit_api_client: ""
-      fitbit_api_secret: ""
+        tag: "{{ requiredEnv "RADAR_REST_SOURCES_AUTHORIZER_IMAGE_TAG" }}"
+      replicaCount: "{{ requiredEnv "RADAR_REST_SOURCES_AUTHORIZER_REPLICA_COUNT" }}"
+      fitbit_api_client: "{{ requiredEnv "FITBIT_API_CLIENT_ID" }}"
+      fitbit_api_secret: "{{ requiredEnv "FITBIT_API_CLIENT_SECRET" }}"
   - name: radar-rest-sources-backend
     chart: ./charts/radar-rest-sources-backend
     values:
     - image:
-        tag: 1.0.0
-      replicaCount: 1
+        tag: "{{ requiredEnv "RADAR_REST_SOURCES_BACKEND_IMAGE_TAG" }}"
+      replicaCount: "{{ requiredEnv "RADAR_REST_SOURCES_BACKEND_REPLICA_COUNT" }}"
       postgres:
-        host: postgresql-postgresql
-        password: password
+        password: "{{ requiredEnv "POSTGRES_PASSWORD" }}"
