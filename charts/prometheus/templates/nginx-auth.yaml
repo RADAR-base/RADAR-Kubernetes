@@ -1,0 +1,9 @@
+apiVersion: v1
+data:
+  auth: {{ .Values.nginx_auth | b64enc | quote }}
+kind: Secret
+metadata:
+  name: {{ include "prometheus.fullname" . }}-nginx-auth
+  labels:
+{{ include "prometheus.labels" . | indent 4 }}
+type: Opaque
