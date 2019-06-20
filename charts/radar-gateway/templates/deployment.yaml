@@ -46,6 +46,8 @@ spec:
           env:
           - name: RADAR_IS_CONFIG_LOCATION
             value: "/etc/radar-gateway/is/radar-is.yml"
+          - name: JAVA_OPTS
+            value: "-XX:GCTimeRatio=19 -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=30"
           ports:
             - name: http
               containerPort: 80
