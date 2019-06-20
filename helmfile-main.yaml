@@ -7,131 +7,111 @@ releases:
     values:
     - "charts/hdfs/values-datanode.yaml"
     - image:
-        tag: 3.0.3-alpine
-      replicaCount: 3
+        tag: "{{ requiredEnv "HDFSIMAGE_TAG" }}"
+      replicaCount: "{{ requiredEnv "HDFS_DATANODE_REPLICA_COUNT" }}"
   - name: hdfs-namenode
     chart: ./charts/hdfs
     values:
     - "charts/hdfs/values-namenode.yaml"
     - image:
-        tag: 3.0.3-alpine
-      replicaCount: 1
+        tag: "{{ requiredEnv "HDFSIMAGE_TAG" }}"
+      replicaCount: "{{ requiredEnv "HDFS_NAMENODE_REPLICA_COUNT" }}"
   - name: management-portal
     chart: ./charts/management-portal
     values:
     - image:
-        tag: 0.5.3
+        tag: "{{ requiredEnv "MANAGEMENT_PORTALIMAGE_TAG" }}"
       ingress:
         hosts:
-         - {{ requiredEnv "SERVER_NAME" }}
-      replicaCount: 1
-      server_name: {{ requiredEnv "SERVER_NAME" }}
-      catalogue_server: catalog-server
+         - "{{ requiredEnv "SERVER_NAME" }}"
+      replicaCount: "{{ requiredEnv "MANAGEMENT_PORTAL_REPLICA_COUNT" }}"
+      server_name: "{{ requiredEnv "SERVER_NAME" }}"
       postgres:
-        host: postgresql-postgresql
-        password: password
+        password: "{{ requiredEnv "POSTGRES_PASSWORD" }}"
   - name: radar-backend-monitor
     chart: ./charts/radar-backend
     values:
     - "charts/radar-backend/values-monitor.yaml"
     - image:
-        tag: 0.4.0
-      replicaCount: 1
-      zookeeper: cp-zookeeper-headless:2181
-      kafka: cp-kafka-headless:9092
-      rest_proxy: http://cp-kafka-rest:8082
-      schema_registry: http://cp-schema-registry:8081
-      kafka_num_brokers: "3"
+        tag: "{{ requiredEnv "RADAR_BACKENDIMAGE_TAG" }}"
+      replicaCount: "{{ requiredEnv "RADAR_BACKEND_MONITOR_REPLICA_COUNT" }}"
+      kafka_num_brokers: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
   - name: radar-backend-stream
     chart: ./charts/radar-backend
     values:
     - "charts/radar-backend/values-stream.yaml"
     - image:
-        tag: 0.4.0
-      replicaCount: 1
-      zookeeper: cp-zookeeper-headless:2181
-      kafka: cp-kafka-headless:9092
-      rest_proxy: http://cp-kafka-rest:8082
-      schema_registry: http://cp-schema-registry:8081
-      kafka_num_brokers: "3"
+        tag: "{{ requiredEnv "RADAR_BACKENDIMAGE_TAG" }}"
+      replicaCount: "{{ requiredEnv "RADAR_BACKEND_STREAM_REPLICA_COUNT" }}"
+      kafka_num_brokers: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
   - name: radar-connect-hdfs-sink
     chart: ./charts/radar-connect-hdfs-sink
     values:
     - image:
-        tag: 0.2.0
-      replicaCount: 1
-      zookeeper: cp-zookeeper-headless:2181
-      kafka: PLAINTEXT://cp-kafka-headless:9092
-      kafka_num_brokers: "3"
-      schema_registry: http://cp-schema-registry:8081
-      hdfs_url: hdfs-namenode
+        tag: "{{ requiredEnv "RADAR_CONNECT_HDFS_SINKIMAGE_TAG" }}"
+      replicaCount: "{{ requiredEnv "RADAR_CONNECT_HDFS_SINK_REPLICA_COUNT" }}"
+      kafka_num_brokers: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
   - name: radar-dashboard
     chart: ./charts/radar-dashboard
     values:
     - image:
-        tag: 2.1.0
+        tag: "{{ requiredEnv "RADAR_DASHBOARDIMAGE_TAG" }}"
       ingress:
         hosts:
-         - {{ requiredEnv "SERVER_NAME" }}
-      replicaCount: 1
-      server_name: {{ requiredEnv "SERVER_NAME" }}
+         - "{{ requiredEnv "SERVER_NAME" }}"
+      replicaCount: "{{ requiredEnv "RADAR_DASHBOARD_REPLICA_COUNT" }}"
+      server_name: "{{ requiredEnv "SERVER_NAME" }}"
   - name: radar-gateway
     chart: ./charts/radar-gateway
     values:
     - image:
-        tag: dev
+        tag: "{{ requiredEnv "RADAR_GATEWAYIMAGE_TAG" }}"
       ingress:
         hosts:
-         - {{ requiredEnv "SERVER_NAME" }}
-      replicaCount: 1
-      managementportal_host: management-portal
-      rest_proxy: http://cp-kafka-rest:8082
-      schema_registry: http://cp-schema-registry:8081
+         - "{{ requiredEnv "SERVER_NAME" }}"
+      replicaCount: "{{ requiredEnv "RADAR_GATEWAY_REPLICA_COUNT" }}"
   - name: radar-hotstorage
     chart: ./charts/radar-hotstorage
     values:
     - image:
-        tag: 0.1
-      replicaCount: 1
+        tag: "{{ requiredEnv "RADAR_HOTSTORAGEIMAGE_TAG" }}"
+      replicaCount: "{{ requiredEnv "RADAR_HOTSTORAGE_REPLICA_COUNT" }}"
       hotstorage:
-        username: mongodb-user
-        password: password
-        name: mongodb-database
+        password: "{{ requiredEnv "HOTSTORAGE_PASSWORD" }}"
   - name: radar-mongodb-connector
     chart: ./charts/radar-mongodb-connector
     values:
     - image:
-        tag: dev
-      replicaCount: 1
-      zookeeper: cp-zookeeper-headless:2181
-      kafka: PLAINTEXT://cp-kafka-headless:9092
-      kafka_num_brokers: "3"
-      schema_registry: http://cp-schema-registry:8081
+        tag: "{{ requiredEnv "RADAR_MONGODB_CONNECTORIMAGE_TAG" }}"
+      replicaCount: "{{ requiredEnv "RADAR_MONGODB_CONNECTOR_REPLICA_COUNT" }}"
+      kafka_num_brokers: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
       mongodb:
-        host: radar-hotstorage
-        username: mongodb-user
-        password: password
-        database_name: mongodb-database
+        password: "{{ requiredEnv "HOTSTORAGE_PASSWORD" }}"
+  - name: radar-output
+    chart: ./charts/radar-output
+    values:
+    - image:
+        tag: "{{ requiredEnv "RADAR_OUTPUTIMAGE_TAG" }}"
+      num_threads: "{{ requiredEnv "RESTRUCTURE_NUM_THREADS" }}"
+      replicaCount: "{{ requiredEnv "RADAR_OUTPUT_REPLICA_COUNT" }}"
+      sftp_user_keys: |
+        ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCzNZZGH25F2jEFeFZqmhiePgA02D8jX/8+kRT9lflfKaPUP8wbyc4AmRzv7AFzW1sjVCzn400Aq+gxHmeiCp1wilPprYUTD9hl6mspvTBZlWhcxgisJZVMDt1+9BL8i6BnPFqYT3TwDDuaMXW105qaYwI+xlwvt6WY2ZTkRalwCpdRucYcpbt9cF7rXoQCebXLAypIeZF3yWUhD6GTtnZBuM5pAybUMyrtDZsn4lPSSqjP7bJqp4uiikwkJcT+xjrh06+8SgirN9W5z3+I4x66pg8CEs4b8it/5wAe1+2d0Yju7aCXvpDshERTbRvc6A1chj7SK2m/CxTdv00mtumH
   - name: radar-restapi
     chart: ./charts/radar-restapi
     values:
     - image:
-        tag: 0.3
-      replicaCount: 1
-      managementportal_host: management-portal
+        tag: "{{ requiredEnv "RADAR_RESTAPIIMAGE_TAG" }}"
+      replicaCount: "{{ requiredEnv "RADAR_RESTAPI_REPLICA_COUNT" }}"
       ingress:
         hosts:
-         - {{ requiredEnv "SERVER_NAME" }}
+         - "{{ requiredEnv "SERVER_NAME" }}"
       mongodb:
-        host: radar-hotstorage
-        username: mongodb-user
-        password: password
-        database_name: mongodb-database
+        password: "{{ requiredEnv "HOTSTORAGE_PASSWORD" }}"
   - name: smtp
     chart: ./charts/smtp
     values:
-    - replicaCount: 1
+    - replicaCount: "{{ requiredEnv "SMTP_REPLICA_COUNT" }}"
       smarthost:
-        address: mail.example.com
-        user: user@example.com
-        password: XXXXXXXX
+        address: "{{ requiredEnv "SMTP_ADDRESS" }}"
+        user: "{{ requiredEnv "SMTP_USER" }}"
+        password: "{{ requiredEnv "SMTP_PASSWORD" }}"

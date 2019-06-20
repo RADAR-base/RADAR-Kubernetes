@@ -9,12 +9,12 @@ releases:
       - server_name: {{ requiredEnv "SERVER_NAME" }}
         maintainer_email: {{ requiredEnv "MAINTAINER_EMAIL" }}
 
-  - name: prometheus-operator
-    chart: stable/prometheus-operator
-    version: 5.12.0
+  - name: prometheus
+    chart: ./charts/prometheus
     namespace: monitoring
     values:
-      - "charts/prometheus-operator/values.yaml"
+      - "charts/prometheus/origin-values.yaml"
+      - "charts/prometheus/values.yaml"
       - prometheus:
           ingress:
             hosts: ["prometheus.{{ requiredEnv "SERVER_NAME" }}"]
@@ -33,73 +33,85 @@ releases:
             tls:
             - secretName: radar-base-tls
               hosts: ["grafana.{{ requiredEnv "SERVER_NAME" }}"]
+        receivers: |-
+          slack_config:
+            api_url: "{{ requiredEnv "MONITORING_SLACK_WEBHOOK_URL" }}"
+            channel: "{{ requiredEnv "MONITORING_SLACK_CHANNEL" }}"
+        nginx_auth: |
+          "{{ requiredEnv "MONITORING_NGINX_AUTH" }}"
 
   - name: nginx-ingress
     chart: stable/nginx-ingress
     version: 1.6.16
     values:
       - "charts/nginx-ingress/values.yaml"
+      - controller:
+          replicaCount: {{ requiredEnv "NGINX_INGRESS_REPLICA_COUNT" }}
 
   - name: cp-kafka
     chart: ./cp-helm-charts/charts/cp-kafka
     values:
       - "charts/cp-kafka/values.yaml"
-      - cp-zookeeper:
-          url: "cp-zookeeper-headless:2181"
-        brokers: "3"
+      - brokers: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
+        imageTag: "{{ requiredEnv "CP_KAFKA_IMAGE_TAG" }}"
   - name: cp-kafka-rest
     chart: ./cp-helm-charts/charts/cp-kafka-rest
     values:
       - "charts/cp-kafka-rest/values.yaml"
-      - cp-schema-registry:
-          url: "http://cp-schema-registry:8081"
-        cp-zookeeper:
-          url: "cp-zookeeper-headless:2181"
+      - replicaCount: "{{ requiredEnv "CP_KAFKA_REST_REPLICA_COUNT" }}"
+        imageTag: "{{ requiredEnv "CP_KAFKA_REST_IMAGE_TAG" }}"
   - name: cp-schema-registry
     chart: ./cp-helm-charts/charts/cp-schema-registry
     values:
       - "charts/cp-schema-registry/values.yaml"
-      - kafka:
-          bootstrapServers: "PLAINTEXT://cp-kafka-headless:9092"
+      - replicaCount: "{{ requiredEnv "CP_SCHEMA_REGISTRY_REPLICA_COUNT" }}"
+        imageTag: "{{ requiredEnv "CP_SCHEMA_REGISTRY_IMAGE_TAG" }}"
         ingress:
           hosts:
-            - host: {{ requiredEnv "SERVER_NAME" }}
+            - host: "{{ requiredEnv "SERVER_NAME" }}"
               paths: ["/schema/?(.*)"]
           tls:
           - secretName: radar-base-tls
             hosts:
-            - {{ requiredEnv "SERVER_NAME" }}
+            - "{{ requiredEnv "SERVER_NAME" }}"
   - name: cp-zookeeper
     chart: ./cp-helm-charts/charts/cp-zookeeper
     values:
       - "charts/cp-zookeeper/values.yaml"
+      - imageTag: "{{ requiredEnv "CP_ZOOKEEPER_IMAGE_TAG" }}"
+        servers: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
   - name: kafka-manager
     chart: stable/kafka-manager
     version: 2.1.5
     values:
       - "charts/kafka-manager/values.yaml"
-      - ingress:
+      - image:
+          tag: "{{ requiredEnv "KAFKA_MANAGER_IMAGE_TAG" }}"
+        ingress:
           hosts:
-            - {{ requiredEnv "SERVER_NAME" }}
+            - "{{ requiredEnv "SERVER_NAME" }}"
           tls:
           - secretName: radar-base-tls
             hosts: ["{{ requiredEnv "SERVER_NAME" }}"]
-        zkHosts: cp-zookeeper:2181
+          basicAuth:
+            enabled: true
+            username: "{{ requiredEnv "KAFKA_MANAGER_USERNAME" }}"
+            password: "{{ requiredEnv "KAFKA_MANAGER_PASSWORD" }}"
   - name: postgresql
     chart: stable/postgresql
     version: 5.3.3
     values:
       - "charts/postgresql/values.yaml"
       - replication:
-          password: repl_password
-        postgresqlPassword: password
+          password: "{{ requiredEnv "POSTGRES_PASSWORD" }}"
+        postgresqlPassword: "{{ requiredEnv "POSTGRES_PASSWORD" }}"
+        image:
+          tag: "{{ requiredEnv "POSTGRESQL_IMAGE_TAG" }}"
 
   - name: catalog-server
     chart: ./charts/catalog-server
     values:
     - image:
-        tag: 0.4.3
-      replicaCount: 1
-      kafka_num_brokers: 3
-      zookeeper: cp-zookeeper-headless:2181
-      schema_registry: http://cp-schema-registry:8081
+        tag: "{{ requiredEnv "CATALOG_SERVER_IMAGE_TAG" }}"
+      replicaCount: "{{ requiredEnv "CATALOG_SERVER_REPLICA_COUNT" }}"
+      kafka_num_brokers: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
