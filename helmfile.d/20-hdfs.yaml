@@ -1,0 +1,39 @@
+helmDefaults:
+  atomic: true
+  wait: false
+
+releases:
+  - name: hdfs-datanode
+    chart: ../charts/hdfs
+    installed: {{ requiredEnv "RADAR_INSTALL_HDFS" }}
+    values:
+    - "../charts/hdfs/values-datanode.yaml"
+    - image:
+        tag: "{{ requiredEnv "HDFS_IMAGE_TAG" }}"
+      replicaCount: "{{ requiredEnv "HDFS_DATANODE_REPLICA_COUNT" }}"
+  - name: hdfs-namenode
+    chart: ../charts/hdfs
+    installed: {{ requiredEnv "RADAR_INSTALL_HDFS" }}
+    values:
+    - "../charts/hdfs/values-namenode.yaml"
+    - image:
+        tag: "{{ requiredEnv "HDFS_IMAGE_TAG" }}"
+      replicaCount: "{{ requiredEnv "HDFS_NAMENODE_REPLICA_COUNT" }}"
+  - name: radar-connect-hdfs-sink
+    chart: ../charts/radar-connect-hdfs-sink
+    installed: {{ requiredEnv "RADAR_INSTALL_HDFS" }}
+    values:
+    - image:
+        tag: "{{ requiredEnv "RADAR_CONNECT_HDFS_SINK_IMAGE_TAG" }}"
+      replicaCount: "{{ requiredEnv "RADAR_CONNECT_HDFS_SINK_REPLICA_COUNT" }}"
+      kafka_num_brokers: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
+  - name: radar-output
+    chart: ../charts/radar-output
+    installed: {{ requiredEnv "RADAR_INSTALL_HDFS" }}
+    values:
+    - image:
+        tag: "{{ requiredEnv "RADAR_OUTPUT_IMAGE_TAG" }}"
+      num_threads: "{{ requiredEnv "RESTRUCTURE_NUM_THREADS" }}"
+      replicaCount: "{{ requiredEnv "RADAR_OUTPUT_REPLICA_COUNT" }}"
+      sftp_user_keys: |
+        ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCzNZZGH25F2jEFeFZqmhiePgA02D8jX/8+kRT9lflfKaPUP8wbyc4AmRzv7AFzW1sjVCzn400Aq+gxHmeiCp1wilPprYUTD9hl6mspvTBZlWhcxgisJZVMDt1+9BL8i6BnPFqYT3TwDDuaMXW105qaYwI+xlwvt6WY2ZTkRalwCpdRucYcpbt9cF7rXoQCebXLAypIeZF3yWUhD6GTtnZBuM5pAybUMyrtDZsn4lPSSqjP7bJqp4uiikwkJcT+xjrh06+8SgirN9W5z3+I4x66pg8CEs4b8it/5wAe1+2d0Yju7aCXvpDshERTbRvc6A1chj7SK2m/CxTdv00mtumH

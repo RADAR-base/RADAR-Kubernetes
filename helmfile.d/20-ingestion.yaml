@@ -1,0 +1,23 @@
+helmDefaults:
+  atomic: true
+  wait: false
+
+releases:
+  - name: cp-kafka-rest
+    chart: ../cp-helm-charts/charts/cp-kafka-rest
+    wait: false
+    installed: {{ requiredEnv "RADAR_INSTALL_INGESTION" }}
+    values:
+      - "../charts/cp-kafka-rest/values.yaml"
+      - replicaCount: "{{ requiredEnv "CP_KAFKA_REST_REPLICA_COUNT" }}"
+        imageTag: "{{ requiredEnv "CP_KAFKA_REST_IMAGE_TAG" }}"
+  - name: radar-gateway
+    chart: ../charts/radar-gateway
+    installed: {{ requiredEnv "RADAR_INSTALL_INGESTION" }}
+    values:
+    - image:
+        tag: "{{ requiredEnv "RADAR_GATEWAY_IMAGE_TAG" }}"
+      ingress:
+        hosts:
+         - "{{ requiredEnv "SERVER_NAME" }}"
+      replicaCount: "{{ requiredEnv "RADAR_GATEWAY_REPLICA_COUNT" }}"

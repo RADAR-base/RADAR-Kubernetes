@@ -1,0 +1,12 @@
+helmDefaults:
+  atomic: true
+  wait: false
+
+releases:
+  - name: radar-integration
+    chart: ../charts/radar-integration
+    installed: {{ requiredEnv "RADAR_INSTALL_REDCAP" }}
+    values:
+    - image:
+        tag: "{{ requiredEnv "RADAR_INTEGRATION_IMAGE_TAG" }}"
+      replicaCount: "{{ requiredEnv "RADAR_INTEGRATION_REPLICA_COUNT" }}"
