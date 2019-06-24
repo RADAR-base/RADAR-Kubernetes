@@ -1,0 +1,72 @@
+helmDefaults:
+  atomic: true
+  force: true
+
+releases:
+  - name: cert
+    namespace: cert-manager
+    wait: true
+    chart: ../charts/cert
+    values:
+      - server_name: {{ requiredEnv "SERVER_NAME" }}
+        maintainer_email: {{ requiredEnv "MAINTAINER_EMAIL" }}
+
+  - name: prometheus
+    chart: ../charts/prometheus
+    atomic: true
+    wait: true
+    timeout: 600
+    namespace: monitoring
+    values:
+      - "../charts/prometheus/origin-values.yaml"
+      - "../charts/prometheus/values.yaml"
+      - prometheus:
+          ingress:
+            hosts: ["prometheus.{{ requiredEnv "SERVER_NAME" }}"]
+            tls:
+            - secretName: radar-base-tls
+              hosts: ["prometheus.{{ requiredEnv "SERVER_NAME" }}"]
+        alertmanager:
+          ingress:
+            hosts: ["alertmanager.{{ requiredEnv "SERVER_NAME" }}"]
+            tls:
+            - secretName: radar-base-tls
+              hosts: ["alertmanager.{{ requiredEnv "SERVER_NAME" }}"]
+        grafana:
+          ingress:
+            hosts: ["grafana.{{ requiredEnv "SERVER_NAME" }}"]
+            tls:
+            - secretName: radar-base-tls
+              hosts: ["grafana.{{ requiredEnv "SERVER_NAME" }}"]
+        receivers: |-
+          slack_config:
+            api_url: "{{ requiredEnv "MONITORING_SLACK_WEBHOOK_URL" }}"
+            channel: "{{ requiredEnv "MONITORING_SLACK_CHANNEL" }}"
+        nginx_auth: |
+          "{{ requiredEnv "MONITORING_NGINX_AUTH" }}"
+
+  - name: nginx-ingress
+    chart: stable/nginx-ingress
+    version: 1.6.16
+    wait: false
+    values:
+      - "../charts/nginx-ingress/values.yaml"
+      - controller:
+          replicaCount: {{ requiredEnv "NGINX_INGRESS_REPLICA_COUNT" }}
+
+  - name: kafka-manager
+    chart: ../charts/kafka-manager
+    wait: false
+    values:
+      - image:
+          tag: "{{ requiredEnv "KAFKA_MANAGER_IMAGE_TAG" }}"
+        ingress:
+          hosts:
+            - "{{ requiredEnv "SERVER_NAME" }}"
+          tls:
+          - secretName: radar-base-tls
+            hosts: ["{{ requiredEnv "SERVER_NAME" }}"]
+          basicAuth:
+            enabled: true
+            username: "{{ requiredEnv "KAFKA_MANAGER_USERNAME" }}"
+            password: "{{ requiredEnv "KAFKA_MANAGER_PASSWORD" }}"
