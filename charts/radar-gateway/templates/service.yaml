@@ -14,6 +14,10 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+    - name: metrics
+      port: 5556
+      protocol: TCP
+      targetPort: metrics
   selector:
     app.kubernetes.io/name: {{ include "radar-gateway.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}

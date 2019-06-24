@@ -39,6 +39,18 @@ spec:
                     - {{ .Release.Name }}
               topologyKey: "kubernetes.io/hostname"
       containers:
+        - image: sscaling/jmx-prometheus-exporter
+          imagePullPolicy: IfNotPresent
+          name: prometheus-jmx-exporter
+          env:
+            - name: "CONFIG_YML"
+              value: "/etc/radar-gateway/config.yml"
+          ports:
+          - containerPort: 5556
+            protocol: TCP
+          volumeMounts:
+          - mountPath: /etc/radar-gateway/
+            name: gateway-jmx-configmap
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -57,7 +69,7 @@ spec:
               command:
               - /bin/sh
               - -c
-              - curl -IX localhost/radar-gateway/topics 2>&1 | grep -q 401 || exit 1
+              - curl -Is localhost/radar-gateway/topics 2>&1 | grep -q 401 || exit 1
             initialDelaySeconds: 5
             periodSeconds: 90
             timeoutSeconds: 5
@@ -68,7 +80,7 @@ spec:
               command:
               - /bin/sh
               - -c
-              - curl -IX localhost/radar-gateway/topics 2>&1 | grep -q 401 || exit 1
+              - curl -Is localhost/radar-gateway/topics 2>&1 | grep -q 401 || exit 1
             initialDelaySeconds: 5
             periodSeconds: 90
             timeoutSeconds: 5
@@ -85,6 +97,9 @@ spec:
         - name: config
           configMap:
             name: {{ include "radar-gateway.fullname" . }}
+        - name: gateway-jmx-configmap
+          configMap:
+            name:  {{ include "radar-gateway.fullname" . }}-jmx-configmap
         - name: is
           secret:
             secretName: {{ include "radar-gateway.fullname" . }}-is
