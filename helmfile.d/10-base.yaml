@@ -2,48 +2,53 @@ helmDefaults:
   atomic: true
 
 releases:
+  - name: cp-zookeeper
+    chart: ../cp-helm-charts/charts/cp-zookeeper
+    wait: true
+    installed: {{ requiredEnv "RADAR_INSTALL_BASE" }}
+    set:
+      - name: imageTag
+        value: "{{ requiredEnv "CP_ZOOKEEPER_IMAGE_TAG" }}"
+      - name: servers
+        value: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
   - name: cp-kafka
     chart: ../cp-helm-charts/charts/cp-kafka
     wait: true
     installed: {{ requiredEnv "RADAR_INSTALL_BASE" }}
     values:
       - "../charts/cp-kafka/values.yaml"
-      - brokers: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
-        imageTag: "{{ requiredEnv "CP_KAFKA_IMAGE_TAG" }}"
+    set:
+      - name: brokers
+        value: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
+      - name: imageTag
+        value: "{{ requiredEnv "CP_KAFKA_IMAGE_TAG" }}"
   - name: cp-schema-registry
     chart: ../cp-helm-charts/charts/cp-schema-registry
     wait: true
     installed: {{ requiredEnv "RADAR_INSTALL_BASE" }}
     values:
       - "../charts/cp-schema-registry/values.yaml"
-      - replicaCount: "{{ requiredEnv "CP_SCHEMA_REGISTRY_REPLICA_COUNT" }}"
-        imageTag: "{{ requiredEnv "CP_SCHEMA_REGISTRY_IMAGE_TAG" }}"
-        ingress:
-          hosts:
-            - host: "{{ requiredEnv "SERVER_NAME" }}"
-              paths: ["/schema/?(.*)"]
-          tls:
-          - secretName: radar-base-tls
-            hosts:
-            - "{{ requiredEnv "SERVER_NAME" }}"
-  - name: cp-zookeeper
-    chart: ../cp-helm-charts/charts/cp-zookeeper
-    wait: true
-    installed: {{ requiredEnv "RADAR_INSTALL_BASE" }}
-    values:
-      - "../charts/cp-zookeeper/values.yaml"
-      - imageTag: "{{ requiredEnv "CP_ZOOKEEPER_IMAGE_TAG" }}"
-        servers: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
-
+    set:
+      - name: replicaCount
+        value: "{{ requiredEnv "CP_SCHEMA_REGISTRY_REPLICA_COUNT" }}"
+      - name: imageTag
+        value: "{{ requiredEnv "CP_SCHEMA_REGISTRY_IMAGE_TAG" }}"
+      - name: ingress.hosts[0].host
+        value: "{{ requiredEnv "SERVER_NAME" }}"
+      - name: ingress.tls[0].hosts
+        values: ["{{ requiredEnv "SERVER_NAME" }}"]
   - name: catalog-server
     chart: ../charts/catalog-server
     wait: true
     installed: {{ requiredEnv "RADAR_INSTALL_BASE" }}
-    values:
-    - image:
-        tag: "{{ requiredEnv "CATALOG_SERVER_IMAGE_TAG" }}"
-      replicaCount: "{{ requiredEnv "CATALOG_SERVER_REPLICA_COUNT" }}"
-      kafka_num_brokers: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
+    set:
+      - name: image.tag
+        value: "{{ requiredEnv "CATALOG_SERVER_IMAGE_TAG" }}"
+      - name: replicaCount
+        value: "{{ requiredEnv "CATALOG_SERVER_REPLICA_COUNT" }}"
+      - name: kafka_num_brokers
+        value: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
+
 
   - name: postgresql
     chart: stable/postgresql
@@ -52,22 +57,25 @@ releases:
     installed: {{ requiredEnv "RADAR_INSTALL_BASE" }}
     values:
       - "../charts/postgresql/values.yaml"
-      - replication:
-          password: "{{ requiredEnv "POSTGRES_PASSWORD" }}"
-        postgresqlPassword: "{{ requiredEnv "POSTGRES_PASSWORD" }}"
-        image:
-          tag: "{{ requiredEnv "POSTGRESQL_IMAGE_TAG" }}"
-          
+    set:
+      - name: replication.password
+        value: "{{ requiredEnv "POSTGRES_PASSWORD" }}"
+      - name: postgresqlPassword
+        value: "{{ requiredEnv "POSTGRES_PASSWORD" }}"
+      - name: image.tag
+        value: "{{ requiredEnv "POSTGRESQL_IMAGE_TAG" }}"
+
   - name: management-portal
     chart: ../charts/management-portal
     installed: {{ requiredEnv "RADAR_INSTALL_BASE" }}
-    values:
-    - image:
-        tag: "{{ requiredEnv "MANAGEMENT_PORTAL_IMAGE_TAG" }}"
-      ingress:
-        hosts:
-         - "{{ requiredEnv "SERVER_NAME" }}"
-      replicaCount: "{{ requiredEnv "MANAGEMENT_PORTAL_REPLICA_COUNT" }}"
-      server_name: "{{ requiredEnv "SERVER_NAME" }}"
-      postgres:
-        password: "{{ requiredEnv "POSTGRES_PASSWORD" }}"
+    set:
+      - name: image.tag
+        value: "{{ requiredEnv "MANAGEMENT_PORTAL_IMAGE_TAG" }}"
+      - name: ingress.hosts
+        values: ["{{ requiredEnv "SERVER_NAME" }}"]
+      - name: replicaCount
+        value: "{{ requiredEnv "MANAGEMENT_PORTAL_REPLICA_COUNT" }}"
+      - name: server_name
+        value: "{{ requiredEnv "SERVER_NAME" }}"
+      - name: postgres.password
+        value: "{{ requiredEnv "POSTGRES_PASSWORD" }}"

@@ -7,43 +7,45 @@ releases:
     namespace: cert-manager
     wait: true
     chart: ../charts/cert
-    values:
-      - server_name: {{ requiredEnv "SERVER_NAME" }}
-        maintainer_email: {{ requiredEnv "MAINTAINER_EMAIL" }}
+    set:
+      - name: server_name
+        value: {{ requiredEnv "SERVER_NAME" }}
+      - name: maintainer_email
+        value: {{ requiredEnv "MAINTAINER_EMAIL" }}
 
-  - name: prometheus
-    chart: ../charts/prometheus
+  - name: prometheus-operator
+    chart: ../charts/prometheus-operator
     atomic: true
     wait: true
     timeout: 600
     namespace: monitoring
     values:
-      - "../charts/prometheus/origin-values.yaml"
-      - "../charts/prometheus/values.yaml"
-      - prometheus:
-          ingress:
-            hosts: ["prometheus.{{ requiredEnv "SERVER_NAME" }}"]
-            tls:
-            - secretName: radar-base-tls
-              hosts: ["prometheus.{{ requiredEnv "SERVER_NAME" }}"]
-        alertmanager:
-          ingress:
-            hosts: ["alertmanager.{{ requiredEnv "SERVER_NAME" }}"]
-            tls:
-            - secretName: radar-base-tls
-              hosts: ["alertmanager.{{ requiredEnv "SERVER_NAME" }}"]
-        grafana:
-          ingress:
-            hosts: ["grafana.{{ requiredEnv "SERVER_NAME" }}"]
-            tls:
-            - secretName: radar-base-tls
-              hosts: ["grafana.{{ requiredEnv "SERVER_NAME" }}"]
-        receivers: |-
+      - "../charts/prometheus-operator/origin-values.yaml"
+      - "../charts/prometheus-operator/values.yaml"
+    set:
+      - name: prometheus.ingress.hosts
+        values: ["prometheus.{{ requiredEnv "SERVER_NAME" }}"]
+      - name: prometheus.ingress.tls[0].hosts
+        values: ["prometheus.{{ requiredEnv "SERVER_NAME" }}"]
+
+      - name: alertmanager.ingress.hosts
+        values: ["alertmanager.{{ requiredEnv "SERVER_NAME" }}"]
+      - name: alertmanager.ingress.tls[0].hosts
+        values: ["alertmanager.{{ requiredEnv "SERVER_NAME" }}"]
+
+      - name: grafana.ingress.hosts
+        values: ["grafana.{{ requiredEnv "SERVER_NAME" }}"]
+      - name: grafana.ingress.tls[0].hosts
+        values: ["grafana.{{ requiredEnv "SERVER_NAME" }}"]
+
+      - name: nginx_auth
+        value: "{{ requiredEnv "MONITORING_NGINX_AUTH" }}"
+
+      - name: receivers
+        value: |-
           slack_config:
             api_url: "{{ requiredEnv "MONITORING_SLACK_WEBHOOK_URL" }}"
             channel: "{{ requiredEnv "MONITORING_SLACK_CHANNEL" }}"
-        nginx_auth: |
-          "{{ requiredEnv "MONITORING_NGINX_AUTH" }}"
 
   - name: nginx-ingress
     chart: stable/nginx-ingress
@@ -51,22 +53,23 @@ releases:
     wait: false
     values:
       - "../charts/nginx-ingress/values.yaml"
-      - controller:
-          replicaCount: {{ requiredEnv "NGINX_INGRESS_REPLICA_COUNT" }}
+    set:
+      - name: controller.replicaCount
+        value: {{ requiredEnv "NGINX_INGRESS_REPLICA_COUNT" }}
 
   - name: kafka-manager
     chart: ../charts/kafka-manager
     wait: false
-    values:
-      - image:
-          tag: "{{ requiredEnv "KAFKA_MANAGER_IMAGE_TAG" }}"
-        ingress:
-          hosts:
-            - "{{ requiredEnv "SERVER_NAME" }}"
-          tls:
-          - secretName: radar-base-tls
-            hosts: ["{{ requiredEnv "SERVER_NAME" }}"]
-          basicAuth:
-            enabled: true
-            username: "{{ requiredEnv "KAFKA_MANAGER_USERNAME" }}"
-            password: "{{ requiredEnv "KAFKA_MANAGER_PASSWORD" }}"
+    set:
+      - name: image.tag
+        value: "{{ requiredEnv "KAFKA_MANAGER_IMAGE_TAG" }}"
+      - name: ingress.hosts
+        values: ["{{ requiredEnv "SERVER_NAME" }}"]
+      - name: ingress.tls[0].hosts
+        values: ["{{ requiredEnv "SERVER_NAME" }}"]
+      - name: basicAuth.enabled
+        value: true
+      - name: basicAuth.username
+        value: "{{ requiredEnv "KAFKA_MANAGER_USERNAME" }}"
+      - name: basicAuth.password
+        value: "{{ requiredEnv "KAFKA_MANAGER_PASSWORD" }}"

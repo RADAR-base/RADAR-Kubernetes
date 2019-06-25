@@ -3,10 +3,36 @@ helmDefaults:
   wait: false
 
 releases:
-  - name: radar-integration
-    chart: ../charts/radar-integration
-    installed: {{ requiredEnv "RADAR_INSTALL_REDCAP" }}
-    values:
-    - image:
-        tag: "{{ requiredEnv "RADAR_INTEGRATION_IMAGE_TAG" }}"
-      replicaCount: "{{ requiredEnv "RADAR_INTEGRATION_REPLICA_COUNT" }}"
+  - name: radar-fitbit-connector
+    chart: ./charts/radar-fitbit-connector
+    set:
+      - name: image.tag
+        value: "{{ requiredEnv "RADAR_FITBIT_CONNECTOR_IMAGE_TAG" }}"
+      - name: replicaCount
+        value: "{{ requiredEnv "RADAR_FITBIT_CONNECTOR_REPLICA_COUNT" }}"
+      - name: kafka_num_brokers
+        value: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
+      - name: fitbit_api_client
+        value: "{{ requiredEnv "FITBIT_API_CLIENT_ID" }}"
+      - name: fitbit_api_secret
+        value: "{{ requiredEnv "FITBIT_API_CLIENT_SECRET" }}"
+  - name: radar-rest-sources-authorizer
+    chart: ./charts/radar-rest-sources-authorizer
+    set:
+      - name: image.tag
+        value: "{{ requiredEnv "RADAR_REST_SOURCES_AUTHORIZER_IMAGE_TAG" }}"
+      - name: replicaCount
+        value: "{{ requiredEnv "RADAR_REST_SOURCES_AUTHORIZER_REPLICA_COUNT" }}"
+      - name: fitbit_api_client
+        value: "{{ requiredEnv "FITBIT_API_CLIENT_ID" }}"
+      - name: fitbit_api_secret
+        value: "{{ requiredEnv "FITBIT_API_CLIENT_SECRET" }}"
+  - name: radar-rest-sources-backend
+    chart: ./charts/radar-rest-sources-backend
+    set:
+      - name: image.tag
+        value: "{{ requiredEnv "RADAR_REST_SOURCES_BACKEND_IMAGE_TAG" }}"
+      - name: replicaCount
+        value: "{{ requiredEnv "RADAR_REST_SOURCES_BACKEND_REPLICA_COUNT" }}"
+      - name: postgres.password
+        value: "{{ requiredEnv "POSTGRES_PASSWORD" }}"

@@ -6,42 +6,46 @@ releases:
   - name: radar-dashboard
     chart: ../charts/radar-dashboard
     installed: {{ requiredEnv "RADAR_INSTALL_DASHBOARD" }}
-    values:
-    - image:
-        tag: "{{ requiredEnv "RADAR_DASHBOARD_IMAGE_TAG" }}"
-      ingress:
-        hosts:
-         - "{{ requiredEnv "SERVER_NAME" }}"
-      replicaCount: "{{ requiredEnv "RADAR_DASHBOARD_REPLICA_COUNT" }}"
-      server_name: "{{ requiredEnv "SERVER_NAME" }}"
+    set:
+      - name: image.tag
+        value: "{{ requiredEnv "RADAR_DASHBOARD_IMAGE_TAG" }}"
+      - name: ingress.hosts
+        values: ["{{ requiredEnv "SERVER_NAME" }}"]
+      - name: replicaCount
+        value: "{{ requiredEnv "RADAR_DASHBOARD_REPLICA_COUNT" }}"
+      - name: server_name
+        value: "{{ requiredEnv "SERVER_NAME" }}"
   - name: radar-hotstorage
     chart: ../charts/radar-hotstorage
     installed: {{ requiredEnv "RADAR_INSTALL_DASHBOARD" }}
-    values:
-    - image:
-        tag: "{{ requiredEnv "RADAR_HOTSTORAGE_IMAGE_TAG" }}"
-      replicaCount: "{{ requiredEnv "RADAR_HOTSTORAGE_REPLICA_COUNT" }}"
-      hotstorage:
-        password: "{{ requiredEnv "HOTSTORAGE_PASSWORD" }}"
+    set:
+      - name: image.tag
+        value: "{{ requiredEnv "RADAR_HOTSTORAGE_IMAGE_TAG" }}"
+      - name: replicaCount
+        value: "{{ requiredEnv "RADAR_HOTSTORAGE_REPLICA_COUNT" }}"
+      - name: hotstorage.password
+        value: "{{ requiredEnv "HOTSTORAGE_PASSWORD" }}"
   - name: radar-mongodb-connector
     chart: ../charts/radar-mongodb-connector
     installed: {{ requiredEnv "RADAR_INSTALL_DASHBOARD" }}
-    values:
-    - image:
-        tag: "{{ requiredEnv "RADAR_MONGODB_CONNECTOR_IMAGE_TAG" }}"
-      replicaCount: "{{ requiredEnv "RADAR_MONGODB_CONNECTOR_REPLICA_COUNT" }}"
-      kafka_num_brokers: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
-      mongodb:
-        password: "{{ requiredEnv "HOTSTORAGE_PASSWORD" }}"
+    set:
+      - name: image.tag
+        value: "{{ requiredEnv "RADAR_MONGODB_CONNECTOR_IMAGE_TAG" }}"
+      - name: replicaCount
+        value: "{{ requiredEnv "RADAR_MONGODB_CONNECTOR_REPLICA_COUNT" }}"
+      - name: kafka_num_brokers
+        value: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
+      - name: mongodb.password
+        value: "{{ requiredEnv "HOTSTORAGE_PASSWORD" }}"
   - name: radar-restapi
     chart: ../charts/radar-restapi
     installed: {{ requiredEnv "RADAR_INSTALL_DASHBOARD" }}
-    values:
-    - image:
-        tag: "{{ requiredEnv "RADAR_RESTAPI_IMAGE_TAG" }}"
-      replicaCount: "{{ requiredEnv "RADAR_RESTAPI_REPLICA_COUNT" }}"
-      ingress:
-        hosts:
-         - "{{ requiredEnv "SERVER_NAME" }}"
-      mongodb:
-        password: "{{ requiredEnv "HOTSTORAGE_PASSWORD" }}"
+    set:
+      - name: image.tag
+        value: "{{ requiredEnv "RADAR_RESTAPI_IMAGE_TAG" }}"
+      - name: replicaCount
+        value: "{{ requiredEnv "RADAR_RESTAPI_REPLICA_COUNT" }}"
+      - name: ingress.hosts
+        values: ["{{ requiredEnv "SERVER_NAME" }}"]
+      - name: mongodb.password
+        value: "{{ requiredEnv "HOTSTORAGE_PASSWORD" }}"

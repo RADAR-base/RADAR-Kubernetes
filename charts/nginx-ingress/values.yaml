@@ -4,8 +4,6 @@ controller:
   config:
     http-snippet:
       limit_req_zone $binary_remote_addr zone=login_limit:10m rate=2r/s;
-
-controller:
   metrics:
     enabled: "true"
     serviceMonitor:
