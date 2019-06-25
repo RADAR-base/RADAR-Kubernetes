@@ -9,15 +9,18 @@ releases:
     installed: {{ requiredEnv "RADAR_INSTALL_INGESTION" }}
     values:
       - "../charts/cp-kafka-rest/values.yaml"
-      - replicaCount: "{{ requiredEnv "CP_KAFKA_REST_REPLICA_COUNT" }}"
-        imageTag: "{{ requiredEnv "CP_KAFKA_REST_IMAGE_TAG" }}"
+    set:
+      - name: imageTag
+        value: "{{ requiredEnv "CP_KAFKA_REST_IMAGE_TAG" }}"
+      - name: replicaCount
+        value: "{{ requiredEnv "CP_KAFKA_REST_REPLICA_COUNT" }}"
   - name: radar-gateway
     chart: ../charts/radar-gateway
     installed: {{ requiredEnv "RADAR_INSTALL_INGESTION" }}
-    values:
-    - image:
-        tag: "{{ requiredEnv "RADAR_GATEWAY_IMAGE_TAG" }}"
-      ingress:
-        hosts:
-         - "{{ requiredEnv "SERVER_NAME" }}"
-      replicaCount: "{{ requiredEnv "RADAR_GATEWAY_REPLICA_COUNT" }}"
+    set:
+      - name: image.tag
+        value: "{{ requiredEnv "RADAR_GATEWAY_IMAGE_TAG" }}"
+      - name: replicaCount
+        value: "{{ requiredEnv "RADAR_GATEWAY_REPLICA_COUNT" }}"
+      - name: ingress.hosts
+        values: ["{{ requiredEnv "SERVER_NAME" }}"]

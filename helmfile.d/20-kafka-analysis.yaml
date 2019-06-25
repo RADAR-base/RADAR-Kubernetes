@@ -8,25 +8,36 @@ releases:
     installed: {{ requiredEnv "RADAR_INSTALL_KAFKA_ANALYSIS" }}
     values:
     - "../charts/radar-backend/values-monitor.yaml"
-    - image:
-        tag: "{{ requiredEnv "RADAR_BACKEND_IMAGE_TAG" }}"
-      replicaCount: "{{ requiredEnv "RADAR_BACKEND_MONITOR_REPLICA_COUNT" }}"
-      kafka_num_brokers: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
+    set:
+      - name: image.tag
+        value: "{{ requiredEnv "RADAR_BACKEND_IMAGE_TAG" }}"
+      - name: replicaCount
+        value: "{{ requiredEnv "RADAR_BACKEND_MONITOR_REPLICA_COUNT" }}"
+      - name: kafka_num_brokers
+        value: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
   - name: radar-backend-stream
     chart: ../charts/radar-backend
     installed: {{ requiredEnv "RADAR_INSTALL_KAFKA_ANALYSIS" }}
     values:
     - "../charts/radar-backend/values-stream.yaml"
-    - image:
-        tag: "{{ requiredEnv "RADAR_BACKEND_IMAGE_TAG" }}"
-      replicaCount: "{{ requiredEnv "RADAR_BACKEND_STREAM_REPLICA_COUNT" }}"
-      kafka_num_brokers: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
+    set:
+      - name: image.tag
+        value: "{{ requiredEnv "RADAR_BACKEND_IMAGE_TAG" }}"
+      - name: replicaCount
+        value: "{{ requiredEnv "RADAR_BACKEND_STREAM_REPLICA_COUNT" }}"
+      - name: kafka_num_brokers
+        value: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
   - name: smtp
     chart: ../charts/smtp
     installed: {{ requiredEnv "RADAR_INSTALL_KAFKA_ANALYSIS" }}
-    values:
-    - replicaCount: "{{ requiredEnv "SMTP_REPLICA_COUNT" }}"
-      smarthost:
-        address: "{{ requiredEnv "SMTP_ADDRESS" }}"
-        user: "{{ requiredEnv "SMTP_USER" }}"
-        password: "{{ requiredEnv "SMTP_PASSWORD" }}"
+    set:
+      - name: image.tag
+        value: "{{ requiredEnv "SMTP_IMAGE_TAG" }}"
+      - name: replicaCount
+        value: "{{ requiredEnv "SMTP_REPLICA_COUNT" }}"
+      - name: smarthost.address
+        value: "{{ requiredEnv "SMTP_ADDRESS" }}"
+      - name: smarthost.user
+        value: "{{ requiredEnv "SMTP_USER" }}"
+      - name: smarthost.password
+        value: "{{ requiredEnv "SMTP_PASSWORD" }}"
