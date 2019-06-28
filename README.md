@@ -6,12 +6,39 @@ This repository is still in **alpha** stage and it's not ready for production us
 
 
 ## Installation
-Install [helm](https://github.com/helm/helm#install), [helm-diff](https://github.com/databus23/helm-diff#install) and [helmfile](https://github.com/roboll/helmfile#installation) and then run following commands:
+You need to have a working Kubernetes installation and there are 3 ways to have that:
+* From cloud providers suchs as:
+ * [AWS](https://aws.amazon.com/eks/)
+ * [GCP](https://cloud.google.com/kubernetes-engine/)
+ * [Azure](https://docs.microsoft.com/en-us/azure/aks/)
+ * And many more...
+* Install it on your own servers with:
+ * [Rancher](https://rancher.com/)
+ * [Kubespray](https://github.com/kubernetes-sigs/kubespray)
+ * [Kubeadm](https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/)
+ * [OpenShift](https://www.okd.io/)
+ * And many more...
+* Install it on your local machine with:
+ * [Minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/)
+ * [K3S](https://k3s.io/)
+
+**Note 1:** This setup is currently only tested on [AWS EKS](https://aws.amazon.com/eks/) however because of cloud agnostic approach of Kubernetes you should be able install this stack on any Kubernets installation.
+
+**Note 2:** If you're not using a cloud provider you need to make sure that you can [load balance](https://kubernetes.github.io/ingress-nginx/deploy/baremetal/) and [expose  applications](https://kubernetes.io/docs/concepts/services-networking/connect-applications-service/#exposing-the-service) and provide [persistent volumes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/).
+
+You need to have following tools installed in your machine to install the stack:
+* Git
+* Java (Used by `keystore-init` script to generate keys)
+* [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+* [helm](https://github.com/helm/helm#install)
+* [helm-diff](https://github.com/databus23/helm-diff#install)
+* [helmfile](https://github.com/roboll/helmfile#installation)
+
+After installing them run following commands:
 ```shell
+git clone https://github.com/RADAR-base/RADAR-Kubernetes.git
+cd RADAR-Kubernetes
 git clone https://github.com/RADAR-base/cp-helm-charts.git
-kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.7/deploy/manifests/00-crds.yaml
-kubectl create namespace cert-manager
-kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true
 cp env.template .env
 vim .env  # Change setup parameters and configurations
 source .env
@@ -52,6 +79,42 @@ https://www.web2generators.com/apache-tools/htpasswd-generator
 
 Or following command:
 ```
-sudo docker run --rm httpd:2.4-alpine htpasswd -nbB <username> <password>
+sudo docker run --rm httpd:2.4-alpine htpasswd -nb <username> <password>
 ```
 And put the output to the `MONITORING_NGINX_AUTH` variable in `.env` file.
+It seems like bcrypt encryption isn't supported in current ingress-nginx so make sure that you're using MD5 encryption.
+
+## Usage
+After installation you can check cluster status with `kubectl get pods` command and if it has been successful you should see an output similar to this:
+```
+NAME                                             READY   STATUS    RESTARTS   AGE
+catalog-server-65d7cd5fd5-df7mm                  1/1     Running   0          1h
+cp-kafka-0                                       2/2     Running   0          1h
+cp-kafka-1                                       2/2     Running   0          1h
+cp-kafka-2                                       2/2     Running   0          1h
+cp-kafka-rest-7f8fbc6d9-ktlwd                    2/2     Running   0          1h
+cp-schema-registry-6bf9fb9f89-5qdzc              2/2     Running   0          1h
+cp-zookeeper-0                                   2/2     Running   0          1h
+cp-zookeeper-1                                   2/2     Running   0          1h
+cp-zookeeper-2                                   2/2     Running   0          1h
+hdfs-datanode-0                                  1/1     Running   0          1h
+hdfs-datanode-1                                  1/1     Running   0          1h
+hdfs-datanode-2                                  1/1     Running   0          1h
+hdfs-namenode-0                                  1/1     Running   0          1h
+kafka-manager-6c9c75676c-qdckg                   1/1     Running   0          1h
+management-portal-748655c69-ghd7z                1/1     Running   0          1h
+nginx-ingress-controller-85d89d6776-tgfwv        1/1     Running   0          1h
+nginx-ingress-default-backend-6694789b87-jstq6   1/1     Running   0          1h
+postgresql-postgresql-master-0                   2/2     Running   0          1h
+postgresql-postgresql-slave-0                    1/1     Running   0          1h
+radar-backend-monitor-b468ff5d9-2gtsm            1/1     Running   0          1h
+radar-backend-stream-bd8c768cb-4rf8v             1/1     Running   0          1h
+radar-connect-hdfs-sink-5b74664d84-n2vfv         1/1     Running   0          1h
+radar-dashboard-6fbb7b646c-rmmf7                 1/1     Running   0          1h
+radar-gateway-74496dd958-6vz5v                   2/2     Running   0          1h
+radar-hotstorage-84777f4fc-q7mhd                 1/1     Running   0          1h
+radar-mongodb-connector-5b6b9b77d4-4g7c6         1/1     Running   0          1h
+radar-output-7579864f58-c9bzd                    2/2     Running   0          1h
+radar-restapi-bfd4c87-dvl8v                      1/1     Running   0          1h
+smtp-57fff69b4f-gvrqv                            1/1     Running   0          1h
+```
