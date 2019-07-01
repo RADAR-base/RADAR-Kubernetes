@@ -52,13 +52,17 @@ spec:
                   name: {{ template "kafka-manager.fullname" . }}
                   key: basicAuthPassword
           livenessProbe:
-            httpGet:
-              path: /kafkamanager/api/health
-              port: kafka-manager
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - wget localhost:9000/kafkamanager/api/health 2>&1 | grep -q 401 || exit 1
           readinessProbe:
-            httpGet:
-              path: /kafkamanager/api/health
-              port: kafka-manager
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - wget localhost:9000/kafkamanager/api/health 2>&1 | grep -q 401 || exit 1
           resources:
 {{ toYaml .Values.resources | indent 12 }}
     {{- with .Values.nodeSelector }}
