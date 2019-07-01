@@ -3,10 +3,10 @@ helmDefaults:
   force: true
 
 releases:
-  - name: cert
+  - name: cert-manager
     namespace: cert-manager
     wait: true
-    chart: ../charts/cert
+    chart: ../charts/cert-manager
     set:
       - name: server_name
         value: {{ requiredEnv "SERVER_NAME" }}
@@ -20,32 +20,39 @@ releases:
     timeout: 600
     namespace: monitoring
     values:
-      - "../charts/prometheus-operator/origin-values.yaml"
+      # - "../charts/prometheus-operator/origin-values.yaml"
       - "../charts/prometheus-operator/values.yaml"
     set:
-      - name: prometheus.ingress.hosts
+      - name: prometheus-operator.prometheus.ingress.hosts
         values: ["prometheus.{{ requiredEnv "SERVER_NAME" }}"]
-      - name: prometheus.ingress.tls[0].hosts
+      - name: prometheus-operator.prometheus.ingress.tls[0].secretName
+        value: radar-base-tls
+      - name: prometheus-operator.prometheus.ingress.tls[0].hosts
         values: ["prometheus.{{ requiredEnv "SERVER_NAME" }}"]
 
-      - name: alertmanager.ingress.hosts
+      - name: prometheus-operator.alertmanager.ingress.hosts
         values: ["alertmanager.{{ requiredEnv "SERVER_NAME" }}"]
-      - name: alertmanager.ingress.tls[0].hosts
+      - name: prometheus-operator.alertmanager.ingress.tls[0].secretName
+        value: radar-base-tls
+      - name: prometheus-operator.alertmanager.ingress.tls[0].hosts
         values: ["alertmanager.{{ requiredEnv "SERVER_NAME" }}"]
 
-      - name: grafana.ingress.hosts
+      - name: prometheus-operator.grafana.ingress.hosts
         values: ["grafana.{{ requiredEnv "SERVER_NAME" }}"]
-      - name: grafana.ingress.tls[0].hosts
+      - name: prometheus-operator.grafana.ingress.tls[0].secretName
+        value: radar-base-tls
+      - name: prometheus-operator.grafana.ingress.tls[0].hosts
         values: ["grafana.{{ requiredEnv "SERVER_NAME" }}"]
 
       - name: nginx_auth
         value: "{{ requiredEnv "MONITORING_NGINX_AUTH" }}"
 
-      - name: receivers
-        value: |-
-          slack_config:
-            api_url: "{{ requiredEnv "MONITORING_SLACK_WEBHOOK_URL" }}"
-            channel: "{{ requiredEnv "MONITORING_SLACK_CHANNEL" }}"
+      - name: prometheus-operator.alertmanager.config.receivers[1].name
+        value: "default"
+      - name: prometheus-operator.alertmanager.config.receivers[1].slack_configs[0].api_url
+        value: "{{ requiredEnv "MONITORING_SLACK_WEBHOOK_URL" }}"
+      - name: prometheus-operator.alertmanager.config.receivers[1].slack_configs[0].channel
+        value: "{{ requiredEnv "MONITORING_SLACK_CHANNEL" }}"
 
   - name: nginx-ingress
     chart: stable/nginx-ingress
@@ -65,6 +72,8 @@ releases:
         value: "{{ requiredEnv "KAFKA_MANAGER_IMAGE_TAG" }}"
       - name: ingress.hosts
         values: ["{{ requiredEnv "SERVER_NAME" }}"]
+      - name: ingress.tls[0].secretName
+        value: radar-base-tls
       - name: ingress.tls[0].hosts
         values: ["{{ requiredEnv "SERVER_NAME" }}"]
       - name: basicAuth.enabled

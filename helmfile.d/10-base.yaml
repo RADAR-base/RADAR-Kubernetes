@@ -35,6 +35,10 @@ releases:
         value: "{{ requiredEnv "CP_SCHEMA_REGISTRY_IMAGE_TAG" }}"
       - name: ingress.hosts[0].host
         value: "{{ requiredEnv "SERVER_NAME" }}"
+      - name: ingress.hosts[0].paths
+        values: ["/schema/?(.*)"]
+      - name: ingress.tls[0].secretName
+        value: radar-base-tls
       - name: ingress.tls[0].hosts
         values: ["{{ requiredEnv "SERVER_NAME" }}"]
   - name: catalog-server
@@ -63,7 +67,7 @@ releases:
       - name: postgresqlPassword
         value: "{{ requiredEnv "POSTGRES_PASSWORD" }}"
       - name: image.tag
-        value: "{{ requiredEnv "POSTGRESQL_IMAGE_TAG" }}"
+        value: "{{ requiredEnv "POSTGRES_IMAGE_TAG" }}"
 
   - name: management-portal
     chart: ../charts/management-portal

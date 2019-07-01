@@ -8,19 +8,19 @@ This repository is still in **alpha** stage and it's not ready for production us
 ## Installation
 You need to have a working Kubernetes installation and there are 3 ways to have that:
 * From cloud providers suchs as:
- * [AWS](https://aws.amazon.com/eks/)
- * [GCP](https://cloud.google.com/kubernetes-engine/)
- * [Azure](https://docs.microsoft.com/en-us/azure/aks/)
- * And many more...
+  * [AWS](https://aws.amazon.com/eks/)
+  * [GCP](https://cloud.google.com/kubernetes-engine/)
+  * [Azure](https://docs.microsoft.com/en-us/azure/aks/)
+  * And many more...
 * Install it on your own servers with:
- * [Rancher](https://rancher.com/)
- * [Kubespray](https://github.com/kubernetes-sigs/kubespray)
- * [Kubeadm](https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/)
- * [OpenShift](https://www.okd.io/)
- * And many more...
+  * [Rancher](https://rancher.com/)
+  * [Kubespray](https://github.com/kubernetes-sigs/kubespray)
+  * [Kubeadm](https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/)
+  * [OpenShift](https://www.okd.io/)
+  * And many more...
 * Install it on your local machine with:
- * [Minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/)
- * [K3S](https://k3s.io/)
+  * [Minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/)
+  * [K3S](https://k3s.io/)
 
 **Note 1:** This setup is currently only tested on [AWS EKS](https://aws.amazon.com/eks/) however because of cloud agnostic approach of Kubernetes you should be able install this stack on any Kubernets installation.
 

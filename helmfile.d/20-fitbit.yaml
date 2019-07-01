@@ -4,7 +4,8 @@ helmDefaults:
 
 releases:
   - name: radar-fitbit-connector
-    chart: ./charts/radar-fitbit-connector
+    chart: ../charts/radar-fitbit-connector
+    installed: {{ requiredEnv "RADAR_INSTALL_FITBIT" }}
     set:
       - name: image.tag
         value: "{{ requiredEnv "RADAR_FITBIT_CONNECTOR_IMAGE_TAG" }}"
@@ -17,7 +18,8 @@ releases:
       - name: fitbit_api_secret
         value: "{{ requiredEnv "FITBIT_API_CLIENT_SECRET" }}"
   - name: radar-rest-sources-authorizer
-    chart: ./charts/radar-rest-sources-authorizer
+    chart: ../charts/radar-rest-sources-authorizer
+    installed: {{ requiredEnv "RADAR_INSTALL_FITBIT" }}
     set:
       - name: image.tag
         value: "{{ requiredEnv "RADAR_REST_SOURCES_AUTHORIZER_IMAGE_TAG" }}"
@@ -28,7 +30,8 @@ releases:
       - name: fitbit_api_secret
         value: "{{ requiredEnv "FITBIT_API_CLIENT_SECRET" }}"
   - name: radar-rest-sources-backend
-    chart: ./charts/radar-rest-sources-backend
+    chart: ../charts/radar-rest-sources-backend
+    installed: {{ requiredEnv "RADAR_INSTALL_FITBIT" }}
     set:
       - name: image.tag
         value: "{{ requiredEnv "RADAR_REST_SOURCES_BACKEND_IMAGE_TAG" }}"
