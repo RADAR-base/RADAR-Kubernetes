@@ -22,7 +22,7 @@ You need to have a working Kubernetes installation and there are 3 ways to have 
   * [Minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/)
   * [K3S](https://k3s.io/)
 
-**Note 1:** This setup is currently only tested on [AWS EKS](https://aws.amazon.com/eks/) however because of cloud agnostic approach of Kubernetes you should be able install this stack on any Kubernets installation.
+**Note 1:** This setup is currently only tested on [AWS EKS](https://aws.amazon.com/eks/) however because of cloud agnostic approach of Kubernetes you should be able install this stack on any Kubernetes installation. Also the idea behind using `helm` and `helmfile` has been allowing more complex and customized setups without too much change in the original repository, so if current approach isn't working in your environment you can easily change components to your needs.
 
 **Note 2:** If you're not using a cloud provider you need to make sure that you can [load balance](https://kubernetes.github.io/ingress-nginx/deploy/baremetal/) and [expose  applications](https://kubernetes.io/docs/concepts/services-networking/connect-applications-service/#exposing-the-service) and provide [persistent volumes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/).
 
@@ -118,3 +118,65 @@ radar-output-7579864f58-c9bzd                    2/2     Running   0          1h
 radar-restapi-bfd4c87-dvl8v                      1/1     Running   0          1h
 smtp-57fff69b4f-gvrqv                            1/1     Running   0          1h
 ```
+
+If you have enabled monitoring and SSL you should see these as well:
+```
+➜ kubectl -n monitoring get pods                                                            
+NAME                                                      READY   STATUS    RESTARTS   AGE
+alertmanager-prometheus-operator-alertmanager-0           2/2     Running   0          1h
+prometheus-operator-grafana-6746956b44-krxzh              2/2     Running   0          1h
+prometheus-operator-kube-state-metrics-5d55bd954f-2zj4c   1/1     Running   0          1h
+prometheus-operator-operator-77c55d5484-m8c4p             1/1     Running   0          1h
+prometheus-operator-prometheus-node-exporter-6nrgj        1/1     Running   0          1h
+prometheus-operator-prometheus-node-exporter-7hdzh        1/1     Running   0          1h
+prometheus-operator-prometheus-node-exporter-xp86p        1/1     Running   0          1h
+prometheus-prometheus-operator-prometheus-0               3/3     Running   0          1h
+
+➜ kubectl -n cert-manager get pods
+NAME                            READY   STATUS    RESTARTS   AGE
+cert-manager-776cd4f499-688bm   1/1     Running   0          1h
+```
+
+### Accessing the applications
+In order to access to the applications first you need to find the IP address that Nginx service is listening to and then point the domain that you've specified in `SERVER_NAME` variable to this IP address via a DNS server (e.g. [Route53](https://aws.amazon.com/route53/), [Cloudflare](https://www.cloudflare.com/dns/), [Bind](https://www.isc.org/bind/)) or [`hosts` file](https://en.wikipedia.org/wiki/Hosts_(file)) in your local machine.
+> For this guide we assume that you've set `SERVER_NAME` to "k8s.radar-base.org" and SSL is enabled.
+
+You can see details of Nginx service with following command:
+```
+➜ kubectl get service nginx-ingress-controller
+NAME                       TYPE           CLUSTER-IP      EXTERNAL-IP                           PORT(S)                      AGE
+nginx-ingress-controller   LoadBalancer   10.100.237.75   XXXX.eu-central-1.elb.amazonaws.com   80:31046/TCP,443:30932/TCP   1h
+```
+* If you're using a cloud provider you need to point the value in `EXTERNAL-IP` column (in this example `XXXX.eu-central-1.elb.amazonaws.com`) to `k8s.radar-base.org` domain in your DNS server.
+* If you're not using a cloud provider you need to use a load balancer to expose `31046` and `30932` ports (will be different in your setup) to a IP address and then point `k8s.radar-base.org` domain to that IP address.
+* For development and testing purposes you can run `sudo kubectl port-forward svc/nginx-ingress-controller 80:80 443:443` which will forward Nginx service ports to your local machine and you can have access to applications after adding `127.0.0.1       k8s.radar-base.org` to your `hosts` file.
+
+**Note:** If you've enabled monitoring you should point `*.SERVER_NAME` domain to the same address as `SERVER_NAME`.
+
+Now depending on your setup you should have access to following URLs:
+```
+https://alertmanager.k8s.radar-base.org
+https://grafana.k8s.radar-base.org
+https://k8s.radar-base.org/api
+https://k8s.radar-base.org/dashboard
+https://k8s.radar-base.org/kafka
+https://k8s.radar-base.org/kafkamanager
+https://k8s.radar-base.org/managementportal
+https://k8s.radar-base.org/schema
+https://prometheus.k8s.radar-base.org
+```
+
+#### Radar output
+If `RADAR_INSTALL_HDFS` is set to `true` you can have access to Radar output via SFTP protocol. Default username is `dl` and password login is disabled and you can only connect to it via a ssh key pair (you should put the public key in `RADAR_OUTPUT_SFTP_PUBLIC_KEY` variable).\
+In order to get `host` you should run this command:
+```
+➜ kubectl get service radar-output
+NAME           TYPE           CLUSTER-IP      EXTERNAL-IP                           PORT(S)        AGE
+radar-output   LoadBalancer   10.100.43.218   XXXX.eu-central-1.elb.amazonaws.com   22:32606/TCP   1h
+```
+And now you can use value in `EXTERNAL-IP` column (in this example `XXXX.eu-central-1.elb.amazonaws.com`) as `host` to connect to SFTP server.\
+Alternatively you can forward SSH port to your local machine and connect locally via this command:
+```
+kubectl port-forward svc/radar-output 2222:22
+```
+Now you can use "127.0.0.1" as `host` and "2222" as the `port` to connect to SFTP server.
