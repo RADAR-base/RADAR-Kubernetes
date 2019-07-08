@@ -1,6 +1,6 @@
 helmDefaults:
   atomic: true
-  wait: false
+  timeout: 600
 
 releases:
   - name: radar-dashboard

@@ -1,8 +1,22 @@
 helmDefaults:
   atomic: true
-  wait: false
+  timeout: 600
 
 releases:
+  - name: smtp
+    chart: ../charts/smtp
+    installed: {{ requiredEnv "RADAR_INSTALL_KAFKA_ANALYSIS" }}
+    set:
+      - name: image.tag
+        value: "{{ requiredEnv "SMTP_IMAGE_TAG" }}"
+      - name: replicaCount
+        value: "{{ requiredEnv "SMTP_REPLICA_COUNT" }}"
+      - name: smarthost.address
+        value: "{{ requiredEnv "SMTP_ADDRESS" }}"
+      - name: smarthost.user
+        value: "{{ requiredEnv "SMTP_USER" }}"
+      - name: smarthost.password
+        value: "{{ requiredEnv "SMTP_PASSWORD" }}"
   - name: radar-backend-monitor
     chart: ../charts/radar-backend
     installed: {{ requiredEnv "RADAR_INSTALL_KAFKA_ANALYSIS" }}
@@ -27,17 +41,3 @@ releases:
         value: "{{ requiredEnv "RADAR_BACKEND_STREAM_REPLICA_COUNT" }}"
       - name: kafka_num_brokers
         value: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
-  - name: smtp
-    chart: ../charts/smtp
-    installed: {{ requiredEnv "RADAR_INSTALL_KAFKA_ANALYSIS" }}
-    set:
-      - name: image.tag
-        value: "{{ requiredEnv "SMTP_IMAGE_TAG" }}"
-      - name: replicaCount
-        value: "{{ requiredEnv "SMTP_REPLICA_COUNT" }}"
-      - name: smarthost.address
-        value: "{{ requiredEnv "SMTP_ADDRESS" }}"
-      - name: smarthost.user
-        value: "{{ requiredEnv "SMTP_USER" }}"
-      - name: smarthost.password
-        value: "{{ requiredEnv "SMTP_PASSWORD" }}"

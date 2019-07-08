@@ -6,6 +6,27 @@ prometheus-operator:
   prometheus:
     prometheusSpec:
       serviceMonitorSelectorNilUsesHelmValues: "false"
+      ruleNamespaceSelector:
+        namespaceSelector:
+          matchNames:
+          - default
+          - monitoring
+      ruleSelector:
+        namespaceSelector:
+          matchNames:
+          - default
+          - monitoring
+      serviceMonitorNamespaceSelector:
+        namespaceSelector:
+          matchNames:
+          - default
+          - monitoring
+      serviceMonitorSelector:
+        namespaceSelector:
+          matchNames:
+          - default
+          - monitoring
+
     ingress:
       enabled: true
       annotations:

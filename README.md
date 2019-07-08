@@ -46,7 +46,7 @@ source .env
 helmfile sync --concurrency 1
 ```
 
-Having `--concurrency 1` is necessary because some components such as `prometheus-operator` and `kafka-init` (aka `catalog-server`) should be installed in their specified order, if you've forgotten to use this flag the installation will not be successful and you need to go some cleaning before you can try to install again:
+Having `--concurrency 1` will make installation slower but it is necessary because some components such as `prometheus-operator` and `kafka-init` (aka `catalog-server`) should be installed in their specified order, if you've forgotten to use this flag the installation will not be successful and you need to go some cleaning before you can try to install again:
 
 ### prometheus-operator
 The Prometheus-operator will define a `ServiceMonitor` CRD that other services with monitoring enabled will use, so please make sure that Prometheus chart installs successfully before preceding. By default it's configured to wait for Prometheus deployment to be finished in 10 minutes if this time isn't enough for your environment change it accordingly. If the deployment has been failed for the first time then you should delete it first and then try installing the stack again:

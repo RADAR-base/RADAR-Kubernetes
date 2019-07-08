@@ -1,18 +1,8 @@
 helmDefaults:
   atomic: true
-  wait: false
+  timeout: 600
 
 releases:
-  - name: hdfs-datanode
-    chart: ../charts/hdfs
-    installed: {{ requiredEnv "RADAR_INSTALL_HDFS" }}
-    values:
-    - "../charts/hdfs/values-datanode.yaml"
-    set:
-      - name: image.tag
-        value: "{{ requiredEnv "HDFS_IMAGE_TAG" }}"
-      - name: replicaCount
-        value: "{{ requiredEnv "HDFS_DATANODE_REPLICA_COUNT" }}"
   - name: hdfs-namenode
     chart: ../charts/hdfs
     installed: {{ requiredEnv "RADAR_INSTALL_HDFS" }}
@@ -23,6 +13,16 @@ releases:
         value: "{{ requiredEnv "HDFS_IMAGE_TAG" }}"
       - name: replicaCount
         value: "{{ requiredEnv "HDFS_NAMENODE_REPLICA_COUNT" }}"
+  - name: hdfs-datanode
+    chart: ../charts/hdfs
+    installed: {{ requiredEnv "RADAR_INSTALL_HDFS" }}
+    values:
+    - "../charts/hdfs/values-datanode.yaml"
+    set:
+      - name: image.tag
+        value: "{{ requiredEnv "HDFS_IMAGE_TAG" }}"
+      - name: replicaCount
+        value: "{{ requiredEnv "HDFS_DATANODE_REPLICA_COUNT" }}"
   - name: radar-connect-hdfs-sink
     chart: ../charts/radar-connect-hdfs-sink
     installed: {{ requiredEnv "RADAR_INSTALL_HDFS" }}
