@@ -6,7 +6,7 @@ replicaCount: 2
 
 image:
   repository: radarbase/kafka-init
-  tag: latest
+  tag: 0.4.3
   pullPolicy: IfNotPresent
 
 nameOverride: ""

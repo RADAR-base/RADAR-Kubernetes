@@ -1,6 +1,7 @@
 helmDefaults:
   atomic: true
-
+  timeout: 600
+  
 releases:
   - name: cp-zookeeper
     chart: ../cp-helm-charts/charts/cp-zookeeper
@@ -53,7 +54,6 @@ releases:
       - name: kafka_num_brokers
         value: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
 
-
   - name: postgresql
     chart: stable/postgresql
     version: 5.3.3
@@ -83,3 +83,25 @@ releases:
         value: "{{ requiredEnv "SERVER_NAME" }}"
       - name: postgres.password
         value: "{{ requiredEnv "POSTGRES_PASSWORD" }}"
+      - name: managementportal.catalogue_server_enable_auto_import
+        value: "{{ requiredEnv "MANAGEMENTPORTAL_CATALOGUE_SERVER_ENABLE_AUTO_IMPORT" }}"
+      - name: managementportal.common_admin_password
+        value: "{{ requiredEnv "MANAGEMENTPORTAL_COMMON_ADMIN_PASSWORD" }}"
+      - name: managementportal.common_privacy_policy_url
+        value: "{{ requiredEnv "MANAGEMENTPORTAL_COMMON_PRIVACY_POLICY_URL" }}"
+      - name: managementportal.frontend_client_secret
+        value: "{{ requiredEnv "MANAGEMENTPORTAL_FRONTEND_CLIENT_SECRET" }}"
+      - name: managementportal.oauth_checking_key_aliases_0
+        value: "{{ requiredEnv "MANAGEMENTPORTAL_OAUTH_CHECKING_KEY_ALIASES_0" }}"
+      - name: managementportal.oauth_checking_key_aliases_1
+        value: "{{ requiredEnv "MANAGEMENTPORTAL_OAUTH_CHECKING_KEY_ALIASES_1" }}"
+
+  - name: nginx-ingress
+    chart: stable/nginx-ingress
+    version: 1.6.16
+    installed: {{ requiredEnv "RADAR_INSTALL_BASE" }}
+    values:
+      - "../charts/nginx-ingress/values.yaml"
+    set:
+      - name: controller.replicaCount
+        value: {{ requiredEnv "NGINX_INGRESS_REPLICA_COUNT" }}

@@ -1,11 +1,13 @@
 helmDefaults:
   atomic: true
   force: true
+  timeout: 600
 
 releases:
   - name: cert-manager
     namespace: cert-manager
     wait: true
+    installed: {{ requiredEnv "RADAR_INSTALL_BASE" }}
     chart: ../charts/cert-manager
     set:
       - name: server_name
@@ -15,10 +17,9 @@ releases:
 
   - name: prometheus-operator
     chart: ../charts/prometheus-operator
-    atomic: true
     wait: true
-    timeout: 600
     namespace: monitoring
+    installed: {{ requiredEnv "RADAR_INSTALL_BASE" }}
     values:
       # - "../charts/prometheus-operator/origin-values.yaml"
       - "../charts/prometheus-operator/values.yaml"
@@ -57,7 +58,7 @@ releases:
   - name: nginx-ingress
     chart: stable/nginx-ingress
     version: 1.6.16
-    wait: false
+    installed: {{ requiredEnv "RADAR_INSTALL_BASE" }}
     values:
       - "../charts/nginx-ingress/values.yaml"
     set:
@@ -67,6 +68,7 @@ releases:
   - name: kafka-manager
     chart: ../charts/kafka-manager
     wait: false
+    installed: {{ requiredEnv "RADAR_INSTALL_BASE" }}
     set:
       - name: image.tag
         value: "{{ requiredEnv "KAFKA_MANAGER_IMAGE_TAG" }}"
