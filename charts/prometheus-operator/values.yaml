@@ -1,3 +1,4 @@
+server_name: localhost
 
 nginx_auth: |
   test:$2y$05$/okvi.SPEUOHzFuW/lao0ejB.2XBQMDw2pNVxag8R.nKVr5Y/7pGm
