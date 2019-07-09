@@ -62,6 +62,17 @@ helm del --purge cp-kafka cp-zookeeper
 kubectl delete pvc datadir-0-cp-kafka-{0,1,2} datadir-cp-zookeeper-{0,1,2} datalogdir-cp-zookeeper-{0,1,2}
 ```
 
+### Uninstall
+If you want to remove the Radar-base from your cluster you need set all of your `RADAR_INSTALL_*` variables in `.env` file to `false` and then run the `helmfile sync --concurrency 1` command to delete the charts after that you need to run following commands to remove all of the traces of the installation:
+```
+kubectl delete crd prometheuses.monitoring.coreos.com prometheusrules.monitoring.coreos.com servicemonitors.monitoring.coreos.com alertmanagers.monitoring.coreos.com
+kubectl delete crd certificates.certmanager.k8s.io challenges.certmanager.k8s.io clusterissuers.certmanager.k8s.io issuers.certmanager.k8s.io orders.certmanager.k8s.io
+kubectl delete pvc --all
+kubectl -n cert-manager delete secrets letsencrypt-prod
+kubectl -n default delete secrets radar-base-tls
+kubectl -n monitoring delete secrets radar-base-tls
+```
+
 ## Volume expansion
 
 If want to resize a volumes after its initialization you need to make sure that it's supported by its underlying volume plugin:
