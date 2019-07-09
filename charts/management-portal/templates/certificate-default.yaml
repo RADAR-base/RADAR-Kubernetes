@@ -1,19 +1,16 @@
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
-  name: {{ include "cert-manager.fullname" . }}
-  namespace: default
+  name: {{ include "management-portal.fullname" . }}
 spec:
   secretName: radar-base-tls
   issuerRef:
     kind: ClusterIssuer
     name: letsencrypt-prod
-  commonName: {{ .Values.server_name }}
-  dnsNames:
-  - {{ .Values.server_name }}
+  commonName: {{ first .Values.ingress.hosts }}
+  dnsNames: {{ .Values.ingress.hosts }}
   acme:
     config:
     - http01:
         ingressClass: nginx
-      domains:
-      - {{ .Values.server_name }}
+      domains: {{ .Values.ingress.hosts }}

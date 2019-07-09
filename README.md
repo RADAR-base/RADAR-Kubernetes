@@ -30,7 +30,7 @@ You need to have following tools installed in your machine to install the stack:
 * Git
 * Java (Used by `keystore-init` script to generate keys)
 * [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
-* [helm](https://github.com/helm/helm#install)
+* [helm](https://github.com/helm/helm#install) (Server side component of Helm should be installed in Kubernetes cluster as well)
 * [helm-diff](https://github.com/databus23/helm-diff#install)
 * [helmfile](https://github.com/roboll/helmfile#installation)
 

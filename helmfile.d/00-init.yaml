@@ -24,6 +24,8 @@ releases:
       # - "../charts/prometheus-operator/origin-values.yaml"
       - "../charts/prometheus-operator/values.yaml"
     set:
+      - name: server_name
+        value: {{ requiredEnv "SERVER_NAME" }}
       - name: prometheus-operator.prometheus.ingress.hosts
         values: ["prometheus.{{ requiredEnv "SERVER_NAME" }}"]
       - name: prometheus-operator.prometheus.ingress.tls[0].secretName
