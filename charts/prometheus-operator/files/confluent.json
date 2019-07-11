@@ -1191,7 +1191,7 @@
           "expr": "cp_kafka_network_socketserver_networkprocessoravgidlepercent*100",
           "format": "time_series",
           "intervalFactor": 1,
-          "legendFormat": "{{kubernetes_pod_name}}",
+          "legendFormat": "{{pod}}",
           "refId": "A"
         }
       ],
@@ -1277,7 +1277,7 @@
           "expr": "cp_kafka_kafkarequesthandlerpool_requesthandleravgidlepercent*100",
           "format": "time_series",
           "intervalFactor": 1,
-          "legendFormat": "{{kubernetes_pod_name}}",
+          "legendFormat": "{{pod}}",
           "refId": "A"
         }
       ],
@@ -2230,7 +2230,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "cp_kafka_rest_jetty_metrics_connections_active",
+          "expr": "sum(cp_kafka_rest_jetty_metrics_connections_active)",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "A"
