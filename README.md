@@ -51,7 +51,7 @@ Having `--concurrency 1` will make installation slower but it is necessary becau
 ### prometheus-operator
 The Prometheus-operator will define a `ServiceMonitor` CRD that other services with monitoring enabled will use, so please make sure that Prometheus chart installs successfully before preceding. By default it's configured to wait for Prometheus deployment to be finished in 10 minutes if this time isn't enough for your environment change it accordingly. If the deployment has been failed for the first time then you should delete it first and then try installing the stack again:
 ```
-helm del --purge prometheus
+helm del --purge prometheus-operator
 kubectl delete crd prometheuses.monitoring.coreos.com prometheusrules.monitoring.coreos.com servicemonitors.monitoring.coreos.com alertmanagers.monitoring.coreos.com
 ```
 
@@ -176,6 +176,8 @@ https://k8s.radar-base.org/managementportal
 https://k8s.radar-base.org/schema
 https://prometheus.k8s.radar-base.org
 ```
+
+**Note:** If you have enabled the SSL you might see invalid certificate error when you try to access to the websites, in this case wait a couple of minutes until `cert-manager` issues those certificates.
 
 #### Radar output
 If `RADAR_INSTALL_HDFS` is set to `true` you can have access to Radar output via SFTP protocol. Default username is `dl` and password login is disabled and you can only connect to it via a ssh key pair (you should put the public key in `RADAR_OUTPUT_SFTP_PUBLIC_KEY` variable).\

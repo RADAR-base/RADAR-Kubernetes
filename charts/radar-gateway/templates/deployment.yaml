@@ -17,7 +17,6 @@ spec:
     metadata:
       annotations:
         checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
-        checksum/secret-is: {{ include (print $.Template.BasePath "/secret-is.yaml") . | sha256sum }}
       labels:
         app.kubernetes.io/name: {{ include "radar-gateway.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
@@ -56,8 +55,6 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["radar-gateway", "/etc/radar-gateway/gateway.yml"]
           env:
-          - name: RADAR_IS_CONFIG_LOCATION
-            value: "/etc/radar-gateway/is/radar-is.yml"
           - name: JAVA_OPTS
             value: "-XX:GCTimeRatio=19 -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=30"
           ports:
@@ -91,8 +88,6 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /etc/radar-gateway
-            - name: is
-              mountPath: /etc/radar-gateway/is
       volumes:
         - name: config
           configMap:
@@ -100,9 +95,6 @@ spec:
         - name: gateway-jmx-configmap
           configMap:
             name:  {{ include "radar-gateway.fullname" . }}-jmx-configmap
-        - name: is
-          secret:
-            secretName: {{ include "radar-gateway.fullname" . }}-is
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
