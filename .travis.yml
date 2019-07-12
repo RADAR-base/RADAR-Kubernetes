@@ -1,0 +1,14 @@
+language: generic
+env:
+  HELM_VERSION: v2.14.2
+  HELM: $HOME/bin/helm
+
+before_install:
+  - docker --version
+  - mkdir -p "$HOME/bin";
+  - export PATH="$HOME/bin:$PATH";
+  - curl -L https://get.helm.sh/helm-${HELM_VERSION}-`uname -s`-amd64.tar.gz | tar -xz -C bin --strip-components 1 linux-amd64/helm;
+  - chmod +x "$HELM";
+  - $HELM --version
+script:
+  - for i in $( ls charts ); do helm lint --strict charts/$i; done
