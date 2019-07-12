@@ -1,0 +1,13 @@
+language: generic
+env:
+  HELM_VERSION: v2.14.2
+  HELM: $HOME/bin/helm
+
+before_install:
+  - mkdir -p "$HOME/bin";
+  - export PATH="$HOME/bin:$PATH";
+  - curl -L https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz | tar -xz -C $HOME/bin --strip-components 1
+  - chmod +x "$HELM";
+  - $HELM version -c
+script:
+  - find `ls charts/*/Chart.yaml | cut -d'/' -f-2` -name 'value*.yaml' -execdir helm lint -f {} \;
