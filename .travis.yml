@@ -4,10 +4,10 @@ env:
   HELM: $HOME/bin/helm
 
 before_install:
-  - docker --version
   - mkdir -p "$HOME/bin";
   - export PATH="$HOME/bin:$PATH";
-  - curl -L https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz | tar -xz -C bin --strip-components 1 linux-amd64/helm;
+  - curl -L https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz | tar -xz -C bin --strip-components 1
+  - ls;pwd;ls bin
   - chmod +x "$HELM";
   - $HELM --version
 script:
