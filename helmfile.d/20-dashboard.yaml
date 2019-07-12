@@ -25,6 +25,8 @@ releases:
         value: "{{ requiredEnv "RADAR_HOTSTORAGE_REPLICA_COUNT" }}"
       - name: hotstorage.password
         value: "{{ requiredEnv "HOTSTORAGE_PASSWORD" }}"
+      - name: persistence.size
+        value: "{{ requiredEnv "RADAR_HOTSTORAGE_DISK_SIZE" }}"           
   - name: radar-mongodb-connector
     chart: ../charts/radar-mongodb-connector
     installed: {{ requiredEnv "RADAR_INSTALL_DASHBOARD" }}

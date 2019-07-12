@@ -7,6 +7,13 @@ prometheus-operator:
   prometheus:
     prometheusSpec:
       serviceMonitorSelectorNilUsesHelmValues: "false"
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 2Gi
       ruleNamespaceSelector:
         namespaceSelector:
           matchNames:
@@ -44,6 +51,15 @@ prometheus-operator:
         - localhost
 
   alertmanager:
+    alertmanagerSpec:
+      storage:
+        volumeClaimTemplate:
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 1Gi
+
     config:
       global:
         resolve_timeout: 5m
@@ -73,6 +89,7 @@ prometheus-operator:
         - localhost
 
   grafana:
+    adminPassword: "prom-operator"
     ingress:
       enabled: true
       annotations:
