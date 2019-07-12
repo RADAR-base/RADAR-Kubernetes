@@ -10,4 +10,4 @@ before_install:
   - chmod +x "$HELM";
   - $HELM version -c
 script:
-  - for i in $( ls charts ); do helm lint --strict charts/$i; done
+  - find `ls charts/*/Chart.yaml | cut -d'/' -f-2` -name 'value*.yaml' -execdir helm lint -f {} \;
