@@ -17,6 +17,8 @@ releases:
         value: "{{ requiredEnv "SMTP_USER" }}"
       - name: smarthost.password
         value: "{{ requiredEnv "SMTP_PASSWORD" }}"
+      - name: persistence.size
+        value: "{{ requiredEnv "SMTP_DISK_SIZE" }}"             
   - name: radar-backend-monitor
     chart: ../charts/radar-backend
     installed: {{ requiredEnv "RADAR_INSTALL_KAFKA_ANALYSIS" }}
@@ -29,6 +31,8 @@ releases:
         value: "{{ requiredEnv "RADAR_BACKEND_MONITOR_REPLICA_COUNT" }}"
       - name: kafka_num_brokers
         value: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
+      - name: persistence.size
+        value: "{{ requiredEnv "RADAR_BACKEND_MONITOR_DISK_SIZE" }}"
   - name: radar-backend-stream
     chart: ../charts/radar-backend
     installed: {{ requiredEnv "RADAR_INSTALL_KAFKA_ANALYSIS" }}

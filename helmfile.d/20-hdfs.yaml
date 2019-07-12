@@ -13,6 +13,10 @@ releases:
         value: "{{ requiredEnv "HDFS_IMAGE_TAG" }}"
       - name: replicaCount
         value: "{{ requiredEnv "HDFS_NAMENODE_REPLICA_COUNT" }}"
+      - name: volumes[0].size
+        value: "{{ requiredEnv "HDFS_NAMENODE_1_DISK_SIZE" }}"
+      - name: volumes[1].size
+        value: "{{ requiredEnv "HDFS_NAMENODE_2_DISK_SIZE" }}"
   - name: hdfs-datanode
     chart: ../charts/hdfs
     installed: {{ requiredEnv "RADAR_INSTALL_HDFS" }}
@@ -23,6 +27,8 @@ releases:
         value: "{{ requiredEnv "HDFS_IMAGE_TAG" }}"
       - name: replicaCount
         value: "{{ requiredEnv "HDFS_DATANODE_REPLICA_COUNT" }}"
+      - name: volumes[0].size
+        value: "{{ requiredEnv "HDFS_DATANODE_DISK_SIZE" }}"
   - name: radar-connect-hdfs-sink
     chart: ../charts/radar-connect-hdfs-sink
     installed: {{ requiredEnv "RADAR_INSTALL_HDFS" }}
@@ -45,3 +51,5 @@ releases:
         value: "{{ requiredEnv "RESTRUCTURE_NUM_THREADS" }}"
       - name: sftp_user_keys
         value: "{{ requiredEnv "RADAR_OUTPUT_SFTP_PUBLIC_KEY" }}"
+      - name: persistence.size
+        value: "{{ requiredEnv "RADAR_OUTPUT_DISK_SIZE" }}"    

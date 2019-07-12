@@ -1,7 +1,7 @@
 helmDefaults:
   atomic: true
   timeout: 600
-  
+
 releases:
   - name: cp-zookeeper
     chart: ../cp-helm-charts/charts/cp-zookeeper
@@ -23,6 +23,8 @@ releases:
         value: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
       - name: imageTag
         value: "{{ requiredEnv "CP_KAFKA_IMAGE_TAG" }}"
+      - name: persistence.size
+        value: "{{ requiredEnv "CP_KAFKA_DISK_SIZE" }}"
   - name: cp-schema-registry
     chart: ../cp-helm-charts/charts/cp-schema-registry
     wait: true
@@ -68,6 +70,8 @@ releases:
         value: "{{ requiredEnv "POSTGRES_PASSWORD" }}"
       - name: image.tag
         value: "{{ requiredEnv "POSTGRES_IMAGE_TAG" }}"
+      - name: persistence.size
+        value: "{{ requiredEnv "POSTGRES_DISK_SIZE" }}"
 
   - name: management-portal
     chart: ../charts/management-portal
