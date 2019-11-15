@@ -22,7 +22,8 @@ ingress:
     kubernetes.io/ingress.class: nginx
     certmanager.k8s.io/acme-challenge-type: http01
     certmanager.k8s.io/issuer: letsencrypt-prod
-  path: "/radar-upload"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+  path: "/upload/api/?(.*)"
   hosts:
     - localhost
   tls:
