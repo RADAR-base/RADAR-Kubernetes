@@ -1,27 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "radar-backend.fullname" . }}
+  name: {{ include "radar-upload-connect-backend.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "radar-backend.name" . }}
-    helm.sh/chart: {{ include "radar-backend.chart" . }}
+    app.kubernetes.io/name: {{ include "radar-upload-connect-backend.name" . }}
+    helm.sh/chart: {{ include "radar-upload-connect-backend.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "radar-backend.name" . }}
+      app.kubernetes.io/name: {{ include "radar-upload-connect-backend.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
-  strategy:
-    rollingUpdate:
-      maxUnavailable: 100%
   template:
     metadata:
-      annotations:
-        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
       labels:
-        app.kubernetes.io/name: {{ include "radar-backend.name" . }}
+        app.kubernetes.io/name: {{ include "radar-upload-connect-backend.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
       affinity:
@@ -34,7 +29,7 @@ spec:
                   - key: "app.kubernetes.io/name"
                     operator: In
                     values:
-                    - {{ template "radar-backend.name" . }}
+                    - {{ template "radar-upload-connect-backend.name" . }}
                   - key: "app.kubernetes.io/instance"
                     operator: In
                     values:
@@ -45,42 +40,34 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
-            - radar-backend
-            - -c
-            - /etc/radar/radar.yml
-            - {{ .Values.command }}
+            - radar-upload-backend
+            - /etc/upload-backend/upload.yml
           env:
-          - name: KAFKA_REST_PROXY
-            value: "{{ .Values.rest_proxy }}"
-          - name: KAFKA_SCHEMA_REGISTRY
-            value: "{{ .Values.schema_registry }}"
-          - name: KAFKA_BROKERS
-            value: "{{ .Values.kafka_num_brokers }}"
-{{- if .Values.extraEnv }}
-{{ toYaml .Values.extraEnv | indent 10 }}
-{{- end }}
+          - name: JAVA_OPTS
+            value: "-Dlogback.configurationFile=/etc/upload-backend/logback.xml"
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 8085
               protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: 8085
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 8085
+            initialDelaySeconds: 5
+            periodSeconds: 10
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - name: config
-              mountPath: /etc/radar/
-            - name: backend-monitor-disconnect-data
-              mountPath: /var/lib/radar/data
+              mountPath: /etc/upload-backend/
       volumes:
         - name: config
           configMap:
-            name: {{ include "radar-backend.fullname" . }}
-        - name: backend-monitor-disconnect-data
-        {{- if .Values.persistence.enabled }}
-          persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim | default (include "radar-backend.fullname" .) }}
-        {{- else }}
-          emptyDir: {}
-        {{ end }}
+            name: {{ include "radar-upload-connect-backend.fullname" . }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

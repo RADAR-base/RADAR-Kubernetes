@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "radar-upload-source-connector.fullname" . }}
+  labels:
+    app: {{ template "radar-upload-source-connector.name" . }}
+    chart: {{ template "radar-upload-source-connector.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  source-upload.properties: |
+    name=radar-upload-source
+    connector.class=org.radarbase.connect.upload.UploadSourceConnector
+    tasks.max=4
+    upload.source.client.id={{ .Values.client_id }}
+    upload.source.client.secret={{ .Values.client_secret }}
+    upload.source.client.tokenUrl=http://{{ .Values.managementportal_host }}:8080/managementportal/oauth/token
+    upload.source.backend.baseUrl=http://{{ .Values.radar_upload_connect_backend }}:8085/radar-upload/
+    upload.source.poll.interval.ms=3600000
+    upload.source.record.converter.classes=org.radarbase.connect.upload.converter.AccelerometerCsvRecordConverter,org.radarbase.connect.upload.converter.altoida.AltoidaZipFileRecordConverter

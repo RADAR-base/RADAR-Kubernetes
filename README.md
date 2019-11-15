@@ -58,7 +58,7 @@ kubectl delete crd prometheuses.monitoring.coreos.com prometheusrules.monitoring
 ### kafka-init
 This service will create schemes in Kafka and it should do it before other services access data from it. If order hasn't been preserved you should remove Kafka and initialize again:
 ```
-helm del --purge cp-kafka cp-zookeeper
+helm del --purge cp-zookeeper cp-kafka
 kubectl delete pvc datadir-0-cp-kafka-{0,1,2} datadir-cp-zookeeper-{0,1,2} datalogdir-cp-zookeeper-{0,1,2}
 ```
 
@@ -71,6 +71,7 @@ kubectl delete pvc --all
 kubectl -n cert-manager delete secrets letsencrypt-prod
 kubectl -n default delete secrets radar-base-tls
 kubectl -n monitoring delete secrets radar-base-tls
+kubectl -n monitoring delete psp prometheus-alertmanager prometheus-operator prometheus-prometheus
 ```
 
 ## Volume expansion
