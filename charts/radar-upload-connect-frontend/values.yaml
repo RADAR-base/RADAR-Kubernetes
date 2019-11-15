@@ -23,7 +23,7 @@ ingress:
     certmanager.k8s.io/acme-challenge-type: http01
     certmanager.k8s.io/issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/rewrite-target: /$1
-  path: "/uploader/?(.*)"
+  path: "/upload/?(.*)"
   hosts:
     - localhost
   tls:
