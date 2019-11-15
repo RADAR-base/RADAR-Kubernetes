@@ -13,4 +13,4 @@ data:
     managementPortalUrl: http://{{ .Values.managementportal_host }}:8080/managementportal
     restProxyUrl: {{ .Values.rest_proxy }}
     schemaRegistryUrl: {{ .Values.schema_registry }}
-    maxRequests: {{ .Values.max_requests }}
+    #maxRequests: {{ .Values.max_requests }}

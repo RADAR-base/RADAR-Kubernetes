@@ -13,6 +13,9 @@ spec:
     matchLabels:
       app.kubernetes.io/name: {{ include "catalog-server.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 100%
   template:
     metadata:
       labels:
@@ -101,8 +104,12 @@ spec:
               mountPath: /schema/conf
       volumes:
         - name: config
-          hostPath:
-            path: /radar/etc/schema
+        {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "catalog-server.fullname" .) }}
+        {{- else }}
+          emptyDir: {}
+        {{ end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

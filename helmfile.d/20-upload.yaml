@@ -1,0 +1,51 @@
+helmDefaults:
+  atomic: true
+  timeout: 600
+
+releases:
+  - name: radar-upload-connect-backend
+    chart: ../charts/radar-upload-connect-backend
+    installed: {{ requiredEnv "RADAR_INSTALL_UPLOAD" }}
+    set:
+      - name: image.tag
+        value: "{{ requiredEnv "RADAR_UPLOAD_CONNECT_BACKEND_IMAGE_TAG" }}"
+      - name: replicaCount
+        value: "{{ requiredEnv "RADAR_UPLOAD_CONNECT_BACKEND_REPLICA_COUNT" }}"
+      - name: client_id
+        value: "{{ requiredEnv "RADAR_UPLOAD_CONNECT_BACKEND_CLIENT_ID" }}"
+      - name: client_secret
+        value: "{{ requiredEnv "RADAR_UPLOAD_CONNECT_BACKEND_CLIENT_SECRET" }}"
+      - name: postgres.password
+        value: "{{ requiredEnv "POSTGRES_PASSWORD" }}"
+      - name: ingress.hosts
+        values: ["{{ requiredEnv "SERVER_NAME" }}"]
+        
+  - name: radar-upload-connect-frontend
+    chart: ../charts/radar-upload-connect-frontend
+    installed: {{ requiredEnv "RADAR_INSTALL_UPLOAD" }}
+    set:
+      - name: image.tag
+        value: "{{ requiredEnv "RADAR_UPLOAD_CONNECT_FRONTEND_IMAGE_TAG" }}"
+      - name: replicaCount
+        value: "{{ requiredEnv "RADAR_UPLOAD_CONNECT_FRONTEND_REPLICA_COUNT" }}"
+      - name: vue_app_client_id
+        value: "{{ requiredEnv "RADAR_UPLOAD_CONNECT_FRONTEND_CLIENT_ID" }}"
+      - name: server_name
+        value: "{{ requiredEnv "SERVER_NAME" }}"
+      - name: ingress.hosts
+        values: ["{{ requiredEnv "SERVER_NAME" }}"]
+
+  - name: radar-upload-source-connector
+    chart: ../charts/radar-upload-source-connector
+    installed: {{ requiredEnv "RADAR_INSTALL_UPLOAD" }}
+    set:
+      - name: image.tag
+        value: "{{ requiredEnv "RADAR_UPLOAD_SOURCE_CONNECTOR_IMAGE_TAG" }}"
+      - name: replicaCount
+        value: "{{ requiredEnv "RADAR_UPLOAD_SOURCE_CONNECTOR_REPLICA_COUNT" }}"
+      - name: kafka_num_brokers
+        value: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
+      - name: client_id
+        value: "{{ requiredEnv "RADAR_UPLOAD_SOURCE_CONNECTOR_CLIENT_ID" }}"
+      - name: client_secret
+        value: "{{ requiredEnv "RADAR_UPLOAD_SOURCE_CONNECTOR_CLIENT_SECRET" }}"
