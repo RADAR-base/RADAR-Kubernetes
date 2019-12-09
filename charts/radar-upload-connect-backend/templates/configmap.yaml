@@ -21,23 +21,6 @@ data:
     additionalPersistenceConfig:
       "hibernate.dialect": "org.hibernate.dialect.PostgreSQL95Dialect"
     sourceTypes:
-      - name: "phone-acceleration"
-        topics:
-          - "android_phone_acceleration"
-        contentTypes:
-          - "text/csv"
-        timeRequired: false
-        sourceIdRequired: false
-        configuration:
-          "setting1": "value1"
-          "setting2": "value2"
-      - name: "acceleration-zip"
-        topics:
-          - "android_phone_acceleration"
-        contentTypes:
-          - "application/zip"
-        timeRequired: false
-        sourceIdRequired: false
       - name: "altoida-zip"
         topics:
           - "connect_upload_altoida_acceleration"
@@ -45,6 +28,35 @@ data:
           - "application/zip"
         timeRequired: false
         sourceIdRequired: false
+      - name: "axivity"
+        topics:
+          - "connect_upload_axivity_acceleration"
+          - "connect_upload_axivity_metadata"
+        contentTypes:
+          - "application/zip"
+        timeRequired: false
+        sourceIdRequired: false
+      - name: "physilog"
+        topics:
+          - "connect_upload_physilog_acceleration"
+        contentTypes:
+          - "application/zip"
+          - "application/json"
+        timeRequired: false
+        sourceIdRequired: false
+      - name: "oxford-wearable-camera"
+        topics:
+          - "connect_upload_oxford_camera_data"
+          - "connect_upload_oxford_camera_image"
+        contentTypes:
+          - "application/zip"
+        timeRequired: false
+        sourceIdRequired: false
+        configuration:
+          "host": "sftp"
+          "user": "username"
+          "keyFile": "/path/to/private/ssh/key"
+          "advertizedUrl": "sftp://<my-hostname>"
   logback.xml: |
     <?xml version="1.0" encoding="UTF-8"?>
     <configuration>
