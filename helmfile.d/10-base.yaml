@@ -99,6 +99,20 @@ releases:
         value: "{{ requiredEnv "MANAGEMENTPORTAL_OAUTH_CHECKING_KEY_ALIASES_0" }}"
       - name: managementportal.oauth_checking_key_aliases_1
         value: "{{ requiredEnv "MANAGEMENTPORTAL_OAUTH_CHECKING_KEY_ALIASES_1" }}"
+      - name: from_email
+        value: "{{ requiredEnv "MANAGEMENT_PORTAL_FROM_EMAIL" }}"        
+      - name: client_secrets.prmt
+        value: "{{ requiredEnv "MANAGEMENT_PORTAL_CLIENT_SECRETS_PRMT" }}"
+      - name: client_secrets.armt
+        value: "{{ requiredEnv "MANAGEMENT_PORTAL_CLIENT_SECRETS_ARMT" }}"
+      - name: client_secrets.radar_redcap_integrator
+        value: "{{ requiredEnv "MANAGEMENT_PORTAL_CLIENT_SECRETS_RADAR_REDCAP_INTEGRATOR" }}"
+      - name: client_secrets.radar_upload_backend
+        value: "{{ requiredEnv "MANAGEMENT_PORTAL_CLIENT_SECRETS_RADAR_UPLOAD_BACKEND" }}"
+      - name: client_secrets.radar_upload_connect
+        value: "{{ requiredEnv "MANAGEMENT_PORTAL_CLIENT_SECRETS_RADAR_UPLOAD_CONNECT" }}"
+      - name: client_secrets.radar_upload_frontend
+        value: "{{ requiredEnv "MANAGEMENT_PORTAL_CLIENT_SECRETS_RADAR_UPLOAD_FRONTEND" }}"
 
   - name: nginx-ingress
     chart: stable/nginx-ingress

@@ -55,36 +55,29 @@ spec:
           command:
             - radar-hdfs-restructure
           args:
-            - --compression
-            - gzip
-            - --deduplicate
-            - --num-threads
-            - "{{ .Values.num_threads }}"
-            - -n
-            - "{{ .Values.hdfs_namenode }}"
-            - -o
-            - /output
-            - --tmp-dir
-            - /output/+tmp
+            - -F
+            - /etc/restructure/restructure.yml
             - -S
-            - -i
-            - "300"
-            - /topicAndroidNew
           env:
           - name: RADAR_HDFS_RESTRUCTURE_OPTS
-            value: "-Xmx4g"
+            value: "-Xms250m -Xmx4g"
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - name: output
               mountPath: /output
+            - name: restructure
+              mountPath:  /etc/restructure
       volumes:
         - name: keys
           configMap:
-            name: {{ include "radar-output.fullname" . }}
+            name: {{ include "radar-output.fullname" . }}-keys
         - name: users
           secret:
             secretName: {{ include "radar-output.fullname" . }}
+        - name: restructure
+          configMap:
+            name: {{ include "radar-output.fullname" . }}-restructure
         - name: output
         {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:

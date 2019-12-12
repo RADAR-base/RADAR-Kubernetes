@@ -1,0 +1,12 @@
+apiVersion: v1
+data:
+  auth: {{ .Values.nginx_auth | b64enc | quote }}
+kind: Secret
+metadata:
+  name: radar-rest-sources-nginx-auth
+  labels:
+    app.kubernetes.io/name: {{ include "radar-rest-sources-authorizer.name" . }}
+    helm.sh/chart: {{ include "radar-rest-sources-authorizer.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+type: Opaque

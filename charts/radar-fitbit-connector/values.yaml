@@ -30,7 +30,7 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-resources: 
+resources:
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -53,5 +53,6 @@ kafka: PLAINTEXT://cp-kafka-headless:9092
 kafka_num_brokers: "3"
 schema_registry: http://cp-schema-registry:8081
 
+radar_rest_sources_backend: radar-rest-sources-backend
 fitbit_api_client: ""
 fitbit_api_secret: ""

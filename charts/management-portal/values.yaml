@@ -69,3 +69,11 @@ managementportal:
   oauth_checking_key_aliases_1: selfsigned
   frontend_client_secret: xxx
   common_admin_password: xxx
+
+client_secrets:
+  prmt: secret
+  armt: secret
+  radar_redcap_integrator: secret
+  radar_upload_backend: secret
+  radar_upload_connect: secret
+  radar_upload_frontend: secret

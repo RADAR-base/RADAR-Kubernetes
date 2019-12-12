@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "radar-fitbit-connector.fullname" . }}-properties
+  labels:
+    app: {{ template "radar-fitbit-connector.name" . }}
+    chart: {{ template "radar-fitbit-connector.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  source-fitbit.properties: |
+    name=radar-fitbit-source
+    connector.class=org.radarbase.connect.rest.fitbit.FitbitSourceConnector
+    tasks.max=4
+    rest.source.base.url=https://api.fitbit.com
+    rest.source.poll.interval.ms=5000
+    rest.source.request.generator.class=org.radarbase.connect.rest.fitbit.request.FitbitRequestGenerator
+    fitbit.api.client={{ .Values.fitbit_api_client }}
+    fitbit.api.secret={{ .Values.fitbit_api_secret }}
+    fitbit.user.repository.class=org.radarbase.connect.rest.fitbit.user.ServiceUserRepository
+    fitbit.user.repository.url=http://{{ .Values.radar_rest_sources_backend }}:8080/

@@ -29,6 +29,12 @@ releases:
         value: "{{ requiredEnv "FITBIT_API_CLIENT_ID" }}"
       - name: fitbit_api_secret
         value: "{{ requiredEnv "FITBIT_API_CLIENT_SECRET" }}"
+      - name: ingress.hosts
+        values: ["{{ requiredEnv "SERVER_NAME" }}"]
+
+      - name: nginx_auth
+        value: "{{ requiredEnv "RADAR_REST_SOURCES_NGINX_AUTH" }}"
+    
   - name: radar-rest-sources-backend
     chart: ../charts/radar-rest-sources-backend
     installed: {{ requiredEnv "RADAR_INSTALL_FITBIT" }}
@@ -39,3 +45,5 @@ releases:
         value: "{{ requiredEnv "RADAR_REST_SOURCES_BACKEND_REPLICA_COUNT" }}"
       - name: postgres.password
         value: "{{ requiredEnv "POSTGRES_PASSWORD" }}"
+      - name: ingress.hosts
+        values: ["{{ requiredEnv "SERVER_NAME" }}"]
