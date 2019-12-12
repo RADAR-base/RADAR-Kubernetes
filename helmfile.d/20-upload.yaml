@@ -3,6 +3,23 @@ helmDefaults:
   timeout: 600
 
 releases:
+  - name: radar-upload-postgresql
+    chart: stable/postgresql
+    version: 5.3.3
+    wait: false
+    installed: {{ requiredEnv "RADAR_INSTALL_UPLOAD" }}
+    values:
+      - "../charts/radar-upload-postgresql/values.yaml"
+    set:
+      - name: replication.password
+        value: "{{ requiredEnv "RADAR_UPLOAD_POSTGRES_PASSWORD" }}"
+      - name: postgresqlPassword
+        value: "{{ requiredEnv "RADAR_UPLOAD_POSTGRES_PASSWORD" }}"
+      - name: image.tag
+        value: "{{ requiredEnv "RADAR_UPLOAD_POSTGRES_IMAGE_TAG" }}"
+      - name: persistence.size
+        value: "{{ requiredEnv "RADAR_UPLOAD_POSTGRES_DISK_SIZE" }}"
+
   - name: radar-upload-connect-backend
     chart: ../charts/radar-upload-connect-backend
     installed: {{ requiredEnv "RADAR_INSTALL_UPLOAD" }}
@@ -16,10 +33,10 @@ releases:
       - name: client_secret
         value: "{{ requiredEnv "RADAR_UPLOAD_CONNECT_BACKEND_CLIENT_SECRET" }}"
       - name: postgres.password
-        value: "{{ requiredEnv "POSTGRES_PASSWORD" }}"
+        value: "{{ requiredEnv "RADAR_UPLOAD_POSTGRES_PASSWORD" }}"
       - name: ingress.hosts
         values: ["{{ requiredEnv "SERVER_NAME" }}"]
-        
+
   - name: radar-upload-connect-frontend
     chart: ../charts/radar-upload-connect-frontend
     installed: {{ requiredEnv "RADAR_INSTALL_UPLOAD" }}

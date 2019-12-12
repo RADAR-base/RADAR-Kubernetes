@@ -23,6 +23,7 @@ ingress:
     certmanager.k8s.io/acme-challenge-type: http01
     certmanager.k8s.io/issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/proxy-body-size: 200m
   path: "/upload/api/?(.*)"
   hosts:
     - localhost
@@ -50,7 +51,7 @@ affinity: {}
 client_id: radar_upload_backend
 client_secret: secret
 postgres:
-  host: postgresql-postgresql
+  host: radar-upload-postgresql-postgresql
   user: postgres
   password: password
 managementportal_host: management-portal
