@@ -11,7 +11,7 @@ releases:
       - name: imageTag
         value: "{{ requiredEnv "CP_ZOOKEEPER_IMAGE_TAG" }}"
       - name: servers
-        value: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
+        value: "{{ requiredEnv "CP_ZOOKEEPER_REPLICA_COUNT" }}"
   - name: cp-kafka
     chart: ../cp-helm-charts/charts/cp-kafka
     wait: true
@@ -100,7 +100,7 @@ releases:
       - name: managementportal.oauth_checking_key_aliases_1
         value: "{{ requiredEnv "MANAGEMENTPORTAL_OAUTH_CHECKING_KEY_ALIASES_1" }}"
       - name: from_email
-        value: "{{ requiredEnv "MANAGEMENT_PORTAL_FROM_EMAIL" }}"        
+        value: "{{ requiredEnv "MANAGEMENT_PORTAL_FROM_EMAIL" }}"
       - name: client_secrets.prmt
         value: "{{ requiredEnv "MANAGEMENT_PORTAL_CLIENT_SECRETS_PRMT" }}"
       - name: client_secrets.armt

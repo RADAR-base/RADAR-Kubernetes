@@ -46,3 +46,14 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+oauth_client_id: radar_redcap_integrator
+oauth_client_secret: secret
+management_portal_url: management-portal
+projects:
+  url:
+  project_id:
+  enrolment_event:
+  integration_form:
+  token:
+  mp_info_project_name:

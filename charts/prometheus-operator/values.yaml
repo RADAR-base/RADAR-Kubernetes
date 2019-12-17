@@ -7,6 +7,7 @@ prometheus-operator:
   prometheus:
     prometheusSpec:
       serviceMonitorSelectorNilUsesHelmValues: "false"
+      replicas: 1
       storageSpec:
         volumeClaimTemplate:
           spec:
@@ -19,20 +20,24 @@ prometheus-operator:
           matchNames:
           - default
           - monitoring
+          - cert-manager
       ruleSelector:
         namespaceSelector:
           matchNames:
           - default
+          - cert-manager
           - monitoring
       serviceMonitorNamespaceSelector:
         namespaceSelector:
           matchNames:
           - default
+          - cert-manager
           - monitoring
       serviceMonitorSelector:
         namespaceSelector:
           matchNames:
           - default
+          - cert-manager
           - monitoring
 
     ingress:
@@ -52,6 +57,7 @@ prometheus-operator:
 
   alertmanager:
     alertmanagerSpec:
+      replicas: 1
       storage:
         volumeClaimTemplate:
           spec:

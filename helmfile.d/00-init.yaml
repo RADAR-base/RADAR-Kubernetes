@@ -41,6 +41,8 @@ releases:
         values: ["prometheus.{{ requiredEnv "SERVER_NAME" }}"]
       - name: prometheus-operator.prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage
         value: "{{ requiredEnv "MONITORING_PROMETHEUS_DISK_SIZE" }}"
+      - name: prometheus-operator.prometheus.prometheusSpec.replicas
+        value: "{{ requiredEnv "MONITORING_PROMETHEUS_REPLICAS" }}"
 
       - name: prometheus-operator.alertmanager.ingress.hosts
         values: ["alertmanager.{{ requiredEnv "SERVER_NAME" }}"]
@@ -50,6 +52,8 @@ releases:
         values: ["alertmanager.{{ requiredEnv "SERVER_NAME" }}"]
       - name: prometheus-operator.alertmanager.alertmanagerSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage
         value: "{{ requiredEnv "MONITORING_ALERTMANAGER_DISK_SIZE" }}"
+      - name: prometheus-operator.alertmanager.alertmanagerSpec.replicas
+        value: "{{ requiredEnv "MONITORING_ALERTMANAGER_REPLICAS" }}"
 
       - name: prometheus-operator.grafana.ingress.hosts
         values: ["grafana.{{ requiredEnv "SERVER_NAME" }}"]
