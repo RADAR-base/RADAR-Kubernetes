@@ -13,3 +13,19 @@ releases:
         value: "{{ requiredEnv "RADAR_INTEGRATION_REPLICA_COUNT" }}"
       - name: ingress.hosts
         values: ["{{ requiredEnv "SERVER_NAME" }}"]
+      - name: oauth_client_id
+        values: "{{ requiredEnv "RADAR_INTEGRATION_OAUTH_CLIENT_ID" }}"
+      - name: oauth_client_secret
+        values: "{{ requiredEnv "RADAR_INTEGRATION_OAUTH_CLIENT_SECRET" }}"
+      - name: projects.url
+        values: "{{ requiredEnv "RADAR_INTEGRATION_PROJECTS_URL" }}"
+      - name: projects.project_id
+        values: "{{ requiredEnv "RADAR_INTEGRATION_PROJECTS_PROJECT_ID" }}"
+      - name: projects.enrolment_event
+        values: "{{ requiredEnv "RADAR_INTEGRATION_PROJECTS_ENROLMENT_EVENT" }}"
+      - name: projects.integration_form
+        values: "{{ requiredEnv "RADAR_INTEGRATION_PROJECTS_INTEGRATION_FORM" }}"        
+      - name: projects.token
+        values: "{{ requiredEnv "RADAR_INTEGRATION_PROJECTS_TOKEN" }}"
+      - name: projects.mp_info_project_name
+        values: "{{ requiredEnv "RADAR_INTEGRATION_PROJECTS_MP_INFO_PROJECT_NAME" }}"

@@ -13,6 +13,9 @@ spec:
     matchLabels:
       app.kubernetes.io/name: {{ include "radar-fitbit-connector.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 100%
   template:
     metadata:
       annotations:
@@ -134,6 +137,8 @@ spec:
               mountPath: /etc/kafka-connect/source-fitbit
             - name: config-users
               mountPath: /var/lib/kafka-connect-fitbit-source/users
+            - name: logs
+              mountPath: /var/lib/kafka-connect-fitbit-source/logs
       volumes:
         - name: config-properties
           configMap:
@@ -141,6 +146,13 @@ spec:
         - name: config-users
           configMap:
             name: {{ include "radar-fitbit-connector.fullname" . }}-users
+        - name: logs
+        {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "radar-fitbit-connector.fullname" .) }}
+        {{- else }}
+          emptyDir: {}
+        {{ end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
