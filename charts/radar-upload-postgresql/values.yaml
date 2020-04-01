@@ -6,6 +6,10 @@ global:
   postgresql:
     postgresqlDatabase: uploadconnector
 
+image:
+  tag: 11.3.0-debian-9-r28  # NOTICE: please select the tag from https://hub.docker.com/r/bitnami/postgresql
+
+
 ##
 ## Init containers parameters:
 ## volumePermissions: Change the owner of the persist volume mountpoint to RunAsUser:fsGroup

@@ -30,16 +30,6 @@ spec:
             - name: ssh
               containerPort: 22
               protocol: TCP
-          readinessProbe:
-            tcpSocket:
-              port: ssh
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          livenessProbe:
-            tcpSocket:
-              port: ssh
-            initialDelaySeconds: 15
-            periodSeconds: 20
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
@@ -60,7 +50,7 @@ spec:
             - -S
           env:
           - name: RADAR_HDFS_RESTRUCTURE_OPTS
-            value: "-Xms250m -Xmx4g"
+            value: "-Xms250m -Xmx3g"
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:

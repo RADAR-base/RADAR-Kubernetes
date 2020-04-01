@@ -1,8 +1,14 @@
 repositories:
 - name: stable
   url: https://kubernetes-charts.storage.googleapis.com
-- name: jetstack
-  url: https://charts.jetstack.io
+- name: elastic
+  url: https://helm.elastic.co
+
+environments:
+  default:
+    values:
+    - ../base.yaml
+    - ../production.yaml
 
 helmDefaults:
   atomic: true
@@ -10,96 +16,113 @@ helmDefaults:
   timeout: 600
 
 releases:
+  - name: mongodb
+    namespace: graylog
+    chart: stable/mongodb-replicaset
+    version: 3.11.5
+    installed: {{ .Values.mongodb._install }}
+    values:
+      - "../charts/mongodb/values.yaml"
+      - {{ .Values.mongodb | toYaml | indent 8 | trim }}
+
+  - name: elasticsearch
+    namespace: graylog
+    chart: elastic/elasticsearch
+    version: 7.6.0
+    installed: {{ .Values.elasticsearch._install }}
+    set:
+      - name: imageTag
+        value: "6.8.6"
+
+  - name: graylog
+    namespace: graylog
+    chart: stable/graylog
+    version: 1.5.6
+    installed: {{ .Values.graylog._install }}
+    values:
+      - "../charts/graylog/values.yaml"
+      - {{ .Values.graylog | toYaml | indent 8 | trim }}
+    set:
+      - name: graylog.rootEmail
+        value: {{ .Values.maintainer_email }}
+      - name: graylog.ingress.hosts
+        values: [graylog.{{ .Values.server_name }}]
+      - name: graylog.ingress.tls[0].secretName
+        value: radar-base-tls
+      - name: graylog.ingress.tls[0].hosts
+        values: ["graylog.{{ .Values.server_name }}"]
+
+  - name: fluentd
+    namespace: graylog
+    chart: ../charts/fluentd
+    installed: {{ .Values.fluentd._install }}
+    values:
+      - "../charts/fluentd/values.yaml"
+      - {{ .Values.fluentd | toYaml | indent 8 | trim }}
+
   - name: cert-manager
     namespace: cert-manager
     wait: true
-    installed: {{ requiredEnv "RADAR_INSTALL_BASE" }}
+    installed: {{ .Values.cert_manager._install }}
     chart: ../charts/cert-manager
     set:
       - name: server_name
-        value: {{ requiredEnv "SERVER_NAME" }}
+        value: {{ .Values.server_name }}
       - name: maintainer_email
-        value: {{ requiredEnv "MAINTAINER_EMAIL" }}
+        value: {{ .Values.maintainer_email }}
 
   - name: prometheus-operator
     chart: ../charts/prometheus-operator
     wait: true
     namespace: monitoring
-    installed: {{ requiredEnv "RADAR_INSTALL_BASE" }}
+    installed: {{ .Values.prometheus_operator._install }}
     values:
-      # - "../charts/prometheus-operator/origin-values.yaml"
       - "../charts/prometheus-operator/values.yaml"
+      - {{ .Values.prometheus_operator | toYaml | indent 8 | trim }}
     set:
       - name: server_name
-        value: {{ requiredEnv "SERVER_NAME" }}
-
+        value: {{ .Values.server_name }}
       - name: prometheus-operator.prometheus.ingress.hosts
-        values: ["prometheus.{{ requiredEnv "SERVER_NAME" }}"]
+        values: ["prometheus.{{ .Values.server_name }}"]
       - name: prometheus-operator.prometheus.ingress.tls[0].secretName
-        value: radar-base-tls
+        value: radar-base-tls-prometheus
       - name: prometheus-operator.prometheus.ingress.tls[0].hosts
-        values: ["prometheus.{{ requiredEnv "SERVER_NAME" }}"]
-      - name: prometheus-operator.prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage
-        value: "{{ requiredEnv "MONITORING_PROMETHEUS_DISK_SIZE" }}"
-      - name: prometheus-operator.prometheus.prometheusSpec.replicas
-        value: "{{ requiredEnv "MONITORING_PROMETHEUS_REPLICAS" }}"
+        values: ["prometheus.{{ .Values.server_name }}"]
 
       - name: prometheus-operator.alertmanager.ingress.hosts
-        values: ["alertmanager.{{ requiredEnv "SERVER_NAME" }}"]
+        values: ["alertmanager.{{ .Values.server_name }}"]
       - name: prometheus-operator.alertmanager.ingress.tls[0].secretName
-        value: radar-base-tls
+        value: radar-base-tls-alertmanager
       - name: prometheus-operator.alertmanager.ingress.tls[0].hosts
-        values: ["alertmanager.{{ requiredEnv "SERVER_NAME" }}"]
-      - name: prometheus-operator.alertmanager.alertmanagerSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage
-        value: "{{ requiredEnv "MONITORING_ALERTMANAGER_DISK_SIZE" }}"
-      - name: prometheus-operator.alertmanager.alertmanagerSpec.replicas
-        value: "{{ requiredEnv "MONITORING_ALERTMANAGER_REPLICAS" }}"
+        values: ["alertmanager.{{ .Values.server_name }}"]
 
       - name: prometheus-operator.grafana.ingress.hosts
-        values: ["grafana.{{ requiredEnv "SERVER_NAME" }}"]
+        values: ["grafana.{{ .Values.server_name }}"]
       - name: prometheus-operator.grafana.ingress.tls[0].secretName
-        value: radar-base-tls
+        value: radar-base-tls-grafana
       - name: prometheus-operator.grafana.ingress.tls[0].hosts
-        values: ["grafana.{{ requiredEnv "SERVER_NAME" }}"]
-      - name: prometheus-operator.grafana.adminPassword
-        value: "{{ requiredEnv "MONITORING_GRAFANA_ADMIN_PASSWORD" }}"
-
-      - name: nginx_auth
-        value: "{{ requiredEnv "MONITORING_NGINX_AUTH" }}"
-
-      - name: prometheus-operator.alertmanager.config.receivers[1].name
-        value: "default"
-      - name: prometheus-operator.alertmanager.config.receivers[1].slack_configs[0].api_url
-        value: "{{ requiredEnv "MONITORING_SLACK_WEBHOOK_URL" }}"
-      - name: prometheus-operator.alertmanager.config.receivers[1].slack_configs[0].channel
-        value: "{{ requiredEnv "MONITORING_SLACK_CHANNEL" }}"
+        values: ["grafana.{{ .Values.server_name }}"]
 
   - name: nginx-ingress
     chart: stable/nginx-ingress
-    version: 1.6.16
-    installed: {{ requiredEnv "RADAR_INSTALL_BASE" }}
+    version: 1.30.0
+    installed: {{ .Values.nginx_ingress._install }}
     values:
       - "../charts/nginx-ingress/values.yaml"
-    set:
-      - name: controller.replicaCount
-        value: {{ requiredEnv "NGINX_INGRESS_REPLICA_COUNT" }}
+      - {{ .Values.nginx_ingress | toYaml | indent 8 | trim }}
 
   - name: kafka-manager
     chart: ../charts/kafka-manager
     wait: false
-    installed: {{ requiredEnv "RADAR_INSTALL_BASE" }}
+    installed: {{ .Values.kafka_manager._install }}
+    values:
+      - {{ .Values.kafka_manager | toYaml | indent 8 | trim }}
     set:
-      - name: image.tag
-        value: "{{ requiredEnv "KAFKA_MANAGER_IMAGE_TAG" }}"
       - name: ingress.hosts
-        values: ["{{ requiredEnv "SERVER_NAME" }}"]
+        values:
+          - {{ .Values.server_name }}
       - name: ingress.tls[0].secretName
         value: radar-base-tls
       - name: ingress.tls[0].hosts
-        values: ["{{ requiredEnv "SERVER_NAME" }}"]
-      - name: basicAuth.enabled
-        value: true
-      - name: basicAuth.username
-        value: "{{ requiredEnv "KAFKA_MANAGER_USERNAME" }}"
-      - name: basicAuth.password
-        value: "{{ requiredEnv "KAFKA_MANAGER_PASSWORD" }}"
+        values:
+          - {{ .Values.server_name }}

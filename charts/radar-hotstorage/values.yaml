@@ -6,7 +6,7 @@ replicaCount: 2
 
 image:
   repository: radarbase/radar-hotstorage
-  tag: latest
+  tag: 0.1
   pullPolicy: IfNotPresent
 
 nameOverride: ""

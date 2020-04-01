@@ -1,0 +1,39 @@
+apiVersion: ceph.rook.io/v1
+kind: CephCluster
+metadata:
+  name: {{ include "ceph.fullname" . }}
+  labels:
+{{ include "ceph.labels" . | indent 4 }}
+spec:
+  dataDirHostPath: /var/lib/rook
+  cephVersion:
+    image: "{{ .Values.image_ceph.repository }}:{{ .Values.image_ceph.tag }}"
+  dashboard:
+    enabled: true
+  monitoring:
+    enabled: true
+  mon:
+    count: {{ .Values.ceph_cluster.mon.count }}
+    volumeClaimTemplate:
+      spec:
+        storageClassName: {{ .Values.ceph_cluster.mon.claim.storage.class }}
+        resources:
+          requests:
+            storage: {{ .Values.ceph_cluster.mon.claim.storage.size }}
+  storage:
+   storageClassDeviceSets:
+    - name: {{ .Values.ceph_cluster.storage.name }}
+      count: {{ .Values.ceph_cluster.storage.count }}
+      portable: true
+      tuneSlowDeviceClass: false
+      volumeClaimTemplates:
+      - metadata:
+          name: {{ .Values.ceph_cluster.storage.claim.name }}
+        spec:
+          resources:
+            requests:
+              storage: {{ .Values.ceph_cluster.storage.claim.storage.size }}
+          storageClassName: {{ .Values.ceph_cluster.storage.claim.storage.class }}
+          volumeMode: Block
+          accessModes:
+            - ReadWriteOnce

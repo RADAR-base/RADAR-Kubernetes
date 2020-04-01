@@ -6,7 +6,7 @@ replicaCount: 2
 
 image:
   repository: radarbase/kafka-connect-mongodb-sink
-  tag: latest
+  tag: dev
   pullPolicy: IfNotPresent
 
 nameOverride: ""
