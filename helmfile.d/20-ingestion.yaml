@@ -1,3 +1,9 @@
+environments:
+  default:
+    values:
+    - ../base.yaml
+    - ../production.yaml
+
 helmDefaults:
   atomic: true
   timeout: 600
@@ -6,21 +12,16 @@ releases:
   - name: cp-kafka-rest
     chart: ../cp-helm-charts/charts/cp-kafka-rest
     wait: false
-    installed: {{ requiredEnv "RADAR_INSTALL_INGESTION" }}
+    installed: {{ .Values.cp_kafka_rest._install }}
     values:
       - "../charts/cp-kafka-rest/values.yaml"
-    set:
-      - name: imageTag
-        value: "{{ requiredEnv "CP_KAFKA_REST_IMAGE_TAG" }}"
-      - name: replicaCount
-        value: "{{ requiredEnv "CP_KAFKA_REST_REPLICA_COUNT" }}"
+      - {{ .Values.cp_kafka_rest | toYaml | indent 8 | trim }}
+
   - name: radar-gateway
     chart: ../charts/radar-gateway
-    installed: {{ requiredEnv "RADAR_INSTALL_INGESTION" }}
+    installed: {{ .Values.radar_gateway._install }}
+    values:
+      - {{ .Values.radar_gateway | toYaml | indent 8 | trim }}
     set:
-      - name: image.tag
-        value: "{{ requiredEnv "RADAR_GATEWAY_IMAGE_TAG" }}"
-      - name: replicaCount
-        value: "{{ requiredEnv "RADAR_GATEWAY_REPLICA_COUNT" }}"
       - name: ingress.hosts
-        values: ["{{ requiredEnv "SERVER_NAME" }}"]
+        values: [{{ .Values.server_name }}]

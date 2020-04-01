@@ -8,7 +8,7 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 data:
-  rest_source_clients_configs.yml: 
+  rest_source_clients_configs.yml: |
     rest_source_clients:
       - source_type: FitBit
         authorization_endpoint: https://www.fitbit.com/oauth2/authorize

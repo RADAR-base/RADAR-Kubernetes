@@ -153,8 +153,7 @@ ingress:
     kubernetes.io/tls-acme: "true"
     #nginx.ingress.kubernetes.io/auth-type: basic
     #nginx.ingress.kubernetes.io/auth-secret: secretName
-    certmanager.k8s.io/acme-challenge-type: http01
-    certmanager.k8s.io/issuer: letsencrypt-prod
+    cert-manager.io/cluster-issuer: letsencrypt-prod
   path: /kafkamanager/
   hosts:
     - localhost

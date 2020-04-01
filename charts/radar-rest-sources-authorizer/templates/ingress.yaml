@@ -8,7 +8,7 @@ metadata:
   name: {{ $fullName }}
   labels:
     app.kubernetes.io/name: {{ include "radar-rest-sources-authorizer.name" . }}
-    helm.sh/chart: {{ include "radar-rest-sources-backend.chart" . }}
+    helm.sh/chart: {{ include "radar-rest-sources-authorizer.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   {{- with .Values.ingress.annotations }}

@@ -22,12 +22,14 @@ data:
 
     # Set of supported projects
     projects:
+      {{- range .Values.projects }}
       - redcap_info:
-          url: {{ .Values.projects.url }} #URL pointing REDCap instance
-          project_id: {{ .Values.projects.project_id }} #REDCap project identifier
-          enrolment_event: {{ .Values.projects.enrolment_event }} #Unique identifier for the enrolment event
-          integration_form: {{ .Values.projects.integration_form }} #Name of integration REDCap form
-          token: {{ .Values.projects.token }} #REDCap API Token used to identify the REDCap user against the REDCap instance
+          url: {{ .url }} #URL pointing REDCap instance
+          project_id: {{ .project_id }} #REDCap project identifier
+          enrolment_event: {{ .enrolment_event }} #Unique identifier for the enrolment event
+          integration_form: {{ .integration_form }} #Name of integration REDCap form
+          token: {{ .token }} #REDCap API Token used to identify the REDCap user against the REDCap instance
         mp_info:
           # Management Portal project identifier
-          project_name: {{ .Values.projects.mp_info_project_name }} #
+          project_name: {{ .mp_info_project_name }} #
+      {{ end -}}
