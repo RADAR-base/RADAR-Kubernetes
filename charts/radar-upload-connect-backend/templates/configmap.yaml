@@ -36,7 +36,7 @@ data:
           - "application/zip"
         timeRequired: false
         sourceIdRequired: false
-      - name: "physilog"
+      - name: "physilog5"
         topics:
           - "connect_upload_physilog_acceleration"
         contentTypes:
