@@ -1,3 +1,9 @@
+environments:
+  default:
+    values:
+    - ../base.yaml
+    - ../production.yaml
+
 helmDefaults:
   atomic: true
   timeout: 600
@@ -5,37 +11,37 @@ helmDefaults:
 releases:
   - name: radar-fitbit-connector
     chart: ../charts/radar-fitbit-connector
-    installed: {{ requiredEnv "RADAR_INSTALL_FITBIT" }}
+    installed: {{ .Values.radar_fitbit_connector._install }}
+    values:
+      - {{ .Values.radar_fitbit_connector | toYaml | indent 8 | trim }}
     set:
-      - name: image.tag
-        value: "{{ requiredEnv "RADAR_FITBIT_CONNECTOR_IMAGE_TAG" }}"
-      - name: replicaCount
-        value: "{{ requiredEnv "RADAR_FITBIT_CONNECTOR_REPLICA_COUNT" }}"
       - name: kafka_num_brokers
-        value: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
+        value: {{ .Values.kafka_num_brokers }}
       - name: fitbit_api_client
-        value: "{{ requiredEnv "FITBIT_API_CLIENT_ID" }}"
+        value: {{ .Values.fitbit_api_client }}
       - name: fitbit_api_secret
-        value: "{{ requiredEnv "FITBIT_API_CLIENT_SECRET" }}"
+        value: {{ .Values.fitbit_api_secret }}
+
   - name: radar-rest-sources-authorizer
     chart: ../charts/radar-rest-sources-authorizer
-    installed: {{ requiredEnv "RADAR_INSTALL_FITBIT" }}
+    installed: {{ .Values.radar_rest_sources_authorizer._install }}
+    values:
+      - {{ .Values.radar_rest_sources_authorizer | toYaml | indent 8 | trim }}
     set:
-      - name: image.tag
-        value: "{{ requiredEnv "RADAR_REST_SOURCES_AUTHORIZER_IMAGE_TAG" }}"
-      - name: replicaCount
-        value: "{{ requiredEnv "RADAR_REST_SOURCES_AUTHORIZER_REPLICA_COUNT" }}"
+      - name: ingress.hosts
+        values: [{{ .Values.server_name }}]
       - name: fitbit_api_client
-        value: "{{ requiredEnv "FITBIT_API_CLIENT_ID" }}"
+        value: {{ .Values.fitbit_api_client }}
       - name: fitbit_api_secret
-        value: "{{ requiredEnv "FITBIT_API_CLIENT_SECRET" }}"
+        value: {{ .Values.fitbit_api_secret }}
+
   - name: radar-rest-sources-backend
     chart: ../charts/radar-rest-sources-backend
-    installed: {{ requiredEnv "RADAR_INSTALL_FITBIT" }}
+    installed: {{ .Values.radar_rest_sources_backend._install }}
+    values:
+      - {{ .Values.radar_rest_sources_backend | toYaml | indent 8 | trim }}
     set:
-      - name: image.tag
-        value: "{{ requiredEnv "RADAR_REST_SOURCES_BACKEND_IMAGE_TAG" }}"
-      - name: replicaCount
-        value: "{{ requiredEnv "RADAR_REST_SOURCES_BACKEND_REPLICA_COUNT" }}"
+      - name: ingress.hosts
+        values: [{{ .Values.server_name }}]
       - name: postgres.password
-        value: "{{ requiredEnv "POSTGRES_PASSWORD" }}"
+        value: {{ .Values.postgres_password }}

@@ -1,51 +1,59 @@
+environments:
+  default:
+    values:
+    - ../base.yaml
+    - ../production.yaml
+
 helmDefaults:
   atomic: true
   timeout: 600
 
 releases:
+  - name: radar-upload-postgresql
+    chart: stable/postgresql
+    version: 5.3.3
+    wait: false
+    installed: {{ .Values.radar_upload_postgresql._install }}
+    values:
+      - "../charts/radar-upload-postgresql/values.yaml"
+      - {{ .Values.radar_upload_postgresql | toYaml | indent 8 | trim }}
+    set:
+      - name: postgresqlPassword
+        value: {{ .Values.radar_upload_postgres_password }}
+      - name: replication.password
+        value: {{ .Values.radar_upload_postgres_password }}
+
   - name: radar-upload-connect-backend
     chart: ../charts/radar-upload-connect-backend
-    installed: {{ requiredEnv "RADAR_INSTALL_UPLOAD" }}
+    installed: {{ .Values.radar_upload_connect_backend._install }}
+    values:
+      - {{ .Values.radar_upload_connect_backend | toYaml | indent 8 | trim }}
     set:
-      - name: image.tag
-        value: "{{ requiredEnv "RADAR_UPLOAD_CONNECT_BACKEND_IMAGE_TAG" }}"
-      - name: replicaCount
-        value: "{{ requiredEnv "RADAR_UPLOAD_CONNECT_BACKEND_REPLICA_COUNT" }}"
-      - name: client_id
-        value: "{{ requiredEnv "RADAR_UPLOAD_CONNECT_BACKEND_CLIENT_ID" }}"
-      - name: client_secret
-        value: "{{ requiredEnv "RADAR_UPLOAD_CONNECT_BACKEND_CLIENT_SECRET" }}"
-      - name: postgres.password
-        value: "{{ requiredEnv "POSTGRES_PASSWORD" }}"
       - name: ingress.hosts
-        values: ["{{ requiredEnv "SERVER_NAME" }}"]
-        
+        values: [{{ .Values.server_name }}]
+      - name: postgres.password
+        value: {{ .Values.radar_upload_postgres_password }}
+      - name: client_secret
+        value: {{ .Values.management_portal.client_secrets.radar_upload_backend }}
+
   - name: radar-upload-connect-frontend
     chart: ../charts/radar-upload-connect-frontend
-    installed: {{ requiredEnv "RADAR_INSTALL_UPLOAD" }}
+    installed: {{ .Values.radar_upload_connect_frontend._install }}
+    values:
+      - {{ .Values.radar_upload_connect_frontend | toYaml | indent 8 | trim }}
     set:
-      - name: image.tag
-        value: "{{ requiredEnv "RADAR_UPLOAD_CONNECT_FRONTEND_IMAGE_TAG" }}"
-      - name: replicaCount
-        value: "{{ requiredEnv "RADAR_UPLOAD_CONNECT_FRONTEND_REPLICA_COUNT" }}"
-      - name: vue_app_client_id
-        value: "{{ requiredEnv "RADAR_UPLOAD_CONNECT_FRONTEND_CLIENT_ID" }}"
       - name: server_name
-        value: "{{ requiredEnv "SERVER_NAME" }}"
+        value: {{ .Values.server_name }}
       - name: ingress.hosts
-        values: ["{{ requiredEnv "SERVER_NAME" }}"]
+        values: [{{ .Values.server_name }}]
 
   - name: radar-upload-source-connector
     chart: ../charts/radar-upload-source-connector
-    installed: {{ requiredEnv "RADAR_INSTALL_UPLOAD" }}
+    installed: {{ .Values.radar_upload_source_connector._install }}
+    values:
+      - {{ .Values.radar_upload_source_connector | toYaml | indent 8 | trim }}
     set:
-      - name: image.tag
-        value: "{{ requiredEnv "RADAR_UPLOAD_SOURCE_CONNECTOR_IMAGE_TAG" }}"
-      - name: replicaCount
-        value: "{{ requiredEnv "RADAR_UPLOAD_SOURCE_CONNECTOR_REPLICA_COUNT" }}"
       - name: kafka_num_brokers
-        value: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
-      - name: client_id
-        value: "{{ requiredEnv "RADAR_UPLOAD_SOURCE_CONNECTOR_CLIENT_ID" }}"
+        value: {{ .Values.kafka_num_brokers }}
       - name: client_secret
-        value: "{{ requiredEnv "RADAR_UPLOAD_SOURCE_CONNECTOR_CLIENT_SECRET" }}"
+        value: {{ .Values.management_portal.client_secrets.radar_upload_connect }}

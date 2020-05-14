@@ -1,0 +1,102 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "radar-output.fullname" . }}
+  labels:
+    app: {{ template "radar-output.name" . }}
+    chart: {{ template "radar-output.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  restructure.yml: |
+    service:
+      # Whether to run the application as a polling service.
+      enable: true
+      # Polling interval in seconds.
+      interval: 300
+
+    # Compression characteristics
+    compression:
+      # Compression type: none, zip or gzip
+      type: gzip
+      # Compression Factory class
+      # factory: org.radarbase.hdfs.data.CompressionFactory
+      # Additional compression properties
+      # properties: {}
+
+    # File format
+    format:
+      # Format type: CSV or JSON
+      type: csv
+      # Whether to deduplicate the files in each topic by default
+      deduplication:
+        enable: true
+        # Deduplicate considering only distinct fields sourceId and time.
+        # This may incur data loss if multiple measurements are recorded
+        # at exactly the same time. By default, all values are considered
+        # when looking at distinct lines.
+        # distinctFields: [key.sourceId, value.time]
+      # Format factory class
+      # factory: org.radarbase.hdfs.data.FormatFactory
+      # Additional format properties
+      # properties: {}
+
+    # Worker settings
+    worker:
+      # Maximum number of files and converters to keep open while processing
+      cacheSize: 300
+      # Number of threads to do processing with
+      numThreads: "{{ .Values.num_threads }}"
+      # Maximum number of files to process in any given topic.
+      # maxFilesPerTopic: null
+
+    storage:
+      factory: org.radarbase.hdfs.storage.LocalStorageDriver
+      properties:
+        localUid: 1000
+        localGid: 1000
+
+    # Path settings
+    paths:
+      # Input directories in HDFS
+      inputs:
+        - /topicAndroidNew
+      # Root temporary directory for local file processing.
+      temp: /output/+tmp
+      # Output directory
+      output: /output
+      # Output path construction factory
+      #factory: org.radarbase.hdfs.MonthlyObservationKeyPathFactory
+      # Additional properties
+      # properties: {}
+
+    # Individual topic configuration
+    topics: {}
+    #  # topic name
+    #  connect_fitbit_source:
+    #    # deduplicate this topic, regardless of the format settings
+    #    deduplication:
+    #      # deduplicate this topic only using given fields.
+    #      distinctFields: [value.time]
+    #  connect_fitbit_bad:
+    #    # Do not process this topic
+    #    exclude: true
+    #  biovotion_acceleration:
+    #    # Disable deduplication
+    #    deduplication:
+    #      enable: false
+
+    # HDFS settings
+    hdfs:
+      # HDFS name node in case of a single name node, or HDFS cluster ID in case of high availability.
+      name: "{{ .Values.hdfs_namenode }}"
+      # High availability settings:
+      # nameNodes:
+      #   - name: hdfs1
+      #     hostname: hdfs-namenode-1
+      #   - name: hdfs2
+      #     hostname: hdfs-namenode-2
+      # Where files will be locked. This value should be the same for all restructure processes.
+      lockPath: /logs/org.radarbase.hdfs/lock
+      # Additional raw HDFS configuration properties
+      # properties: {}

@@ -1,3 +1,9 @@
+environments:
+  default:
+    values:
+    - ../base.yaml
+    - ../production.yaml
+
 helmDefaults:
   atomic: true
   timeout: 600
@@ -5,9 +11,9 @@ helmDefaults:
 releases:
   - name: radar-integration
     chart: ../charts/radar-integration
-    installed: {{ requiredEnv "RADAR_INSTALL_REDCAP" }}
+    installed: {{ .Values.radar_integration._install }}
+    values:
+      - {{ .Values.radar_integration | toYaml | indent 8 | trim }}
     set:
-      - name: image.tag
-        value: "{{ requiredEnv "RADAR_INTEGRATION_IMAGE_TAG" }}"
-      - name: replicaCount
-        value: "{{ requiredEnv "RADAR_INTEGRATION_REPLICA_COUNT" }}"
+      - name: ingress.hosts
+        values: [{{ .Values.server_name }}]

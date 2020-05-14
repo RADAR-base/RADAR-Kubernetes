@@ -64,10 +64,20 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /etc/upload-backend/
+            - name: private-keys
+            # - name: output
+            #   mountPath: /output
       volumes:
         - name: config
           configMap:
             name: {{ include "radar-upload-connect-backend.fullname" . }}
+        # - name: output
+        # {{- if .Values.persistence.enabled }}
+        #   persistentVolumeClaim:
+        #     claimName: {{ .Values.persistence.existingClaim | default (include "radar-upload-connect-backend.fullname" .) }}
+        # {{- else }}
+        #   emptyDir: {}
+        # {{ end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
