@@ -28,6 +28,6 @@ data:
           enrolment_event: #Unique identifier for the enrolment event
           integration_form: #Name of integration REDCap form
           token: #REDCap API Token used to identify the REDCap user against the REDCap instance
-      - mp_info:
+        mp_info:
           # Management Portal project identifier
           project_name: #

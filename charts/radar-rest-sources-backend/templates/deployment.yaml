@@ -61,7 +61,7 @@ spec:
           - name: REST_SOURCE_AUTHORIZER_MANAGEMENT_PORTAL_OAUTH_CLIENT_ID
             value: "radar_rest_sources_auth"
           - name: REST_SOURCE_AUTHORIZER_MANAGEMENT_PORTAL_OAUTH_CLIENT_SECRET
-            value: "secret"
+            value: {{ .Values.rest_sources_backend_secret }}
           - name: APP_SLEEP
             value: "10"   # gives time for the database to boot before the application
           ports:
