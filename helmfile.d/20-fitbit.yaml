@@ -30,10 +30,6 @@ releases:
     set:
       - name: ingress.hosts
         values: [{{ .Values.server_name }}]
-      - name: fitbit_api_client
-        value: {{ .Values.fitbit_api_client }}
-      - name: fitbit_api_secret
-        value: {{ .Values.fitbit_api_secret }}
 
   - name: radar-rest-sources-backend
     chart: ../charts/radar-rest-sources-backend
@@ -45,3 +41,9 @@ releases:
         values: [{{ .Values.server_name }}]
       - name: postgres.password
         value: {{ .Values.postgres_password }}
+      - name: fitbit_api_client
+        value: {{ .Values.fitbit_api_client }}
+      - name: fitbit_api_secret
+        value: {{ .Values.fitbit_api_secret }}
+      - name: client_secret
+        value: {{ .Values.management_portal.client_secrets.radar_rest_sources_backend }}
