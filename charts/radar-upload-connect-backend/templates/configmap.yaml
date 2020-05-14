@@ -10,7 +10,6 @@ metadata:
 data:
   upload.yml: |
     baseUri: "http://0.0.0.0:8085/upload/api/"
-
     enableCors: yes
     clientId: {{ .Values.client_id }}
     clientSecret: {{ .Values.client_secret }}
@@ -37,12 +36,7 @@ data:
           - "application/zip"
         timeRequired: false
         sourceIdRequired: false
-        configuration:
-          "host": "sftp"
-          "user": "username"
-          "keyFile": "/path/to/private/ssh/key"
-          "advertizedUrl": "sftp://<my-hostname>"
-      - name: "physilog5"
+      - name: "physilog"
         topics:
           - "connect_upload_physilog_acceleration"
         contentTypes:
@@ -50,6 +44,11 @@ data:
           - "application/json"
         timeRequired: false
         sourceIdRequired: false
+        configuration:
+          "host": "radar-output"
+          "user": "dl"
+          "keyFile": "/etc/upload-backend-private-key/ssh-privatekey"
+          "root": "/output/"
       - name: "oxford-wearable-camera"
         topics:
           - "connect_upload_oxford_camera_data"
@@ -59,10 +58,10 @@ data:
         timeRequired: false
         sourceIdRequired: false
         configuration:
-          "host": "sftp"
-          "user": "username"
-          "keyFile": "/path/to/private/ssh/key"
-          "advertizedUrl": "sftp://<my-hostname>"
+          "host": "radar-output"
+          "user": "dl"
+          "keyFile": "/etc/upload-backend-private-key/ssh-privatekey"
+          "root": "/output/"
   logback.xml: |
     <?xml version="1.0" encoding="UTF-8"?>
     <configuration>

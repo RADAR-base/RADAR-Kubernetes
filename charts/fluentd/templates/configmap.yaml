@@ -1,0 +1,133 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "fluentd.fullname" . }}
+  labels:
+{{ include "fluentd.labels" . | indent 4 }}
+data:
+  fluent.conf: |
+    <match fluent.**>
+      @type stdout
+    </match>
+
+    <source>
+      @type systemd
+      tag systemd
+      path /var/log/journal
+      <storage>
+        @type local
+        persistent true
+        path /pos
+      </storage>
+      <entry>
+        field_map '{"MESSAGE": "log", "_PID": ["process", "pid"], "_CMDLINE": "process", "_COMM": "cmd"}'
+        fields_strip_underscores true
+        fields_lowercase true
+      </entry>
+      read_from_head true
+    </source>
+
+    <source>
+      @type tail
+      path /var/log/containers/*.log
+      pos_file /pos/containers.pos
+      tag kubernetes.*
+      read_from_head true
+      <parse>
+        @type json
+        time_key time
+        keep_time_key true
+        time_format "%Y-%m-%dT%H:%M:%S.%NZ"
+      </parse>
+    </source>
+
+    <source>
+      @type tail
+      path /var/log/kubernetes/audit.log
+      pos_file /pos/audit.pos
+      tag audit
+      read_from_head true
+      <parse>
+        @type json
+        time_key timestamp
+        keep_time_key true
+        time_format "%Y-%m-%dT%H:%M:%SZ"
+      </parse>
+    </source>
+
+    <source>
+      @type tail
+      path /var/log/auth.log
+      pos_file /pos/auth.pos
+      tag auth
+      read_from_head true
+      <parse>
+        @type syslog
+      </parse>
+    </source>
+
+    <source>
+      @type monitor_agent
+      bind 0.0.0.0
+      port 24220
+    </source>
+
+    # <source>
+    #  @type tail
+    #  path /var/log/syslog
+    #  pos_file /pos/syslog.pos
+    #  tag syslog
+    #  read_from_head true
+    #  <parse>
+    #    @type syslog
+    #  </parse>
+    # </source>
+
+    <filter kubernetes.**>
+      @type kubernetes_metadata
+      ca_file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      bearer_token_file /var/run/secrets/kubernetes.io/serviceaccount/token
+    </filter>
+
+    <filter **>
+      @type record_transformer
+      <record>
+        hostname "#{ENV['NODENAME']}"
+      </record>
+    </filter>
+
+    <filter **>
+     @type record_modifier
+     char_encoding utf-8
+    </filter>
+
+    <match **>
+       @type copy
+       <store>
+         @type gelf
+         include_tag_key true
+         host "#{ENV['GELF_HOST']}"
+         port "#{ENV['GELF_PORT']}"
+         # protocol <tcp or udp>
+         protocol "#{ENV['GELF_PROTOCOL']}"
+         # tls <true or false>
+         # tls_options {}
+         # Supported tls_options:
+         # 'no_default_ca' [Boolean] prevents OpenSSL from using the systems CA store.
+         # 'tls_version' [Symbol] any of :TLSv1, :TLSv1_1, :TLSv1_2 (default)
+         # 'cert' [String, IO] the client certificate file
+         # 'key' [String, IO] the key for the client certificate
+         # 'all_ciphers' [Boolean] allows any ciphers to be used, may be insecure
+         flush_interval 10s
+         num_threads 4
+         use_record_host true
+         buffer_queue_limit 512
+         max_retry_wait 300
+         slow_flush_log_threshold 50.0
+      </store>
+    </match>
+
+    # Valid log_level's are: fatal, error, warn, info, debug, trace
+    <system>
+      log_level warn
+    </system>

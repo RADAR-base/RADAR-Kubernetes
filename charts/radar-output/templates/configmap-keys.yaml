@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "radar-output.fullname" . }}
+  name: {{ template "radar-output.fullname" . }}-keys
   labels:
     app: {{ template "radar-output.name" . }}
     chart: {{ template "radar-output.chart" . }}

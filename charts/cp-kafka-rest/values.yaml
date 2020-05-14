@@ -3,3 +3,5 @@ cp-schema-registry:
 
 cp-zookeeper:
   url: "cp-zookeeper-headless:2181"
+
+imageTag: 5.3.1

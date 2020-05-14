@@ -6,7 +6,7 @@ replicaCount: 2
 
 image:
   repository: radarbase/radar-connect-upload-source
-  tag: latest
+  tag: 0.3.0
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -56,3 +56,5 @@ managementportal_host: management-portal
 radar_upload_connect_backend: radar-upload-connect-backend
 client_id: radar_upload_connect
 client_secret: upload_secret
+poll_interval: 1800000
+record_converter_classes: org.radarbase.connect.upload.converter.AccelerometerCsvRecordConverter,org.radarbase.connect.upload.converter.altoida.AltoidaZipFileRecordConverter

@@ -1,3 +1,9 @@
+environments:
+  default:
+    values:
+    - ../base.yaml
+    - ../production.yaml
+
 helmDefaults:
   atomic: true
   timeout: 600
@@ -5,43 +11,26 @@ helmDefaults:
 releases:
   - name: smtp
     chart: ../charts/smtp
-    installed: {{ requiredEnv "RADAR_INSTALL_KAFKA_ANALYSIS" }}
-    set:
-      - name: image.tag
-        value: "{{ requiredEnv "SMTP_IMAGE_TAG" }}"
-      - name: replicaCount
-        value: "{{ requiredEnv "SMTP_REPLICA_COUNT" }}"
-      - name: smarthost.address
-        value: "{{ requiredEnv "SMTP_ADDRESS" }}"
-      - name: smarthost.user
-        value: "{{ requiredEnv "SMTP_USER" }}"
-      - name: smarthost.password
-        value: "{{ requiredEnv "SMTP_PASSWORD" }}"
-      - name: persistence.size
-        value: "{{ requiredEnv "SMTP_DISK_SIZE" }}"             
+    installed: {{ .Values.smtp._install }}
+    values:
+      - {{ .Values.smtp | toYaml | indent 8 | trim }}
+
   - name: radar-backend-monitor
     chart: ../charts/radar-backend
-    installed: {{ requiredEnv "RADAR_INSTALL_KAFKA_ANALYSIS" }}
+    installed: {{ .Values.radar_backend_monitor._install }}
     values:
-    - "../charts/radar-backend/values-monitor.yaml"
+      - "../charts/radar-backend/values-monitor.yaml"
+      - {{ .Values.radar_backend_monitor | toYaml | indent 8 | trim }}
     set:
-      - name: image.tag
-        value: "{{ requiredEnv "RADAR_BACKEND_IMAGE_TAG" }}"
-      - name: replicaCount
-        value: "{{ requiredEnv "RADAR_BACKEND_MONITOR_REPLICA_COUNT" }}"
       - name: kafka_num_brokers
-        value: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
-      - name: persistence.size
-        value: "{{ requiredEnv "RADAR_BACKEND_MONITOR_DISK_SIZE" }}"
+        value: {{ .Values.kafka_num_brokers }}
+    
   - name: radar-backend-stream
     chart: ../charts/radar-backend
-    installed: {{ requiredEnv "RADAR_INSTALL_KAFKA_ANALYSIS" }}
+    installed: {{ .Values.radar_backend_stream._install }}
     values:
-    - "../charts/radar-backend/values-stream.yaml"
+      - "../charts/radar-backend/values-stream.yaml"
+      - {{ .Values.radar_backend_stream | toYaml | indent 8 | trim }}
     set:
-      - name: image.tag
-        value: "{{ requiredEnv "RADAR_BACKEND_IMAGE_TAG" }}"
-      - name: replicaCount
-        value: "{{ requiredEnv "RADAR_BACKEND_STREAM_REPLICA_COUNT" }}"
       - name: kafka_num_brokers
-        value: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
+        value: {{ .Values.kafka_num_brokers }}

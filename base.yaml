@@ -1,0 +1,268 @@
+server_name: example.com
+maintainer_email: MAINTAINER_EMAIL
+kafka_num_brokers: KAFKA_NUM_BROKERS
+postgres_password: password
+
+# --------------------------------------------------------- 00-init.yaml ---------------------------------------------------------
+
+mongodb:
+  _install: true
+
+elasticsearch:
+  _install: true
+
+graylog:
+  _install: true
+
+cert_manager:
+  _install: true
+
+fluentd:
+  _install: true
+
+prometheus_operator:
+  _install: true
+  prometheus-operator:
+    prometheus:
+      prometheusSpec:
+        replicas: 1
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              resources:
+                requests:
+                  storage: 10Gi
+    alertmanager:
+      config:
+        receivers:
+          - name: default
+            slack_configs:
+              - api_url: https://hooks.slack.com/services/XXXXXX/XXXXXX/XXXXXXXXXX
+                channel: "#radar-ops"
+      alertmanagerSpec:
+        replicas: 1
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              resources:
+                requests:
+                  storage: 1Gi
+    grafana:
+      adminPassword: "password"
+    nginx_auth: "test:$apr1$s5C61r9E$kFpp71zFuP7WYiHlA.2Tb1"  # test:test
+
+nginx_ingress:
+  _install: true
+  controller:
+    replicaCount: 1
+
+kafka_manager:
+  _install: true
+  basicAuth:
+    enabled: true
+    username: kafkamanager-user
+    password: password
+
+# --------------------------------------------------------- 10-base.yaml ---------------------------------------------------------
+
+cp_zookeeper:
+  _install: true
+  servers: 3
+
+cp_kafka:
+  _install: true
+  persistence:
+    size: 3Gi
+
+cp_schema_registry:
+  _install: true
+  replicaCount: 1
+
+catalog_server:
+  _install: true
+  replicaCount: 1
+
+postgresql:
+  _install: true
+  persistence:
+    size: 8Gi
+
+management_portal:
+  _install: true
+  replicaCount: 1  # should be 1
+  managementportal:
+    catalogue_server_enable_auto_import: true
+    common_admin_password: password
+    common_privacy_policy_url: http://info.thehyve.nl/radar-cns-privacy-policy
+    frontend_client_secret: password
+    oauth_checking_key_aliases_0: radarbase-managementportal-ec
+    oauth_checking_key_aliases_1: selfsigned
+  from_email: me@example.com
+  client_secrets:
+    prmt: secret
+    armt: secret
+    radar_redcap_integrator: secret
+    radar_upload_backend: secret
+    radar_upload_connect: secret
+    radar_upload_frontend: secret
+
+# --------------------------------------------------------- 20-dashboard.yaml ---------------------------------------------------------
+
+hotstorage_password: password
+
+radar_dashboard:
+  _install: true
+  replicaCount: 1
+
+radar_hotstorage:
+  _install: true
+  replicaCount: 1  # should be 1
+  persistence:
+    size: 10Gi
+
+radar_mongodb-connector:
+  _install: true
+  replicaCount: 1
+
+radar_restapi:
+  _install: true
+  replicaCount: 1
+
+
+# --------------------------------------------------------- 20-fitbit.yaml ---------------------------------------------------------
+fitbit_api_client: fitbit_api_client_id
+fitbit_api_secret: fitbit_api_client_secret
+
+radar_fitbit_connector:
+  _install: true
+  replicaCount: 1
+
+radar_rest_sources_authorizer:
+  _install: true
+  replicaCount: 1
+  nginx_auth: 'test:$apr1$s5C61r9E$kFpp71zFuP7WYiHlA.2Tb1'  # test:test
+
+radar_rest_sources_backend:
+  _install: true
+  replicaCount: 1
+
+# --------------------------------------------------------- 20-hfds.yaml ---------------------------------------------------------
+
+hdfs_namenode:
+  _install: true
+  replicaCount: 1  # should be 1
+  namenode_1_disk_size: 5Gi
+  namenode_2_disk_size: 5Gi
+
+hdfs_datanode:
+  _install: true
+  replicaCount: 3
+  disk_size: 5Gi
+
+radar_connect_hdfs_sink:
+  _install: true
+  replicaCount: 1  # should be 1
+
+rook:
+  _install: true
+
+ceph:
+  _install: true
+  ceph_cluster:
+    mon:
+      count: 3
+      claim:
+        stroage:
+          class: cinder
+          size: 10Gi
+    storage:
+      name: set1
+      count: 3
+      claim:
+        name: data
+        storage:
+          size: 200Gi
+          class: cinder
+
+radar_output:
+  _install: true
+  replicaCount: 1
+  num_threads: 2
+  persistence:
+    size: 30Gi
+
+sftp:
+  _install: true
+  replicaCount: 1  # should be 1
+  sftp_user_keys: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCzNZZGH25F2jEFeFZqmhiePgA02D8jX/8+kRT9lflfKaPUP8wbyc4AmRzv7AFzW1sjVCzn400Aq+gxHmeiCp1wilPprYUTD9hl6mspvTBZlWhcxgisJZVMDt1+9BL8i6BnPFqYT3TwDDuaMXW105qaYwI+xlwvt6WY2ZTkRalwCpdRucYcpbt9cF7rXoQCebXLAypIeZF3yWUhD6GTtnZBuM5pAybUMyrtDZsn4lPSSqjP7bJqp4uiikwkJcT+xjrh06+8SgirN9W5z3+I4x66pg8CEs4b8it/5wAe1+2d0Yju7aCXvpDshERTbRvc6A1chj7SK2m/CxTdv00mtumH"
+
+# --------------------------------------------------------- 20-ingestion.yaml ---------------------------------------------------------
+
+cp_kafka_rest:
+  _install: true
+  replicaCount: 1
+
+radar_gateway:
+  _install: true
+  replicaCount: 1
+
+# --------------------------------------------------------- 20-kafka-analysis.yaml ---------------------------------------------------------
+
+smtp:
+  _install: true
+  replicaCount: 1
+  smarthost:
+    address: mail.example.com
+    user: user@example.com
+    password: password
+  persistence:
+    size: 1Gi
+
+radar_backend_monitor:
+  _install: true
+  replicaCount: 1
+  persistence:
+    size: 1Gi
+
+radar_backend_stream:
+  _install: true
+  replicaCount: 1
+
+# --------------------------------------------------------- 20-redcap.yaml ---------------------------------------------------------
+
+radar_integration:
+  _install: true
+  replicaCount: 1
+  oauth_client_id: radar_redcap_integrator
+  oauth_client_secret: secret
+  projects:
+  - url: "http://example.com"
+    project_id: "1"
+    enrolment_event: enrolment
+    integration_form: radar_integration
+    token: xxx
+    mp_info_project_name: RADAR-BASE
+
+# --------------------------------------------------------- 20-upload.yaml ---------------------------------------------------------
+
+radar_upload_postgres_password: password
+
+radar_upload_postgresql:
+  _install: true
+  persistence:
+    size: 8Gi
+
+radar_upload_connect_backend:
+  _install: true
+  replicaCount: 1
+  client_id: radar_upload_backend
+
+radar_upload_connect_frontend:
+  _install: true
+  replicaCount: 1
+  vue_app_client_id: radar_upload_frontend
+
+radar_upload_source_connector:
+  _install: true
+  replicaCount: 1
+  client_id: radar_upload_connect
