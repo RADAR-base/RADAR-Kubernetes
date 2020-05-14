@@ -6,7 +6,7 @@ replicaCount: 2
 
 image:
   repository: radarbase/radar-rest-source-auth-backend
-  tag: 1.2.0
+  tag: 1.2.1
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -57,3 +57,5 @@ postgres:
 fitbit_api_client: ""
 fitbit_api_secret: ""
 managementportal_host: management-portal
+
+client_secret: secret
