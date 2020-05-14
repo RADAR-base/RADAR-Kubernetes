@@ -267,3 +267,14 @@ radar_upload_source_connector:
   _install: true
   replicaCount: 1
   client_id: radar_upload_connect
+
+
+# --------------------------------------------------------- 20-s3-connector.yaml ---------------------------------------------------------
+
+radar_s3_connector:
+  _install: true
+  replicaCount: 1
+  s3Endpoint: "http://localhost:9000"
+  bucketAccessKey: access_key
+  bucketSecretKey: secret
+  bucketName: radar_intermediate_storage

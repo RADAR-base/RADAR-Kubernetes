@@ -1,0 +1,20 @@
+environments:
+  default:
+    values:
+      - ../base.yaml
+      - ../production.yaml
+
+helmDefaults:
+  atomic: true
+  force: true
+  timeout: 600
+
+releases:
+  - name: radar-s3-connector
+    chart: ../charts/radar-s3-connector
+    installed: {{ .Values.radar_s3_connector._install }}
+    values:
+      - {{ .Values.radar_s3_connector | toYaml | indent 8 | trim }}
+    set:
+      - name: kafka_num_brokers
+        value: {{ .Values.kafka_num_brokers }}
