@@ -6,7 +6,7 @@ replicaCount: 2
 
 image:
   repository: radarbase/radar-connect-upload-source
-  tag: 0.3.0
+  tag: 0.4.1
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -57,4 +57,4 @@ radar_upload_connect_backend: radar-upload-connect-backend
 client_id: radar_upload_connect
 client_secret: upload_secret
 poll_interval: 1800000
-record_converter_classes: org.radarbase.connect.upload.converter.AccelerometerCsvRecordConverter,org.radarbase.connect.upload.converter.altoida.AltoidaZipFileRecordConverter
+record_converter_classes: org.radarbase.connect.upload.converter.altoida.AltoidaConverterFactory,org.radarbase.connect.upload.converter.axivity.AxivityConverterFactory,org.radarbase.connect.upload.converter.oxford.WearableCameraConverterFactory,org.radarbase.connect.upload.converter.gaitup.Physilog5ConverterFactory
