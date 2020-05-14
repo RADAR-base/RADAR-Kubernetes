@@ -81,9 +81,9 @@ spec:
           - name: CONNECT_LOG4J_LOGGERS
             value: "org.reflections=ERROR"
           - name: AWS_ACCESS_KEY
-            value: "{{ .Values.bucket_access_key }}"
+            value: "{{ .Values.bucketAccessKey }}"
           - name: AWS_SECRET_KEY
-            value: "{{ .Values.bucket_secret_key }}"
+            value: "{{ .Values.bucketSecretKey }}"
           ports:
             - name: http
               containerPort: 8083
