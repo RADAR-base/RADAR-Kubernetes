@@ -57,3 +57,4 @@ postgres:
 fitbit_api_client: ""
 fitbit_api_secret: ""
 managementportal_host: management-portal
+rest_sources_backend_secret: ""

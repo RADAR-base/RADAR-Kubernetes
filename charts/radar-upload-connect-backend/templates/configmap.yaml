@@ -9,7 +9,8 @@ metadata:
     heritage: {{ .Release.Service }}
 data:
   upload.yml: |
-    baseUri: "http://0.0.0.0:8085/"
+    baseUri: "http://0.0.0.0:8085/upload/api/"
+
     enableCors: yes
     clientId: {{ .Values.client_id }}
     clientSecret: {{ .Values.client_secret }}
@@ -21,7 +22,7 @@ data:
     additionalPersistenceConfig:
       "hibernate.dialect": "org.hibernate.dialect.PostgreSQL95Dialect"
     sourceTypes:
-      - name: "altoida-zip"
+      - name: "altoida"
         topics:
           - "connect_upload_altoida_acceleration"
         contentTypes:
@@ -36,7 +37,12 @@ data:
           - "application/zip"
         timeRequired: false
         sourceIdRequired: false
-      - name: "physilog"
+        configuration:
+          "host": "sftp"
+          "user": "username"
+          "keyFile": "/path/to/private/ssh/key"
+          "advertizedUrl": "sftp://<my-hostname>"
+      - name: "physilog5"
         topics:
           - "connect_upload_physilog_acceleration"
         contentTypes:
