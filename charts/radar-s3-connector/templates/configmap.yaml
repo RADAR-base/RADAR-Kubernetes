@@ -13,13 +13,10 @@ data:
     connector.class=io.confluent.connect.s3.S3SinkConnector
     tasks.max=4
     topics={{ .Values.topics }}
-
     flush.size=80000
-
     s3.bucket.name={{ .Values.bucketName }}
     aws.access.key.id={{ .Values.bucketAccessKey }}
     aws.secret.access.key={{ .Values.bucketSecretKey }}
-
     store.url={{ .Values.s3Endpoint }}
     storage.class=io.confluent.connect.s3.storage.S3Storage
     format.class=org.radarbase.connect.s3.RadarBaseAvroFormat
