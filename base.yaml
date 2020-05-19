@@ -107,6 +107,17 @@ management_portal:
     radar_upload_frontend: secret
     radar_rest_sources_backend: secret
 
+
+smtp:
+  _install: true
+  replicaCount: 1
+  smarthost:
+    address: mail.example.com
+    user: user@example.com
+    password: password
+  persistence:
+    size: 1Gi
+
 # --------------------------------------------------------- 20-dashboard.yaml ---------------------------------------------------------
 
 hotstorage_password: password
@@ -209,15 +220,6 @@ radar_gateway:
 
 # --------------------------------------------------------- 20-kafka-analysis.yaml ---------------------------------------------------------
 
-smtp:
-  _install: true
-  replicaCount: 1
-  smarthost:
-    address: mail.example.com
-    user: user@example.com
-    password: password
-  persistence:
-    size: 1Gi
 
 radar_backend_monitor:
   _install: true
