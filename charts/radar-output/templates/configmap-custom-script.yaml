@@ -3,6 +3,10 @@ data:
   change_config.sh: |
           #!/bin/bash
           sed -i 's/PermitRootLogin no/PermitRootLogin yes/' /etc/ssh/sshd_config
+          cp /root/.ssh/keys/authorized_keys /root/.ssh/authorized_keys
+          chown -R root:root /root/.ssh || true
+          chmod -R 600 /root/.ssh || true
+
 kind: ConfigMap
 metadata:
   labels:

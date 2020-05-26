@@ -148,26 +148,28 @@ radar_rest_sources_backend:
 
 # --------------------------------------------------------- 20-hfds.yaml ---------------------------------------------------------
 
-hdfs_namenode:
+hdfs:
   _install: true
-  replicaCount: 1  # should be 1
-  namenode_1_disk_size: 5Gi
-  namenode_2_disk_size: 5Gi
+  global:
+    zookeeperQuorumOverride: cp-zookeeper-0.cp-zookeeper-headless.default.svc.cluster.local:2181,cp-zookeeper-1.cp-zookeeper-headless.default.svc.cluster.local:2181,cp-zookeeper-2.cp-zookeeper-headless.default.svc.cluster.local:2181
 
-hdfs_datanode:
-  _install: true
-  replicaCount: 3
-  disk_size: 5Gi
+  hdfs-namenode-k8s:
+    persistence:
+      size: 5Gi
+
+  hdfs-datanode-k8s:
+    persistence:
+      size: 200Gi
 
 radar_connect_hdfs_sink:
   _install: true
   replicaCount: 1  # should be 1
 
 rook:
-  _install: true
+  _install: false
 
 ceph:
-  _install: true
+  _install: false
   ceph_cluster:
     mon:
       count: 3
