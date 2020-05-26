@@ -68,6 +68,8 @@ spec:
             value: {{ include "radar-upload-source-connector.fullname" . }}
           - name: CONNECT_ZOOKEEPER_CONNECT
             value: "{{ .Values.zookeeper }}"
+          - name: CONNECT_VALUE_CONVERTER_CONNECT_META_DATA
+            value: "false"
           - name: CONNECTOR_PROPERTY_FILE_PREFIX
             value: "source-upload"
           - name: KAFKA_HEAP_OPTS
