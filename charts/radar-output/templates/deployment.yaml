@@ -34,11 +34,13 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - name: keys
-              mountPath: /home/dl/.ssh/keys
+              mountPath: /root/.ssh/keys
             - name: users
               mountPath: /etc/sftp/
             - name: output
-              mountPath: /home/dl/output
+              mountPath: /root/output
+            - name: custom-scripts
+              mountPath: /etc/sftp.d/
         - name: output
           image: "{{ .Values.image_output.repository }}:{{ .Values.image_output.tag }}"
           imagePullPolicy: {{ .Values.image_output.pullPolicy }}
@@ -68,6 +70,9 @@ spec:
         - name: restructure
           configMap:
             name: {{ include "radar-output.fullname" . }}-restructure
+        - name: custom-scripts
+          configMap:
+            name: {{ include "radar-output.fullname" . }}-custom-scripts
         - name: output
         {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
