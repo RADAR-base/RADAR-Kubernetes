@@ -76,3 +76,4 @@ client_secrets:
   radar_upload_backend: secret
   radar_upload_connect: secret
   radar_upload_frontend: secret
+  radar_rest_sources_backend: secret
