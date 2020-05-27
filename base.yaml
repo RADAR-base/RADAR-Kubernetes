@@ -1,6 +1,6 @@
 server_name: example.com
 maintainer_email: MAINTAINER_EMAIL
-kafka_num_brokers: KAFKA_NUM_BROKERS
+kafka_num_brokers: 3
 postgres_password: password
 
 # --------------------------------------------------------- 00-init.yaml ---------------------------------------------------------
