@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "radar-s3-connector.fullname" . }}
+  labels:
+    app: {{ template "radar-s3-connector.name" . }}
+    chart: {{ template "radar-s3-connector.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  sink-s3.properties: |
+    name=radar-s3-sink-connector
+    connector.class=io.confluent.connect.s3.S3SinkConnector
+    tasks.max=4
+    topics={{ .Values.topics }}
+    flush.size=1000
+    s3.bucket.name={{ .Values.bucketName }}
+    aws.access.key.id={{ .Values.bucketAccessKey }}
+    aws.secret.access.key={{ .Values.bucketSecretKey }}
+    store.url={{ .Values.s3Endpoint }}
+    storage.class=io.confluent.connect.s3.storage.S3Storage
+    format.class=org.radarbase.connect.s3.RadarBaseAvroFormat
+    avro.codec=deflate
+    errors.tolerance=all
+    errors.deadletterqueue.topic.name=dead_letter_queue_s3
+    errors.deadletterqueue.topic.replication.factor=2
+    errors.deadletterqueue.context.headers.enable=true
+    errors.retry.delay.max.ms=60000
+    errors.retry.timeout=300000
+

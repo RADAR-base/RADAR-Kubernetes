@@ -15,6 +15,32 @@ data:
       # Polling interval in seconds.
       interval: 300
 
+    source:
+      type: s3
+      # Minio S3 settings
+      s3:
+        endpoint: "{{ .Values.s3Endpoint }}"
+        accessToken: "{{ .Values.bucketAccessKey }}"
+        secretKey: "{{ .Values.bucketSecretKey }}"
+        bucket: "{{ .Values.sourceBucketName }}"
+      hdfs:
+        nameNodes:
+
+    target:
+      type: local
+      local:
+        userId: 0
+        groupId: 0
+      s3:
+        endpoint: "{{ .Values.s3Endpoint }}"
+        accessToken: "{{ .Values.bucketAccessKey }}"
+        secretKey: "{{ .Values.bucketSecretKey }}"
+        bucket: "{{ .Values.targetBucketName }}"
+
+    redis:
+      uri: "{{ .Values.redisUrl }}"
+      lockPrefix: radar-output/lock/
+
     # Compression characteristics
     compression:
       # Compression type: none, zip or gzip
