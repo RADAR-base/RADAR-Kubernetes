@@ -160,31 +160,33 @@ radar_rest_sources_backend:
 
 # --------------------------------------------------------- 20-hfds.yaml ---------------------------------------------------------
 
-hdfs_namenode:
+hdfs:
   _install: true
-  replicaCount: 1  # should be 1
-  namenode_1_disk_size: 5Gi
-  namenode_2_disk_size: 5Gi
+  global:
+    zookeeperQuorumOverride: cp-zookeeper-0.cp-zookeeper-headless.default.svc.cluster.local:2181,cp-zookeeper-1.cp-zookeeper-headless.default.svc.cluster.local:2181,cp-zookeeper-2.cp-zookeeper-headless.default.svc.cluster.local:2181
 
-hdfs_datanode:
-  _install: true
-  replicaCount: 3
-  disk_size: 5Gi
+  hdfs-namenode-k8s:
+    persistence:
+      size: 5Gi
+
+  hdfs-datanode-k8s:
+    persistence:
+      size: 200Gi
 
 radar_connect_hdfs_sink:
   _install: true
   replicaCount: 1  # should be 1
 
 rook:
-  _install: true
+  _install: false
 
 ceph:
-  _install: true
+  _install: false
   ceph_cluster:
     mon:
       count: 3
       claim:
-        stroage:
+        storage:
           class: cinder
           size: 10Gi
     storage:
@@ -212,7 +214,8 @@ radar_output:
 sftp:
   _install: true
   replicaCount: 1  # should be 1
-  sftp_user_keys: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCzNZZGH25F2jEFeFZqmhiePgA02D8jX/8+kRT9lflfKaPUP8wbyc4AmRzv7AFzW1sjVCzn400Aq+gxHmeiCp1wilPprYUTD9hl6mspvTBZlWhcxgisJZVMDt1+9BL8i6BnPFqYT3TwDDuaMXW105qaYwI+xlwvt6WY2ZTkRalwCpdRucYcpbt9cF7rXoQCebXLAypIeZF3yWUhD6GTtnZBuM5pAybUMyrtDZsn4lPSSqjP7bJqp4uiikwkJcT+xjrh06+8SgirN9W5z3+I4x66pg8CEs4b8it/5wAe1+2d0Yju7aCXvpDshERTbRvc6A1chj7SK2m/CxTdv00mtumH"
+  sftp_user_keys: |
+    ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCzNZZGH25F2jEFeFZqmhiePgA02D8jX/8+kRT9lflfKaPUP8wbyc4AmRzv7AFzW1sjVCzn400Aq+gxHmeiCp1wilPprYUTD9hl6mspvTBZlWhcxgisJZVMDt1+9BL8i6BnPFqYT3TwDDuaMXW105qaYwI+xlwvt6WY2ZTkRalwCpdRucYcpbt9cF7rXoQCebXLAypIeZF3yWUhD6GTtnZBuM5pAybUMyrtDZsn4lPSSqjP7bJqp4uiikwkJcT+xjrh06+8SgirN9W5z3+I4x66pg8CEs4b8it/5wAe1+2d0Yju7aCXvpDshERTbRvc6A1chj7SK2m/CxTdv00mtumH
 
 # --------------------------------------------------------- 20-ingestion.yaml ---------------------------------------------------------
 
@@ -278,6 +281,17 @@ radar_upload_source_connector:
 
 
 # --------------------------------------------------------- 20-s3-connector.yaml ---------------------------------------------------------
+
+redis:
+  _install: true
+
+minio:
+  _install: true
+  replicas: 4
+  accessKey: AKIAIOSFODNN7EXAMPLE
+  secretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+  persistence:
+    size: 20Gi
 
 radar_s3_connector:
   # set to true if radar-s3-connector should be installed

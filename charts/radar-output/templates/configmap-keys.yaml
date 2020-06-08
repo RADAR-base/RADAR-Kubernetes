@@ -8,5 +8,5 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 data:
-  id_rsa.pub: |
+  authorized_keys: |
     {{ .Values.sftp_user_keys }}
