@@ -202,6 +202,9 @@ radar_output:
   _install: true
   replicaCount: 1
   num_threads: 2
+  target_type: s3
+  source_type: s3
+  hdfs_namenodes: "[hdfs-namenode-0, hdfs-namenode-1]"
   s3Endpoint: "http://minio:9000/"
   bucketAccessKey: access_key
   bucketSecretKey: secret

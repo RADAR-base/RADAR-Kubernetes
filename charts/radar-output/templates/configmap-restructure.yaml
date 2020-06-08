@@ -16,7 +16,7 @@ data:
       interval: 300
 
     source:
-      type: s3
+      type: "{{ .Values.source_type }}"
       # Minio S3 settings
       s3:
         endpoint: "{{ .Values.s3Endpoint }}"
@@ -24,10 +24,10 @@ data:
         secretKey: "{{ .Values.bucketSecretKey }}"
         bucket: "{{ .Values.sourceBucketName }}"
       hdfs:
-        nameNodes:
+        nameNodes: "{{ .Values.hdfs_namenodes }}"
 
     target:
-      type: local
+      type: "{{ .Values.target_type }}"
       local:
         userId: 0
         groupId: 0
@@ -76,23 +76,23 @@ data:
       # Maximum number of files to process in any given topic.
       # maxFilesPerTopic: null
 
-    storage:
-      factory: org.radarbase.hdfs.storage.LocalStorageDriver
-      properties:
-        localUid: 0
-        localGid: 0
+    #storage:
+      #factory: org.radarbase.hdfs.storage.LocalStorageDriver
+      #properties:
+      #  localUid: 0
+      #  localGid: 0
 
     # Path settings
     paths:
       # Input directories in HDFS
       inputs:
-        - /topicAndroidNew
+        - /topics
       # Root temporary directory for local file processing.
       temp: /output/+tmp
       # Output directory
       output: /output
       # Output path construction factory
-      #factory: org.radarbase.hdfs.MonthlyObservationKeyPathFactory
+      factory: org.radarbase.output.path.MonthlyObservationKeyPathFactory
       # Additional properties
       # properties: {}
 
@@ -111,18 +111,3 @@ data:
     #    # Disable deduplication
     #    deduplication:
     #      enable: false
-
-    # HDFS settings
-    hdfs:
-      # HDFS name node in case of a single name node, or HDFS cluster ID in case of high availability.
-      name: "{{ .Values.hdfs_namenode }}"
-      # High availability settings:
-      # nameNodes:
-      #   - name: hdfs1
-      #     hostname: hdfs-namenode-1
-      #   - name: hdfs2
-      #     hostname: hdfs-namenode-2
-      # Where files will be locked. This value should be the same for all restructure processes.
-      lockPath: /logs/org.radarbase.hdfs/lock
-      # Additional raw HDFS configuration properties
-      # properties: {}
