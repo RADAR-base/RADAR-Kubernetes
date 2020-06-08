@@ -1,3 +1,9 @@
+repositories:
+- name: stable
+  url: https://kubernetes-charts.storage.googleapis.com
+- name: bitnami
+  url: https://charts.bitnami.com/bitnami
+
 environments:
   default:
     values:
@@ -10,6 +16,29 @@ helmDefaults:
   timeout: 600
 
 releases:
+  - name: redis
+    chart: bitnami/redis
+    version: 10.6.15
+    installed: {{ .Values.redis._install }}
+    values:
+      - "../charts/redis/values.yaml"
+      - {{ .Values.redis | toYaml | indent 8 | trim }}
+
+  - name: minio
+    chart: stable/minio
+    version: 5.0.26
+    installed: {{ .Values.minio._install }}
+    values:
+      - "../charts/minio/values.yaml"
+      - {{ .Values.minio | toYaml | indent 8 | trim }}
+    set:
+      - name: ingress.hosts
+        values: ["s3.{{ .Values.server_name }}"]
+      - name: ingress.tls[0].secretName
+        value: radar-base-tls
+      - name: ingress.tls[0].hosts
+        values: ["s3.{{ .Values.server_name }}"]
+
   - name: radar-s3-connector
     chart: ../charts/radar-s3-connector
     installed: {{ .Values.radar_s3_connector._install }}

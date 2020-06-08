@@ -25,7 +25,6 @@ releases:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
 
-
   - name: radar-output
     chart: ../charts/radar-output
     wait: true
