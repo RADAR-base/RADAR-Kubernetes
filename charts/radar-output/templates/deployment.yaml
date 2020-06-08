@@ -45,7 +45,7 @@ spec:
           image: "{{ .Values.image_output.repository }}:{{ .Values.image_output.tag }}"
           imagePullPolicy: {{ .Values.image_output.pullPolicy }}
           command:
-            - radar-hdfs-restructure
+            - radar-output-restructure
           args:
             - -F
             - /etc/restructure/restructure.yml
