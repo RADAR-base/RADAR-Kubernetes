@@ -69,7 +69,7 @@ spec:
           - name: CONNECT_OFFSET_STORAGE_FILE_FILENAME
             value: "/tmp/connect2.offset"
           - name: CONNECT_REST_ADVERTISED_HOST_NAME
-            value: {{ include "radar-s3-sink-connector.fullname" . }}
+            value: {{ include "radar-s3-connector.fullname" . }}
           - name: CONNECT_ZOOKEEPER_CONNECT
             value: "{{ .Values.zookeeper }}"
           - name: CONNECTOR_PROPERTY_FILE_PREFIX
