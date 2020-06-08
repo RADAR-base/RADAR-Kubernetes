@@ -4,5 +4,6 @@ kubernetes-HDFS/
 keystore.p12
 radar-is.yml
 *.tgz
+production.yaml
 .idea/
 RADAR-Kubernetes.iml

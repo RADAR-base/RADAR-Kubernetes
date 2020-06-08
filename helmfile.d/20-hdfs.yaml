@@ -1,7 +1,3 @@
-repositories:
-- name: rook-release
-  url: https://charts.rook.io/release
-
 environments:
   default:
     values:
@@ -14,27 +10,11 @@ helmDefaults:
   timeout: 600
 
 releases:
-  - name: hdfs-namenode
-    chart: ../charts/hdfs
-    installed: {{ .Values.hdfs_namenode._install }}
+  - name: hdfs
+    chart: ../kubernetes-HDFS/charts/hdfs-k8s
+    installed: {{ .Values.hdfs._install }}
     values:
-      - "../charts/hdfs/values-namenode.yaml"
-      - {{ .Values.hdfs_namenode | toYaml | indent 8 | trim }}
-    set:
-      - name: volumes[0].size
-        value: {{ .Values.hdfs_namenode.namenode_1_disk_size }}
-      - name: volumes[1].size
-        value: {{ .Values.hdfs_namenode.namenode_2_disk_size }}
-
-  - name: hdfs-datanode
-    chart: ../charts/hdfs
-    installed: {{ .Values.hdfs_datanode._install }}
-    values:
-      - "../charts/hdfs/values-datanode.yaml"
-      - {{ .Values.hdfs_datanode | toYaml | indent 8 | trim }}
-    set:
-      - name: volumes[0].size
-        value: {{ .Values.hdfs_datanode.disk_size }}
+      - {{ .Values.hdfs | toYaml | indent 8 | trim }}
 
   - name: radar-connect-hdfs-sink
     chart: ../charts/radar-connect-hdfs-sink
@@ -44,7 +24,6 @@ releases:
     set:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
-
 
   - name: radar-output
     chart: ../charts/radar-output

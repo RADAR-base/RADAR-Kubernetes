@@ -1,0 +1,28 @@
+ingress:
+  enabled: true
+  hosts:
+    - s3.example.com
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+
+replicas: 4
+mode: distributed
+
+persistence:
+  size: 20Gi
+
+accessKey: AKIAIOSFODNN7EXAMPLE
+secretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+
+metrics:
+  serviceMonitor:
+    enabled: true
+
+buckets:
+  - name: radar-intermediate-storage
+    policy: none
+    purge: false
+  - name: radar-output-storage
+    policy: none
+    purge: false
