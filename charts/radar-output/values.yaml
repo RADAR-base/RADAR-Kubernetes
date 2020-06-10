@@ -11,7 +11,7 @@ image_sftp:
 
 image_output:
   repository: radarbase/radar-output-restructure
-  tag: 1.0.0
+  tag: 1.1.0
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
@@ -85,4 +85,4 @@ bucketAccessKey: access_key
 bucketSecretKey: secret
 sourceBucketName: radar-intermediate-storage
 targetBucketName: radar-output-storage
-redisUrl: "redis://redis-headless:6379"
+redisUrl: "redis://redis-master:6379"
