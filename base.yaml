@@ -205,9 +205,9 @@ radar_output:
   target_type: s3
   source_type: s3
   hdfs_namenodes: "[hdfs-namenode-0, hdfs-namenode-1]"
-  s3Endpoint: "http://minio:9000/"
-  bucketAccessKey: access_key
-  bucketSecretKey: secret
+#  s3Endpoint: "http://minio:9000/"
+#  bucketAccessKey: access_key
+#  bucketSecretKey: secret
   sourceBucketName: radar-intermediate-storage
   targetBucketName: radar-output-storage
   redisUrl: "redis://redis-headless:6379"
