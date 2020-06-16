@@ -47,3 +47,9 @@ releases:
     set:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
+      - name: s3Endpoint
+        value: {{ .Values.minio.advertizedS3EndpointUrl }}
+      - name: bucketAccessKey
+        value: {{ .Values.minio.accessKey }}
+      - name: bucketSecretKey
+        value: {{ .Values.minio.secretKey }}
