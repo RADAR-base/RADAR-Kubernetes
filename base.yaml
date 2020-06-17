@@ -290,7 +290,7 @@ minio:
   replicas: 4
   accessKey: AKIAIOSFODNN7EXAMPLE
   secretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-  advertizedS3EndpointUrl: http://minio:9000/
+  s3Endpoint: http://minio:9000/
   persistence:
     size: 20Gi
 
