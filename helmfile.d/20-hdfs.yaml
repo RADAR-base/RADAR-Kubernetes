@@ -33,7 +33,7 @@ releases:
       - {{ .Values.radar_output | toYaml | indent 8 | trim }}
     set:
       - name: s3Endpoint
-        value: {{ .Values.minio.advertizedS3EndpointUrl }}
+        value: {{ .Values.minio.s3Endpoint }}
       - name: bucketAccessKey
         value: {{ .Values.minio.accessKey }}
       - name: bucketSecretKey
