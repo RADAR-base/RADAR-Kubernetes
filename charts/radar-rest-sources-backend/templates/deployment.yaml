@@ -62,6 +62,8 @@ spec:
             value: "radar_rest_sources_auth_backend"
           - name: REST_SOURCE_AUTHORIZER_MANAGEMENT_PORTAL_OAUTH_CLIENT_SECRET
             value: {{ .Values.client_secret }}
+          - name: REST_SOURCE_AUTHORIZER_AUTH_PUBLIC_KEY_ENDPOINTS_0
+            value: "http://{{ .Values.managementportal_host }}:8080/managementportal/oauth/token_key"
           - name: APP_SLEEP
             value: "10"   # gives time for the database to boot before the application
           ports:
@@ -69,24 +71,20 @@ spec:
               containerPort: 8080
               protocol: TCP
           livenessProbe:
-            exec:
-              command:
-              - /bin/sh
-              - -c
-              - wget --spider http://localhost:8080/users
+            httpGet:
+              path: /health
+              port: 8080
             initialDelaySeconds: 5
-            periodSeconds: 90
+            periodSeconds: 300
             timeoutSeconds: 3
             successThreshold: 1
             failureThreshold: 3
           readinessProbe:
-            exec:
-              command:
-              - /bin/sh
-              - -c
-              - wget --spider http://localhost:8080/users
+            httpGet:
+              path: /health
+              port: 8080
             initialDelaySeconds: 5
-            periodSeconds: 90
+            periodSeconds: 60
             timeoutSeconds: 3
             successThreshold: 1
             failureThreshold: 3
