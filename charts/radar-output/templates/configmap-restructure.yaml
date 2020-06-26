@@ -100,7 +100,7 @@ data:
       # Root temporary directory for local file processing.
       temp: /output/+tmp
       # Output directory
-      output: /output
+      output: /
       # Output path construction factory
       factory: org.radarbase.output.path.MonthlyObservationKeyPathFactory
       # Additional properties
