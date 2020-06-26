@@ -43,7 +43,7 @@ spec:
           - name: BASE_HREF
             value: /rest-sources/authorizer/
           - name: BACKEND_BASE_URL
-            value: {{ .Values.restSourceBackendUrl }}
+            value: https://{{ .Values.serverName }}/rest-sources/backend
           - name: VALIDATE
             value: "true"
           - name: AUTH_GRANT_TYPE
@@ -53,9 +53,9 @@ spec:
           - name: AUTH_CLIENT_SECRET
             value: ""
           - name: AUTH_CALLBACK_URL
-            value: {{ .Values.callbackUrl }}
+            value: https://{{ .Values.serverName }}/rest-sources/authorizer/login
           - name: AUTH_URI
-            value: {{ .Values.managementPortalUrl }}
+            value: https://{{ .Values.serverName }}/managementportal/oauth
           ports:
             - name: http
               containerPort: 80

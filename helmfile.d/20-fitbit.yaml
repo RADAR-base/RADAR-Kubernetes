@@ -30,7 +30,8 @@ releases:
     set:
       - name: ingress.hosts
         values: [{{ .Values.server_name }}]
-
+      - name: serverName
+        value: {{ .Values.server_name }}
   - name: radar-rest-sources-backend
     chart: ../charts/radar-rest-sources-backend
     installed: {{ .Values.radar_rest_sources_backend._install }}
