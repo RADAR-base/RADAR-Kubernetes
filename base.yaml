@@ -207,7 +207,7 @@ radar_output:
   hdfs_namenodes: "[hdfs-namenode-0, hdfs-namenode-1]"
   sourceBucketName: radar-intermediate-storage
   targetBucketName: radar-output-storage
-  redisUrl: "redis://redis-headless:6379"
+  redisUrl: redis://redis-master:6379
   persistence:
     size: 30Gi
 
