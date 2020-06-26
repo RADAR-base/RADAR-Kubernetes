@@ -59,7 +59,7 @@ spec:
           - name: REST_SOURCE_AUTHORIZER_MANAGEMENT_PORTAL_BASE_URL
             value: "http://{{ .Values.managementportal_host }}:8080/managementportal"
           - name: REST_SOURCE_AUTHORIZER_MANAGEMENT_PORTAL_OAUTH_CLIENT_ID
-            value: "radar_rest_sources_auth"
+            value: "radar_rest_sources_auth_backend"
           - name: REST_SOURCE_AUTHORIZER_MANAGEMENT_PORTAL_OAUTH_CLIENT_SECRET
             value: {{ .Values.client_secret }}
           - name: APP_SLEEP
