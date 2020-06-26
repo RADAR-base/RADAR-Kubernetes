@@ -23,24 +23,6 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       containers:
-        - name: sftp
-          image: "{{ .Values.image_sftp.repository }}:{{ .Values.image_sftp.tag }}"
-          imagePullPolicy: {{ .Values.image_sftp.pullPolicy }}
-          ports:
-            - name: ssh
-              containerPort: 22
-              protocol: TCP
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-          volumeMounts:
-            - name: keys
-              mountPath: /root/.ssh/keys
-            - name: users
-              mountPath: /etc/sftp/
-            - name: output
-              mountPath: /root/output
-            - name: custom-scripts
-              mountPath: /etc/sftp.d/
         - name: output
           image: "{{ .Values.image_output.repository }}:{{ .Values.image_output.tag }}"
           imagePullPolicy: {{ .Values.image_output.pullPolicy }}
@@ -61,18 +43,9 @@ spec:
             - name: restructure
               mountPath:  /etc/restructure
       volumes:
-        - name: keys
-          configMap:
-            name: {{ include "radar-output.fullname" . }}-keys
-        - name: users
-          secret:
-            secretName: {{ include "radar-output.fullname" . }}
         - name: restructure
           configMap:
             name: {{ include "radar-output.fullname" . }}-restructure
-        - name: custom-scripts
-          configMap:
-            name: {{ include "radar-output.fullname" . }}-custom-scripts
         - name: output
         {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
