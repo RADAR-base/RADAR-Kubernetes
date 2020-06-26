@@ -44,11 +44,6 @@ data:
           - "application/json"
         timeRequired: false
         sourceIdRequired: false
-        configuration:
-          "host": "radar-output"
-          "user": "dl"
-          "keyFile": "/etc/upload-backend-private-key/ssh-privatekey"
-          "root": "/output/"
       - name: "oxford-wearable-camera"
         topics:
           - "connect_upload_oxford_camera_data"
@@ -57,11 +52,6 @@ data:
           - "application/zip"
         timeRequired: false
         sourceIdRequired: false
-        configuration:
-          "host": "radar-output"
-          "user": "dl"
-          "keyFile": "/etc/upload-backend-private-key/ssh-privatekey"
-          "root": "/output/"
   logback.xml: |
     <?xml version="1.0" encoding="UTF-8"?>
     <configuration>
