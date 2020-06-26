@@ -74,8 +74,10 @@ spec:
             value: "{{ .Values.zookeeper }}"
           - name: CONNECTOR_PROPERTY_FILE_PREFIX
             value: "sink-s3"
+          - name: CONNECT_VALUE_CONVERTER_CONNECT_META_DATA
+            value: "false"
           - name: KAFKA_HEAP_OPTS
-            value: "-Xms256m -Xmx768m"
+            value: "-Xms256m -Xmx4g"
           - name: KAFKA_BROKERS
             value: "{{ .Values.kafka_num_brokers }}"
           - name: CONNECT_LOG4J_LOGGERS
