@@ -50,12 +50,15 @@ spec:
               containerPort: 8085
               protocol: TCP
           livenessProbe:
-            tcpSocket:
+            httpGet:
+              path: /upload/api/status
               port: 8085
             initialDelaySeconds: 5
-            periodSeconds: 10
+            failureThreshold: 3
+            periodSeconds: 300
           readinessProbe:
-            tcpSocket:
+            httpGet:
+              path: /upload/api/status
               port: 8085
             initialDelaySeconds: 5
             periodSeconds: 10
