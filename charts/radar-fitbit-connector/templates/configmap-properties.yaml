@@ -17,6 +17,7 @@ data:
     rest.source.request.generator.class=org.radarbase.connect.rest.fitbit.request.FitbitRequestGenerator
     fitbit.api.client={{ .Values.fitbit_api_client }}
     fitbit.api.secret={{ .Values.fitbit_api_secret }}
+    fitbit.api.intraday={{ .Values.includeIntradayData }}
     fitbit.user.repository.class=org.radarbase.connect.rest.fitbit.user.ServiceUserRepository
     fitbit.user.repository.url=http://{{ .Values.radar_rest_sources_backend }}:8080/
     fitbit.user.repository.client.id={{ .Values.oauthClientId }}
