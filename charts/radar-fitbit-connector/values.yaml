@@ -6,7 +6,7 @@ replicaCount: 2
 
 image:
   repository: radarbase/kafka-connect-rest-fitbit-source
-  tag: 0.2.4
+  tag: 0.3.1
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -72,3 +72,7 @@ schema_registry: http://cp-schema-registry:8081
 radar_rest_sources_backend: radar-rest-sources-backend
 fitbit_api_client: ""
 fitbit_api_secret: ""
+
+oauthClientId: radar_fitbit_connector
+oauthClientSecret: secret
+managementportal_host: management-portal
