@@ -106,6 +106,7 @@ management_portal:
     radar_upload_connect: secret
     radar_upload_frontend: secret
     radar_rest_sources_backend: secret
+    radarFitbitConnector: secret
 
 
 smtp:
@@ -148,6 +149,7 @@ fitbit_api_secret: fitbit_api_client_secret
 radar_fitbit_connector:
   _install: true
   replicaCount: 1
+  oauthClientId: radar_fitbit_connector
 
 radar_rest_sources_authorizer:
   _install: true
