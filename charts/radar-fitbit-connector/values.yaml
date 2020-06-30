@@ -76,3 +76,4 @@ fitbit_api_secret: ""
 oauthClientId: radar_fitbit_connector
 oauthClientSecret: secret
 managementportal_host: management-portal
+includeIntradayData: true
