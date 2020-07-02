@@ -38,21 +38,12 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-            - name: output
-              mountPath: /output
             - name: restructure
               mountPath:  /etc/restructure
       volumes:
         - name: restructure
           configMap:
             name: {{ include "radar-output.fullname" . }}-restructure
-        - name: output
-        {{- if .Values.persistence.enabled }}
-          persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim | default (include "radar-output.fullname" .) }}
-        {{- else }}
-          emptyDir: {}
-        {{ end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
