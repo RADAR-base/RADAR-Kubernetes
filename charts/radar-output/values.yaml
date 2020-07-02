@@ -4,11 +4,6 @@
 
 replicaCount: 1
 
-image_sftp:
-  repository: atmoz/sftp
-  tag: latest
-  pullPolicy: IfNotPresent
-
 image_output:
   repository: radarbase/radar-output-restructure
   tag: 1.1.0
@@ -19,8 +14,8 @@ nameOverride: ""
 fullnameOverride: ""
 
 service:
-  type: LoadBalancer
-  port: 22
+  type: ClusterIP
+  port: 80
 
 ingress:
   enabled: false

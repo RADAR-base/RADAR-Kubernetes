@@ -23,8 +23,6 @@ data:
         accessToken: "{{ .Values.bucketAccessKey }}"
         secretKey: "{{ .Values.bucketSecretKey }}"
         bucket: "{{ .Values.sourceBucketName }}"
-      hdfs:
-        nameNodes: "{{ .Values.hdfs_namenodes }}"
 
     target:
       type: "{{ .Values.target_type }}"
@@ -102,7 +100,7 @@ data:
       # Output directory
       output: /
       # Output path construction factory
-      factory: org.radarbase.output.path.MonthlyObservationKeyPathFactory
+      # factory: org.radarbase.output.path.MonthlyObservationKeyPathFactory
       # Additional properties
       # properties: {}
 
