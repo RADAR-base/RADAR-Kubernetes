@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "velero.fullname" . }}-object-storage-backup
+  labels:
+{{ include "velero.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.intermediateReplicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "velero.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "velero.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: intermediate
+          image: "{{ .Values.mc_image.repository }}:{{ .Values.mc_image.tag }}"
+          env:
+          - name: MC_HOST_local
+            value: "http://{{ .Values.local.accessKey }}:{{ .Values.local.secretKey }}@{{ .Values.local.address }}"
+          - name: MC_HOST_backup
+            value: "https://{{ .Values.backup.accessKey }}:{{ .Values.backup.secretKey }}@{{ .Values.backup.address }}"
+          command:
+            - mc
+            - mirror
+            - --overwrite
+            - --watch
+            - --md5
+            - local/{{ .Values.local.intermediateBucketName }}
+            - backup/{{ .Values.backup.intermediateBucketName }}
+        - name: output
+          image: "{{ .Values.mc_image.repository }}:{{ .Values.mc_image.tag }}"
+          env:
+          - name: MC_HOST_local
+            value: "http://{{ .Values.local.accessKey }}:{{ .Values.local.secretKey }}@{{ .Values.local.address }}"
+          - name: MC_HOST_backup
+            value: "https://{{ .Values.backup.accessKey }}:{{ .Values.backup.secretKey }}@{{ .Values.backup.address }}"
+          command:
+            - mc
+            - mirror
+            - --overwrite
+            - --watch
+            - --md5
+            - local/{{ .Values.local.outputBucketName }}
+            - backup/{{ .Values.backup.outputBucketName }}

@@ -235,7 +235,8 @@ master:
   affinity: {}
   tolerations: []
   podLabels: {}
-  podAnnotations: {}
+  podAnnotations:
+    backup.velero.io/backup-volumes: data
 
 ##
 ## PostgreSQL Slave parameters

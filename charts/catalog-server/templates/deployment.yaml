@@ -21,6 +21,8 @@ spec:
       labels:
         app.kubernetes.io/name: {{ include "catalog-server.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
+      annotations:      
+        backup.velero.io/backup-volumes: config
     spec:
       affinity:
         podAntiAffinity:

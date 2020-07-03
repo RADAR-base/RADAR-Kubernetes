@@ -21,6 +21,7 @@ spec:
       annotations:
         checksum/configmap-properties: {{ include (print $.Template.BasePath "/configmap-properties.yaml") . | sha256sum }}
         checksum/configmap-users: {{ include (print $.Template.BasePath "/configmap-users.yaml") . | sha256sum }}
+        backup.velero.io/backup-volumes: logs        
       labels:
         app.kubernetes.io/name: {{ include "radar-fitbit-connector.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}

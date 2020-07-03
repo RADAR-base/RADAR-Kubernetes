@@ -15,6 +15,10 @@ metrics:
 sentinel:
   enabled: false
 
+master:
+  podAnnotations:
+    backup.velero.io/backup-volumes: redis-data
+
 # Redis may require some changes in the kernel of the host machine to work as expected, in particular increasing the somaxconn value and disabling transparent huge pages.
 sysctlImage:
   enabled: true
