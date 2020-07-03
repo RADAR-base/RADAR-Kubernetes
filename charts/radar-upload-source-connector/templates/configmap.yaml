@@ -16,5 +16,10 @@ data:
     upload.source.client.secret={{ .Values.client_secret }}
     upload.source.client.tokenUrl=http://{{ .Values.managementportal_host }}:8080/managementportal/oauth/token
     upload.source.backend.baseUrl=http://{{ .Values.radar_upload_connect_backend }}:8085/upload/api/
-    upload.source.poll.interval.ms={{ .Values.poll_interval }}
+    upload.source.poll.interval.ms={{ .Values.poll_interval | int }}
     upload.source.record.converter.classes={{ .Values.record_converter_classes }}
+    upload.source.file.uploader.type={{ .Values.uploaderType }}
+    upload.source.file.uploader.target.endpoint={{ .Values.s3Endpoint }}
+    upload.source.file.uploader.target.root.directory={{ .Values.targetBucketName }}
+    upload.source.file.uploader.username={{ .Values.bucketAccessKey }}
+    upload.source.file.uploader.password={{ .Values.bucketSecretKey }}
