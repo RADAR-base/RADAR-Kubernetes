@@ -63,6 +63,29 @@ kafka_manager:
     username: kafkamanager-user
     password: password
 
+velero:
+  _install: true
+  local:
+    accessKey: accessKey
+    secretKey: secretKey
+  backup:
+    address: s3.amazon.com  # protocol should not be specified
+    accessKey: accessKey
+    secretKey: secretKey
+    bucket: radar-base-backups
+  velero:
+    configuration:
+      backupStorageLocation:
+        bucket: radar-base-backups
+        config:
+          s3Url: https://s3.amazon.com # protocol should be specified
+    credentials:
+      secretContents:
+        cloud: |
+          [default]
+          aws_access_key_id=accessKey
+          aws_secret_access_key=secretKey
+
 # --------------------------------------------------------- 10-base.yaml ---------------------------------------------------------
 
 cp_zookeeper:

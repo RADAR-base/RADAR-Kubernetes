@@ -1,0 +1,106 @@
+# Default values for velero.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+intermediateReplicaCount: 1
+outputReplicaCount: 1
+
+mc_image:
+  repository: minio/mc
+  tag: latest
+  pullPolicy: IfNotPresent
+
+local:
+  address: minio.default:9000
+  accessKey: accessKey
+  secretKey: secretKey
+  intermediateBucketName: radar-intermediate-storage
+  outputBucketName: radar-output-storage
+
+backup:
+  address: s3.example.com
+  accessKey: accessKey
+  secretKey: secretKey
+  intermediateBucketName: radar-intermediate-storage
+  outputBucketName: radar-output-storage
+
+#----
+velero:
+  initContainers:
+    - name: velero-plugin-for-aws
+      image: velero/velero-plugin-for-aws:v1.1.0
+      imagePullPolicy: IfNotPresent
+      volumeMounts:
+        - mountPath: /target
+          name: plugins
+
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+
+  configuration:
+    # Cloud provider being used (e.g. aws, azure, gcp).
+    provider: aws
+
+    # Parameters for the `default` BackupStorageLocation. See
+    # https://velero.io/docs/v1.0.0/api-types/backupstoragelocation/
+    backupStorageLocation:
+      # Cloud provider where backups should be stored. Usually should
+      # match `configuration.provider`. Required.
+      name: default
+      # Bucket to store backups in. Required.
+      bucket: radar-base-backups
+      # Additional provider-specific configuration. See link above
+      # for details of required/optional fields for your provider.
+      config:
+       region: eu-central-1
+       s3ForcePathStyle: "true"
+       s3Url: "https://s3.amazon.com"
+
+  credentials:
+    secretContents:
+      cloud: |
+        [default]
+        aws_access_key_id=accessKey
+        aws_secret_access_key=secretKey
+
+  snapshotsEnabled: false
+  deployRestic: true
+
+  restic:
+    podVolumePath: /var/lib/kubelet/pods
+    privileged: false
+    # Pod priority class name to use for the Restic daemonset. Optional.
+    priorityClassName: {}
+    # Resource requests/limits to specify for the Restic daemonset deployment. Optional.
+    resources: {}
+    # Tolerations to use for the Restic daemonset. Optional.
+    tolerations: []
+
+    # Extra volumes for the Restic daemonset. Optional.
+    extraVolumes: []
+
+    # Extra volumeMounts for the Restic daemonset. Optional.
+    extraVolumeMounts: []
+
+    # SecurityContext to use for the Velero deployment. Optional.
+    # Set fsGroup for `AWS IAM Roles for Service Accounts`
+    # see more informations at: https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html
+    securityContext: {}
+      # fsGroup: 1337
+
+  schedules:
+    backup:
+      schedule: "0 3 * * *"
+      template:
+        ttl: "240h"
+        includeClusterResources: true
+        snapshotVolumes: false
+        includedNamespaces:
+         - cert-manager
+         - default
+         - graylog
+         - kubernetes-dashboard
+         - monitoring
+         - velero

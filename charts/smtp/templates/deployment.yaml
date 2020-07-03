@@ -21,6 +21,8 @@ spec:
       labels:
         app.kubernetes.io/name: {{ include "smtp.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
+      annotations:  
+        backup.velero.io/backup-volumes: exim
     spec:
       affinity:
         podAntiAffinity:
