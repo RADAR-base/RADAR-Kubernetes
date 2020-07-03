@@ -79,3 +79,9 @@ releases:
         value: {{ .Values.server_name }}
       - name: postgres.password
         value: {{ .Values.postgres_password }}
+
+  - name: smtp
+    chart: ../charts/smtp
+    installed: {{ .Values.smtp._install }}
+    values:
+      - {{ .Values.smtp | toYaml | indent 8 | trim }}

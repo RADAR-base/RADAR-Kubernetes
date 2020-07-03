@@ -9,12 +9,6 @@ helmDefaults:
   timeout: 600
 
 releases:
-  - name: smtp
-    chart: ../charts/smtp
-    installed: {{ .Values.smtp._install }}
-    values:
-      - {{ .Values.smtp | toYaml | indent 8 | trim }}
-
   - name: radar-backend-monitor
     chart: ../charts/radar-backend
     installed: {{ .Values.radar_backend_monitor._install }}

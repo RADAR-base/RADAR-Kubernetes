@@ -130,6 +130,17 @@ management_portal:
     radar_upload_frontend: secret
     radar_rest_sources_backend: secret
 
+
+smtp:
+  _install: true
+  replicaCount: 1
+  smarthost:
+    address: mail.example.com
+    user: user@example.com
+    password: password
+  persistence:
+    size: 1Gi
+
 # --------------------------------------------------------- 20-dashboard.yaml ---------------------------------------------------------
 
 hotstorage_password: password
@@ -214,6 +225,12 @@ radar_output:
   _install: true
   replicaCount: 1
   num_threads: 2
+  target_type: s3
+  source_type: s3
+  hdfs_namenodes: "[hdfs-namenode-0, hdfs-namenode-1]"
+  sourceBucketName: radar-intermediate-storage
+  targetBucketName: radar-output-storage
+  redisUrl: "redis://redis-headless:6379"
   persistence:
     size: 30Gi
 
@@ -235,15 +252,6 @@ radar_gateway:
 
 # --------------------------------------------------------- 20-kafka-analysis.yaml ---------------------------------------------------------
 
-smtp:
-  _install: true
-  replicaCount: 1
-  smarthost:
-    address: mail.example.com
-    user: user@example.com
-    password: password
-  persistence:
-    size: 1Gi
 
 radar_backend_monitor:
   _install: true
@@ -305,6 +313,7 @@ minio:
   replicas: 4
   accessKey: AKIAIOSFODNN7EXAMPLE
   secretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+  s3Endpoint: http://minio:9000/
   persistence:
     size: 20Gi
 
@@ -312,11 +321,5 @@ radar_s3_connector:
   # set to true if radar-s3-connector should be installed
   _install: true
   replicaCount: 1
-  # Endpoint of the S3, this could be the endpoint of locally hosted minio or an external one
-  s3Endpoint: "http://localhost:9000"
-  # The Access key of S3
-  bucketAccessKey: access_key
-  # The secret key of S3
-  bucketSecretKey: secret
   # The bucket name where intermediate data for cold storage should be written to.
   bucketName: radar_intermediate_storage

@@ -64,7 +64,6 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /etc/upload-backend/
-            - name: private-keys
             # - name: output
             #   mountPath: /output
       volumes:

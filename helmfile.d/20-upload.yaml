@@ -57,3 +57,9 @@ releases:
         value: {{ .Values.kafka_num_brokers }}
       - name: client_secret
         value: {{ .Values.management_portal.client_secrets.radar_upload_connect }}
+      - name: s3Endpoint
+        value: {{ .Values.minio.s3Endpoint }}
+      - name: bucketAccessKey
+        value: {{ .Values.minio.accessKey }}
+      - name: bucketSecretKey
+        value: {{ .Values.minio.secretKey }}
