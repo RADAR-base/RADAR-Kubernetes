@@ -68,3 +68,4 @@ postgres:
   user: postgres
   password: password
 managementportal_host: management-portal
+serverName: localhost
