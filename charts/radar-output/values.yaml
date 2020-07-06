@@ -6,7 +6,7 @@ replicaCount: 1
 
 image_output:
   repository: radarbase/radar-output-restructure
-  tag: 1.1.0
+  tag: 1.1.1-logging
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
