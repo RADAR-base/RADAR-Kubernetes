@@ -89,6 +89,28 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /etc/kafka-connect/upload/
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - curl -sf localhost:8083/connectors/radar-upload-source/status | grep -o '\"state\":\"[^\"]*\"' | tr '\\n' ',' | grep -vq FAILED || exit 1
+            initialDelaySeconds: 5
+            periodSeconds: 60
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - curl -sf localhost:8083/connectors/radar-upload-source/status | grep -o '\"state\":\"[^\"]*\"' | tr '\\n' ',' | grep -vq FAILED || exit 1
+            initialDelaySeconds: 5
+            periodSeconds: 60
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
       volumes:
         - name: config
           configMap:

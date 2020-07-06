@@ -31,6 +31,8 @@ releases:
     set:
       - name: ingress.hosts
         values: [{{ .Values.server_name }}]
+      - name: serverName
+        value: {{ .Values.server_name }}
       - name: postgres.password
         value: {{ .Values.radar_upload_postgres_password }}
       - name: client_secret

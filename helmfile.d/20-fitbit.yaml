@@ -21,6 +21,8 @@ releases:
         value: {{ .Values.fitbit_api_client }}
       - name: fitbit_api_secret
         value: {{ .Values.fitbit_api_secret }}
+      - name: oauthClientSecret
+        value: {{ .Values.management_portal.client_secrets.radarFitbitConnector }}
 
   - name: radar-rest-sources-authorizer
     chart: ../charts/radar-rest-sources-authorizer
@@ -30,7 +32,8 @@ releases:
     set:
       - name: ingress.hosts
         values: [{{ .Values.server_name }}]
-
+      - name: serverName
+        value: {{ .Values.server_name }}
   - name: radar-rest-sources-backend
     chart: ../charts/radar-rest-sources-backend
     installed: {{ .Values.radar_rest_sources_backend._install }}
