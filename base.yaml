@@ -1,3 +1,4 @@
+kubeContext: default
 server_name: example.com
 maintainer_email: MAINTAINER_EMAIL
 kafka_num_brokers: 3

@@ -7,6 +7,7 @@ environments:
 helmDefaults:
   atomic: true
   timeout: 600
+  kubeContext: {{ .Values.kubeContext }}
 
 releases:
   - name: cp-zookeeper
@@ -41,7 +42,7 @@ releases:
         value: radar-base-tls
       - name: ingress.tls[0].hosts
         values: ["{{ .Values.server_name }}"]
-        
+
   - name: catalog-server
     chart: ../charts/catalog-server
     wait: true

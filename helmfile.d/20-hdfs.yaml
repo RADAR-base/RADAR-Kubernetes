@@ -8,7 +8,8 @@ helmDefaults:
   atomic: true
   force: true
   timeout: 600
-
+  kubeContext: {{ .Values.kubeContext }}
+  
 releases:
   - name: hdfs
     chart: ../kubernetes-HDFS/charts/hdfs-k8s
