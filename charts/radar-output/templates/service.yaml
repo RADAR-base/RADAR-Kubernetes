@@ -8,9 +8,9 @@ spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: ssh
+      targetPort: http
       protocol: TCP
-      name: ssh
+      name: http
   selector:
     app.kubernetes.io/name: {{ include "radar-output.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
