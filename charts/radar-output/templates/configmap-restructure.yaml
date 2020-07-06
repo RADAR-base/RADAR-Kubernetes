@@ -75,6 +75,7 @@ data:
       numThreads: "{{ .Values.num_threads }}"
       # Maximum number of files to process in any given topic.
       # maxFilesPerTopic: null
+      minimumFileAge: {{ .Values.minimumFileAge }}
 
     cleaner:
       # Enable cleaning up old source files
