@@ -7,7 +7,8 @@ environments:
 helmDefaults:
   atomic: true
   timeout: 600
-
+  kubeContext: {{ .Values.kubeContext }}
+  
 releases:
   - name: radar-fitbit-connector
     chart: ../charts/radar-fitbit-connector

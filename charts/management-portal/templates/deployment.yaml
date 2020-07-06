@@ -47,7 +47,7 @@ spec:
           - name: SPRING_PROFILES_ACTIVE
             value: "prod,swagger"
           - name: SPRING_DATASOURCE_URL
-            value: "jdbc:postgresql://{{ .Values.postgres.host }}:5432/managementportal"
+            value: "jdbc:postgresql://{{ .Values.postgres.host }}:5432/managementportal&sslmode=require"
           - name: SPRING_DATASOURCE_USERNAME
             value: {{ .Values.postgres.user }}
           - name: SPRING_DATASOURCE_PASSWORD
