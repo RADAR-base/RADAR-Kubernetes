@@ -209,8 +209,7 @@ radar_output:
   sourceBucketName: radar-intermediate-storage
   targetBucketName: radar-output-storage
   redisUrl: redis://redis-master:6379
-  persistence:
-    size: 30Gi
+  minimumFileAge: 900
 
 # --------------------------------------------------------- 20-ingestion.yaml ---------------------------------------------------------
 
