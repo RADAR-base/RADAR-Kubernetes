@@ -6,7 +6,7 @@ replicaCount: 2
 
 image:
   repository: radarbase/radar-backend
-  tag: latest
+  tag: 0.4.0
   pullPolicy: IfNotPresent
 
 nameOverride: ""

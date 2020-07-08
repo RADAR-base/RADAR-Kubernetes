@@ -39,9 +39,8 @@ After installing them run following commands:
 git clone https://github.com/RADAR-base/RADAR-Kubernetes.git
 cd RADAR-Kubernetes
 git clone https://github.com/RADAR-base/cp-helm-charts.git
-cp env.template .env
-vim .env  # Change setup parameters and configurations
-source .env
+cp base.yaml production.yaml
+vim production.yaml  # Change setup parameters and configurations
 ./bin/keystore-init
 helmfile sync --concurrency 1
 ```
@@ -52,7 +51,10 @@ Having `--concurrency 1` will make installation slower but it is necessary becau
 The Prometheus-operator will define a `ServiceMonitor` CRD that other services with monitoring enabled will use, so please make sure that Prometheus chart installs successfully before preceding. By default it's configured to wait for Prometheus deployment to be finished in 10 minutes if this time isn't enough for your environment change it accordingly. If the deployment has been failed for the first time then you should delete it first and then try installing the stack again:
 ```
 helm del --purge prometheus-operator
-kubectl delete crd prometheuses.monitoring.coreos.com prometheusrules.monitoring.coreos.com servicemonitors.monitoring.coreos.com alertmanagers.monitoring.coreos.com
+kubectl delete crd prometheuses.monitoring.coreos.com prometheusrules.monitoring.coreos.com servicemonitors.monitoring.coreos.com alertmanagers.monitoring.coreos.com podmonitors.monitoring.coreos.com
+kubectl delete psp prometheus-operator-alertmanager prometheus-operator-grafana prometheus-operator-grafana-test prometheus-operator-kube-state-metrics prometheus-operator-operator prometheus-operator-prometheus prometheus-operator-prometheus-node-exporter
+kubectl delete mutatingwebhookconfigurations prometheus-admission
+kubectl delete ValidatingWebhookConfiguration prometheus-admission
 ```
 
 ### kafka-init
@@ -65,13 +67,19 @@ kubectl delete pvc datadir-0-cp-kafka-{0,1,2} datadir-cp-zookeeper-{0,1,2} datal
 ### Uninstall
 If you want to remove the Radar-base from your cluster you need set all of your `RADAR_INSTALL_*` variables in `.env` file to `false` and then run the `helmfile sync --concurrency 1` command to delete the charts after that you need to run following commands to remove all of the traces of the installation:
 ```
-kubectl delete crd prometheuses.monitoring.coreos.com prometheusrules.monitoring.coreos.com servicemonitors.monitoring.coreos.com alertmanagers.monitoring.coreos.com
-kubectl delete crd certificates.certmanager.k8s.io challenges.certmanager.k8s.io clusterissuers.certmanager.k8s.io issuers.certmanager.k8s.io orders.certmanager.k8s.io
+kubectl delete crd prometheuses.monitoring.coreos.com prometheusrules.monitoring.coreos.com servicemonitors.monitoring.coreos.com alertmanagers.monitoring.coreos.com podmonitors.monitoring.coreos.com
+kubectl delete psp prometheus-operator-alertmanager prometheus-operator-grafana prometheus-operator-grafana-test prometheus-operator-kube-state-metrics prometheus-operator-operator prometheus-operator-prometheus prometheus-operator-prometheus-node-exporter
+kubectl delete mutatingwebhookconfigurations prometheus-admission
+kubectl delete ValidatingWebhookConfiguration prometheus-admission
+
+kubectl delete crd certificaterequests.cert-manager.io certificates.cert-manager.io challenges.acme.cert-manager.io clusterissuers.cert-manager.io issuers.cert-manager.io orders.acme.cert-manager.io
 kubectl delete pvc --all
 kubectl -n cert-manager delete secrets letsencrypt-prod
 kubectl -n default delete secrets radar-base-tls
 kubectl -n monitoring delete secrets radar-base-tls
-kubectl -n monitoring delete psp prometheus-alertmanager prometheus-operator prometheus-prometheus
+
+kubectl delete crd cephblockpools.ceph.rook.io  cephclients.ceph.rook.io cephclusters.ceph.rook.io cephfilesystems.ceph.rook.io cephnfses.ceph.rook.io cephobjectstores.ceph.rook.io cephobjectstoreusers.ceph.rook.io volumes.rook.io
+kubectl delete psp 00-rook-ceph-operator
 ```
 
 ## Volume expansion
@@ -194,3 +202,29 @@ Alternatively you can forward SSH port to your local machine and connect locally
 kubectl port-forward svc/radar-output 2222:22
 ```
 Now you can use "127.0.0.1" as `host` and "2222" as the `port` to connect to SFTP server.
+
+
+
+
+# - name: rook
+#   chart: rook-release/rook-ceph
+#   version: v1.2.3
+#   namespace: rook-ceph
+#   wait: true
+#   installed: {{ .Values.rook._install }}
+#
+# - name: ceph
+#   chart: ../charts/ceph
+#   namespace: rook-ceph
+#   wait: true
+#   installed: {{ .Values.ceph._install }}
+#   values:
+#     - {{ .Values.ceph | toYaml | indent 8 | trim }}
+
+#
+# - name: sftp
+#   chart: ../charts/sftp
+#   wait: true
+#   installed: {{ .Values.sftp._install }}
+#   values:
+#     - {{ .Values.sftp | toYaml | indent 8 | trim }}

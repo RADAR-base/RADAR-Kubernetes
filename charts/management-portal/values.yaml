@@ -6,7 +6,7 @@ replicaCount: 2
 
 image:
   repository: radarbase/management-portal
-  tag: latest
+  tag: 0.5.8
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -20,8 +20,7 @@ ingress:
   enabled: true
   annotations:
     kubernetes.io/ingress.class: nginx
-    certmanager.k8s.io/acme-challenge-type: http01
-    certmanager.k8s.io/issuer: letsencrypt-prod
+    cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/server-snippet: |
       location /managementportal/oauth/ {
         # Allow 20 fast-following requests, like when authorizing a user.
@@ -69,3 +68,13 @@ managementportal:
   oauth_checking_key_aliases_1: selfsigned
   frontend_client_secret: xxx
   common_admin_password: xxx
+
+client_secrets:
+  prmt: secret
+  armt: secret
+  radar_redcap_integrator: secret
+  radar_upload_backend: secret
+  radar_upload_connect: secret
+  radar_upload_frontend: secret
+  radar_rest_sources_backend: secret
+  radarFitbitConnector: secret

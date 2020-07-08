@@ -46,27 +46,26 @@ spec:
               containerPort: 8080
               protocol: TCP
           livenessProbe:
-            exec:
-              command:
-              - /bin/sh
-              - -c
-              - wget --post-data "" http://localhost:8080/redcap/trigger
+            failureThreshold: 3
             initialDelaySeconds: 5
             periodSeconds: 60
-            timeoutSeconds: 5
             successThreshold: 1
-            failureThreshold: 3
-          readinessProbe:
-            exec:
-              command:
-              - /bin/sh
-              - -c
-              - wget --post-data "" http://localhost:8080/redcap/trigger
-            initialDelaySeconds: 5
-            periodSeconds: 60
+            tcpSocket:
+              port: 8080
             timeoutSeconds: 5
-            successThreshold: 1
-            failureThreshold: 3
+            name: radar-integration
+            ports:
+              - containerPort: 8080
+                name: http
+                protocol: TCP
+            readinessProbe:
+              failureThreshold: 3
+              initialDelaySeconds: 5
+              periodSeconds: 60
+              successThreshold: 1
+              tcpSocket:
+                port: 8080
+              timeoutSeconds: 5
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:

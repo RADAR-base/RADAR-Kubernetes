@@ -47,6 +47,10 @@ spec:
           ports:
           - containerPort: 5556
             protocol: TCP
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
           volumeMounts:
           - mountPath: /etc/radar-gateway/
             name: gateway-jmx-configmap

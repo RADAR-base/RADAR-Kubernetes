@@ -50,12 +50,15 @@ spec:
               containerPort: 8085
               protocol: TCP
           livenessProbe:
-            tcpSocket:
+            httpGet:
+              path: /upload/api/status
               port: 8085
             initialDelaySeconds: 5
-            periodSeconds: 10
+            failureThreshold: 3
+            periodSeconds: 300
           readinessProbe:
-            tcpSocket:
+            httpGet:
+              path: /upload/api/status
               port: 8085
             initialDelaySeconds: 5
             periodSeconds: 10
@@ -64,10 +67,19 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /etc/upload-backend/
+            # - name: output
+            #   mountPath: /output
       volumes:
         - name: config
           configMap:
             name: {{ include "radar-upload-connect-backend.fullname" . }}
+        # - name: output
+        # {{- if .Values.persistence.enabled }}
+        #   persistentVolumeClaim:
+        #     claimName: {{ .Values.persistence.existingClaim | default (include "radar-upload-connect-backend.fullname" .) }}
+        # {{- else }}
+        #   emptyDir: {}
+        # {{ end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

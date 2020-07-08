@@ -13,10 +13,15 @@ spec:
     matchLabels:
       app.kubernetes.io/name: {{ include "radar-fitbit-connector.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 100%
   template:
     metadata:
       annotations:
-        checksum/configmap-users: {{ include (print $.Template.BasePath "/configmap-users.yaml") . | sha256sum }}      
+        checksum/configmap-properties: {{ include (print $.Template.BasePath "/configmap-properties.yaml") . | sha256sum }}
+        checksum/configmap-users: {{ include (print $.Template.BasePath "/configmap-users.yaml") . | sha256sum }}
+        backup.velero.io/backup-volumes: logs        
       labels:
         app.kubernetes.io/name: {{ include "radar-fitbit-connector.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
@@ -80,26 +85,26 @@ spec:
             value: "{{ .Values.kafka_num_brokers }}"
           - name: CONNECT_LOG4J_LOGGERS
             value: "org.reflections=ERROR"
-          - name: CONNECT_NAME
-            value: "radar-fitbit-source"
-          - name: CONNECT_CONNECTOR_CLASS
-            value: "org.radarbase.connect.rest.fitbit.FitbitSourceConnector"
-          - name: CONNECT_TASKS_MAX
-            value: "4"
-          - name: CONNECT_REST_SOURCE_BASE_URL
-            value: "https://api.fitbit.com"
-          - name: CONNECT_REST_SOURCE_POLL_INTERVAL_MS
-            value: "5000"
-          - name: CONNECT_REST_SOURCE_REQUEST_GENERATOR_CLASS
-            value: "org.radarbase.connect.rest.fitbit.request.FitbitRequestGenerator"
-          - name: CONNECT_FITBIT_API_CLIENT
-            value: "{{ .Values.fitbit_api_client }}"
-          - name: CONNECT_FITBIT_API_SECRET
-            value: "{{ .Values.fitbit_api_secret }}"
-          - name: CONNECT_FITBIT_USER_REPOSITORY_CLASS
-            value: "org.radarbase.connect.rest.fitbit.user.ServiceUserRepository"
-          - name: CONNECT_FITBIT_USER_REPOSITORY_URL
-            value: "http://{{ .Values.radar_rest_sources_backend }}:8080/"
+          # - name: CONNECT_NAME
+          #   value: "radar-fitbit-source"
+          # - name: CONNECT_CONNECTOR_CLASS
+          #   value: "org.radarbase.connect.rest.fitbit.FitbitSourceConnector"
+          # - name: CONNECT_TASKS_MAX
+          #   value: "4"
+          # - name: CONNECT_REST_SOURCE_BASE_URL
+          #   value: "https://api.fitbit.com"
+          # - name: CONNECT_REST_SOURCE_POLL_INTERVAL_MS
+          #   value: "5000"
+          # - name: CONNECT_REST_SOURCE_REQUEST_GENERATOR_CLASS
+          #   value: "org.radarbase.connect.rest.fitbit.request.FitbitRequestGenerator"
+          # - name: CONNECT_FITBIT_API_CLIENT
+          #   value: "{{ .Values.fitbit_api_client }}"
+          # - name: CONNECT_FITBIT_API_SECRET
+          #   value: "{{ .Values.fitbit_api_secret }}"
+          # - name: CONNECT_FITBIT_USER_REPOSITORY_CLASS
+          #   value: "org.radarbase.connect.rest.fitbit.user.ServiceUserRepository"
+          # - name: CONNECT_FITBIT_USER_REPOSITORY_URL
+          #   value: "http://{{ .Values.radar_rest_sources_backend }}:8080/"
           ports:
             - name: http
               containerPort: 80
@@ -129,8 +134,12 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
+            - name: config-properties
+              mountPath: /etc/kafka-connect/source-fitbit
             - name: config-users
               mountPath: /var/lib/kafka-connect-fitbit-source/users
+            - name: logs
+              mountPath: /var/lib/kafka-connect-fitbit-source/logs
       volumes:
         - name: config-properties
           configMap:
@@ -138,6 +147,13 @@ spec:
         - name: config-users
           configMap:
             name: {{ include "radar-fitbit-connector.fullname" . }}-users
+        - name: logs
+        {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "radar-fitbit-connector.fullname" .) }}
+        {{- else }}
+          emptyDir: {}
+        {{ end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

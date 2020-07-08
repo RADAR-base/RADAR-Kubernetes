@@ -6,6 +6,9 @@ global:
   postgresql:
     postgresqlDatabase: managementportal
 
+  image:
+    tag: 11.3.0-debian-9-r28  # NOTICE: please select the tag from https://hub.docker.com/r/bitnami/postgresql
+
 ##
 ## Init containers parameters:
 ## volumePermissions: Change the owner of the persist volume mountpoint to RunAsUser:fsGroup
@@ -232,7 +235,8 @@ master:
   affinity: {}
   tolerations: []
   podLabels: {}
-  podAnnotations: {}
+  podAnnotations:
+    backup.velero.io/backup-volumes: data
 
 ##
 ## PostgreSQL Slave parameters
@@ -335,4 +339,4 @@ metrics:
 # Define custom environment variables to pass to the image here
 extraEnv:
   - name: POSTGRES_MULTIPLE_DATABASES
-    value: managementportal,restsourceauthorizer,uploadconnector
+    value: managementportal,restsourceauthorizer
