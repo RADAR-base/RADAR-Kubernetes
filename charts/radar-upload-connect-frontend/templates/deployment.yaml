@@ -41,13 +41,15 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
           - name: VUE_APP_BASE_URL
-            value: "{{ .Values.server_name }}/radar-upload"
+            value: "/upload"
+          - name: VUE_APP_API_BASE_URL
+            value: "https://{{ .Values.server_name }}/upload/api/"
           - name: VUE_APP_AUTH_API
-            value: "{{ .Values.server_name }}/managementportal/oauth"
+            value: "https://{{ .Values.server_name }}/managementportal/oauth"
           - name: VUE_APP_AUTH_CALLBACK
-            value: "{{ .Values.server_name }}/uploader/login"
+            value: "{{ .Values.server_name }}/upload/login"
           - name: VUE_APP_CLIENT_ID
-            value: "{{ .Values.vue_app_client_id }}"
+            value: "https://{{ .Values.vue_app_client_id }}"
           ports:
             - name: http
               containerPort: 80

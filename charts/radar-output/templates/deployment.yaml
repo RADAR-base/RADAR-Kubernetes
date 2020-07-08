@@ -23,75 +23,27 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       containers:
-        - name: sftp
-          image: "{{ .Values.image_sftp.repository }}:{{ .Values.image_sftp.tag }}"
-          imagePullPolicy: {{ .Values.image_sftp.pullPolicy }}
-          ports:
-            - name: ssh
-              containerPort: 22
-              protocol: TCP
-          readinessProbe:
-            tcpSocket:
-              port: ssh
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          livenessProbe:
-            tcpSocket:
-              port: ssh
-            initialDelaySeconds: 15
-            periodSeconds: 20
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-          volumeMounts:
-            - name: keys
-              mountPath: /home/dl/.ssh/keys
-            - name: users
-              mountPath: /etc/sftp/
-            - name: output
-              mountPath: /home/dl/output
         - name: output
           image: "{{ .Values.image_output.repository }}:{{ .Values.image_output.tag }}"
           imagePullPolicy: {{ .Values.image_output.pullPolicy }}
           command:
-            - radar-hdfs-restructure
+            - radar-output-restructure
           args:
-            - --compression
-            - gzip
-            - --deduplicate
-            - --num-threads
-            - "{{ .Values.num_threads }}"
-            - -n
-            - "{{ .Values.hdfs_namenode }}"
-            - -o
-            - /output
-            - --tmp-dir
-            - /output/+tmp
+            - -F
+            - /etc/restructure/restructure.yml
             - -S
-            - -i
-            - "300"
-            - /topicAndroidNew
           env:
           - name: RADAR_HDFS_RESTRUCTURE_OPTS
-            value: "-Xmx4g"
+            value: "-Xms250m -Xmx3g"
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-            - name: output
-              mountPath: /output
+            - name: restructure
+              mountPath:  /etc/restructure
       volumes:
-        - name: keys
+        - name: restructure
           configMap:
-            name: {{ include "radar-output.fullname" . }}
-        - name: users
-          secret:
-            secretName: {{ include "radar-output.fullname" . }}
-        - name: output
-        {{- if .Values.persistence.enabled }}
-          persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim | default (include "radar-output.fullname" .) }}
-        {{- else }}
-          emptyDir: {}
-        {{ end }}
+            name: {{ include "radar-output.fullname" . }}-restructure
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

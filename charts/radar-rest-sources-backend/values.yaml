@@ -6,7 +6,7 @@ replicaCount: 2
 
 image:
   repository: radarbase/radar-rest-source-auth-backend
-  tag: latest
+  tag: 1.3.1
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -17,18 +17,16 @@ service:
   port: 8080
 
 ingress:
-  enabled: false
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+  path: "/rest-sources/backend/?(.*)"
   hosts:
-    - host: chart-example.local
-      paths: []
-
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+    - localhost
+  tls:
+    secretName: radar-base-tls
 
 resources:
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -56,3 +54,6 @@ postgres:
 
 fitbit_api_client: ""
 fitbit_api_secret: ""
+managementportal_host: management-portal
+
+client_secret: secret

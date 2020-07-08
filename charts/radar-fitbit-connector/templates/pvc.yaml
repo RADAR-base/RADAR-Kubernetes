@@ -2,10 +2,10 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: {{ template "radar-output.fullname" . }}
+  name: {{ template "radar-fitbit-connector.fullname" . }}
   labels:
-    app: "{{ template "radar-output.fullname" . }}"
-    chart: "{{ template "radar-output.chart" . }}"
+    app: "{{ template "radar-fitbit-connector.fullname" . }}"
+    chart: "{{ template "radar-fitbit-connector.chart" . }}"
     release: {{ .Release.Name | quote }}
     heritage: {{ .Release.Service | quote }}
 spec:

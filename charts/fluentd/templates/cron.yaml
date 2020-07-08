@@ -1,0 +1,23 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ include "fluentd.fullname" . }}
+  labels:
+{{ include "fluentd.labels" . | indent 4 }}
+spec:
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  schedule: "*/30 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: {{ include "fluentd.fullname" . }}
+          containers:
+          - name: cron
+            image: roffe/kubectl:v1.13.2
+            args:
+            - /bin/sh
+            - -c
+            - for POD in `kubectl get pod --namespace {{ .Release.Namespace }} -l app.kubernetes.io/name={{ include "fluentd.name" . }} | tail -n +2 | awk '{print $1}'`; do echo RELOAD ${POD}; kubectl exec --namespace {{ .Release.Namespace }} ${POD} -- /bin/sh -c "ps aux|grep '/usr/bin/ruby2.3 /usr/local/bin/fluentd' | grep -v grep | awk {'print \$2'} | xargs kill -1"; sleep 30; done
+          restartPolicy: Never

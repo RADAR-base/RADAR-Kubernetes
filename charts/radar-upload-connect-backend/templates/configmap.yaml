@@ -9,7 +9,8 @@ metadata:
     heritage: {{ .Release.Service }}
 data:
   upload.yml: |
-    baseUri: "http://0.0.0.0:8085/radar-upload/"
+    baseUri: "http://0.0.0.0:8085/upload/api/"
+    advertisedBaseUri: https://{{ .Values.serverName }}/upload/api/
     enableCors: yes
     clientId: {{ .Values.client_id }}
     clientSecret: {{ .Values.client_secret }}
@@ -21,26 +22,33 @@ data:
     additionalPersistenceConfig:
       "hibernate.dialect": "org.hibernate.dialect.PostgreSQL95Dialect"
     sourceTypes:
-      - name: "phone-acceleration"
+      - name: "altoida"
         topics:
-          - "android_phone_acceleration"
-        contentTypes:
-          - "text/csv"
-        timeRequired: false
-        sourceIdRequired: false
-        configuration:
-          "setting1": "value1"
-          "setting2": "value2"
-      - name: "acceleration-zip"
-        topics:
-          - "android_phone_acceleration"
+          - "connect_upload_altoida_acceleration"
         contentTypes:
           - "application/zip"
         timeRequired: false
         sourceIdRequired: false
-      - name: "altoida-zip"
+      - name: "axivity"
         topics:
-          - "connect_upload_altoida_acceleration"
+          - "connect_upload_axivity_acceleration"
+          - "connect_upload_axivity_metadata"
+        contentTypes:
+          - "application/zip"
+        timeRequired: false
+        sourceIdRequired: false
+      - name: "physilog5"
+        topics:
+          - "connect_upload_physilog_acceleration"
+        contentTypes:
+          - "application/zip"
+          - "application/json"
+        timeRequired: false
+        sourceIdRequired: false
+      - name: "oxford-wearable-camera"
+        topics:
+          - "connect_upload_oxford_camera_data"
+          - "connect_upload_oxford_camera_image"
         contentTypes:
           - "application/zip"
         timeRequired: false

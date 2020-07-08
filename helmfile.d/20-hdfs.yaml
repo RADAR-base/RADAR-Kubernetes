@@ -1,55 +1,40 @@
+environments:
+  default:
+    values:
+    - ../base.yaml
+    - ../production.yaml
+
 helmDefaults:
   atomic: true
+  force: true
   timeout: 600
 
 releases:
-  - name: hdfs-namenode
-    chart: ../charts/hdfs
-    installed: {{ requiredEnv "RADAR_INSTALL_HDFS" }}
+  - name: hdfs
+    chart: ../kubernetes-HDFS/charts/hdfs-k8s
+    installed: {{ .Values.hdfs._install }}
     values:
-    - "../charts/hdfs/values-namenode.yaml"
-    set:
-      - name: image.tag
-        value: "{{ requiredEnv "HDFS_IMAGE_TAG" }}"
-      - name: replicaCount
-        value: "{{ requiredEnv "HDFS_NAMENODE_REPLICA_COUNT" }}"
-      - name: volumes[0].size
-        value: "{{ requiredEnv "HDFS_NAMENODE_1_DISK_SIZE" }}"
-      - name: volumes[1].size
-        value: "{{ requiredEnv "HDFS_NAMENODE_2_DISK_SIZE" }}"
-  - name: hdfs-datanode
-    chart: ../charts/hdfs
-    installed: {{ requiredEnv "RADAR_INSTALL_HDFS" }}
-    values:
-    - "../charts/hdfs/values-datanode.yaml"
-    set:
-      - name: image.tag
-        value: "{{ requiredEnv "HDFS_IMAGE_TAG" }}"
-      - name: replicaCount
-        value: "{{ requiredEnv "HDFS_DATANODE_REPLICA_COUNT" }}"
-      - name: volumes[0].size
-        value: "{{ requiredEnv "HDFS_DATANODE_DISK_SIZE" }}"
+      - {{ .Values.hdfs | toYaml | indent 8 | trim }}
+
   - name: radar-connect-hdfs-sink
     chart: ../charts/radar-connect-hdfs-sink
-    installed: {{ requiredEnv "RADAR_INSTALL_HDFS" }}
+    installed: {{ .Values.radar_connect_hdfs_sink._install }}
+    values:
+      - {{ .Values.radar_connect_hdfs_sink | toYaml | indent 8 | trim }}
     set:
-      - name: image.tag
-        value: "{{ requiredEnv "RADAR_CONNECT_HDFS_SINK_IMAGE_TAG" }}"
-      - name: replicaCount
-        value: "{{ requiredEnv "RADAR_CONNECT_HDFS_SINK_REPLICA_COUNT" }}"
       - name: kafka_num_brokers
-        value: "{{ requiredEnv "KAFKA_NUM_BROKERS" }}"
+        value: {{ .Values.kafka_num_brokers }}
+
   - name: radar-output
     chart: ../charts/radar-output
-    installed: {{ requiredEnv "RADAR_INSTALL_HDFS" }}
+    wait: true
+    installed: {{ .Values.radar_output._install }}
+    values:
+      - {{ .Values.radar_output | toYaml | indent 8 | trim }}
     set:
-      - name: image.tag
-        value: "{{ requiredEnv "RADAR_OUTPUT_IMAGE_TAG" }}"
-      - name: replicaCount
-        value: "{{ requiredEnv "RADAR_OUTPUT_REPLICA_COUNT" }}"
-      - name: num_threads
-        value: "{{ requiredEnv "RESTRUCTURE_NUM_THREADS" }}"
-      - name: sftp_user_keys
-        value: "{{ requiredEnv "RADAR_OUTPUT_SFTP_PUBLIC_KEY" }}"
-      - name: persistence.size
-        value: "{{ requiredEnv "RADAR_OUTPUT_DISK_SIZE" }}"    
+      - name: s3Endpoint
+        value: {{ .Values.minio.s3Endpoint }}
+      - name: bucketAccessKey
+        value: {{ .Values.minio.accessKey }}
+      - name: bucketSecretKey
+        value: {{ .Values.minio.secretKey }}

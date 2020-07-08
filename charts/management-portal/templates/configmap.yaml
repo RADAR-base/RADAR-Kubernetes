@@ -10,9 +10,15 @@ metadata:
 data:
   oauth_client_details.csv: |
     client_id;resource_ids;client_secret;scope;authorized_grant_types;redirect_uri;authorities;access_token_validity;refresh_token_validity;additional_information;autoapprove
-    pRMT;res_ManagementPortal,res_gateway;;MEASUREMENT.CREATE,SUBJECT.UPDATE,SUBJECT.READ,PROJECT.READ,SOURCETYPE.READ,SOURCE.READ,SOURCETYPE.READ,SOURCEDATA.READ,USER.READ,ROLE.READ;refresh_token,authorization_code;;;43200;7948800;{"dynamic_registration": true};
-    aRMT;res_ManagementPortal,res_gateway;;MEASUREMENT.CREATE,SUBJECT.UPDATE,SUBJECT.READ,PROJECT.READ,SOURCETYPE.READ,SOURCE.READ,SOURCETYPE.READ,SOURCEDATA.READ,USER.READ,ROLE.READ;refresh_token,authorization_code;;;43200;7948800;{"dynamic_registration": true};
+    pRMT;res_ManagementPortal,res_gateway;{{ .Values.client_secrets.prmt }};MEASUREMENT.CREATE,SUBJECT.UPDATE,SUBJECT.READ,PROJECT.READ,SOURCETYPE.READ,SOURCE.READ,SOURCETYPE.READ,SOURCEDATA.READ,USER.READ,ROLE.READ;refresh_token,authorization_code;;;43200;7948800;{"dynamic_registration": true};
+    aRMT;res_ManagementPortal,res_gateway;{{ .Values.client_secrets.armt }};MEASUREMENT.CREATE,SUBJECT.UPDATE,SUBJECT.READ,PROJECT.READ,SOURCETYPE.READ,SOURCE.READ,SOURCETYPE.READ,SOURCEDATA.READ,USER.READ,ROLE.READ;refresh_token,authorization_code;;;43200;7948800;{"dynamic_registration": true};
     THINC-IT;res_ManagementPortal,res_gateway;;MEASUREMENT.CREATE,SUBJECT.UPDATE,SUBJECT.READ,PROJECT.READ,SOURCETYPE.READ,SOURCE.READ,SOURCETYPE.READ,SOURCEDATA.READ,USER.READ,ROLE.READ;refresh_token,authorization_code;;;43200;7948800;{"dynamic_registration": true};
     radar_restapi;res_ManagementPortal;secret;SUBJECT.READ,PROJECT.READ,SOURCE.READ,SOURCETYPE.READ,SOURCEDATA.READ;client_credentials;;;43200;259200;{};
-    radar_redcap_integrator;res_ManagementPortal;secret;PROJECT.READ,SUBJECT.CREATE,SUBJECT.READ,SUBJECT.UPDATE;client_credentials;;;43200;259200;{};
+    radar_redcap_integrator;res_ManagementPortal;{{ .Values.client_secrets.radar_redcap_integrator }};PROJECT.READ,SUBJECT.CREATE,SUBJECT.READ,SUBJECT.UPDATE;client_credentials;;;43200;259200;{};
     radar_dashboard;res_ManagementPortal,res_RestApi;;SUBJECT.READ,PROJECT.READ,SOURCE.READ,SOURCETYPE.READ,MEASUREMENT.READ;refresh_token,authorization_code;;;43200;259200;{};
+    radar_upload_backend;res_ManagementPortal,res_upload;{{ .Values.client_secrets.radar_upload_backend }};SUBJECT.READ,PROJECT.READ;client_credentials;;;43200;86400;{"dynamic_registration": true};
+    radar_upload_connect;res_ManagementPortal,res_upload;{{ .Values.client_secrets.radar_upload_connect }};SUBJECT.READ,SUBJECT.UPDATE,PROJECT.READ,SOURCE.READ,SOURCETYPE.READ,MEASUREMENT.CREATE;client_credentials;;;43200;259200;{};
+    radar_upload_frontend;res_ManagementPortal,res_upload;{{ .Values.client_secrets.radar_upload_frontend }};SOURCETYPE.READ,MEASUREMENT.CREATE,PROJECT.READ,SUBJECT.READ;authorization_code;https://{{ .Values.server_name }}/upload/login,http://localhost:8080/upload/login;3600;78000;;
+    radar_rest_sources_auth_backend;res_ManagementPortal;{{ .Values.client_secrets.radar_rest_sources_backend }};PROJECT.READ,SOURCETYPE.READ,SUBJECT.READ,SOURCE.READ;client_credentials;;;43200;86400;{};
+    radar_rest_sources_authorizer;res_restAuthorizer;;SOURCETYPE.READ,PROJECT.READ,SUBJECT.READ;authorization_code;https://{{ .Values.server_name }}/rest-sources/authorizer/login;;43200;86400;{};
+    radar_fitbit_connector;res_restAuthorizer;{{ .Values.client_secrets.radarFitbitConnector }};SUBJECT.READ;client_credentials;;;43200;;{};

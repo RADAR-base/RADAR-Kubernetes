@@ -1,0 +1,122 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "radar-output.fullname" . }}-restructure
+  labels:
+    app: {{ template "radar-output.name" . }}
+    chart: {{ template "radar-output.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  restructure.yml: |
+    service:
+      # Whether to run the application as a polling service.
+      enable: true
+      # Polling interval in seconds.
+      interval: 300
+
+    source:
+      type: "{{ .Values.source_type }}"
+      # Minio S3 settings
+      s3:
+        endpoint: "{{ .Values.s3Endpoint }}"
+        accessToken: "{{ .Values.bucketAccessKey }}"
+        secretKey: "{{ .Values.bucketSecretKey }}"
+        bucket: "{{ .Values.sourceBucketName }}"
+
+    target:
+      type: "{{ .Values.target_type }}"
+      local:
+        userId: 0
+        groupId: 0
+      s3:
+        endpoint: "{{ .Values.s3Endpoint }}"
+        accessToken: "{{ .Values.bucketAccessKey }}"
+        secretKey: "{{ .Values.bucketSecretKey }}"
+        bucket: "{{ .Values.targetBucketName }}"
+
+    redis:
+      uri: "{{ .Values.redisUrl }}"
+      lockPrefix: radar-output/lock/
+
+    # Compression characteristics
+    compression:
+      # Compression type: none, zip or gzip
+      type: gzip
+      # Compression Factory class
+      # factory: org.radarbase.hdfs.data.CompressionFactory
+      # Additional compression properties
+      # properties: {}
+
+    # File format
+    format:
+      # Format type: CSV or JSON
+      type: csv
+      # Whether to deduplicate the files in each topic by default
+      deduplication:
+        enable: true
+        # Deduplicate considering only distinct fields sourceId and time.
+        # This may incur data loss if multiple measurements are recorded
+        # at exactly the same time. By default, all values are considered
+        # when looking at distinct lines.
+        # distinctFields: [key.sourceId, value.time]
+      # Format factory class
+      # factory: org.radarbase.hdfs.data.FormatFactory
+      # Additional format properties
+      # properties: {}
+
+    # Worker settings
+    worker:
+      # Maximum number of files and converters to keep open while processing
+      cacheSize: 300
+      # Maximum number of offsets in cache.
+      cacheOffsetsSize: 500000
+      # Number of threads to do processing with
+      numThreads: "{{ .Values.num_threads }}"
+      # Maximum number of files to process in any given topic.
+      # maxFilesPerTopic: null
+      minimumFileAge: {{ .Values.minimumFileAge }}
+
+    cleaner:
+      # Enable cleaning up old source files
+      enable: true
+      # Interval in seconds to clean data
+      interval: 1800  # 21 minutes
+      # Number of days after which a source file is considered old
+      age: 7
+
+    #storage:
+      #factory: org.radarbase.hdfs.storage.LocalStorageDriver
+      #properties:
+      #  localUid: 0
+      #  localGid: 0
+
+    # Path settings
+    paths:
+      # Input directories in HDFS
+      inputs:
+        - /topics
+      # Root temporary directory for local file processing.
+      temp: /output/+tmp
+      # Output directory
+      output: /
+      # Output path construction factory
+      # factory: org.radarbase.output.path.MonthlyObservationKeyPathFactory
+      # Additional properties
+      # properties: {}
+
+    # Individual topic configuration
+    topics: {}
+    #  # topic name
+    #  connect_fitbit_source:
+    #    # deduplicate this topic, regardless of the format settings
+    #    deduplication:
+    #      # deduplicate this topic only using given fields.
+    #      distinctFields: [value.time]
+    #  connect_fitbit_bad:
+    #    # Do not process this topic
+    #    exclude: true
+    #  biovotion_acceleration:
+    #    # Disable deduplication
+    #    deduplication:
+    #      enable: false

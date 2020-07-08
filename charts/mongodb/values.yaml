@@ -1,0 +1,5 @@
+persistentVolume:
+  size: 2Gi
+
+metrics:
+  enabled: true
