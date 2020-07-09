@@ -114,6 +114,10 @@ postgresql:
 management_portal:
   _install: true
   replicaCount: 1  # should be 1
+  postgres:
+    ssl:
+      enabled: false
+      keystorepassword: keystorepassword
   managementportal:
     catalogue_server_enable_auto_import: true
     common_admin_password: password

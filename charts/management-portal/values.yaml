@@ -6,7 +6,7 @@ replicaCount: 2
 
 image:
   repository: radarbase/management-portal
-  tag: 0.5.8
+  tag: 0.6.0
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -57,6 +57,9 @@ postgres:
   host: postgresql-postgresql
   user: postgres
   password: password
+  ssl:
+    enabled: false
+    keystorepassword: keystorepassword
 
 from_email: from-email
 server_name: localhost
