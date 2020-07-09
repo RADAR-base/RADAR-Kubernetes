@@ -5,68 +5,12 @@ environments:
     - ../production.yaml
 
 helmDefaults:
-  atomic: true
+  atomic: false
   timeout: 600
   kubeContext: {{ .Values.kubeContext }}
 
 releases:
-  - name: cp-zookeeper
-    chart: ../cp-helm-charts/charts/cp-zookeeper
-    wait: true
-    installed: {{ .Values.cp_zookeeper._install }}
-    values:
-      - {{ .Values.cp_zookeeper | toYaml | indent 8 | trim }}
-  - name: cp-kafka
-    chart: ../cp-helm-charts/charts/cp-kafka
-    wait: true
-    installed: {{ .Values.cp_kafka._install }}
-    values:
-      - "../charts/cp-kafka/values.yaml"
-      - {{ .Values.cp_kafka | toYaml | indent 8 | trim }}
-    set:
-      - name: brokers
-        value: {{ .Values.kafka_num_brokers }}
-  - name: cp-schema-registry
-    chart: ../cp-helm-charts/charts/cp-schema-registry
-    wait: true
-    installed: {{ .Values.cp_schema_registry._install }}
-    values:
-      - "../charts/cp-schema-registry/values.yaml"
-      - {{ .Values.cp_schema_registry | toYaml | indent 8 | trim }}
-    set:
-      - name: ingress.hosts[0].host
-        value: "{{ .Values.server_name }}"
-      - name: ingress.hosts[0].paths
-        values: ["/schema/?(.*)"]
-      - name: ingress.tls[0].secretName
-        value: radar-base-tls
-      - name: ingress.tls[0].hosts
-        values: ["{{ .Values.server_name }}"]
 
-  - name: catalog-server
-    chart: ../charts/catalog-server
-    wait: true
-    installed: {{ .Values.catalog_server._install }}
-    values:
-      - "../charts/postgresql/values.yaml"
-      - {{ .Values.catalog_server | toYaml | indent 8 | trim }}
-    set:
-      - name: kafka_num_brokers
-        value: {{ .Values.kafka_num_brokers }}
-
-  - name: postgresql
-    chart: stable/postgresql
-    version: 5.3.3
-    wait: false
-    installed: {{ .Values.postgresql._install }}
-    values:
-      - "../charts/postgresql/values.yaml"
-      - {{ .Values.postgresql | toYaml | indent 8 | trim }}
-    set:
-      - name: postgresqlPassword
-        value: {{ .Values.postgres_password }}
-      - name: replication.password
-        value: {{ .Values.postgres_password }}
 
   - name: management-portal
     chart: ../charts/management-portal
@@ -81,8 +25,3 @@ releases:
       - name: postgres.password
         value: {{ .Values.postgres_password }}
 
-  - name: smtp
-    chart: ../charts/smtp
-    installed: {{ .Values.smtp._install }}
-    values:
-      - {{ .Values.smtp | toYaml | indent 8 | trim }}
