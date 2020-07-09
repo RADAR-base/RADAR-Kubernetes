@@ -47,7 +47,7 @@ spec:
           - name: SPRING_PROFILES_ACTIVE
             value: "prod,swagger"
           - name: SPRING_DATASOURCE_URL
-            value: "jdbc:postgresql://{{ .Values.postgres.host }}:5432/managementportal&?ssl=true"
+            value: "jdbc:postgresql://{{ .Values.postgres.host }}:5432/managementportal?ssl=true"
           - name: SPRING_DATASOURCE_USERNAME
             value: {{ .Values.postgres.user }}
           - name: SPRING_DATASOURCE_PASSWORD
@@ -84,7 +84,7 @@ spec:
           - name: JHIPSTER_SLEEP # gives time for the database to boot before the application
             value: "0"
           - name: JAVA_OPTS  # maximum heap size for the JVM running ManagementPortal, increase this as necessary
-            value: "-Xmx1500m -Djavax.net.ssl.trustStore=/etc/share/cert/BaltimoreCyberTrustRoot.crt.pem -Djavax.net.ssl.trustStorePassword={{ .Values.postgres.ssl.keystorepassword }}"
+            value: "-Xmx1500m"
           ports:
             - name: http
               containerPort: 8080
@@ -118,10 +118,6 @@ spec:
               mountPath: /config/
             - name: keystore
               mountPath: /mp-includes/config/
-            {{- if .Values.postgres.ssl.enabled }}
-            - name: postgres-root-cert
-              mountPath: ~/.postgresql/
-            {{ end }}
       volumes:
         - name: config
           configMap:
@@ -129,11 +125,6 @@ spec:
         - name: keystore
           secret:
             secretName: {{ include "management-portal.fullname" . }}-keystore
-        {{- if .Values.postgres.ssl.enabled }}
-        - name: postgres-root-cert
-          secret:
-            secretName: {{ include "management-portal.fullname" . }}-root-cert
-        {{ end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
