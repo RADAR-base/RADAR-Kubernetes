@@ -47,7 +47,7 @@ spec:
           - name: SPRING_PROFILES_ACTIVE
             value: "prod,swagger"
           - name: SPRING_DATASOURCE_URL
-            value: "jdbc:postgresql://{{ .Values.postgres.host }}:5432/managementportal?ssl=true"
+            value: "jdbc:postgresql://{{ .Values.postgres.host }}:5432/managementportal?ssl=true&sslmode=verify-ca"
           - name: SPRING_DATASOURCE_USERNAME
             value: {{ .Values.postgres.user }}
           - name: SPRING_DATASOURCE_PASSWORD
@@ -118,6 +118,10 @@ spec:
               mountPath: /config/
             - name: keystore
               mountPath: /mp-includes/config/
+            {{- if .Values.postgres.ssl.enabled }}
+            - name: postgres-root-cert
+              mountPath: /root/.postgresql/
+            {{ end }}
       volumes:
         - name: config
           configMap:
@@ -125,6 +129,11 @@ spec:
         - name: keystore
           secret:
             secretName: {{ include "management-portal.fullname" . }}-keystore
+        {{- if .Values.postgres.ssl.enabled }}
+        - name: postgres-root-cert
+          secret:
+            secretName: {{ include "management-portal.fullname" . }}-root-cert
+        {{ end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
