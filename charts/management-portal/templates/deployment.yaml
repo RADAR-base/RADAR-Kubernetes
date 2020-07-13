@@ -85,6 +85,24 @@ spec:
             value: "0"
           - name: JAVA_OPTS  # maximum heap size for the JVM running ManagementPortal, increase this as necessary
             value: "-Xmx1500m"
+          {{- if .Values.sendGrid.enabled }}
+          - name: SPRING_MAIL_HOST
+            value: {{ .Values.sendGrid.host | quote }}
+          - name: SPRING_MAIL_PORT
+            value: {{ .Values.sendGrid.port | quote }}
+          - name: SPRING_MAIL_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "management-portal.secretName" . }}
+                key: sendGridUsername
+          - name: SPRING_MAIL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "management-portal.secretName" . }}
+                key: sendGridPassword
+          - name: SPRING_MAIL_FROM
+            value: {{ .Values.sendGrid.from | quote }}
+          {{ end }}
           ports:
             - name: http
               containerPort: 8080
