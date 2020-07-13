@@ -81,3 +81,11 @@ client_secrets:
   radar_upload_frontend: secret
   radar_rest_sources_backend: secret
   radarFitbitConnector: secret
+
+sendGrid:
+  enabled: false
+  host: smtp
+  port: 25
+  username: username
+  password: secret
+  from: no-reply-more@chdr.nl
