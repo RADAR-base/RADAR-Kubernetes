@@ -105,6 +105,15 @@ cp_schema_registry:
 catalog_server:
   _install: true
   replicaCount: 1
+  schema_registry: http://cp-schema-registry:8081
+
+  cc:
+    enabled: false
+    bootstrapServerurl: confluent-url
+    apiKey: ccApikey
+    apiSecret: ccApiSecret
+    schemaRegistryApiKey: srApiKey
+    schemaRegistryApiSecret: srApiSecret
 
 postgresql:
   _install: true
