@@ -71,7 +71,7 @@ spec:
           - "cc_topic_init.sh"
         volumeMounts:
           - name: cc-java-config
-            mountPath: /etc/config/java-config.properties
+            mountPath: /etc/config/
         {{ end }}
       containers:
         - name: {{ .Chart.Name }}

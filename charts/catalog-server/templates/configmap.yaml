@@ -16,9 +16,4 @@ data:
     sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="{{ .Values.cc.apiKey }}" password="{{ .Values.cc.apiSecret }}";
     ssl.endpoint.identification.algorithm=https
     sasl.mechanism=PLAIN
-
-    # Confluent Cloud Schema Registry
-    schema.registry.url={{ .Values.schema_registry}}
-    basic.auth.credentials.source=USER_INFO
-    schema.registry.basic.auth.user.info={{ .Values.cc.schemaRegistryApiKey }}:{{ .Values.cc.schemaRegistryApiSecret }}
 {{- end -}}
