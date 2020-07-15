@@ -18,8 +18,18 @@ data:
     kafka:
       producer:
         bootstrap.servers: {{ .Values.bootstrapServers }}
+        {{- if .Values.cc.enabled }}
+        admin:
+            bootstrap.servers: {{ .Values.bootstrapServers }}
+            security.protocol: SASL_SSL
+            sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="{{ .Values.cc.apiKey }}" password="{{ .Values.cc.apiSecret }}";
+            ssl.endpoint.identification.algorithm: https
+            sasl.mechanism: PLAIN
+        {{ end }}
       serialization:
         schema.registry.url: {{ .Values.schemaRegistry }}
-
+        {{- if .Values.cc.enabled }}
+        schema.registry.basic.auth.user.info: {{ .Values.cc.schemaRegistryApiKey }}:{{ .Values.cc.schemaRegistryApiSecret }}
+        {{ end }}
     auth:
       managementPortalUrl: http://{{ .Values.managementportalHost }}:8080/managementportal
