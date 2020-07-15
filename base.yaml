@@ -340,3 +340,10 @@ radar_s3_connector:
   replicaCount: 1
   # The bucket name where intermediate data for cold storage should be written to.
   bucketName: radar_intermediate_storage
+
+
+# --------------------------------------------------------- 30-confluent-cloud.yaml ---------------------------------------------------------
+
+ccSchemaRegistryProxy:
+  _install: false
+  externalName: schema-registry-domain

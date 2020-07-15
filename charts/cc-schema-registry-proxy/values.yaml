@@ -1,0 +1,38 @@
+
+replicaCount: 1
+
+service:
+  type: ExternalName
+  externalName: schema-registry-domain
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      limit_except GET {
+        deny all;
+      }
+    nginx.ingress.kubernetes.io/server-snippet: |
+      proxy_ssl_name schema-registry-domain;
+      proxy_ssl_server_name on;
+  hosts:
+    - host: localhost
+      path: "/schema/?(.*)"
+  tls:
+    secretName: radar-base-tls
+    hosts:
+      more-dev.thehyve.net
+
+
+
+
+cc:
+  enabled: false
+  bootstrapServerurl: confluent-url
+  apiKey: ccApikey
+  apiSecret: ccApiSecret
+  schemaRegistryApiKey: srApiKey
+  schemaRegistryApiSecret: srApiSecret

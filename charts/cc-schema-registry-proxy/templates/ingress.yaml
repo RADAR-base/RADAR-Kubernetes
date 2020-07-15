@@ -1,0 +1,28 @@
+{{- $fullName := include "cc-schema-registry-proxy.fullname" . -}}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ $fullName }}
+  labels:
+    app.kubernetes.io/name: {{ include "cc-schema-registry-proxy.name" . }}
+    helm.sh/chart: {{ include "cc-schema-registry-proxy.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+    nginx.ingress.kubernetes.io/upstream-vhost: {{ .Values.service.externalName }}
+spec:
+  rules:
+  {{- range .Values.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+        {{- range .paths }}
+          - path: {{ . }}
+            backend:
+              serviceName: {{ $fullName }}
+              servicePort: https
+        {{- end }}
+  {{- end }}
