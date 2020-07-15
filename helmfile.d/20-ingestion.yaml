@@ -23,6 +23,15 @@ releases:
     installed: {{ .Values.radar_gateway._install }}
     values:
       - {{ .Values.radar_gateway | toYaml | indent 8 | trim }}
+      - {{ .Values.confluentCloud| toYaml | indent 8 | trim }}
     set:
       - name: ingress.hosts
         values: [{{ .Values.server_name }}]
+      - name: cc.enabled
+        value: {{ .Values.confluentCloud.enabled }}
+      {{- if .Values.confluentCloud.enabled }}
+      - name: schemaRegistry
+        value: {{ .Values.confluentCloud.cc.schemaRegistryUrl }}
+      - name: bootstrapServers
+        value: {{ .Values.confluentCloud.cc.bootstrapServerurl }}
+      {{ end }}
