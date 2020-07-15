@@ -15,24 +15,14 @@ ingress:
       limit_except GET {
         deny all;
       }
-    nginx.ingress.kubernetes.io/server-snippet: |
-      proxy_ssl_name schema-registry-domain;
-      proxy_ssl_server_name on;
+  path: "/schema/?(.*)"
   hosts:
-    - host: localhost
-      path: "/schema/?(.*)"
+    - localhost
   tls:
     secretName: radar-base-tls
-    hosts:
-      more-dev.thehyve.net
-
 
 
 
 cc:
-  enabled: false
-  bootstrapServerurl: confluent-url
-  apiKey: ccApikey
-  apiSecret: ccApiSecret
   schemaRegistryApiKey: srApiKey
   schemaRegistryApiSecret: srApiSecret
