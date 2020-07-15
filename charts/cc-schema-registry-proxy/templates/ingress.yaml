@@ -19,10 +19,9 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
     nginx.ingress.kubernetes.io/upstream-vhost: {{ $externalName }}
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
     nginx.ingress.kubernetes.io/backend-protocol: https
-    nginx.ingress.kubernetes.io/server-snippet: |
-      proxy_ssl_name "{{ $externalName }};"
-      proxy_ssl_server_name on;
+    nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_set_header Authorization "Basic {{ $credentials | quote | b64enc }}";
 
 spec:
@@ -42,6 +41,6 @@ spec:
           - path: {{ $path | quote }}
             backend:
               serviceName: {{ $fullName }}
-              servicePort: https
+              servicePort: 443
   {{- end }}
 {{- end }}
