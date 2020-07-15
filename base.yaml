@@ -91,12 +91,12 @@ velero:
 confluentCloud:
   enabled: false
   cc:
-    bootstrapServerurl: confluent-url
+    bootstrapServerurl: confluentBootstrapServers
     apiKey: ccApikey
     apiSecret: ccApiSecret
     schemaRegistryApiKey: srApiKey
     schemaRegistryApiSecret: srApiSecret
-
+    schemaRegistryUrl: confluentSchemaRegistryUrl
 
 cp_zookeeper:
   _install: true
