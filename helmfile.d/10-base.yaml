@@ -56,7 +56,10 @@ releases:
         value: {{ .Values.kafka_num_brokers }}
       - name: cc.enabled
         value: {{ .Values.confluentCloud.enabled }}
-
+      {{- if .Values.confluentCloud.enabled }}
+      - name: schema_registry
+        value: {{ .Values.confluentCloud.cc.schemaRegistryUrl }}
+      {{ end }}
   - name: postgresql
     chart: stable/postgresql
     version: 5.3.3
