@@ -88,6 +88,15 @@ velero:
           aws_secret_access_key=secretKey
 
 # --------------------------------------------------------- 10-base.yaml ---------------------------------------------------------
+confluentCloud:
+  enabled: false
+  cc:
+    bootstrapServerurl: confluent-url
+    apiKey: ccApikey
+    apiSecret: ccApiSecret
+    schemaRegistryApiKey: srApiKey
+    schemaRegistryApiSecret: srApiSecret
+
 
 cp_zookeeper:
   _install: true
@@ -107,13 +116,6 @@ catalog_server:
   replicaCount: 1
   schema_registry: http://cp-schema-registry:8081
 
-  cc:
-    enabled: false
-    bootstrapServerurl: confluent-url
-    apiKey: ccApikey
-    apiSecret: ccApiSecret
-    schemaRegistryApiKey: srApiKey
-    schemaRegistryApiSecret: srApiSecret
 
 postgresql:
   _install: true

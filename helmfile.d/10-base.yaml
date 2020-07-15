@@ -50,9 +50,12 @@ releases:
     values:
       - "../charts/postgresql/values.yaml"
       - {{ .Values.catalog_server | toYaml | indent 8 | trim }}
+      - {{ .Values.confluentCloud| toYaml | indent 8 | trim }}
     set:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
+      - name: cc.enabled
+        value: {{ .Values.confluentCloud.enabled }}
 
   - name: postgresql
     chart: stable/postgresql
