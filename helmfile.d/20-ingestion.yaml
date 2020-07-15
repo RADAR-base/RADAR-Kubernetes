@@ -10,13 +10,6 @@ helmDefaults:
   kubeContext: {{ .Values.kubeContext }}
   
 releases:
-  - name: cp-kafka-rest
-    chart: ../cp-helm-charts/charts/cp-kafka-rest
-    wait: false
-    installed: {{ .Values.cp_kafka_rest._install }}
-    values:
-      - "../charts/cp-kafka-rest/values.yaml"
-      - {{ .Values.cp_kafka_rest | toYaml | indent 8 | trim }}
 
   - name: radar-gateway
     chart: ../charts/radar-gateway
@@ -29,6 +22,8 @@ releases:
         values: [{{ .Values.server_name }}]
       - name: cc.enabled
         value: {{ .Values.confluentCloud.enabled }}
+      - name: serviceMonitor.enabled
+        value: {{ .Values.prometheus_operator._install }}
       {{- if .Values.confluentCloud.enabled }}
       - name: schemaRegistry
         value: {{ .Values.confluentCloud.cc.schemaRegistryUrl }}

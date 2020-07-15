@@ -56,6 +56,9 @@ tolerations: []
 
 affinity: {}
 
+serviceMonitor:
+  enabled: true
+
 managementportalHost: management-portal
 schemaRegistry: http://cp-schema-registry:8081
 max_requests: 1000
