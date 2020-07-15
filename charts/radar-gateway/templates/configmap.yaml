@@ -9,8 +9,17 @@ metadata:
     heritage: {{ .Release.Service }}
 data:
   gateway.yml: |
-    baseUri: http://0.0.0.0/radar-gateway/
-    managementPortalUrl: http://{{ .Values.managementportal_host }}:8080/managementportal
-    restProxyUrl: {{ .Values.rest_proxy }}
-    schemaRegistryUrl: {{ .Values.schema_registry }}
-    #maxRequests: {{ .Values.max_requests }}
+    # Resource config class
+    #resourceConfig: org.radarbase.gateway.inject.ManagementPortalEnhancerFactory
+
+    server:
+      baseUri: http://0.0.0.0/radar-gateway/
+
+    kafka:
+      producer:
+        bootstrap.servers: {{ .Values.bootstrapServers }}
+      serialization:
+        schema.registry.url: {{ .Values.schemaRegistry }}
+
+    auth:
+      managementPortalUrl: http://{{ .Values.managementportalHost }}:8080/managementportal
