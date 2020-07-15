@@ -19,3 +19,5 @@ releases:
     set:
       - name: service.externalName
         value: {{ .Values.ccSchemaRegistryProxy.externalName }}
+      - name: ingress.hosts
+        values: [{{ .Values.server_name }}]
