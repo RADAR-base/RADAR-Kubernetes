@@ -14,15 +14,19 @@ metadata:
     helm.sh/chart: {{ include "cc-schema-registry-proxy.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-  {{- with .Values.ingress.annotations }}
   annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    ingress.kubernetes.io/preserve-host: "false"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      limit_except GET {
+        deny all;
+      }
+      more_set_headers "Authorization: Basic {{ $credentials | b64enc }}";
     nginx.ingress.kubernetes.io/upstream-vhost: {{ $externalName }}
     nginx.ingress.kubernetes.io/rewrite-target: /$1
     nginx.ingress.kubernetes.io/backend-protocol: https
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      proxy_set_header Authorization "Basic {{ $credentials | quote | b64enc }}";
+
 
 spec:
 {{- if .Values.ingress.tls }}

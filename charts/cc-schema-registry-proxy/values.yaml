@@ -7,21 +7,11 @@ service:
 
 ingress:
   enabled: true
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    ingress.kubernetes.io/preserve-host: "false"
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      limit_except GET {
-        deny all;
-      }
   path: "/schema/?(.*)"
   hosts:
     - localhost
   tls:
     secretName: radar-base-tls
-
-
 
 cc:
   schemaRegistryApiKey: srApiKey
