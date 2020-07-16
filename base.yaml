@@ -340,7 +340,16 @@ radar_s3_connector:
   replicaCount: 1
   # The bucket name where intermediate data for cold storage should be written to.
   bucketName: radar_intermediate_storage
+  bucketAccessKey: AKIAIOSFODNN7EXAMPLE
+  bucketSecretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+  s3Endpoint: http://minio:9000/
 
+s3_proxy:
+  _install: false
+  replicaCount: 1
+  s3AccessKey: AKIAIOSFODNN7EXAMPLE
+  s3Secret: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+  provider: azureblob
 
 # --------------------------------------------------------- 30-confluent-cloud.yaml ---------------------------------------------------------
 
