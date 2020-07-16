@@ -19,12 +19,17 @@ data:
       producer:
         bootstrap.servers: {{ .Values.bootstrapServers }}
         {{- if .Values.cc.enabled }}
-        admin:
-            bootstrap.servers: {{ .Values.bootstrapServers }}
-            security.protocol: SASL_SSL
-            sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="{{ .Values.cc.apiKey }}" password="{{ .Values.cc.apiSecret }}";
-            ssl.endpoint.identification.algorithm: https
-            sasl.mechanism: PLAIN
+        bootstrap.servers: {{ .Values.bootstrapServers }}
+        security.protocol: SASL_SSL
+        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="{{ .Values.cc.apiKey }}" password="{{ .Values.cc.apiSecret }}";
+        ssl.endpoint.identification.algorithm: https
+        sasl.mechanism: PLAIN
+      admin:
+        bootstrap.servers: {{ .Values.bootstrapServers }}
+        security.protocol: SASL_SSL
+        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="{{ .Values.cc.apiKey }}" password="{{ .Values.cc.apiSecret }}";
+        ssl.endpoint.identification.algorithm: https
+        sasl.mechanism: PLAIN
         {{ end }}
       serialization:
         schema.registry.url: {{ .Values.schemaRegistry }}
