@@ -11,8 +11,8 @@ metadata:
     "helm.sh/hook": test-success
 spec:
   containers:
-    - name: wget
+    - name: nc
       image: busybox
-      command: ['wget']
-      args:  ['{{ include "s3-proxy.fullname" . }}:{{ .Values.service.port }}']
+      command: ['/bin/nc']
+      args:  ['-zv', '{{ include "s3-proxy.fullname" . }}', '{{ .Values.service.port }}']
   restartPolicy: Never
