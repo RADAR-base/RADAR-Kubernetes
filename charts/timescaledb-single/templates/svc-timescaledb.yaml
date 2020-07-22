@@ -1,0 +1,31 @@
+# This file and its contents are licensed under the Apache License 2.0.
+# Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "clusterName" . }}
+  labels:
+    app: {{ template "timescaledb.fullname" . }}
+    chart: {{ template "timescaledb.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    cluster-name: {{ template "clusterName" . }}
+    role: master
+  annotations:
+{{ .Values.loadBalancer.annotations | toYaml | indent 4 }}
+spec:
+{{- if .Values.loadBalancer.enabled }}
+  type: LoadBalancer
+{{- else }}
+  type: ClusterIP
+{{- end }}
+  ports:
+  - name: postgresql
+    # This always defaults to 5432, even if `!loadBalancer.enabled`.
+    port: {{ .Values.loadBalancer.port }}
+    targetPort: postgresql
+    protocol: TCP
+{{- if .Values.loadBalancer.spec }}
+{{ .Values.loadBalancer.spec | toYaml | indent 2 }}
+{{- end }}
