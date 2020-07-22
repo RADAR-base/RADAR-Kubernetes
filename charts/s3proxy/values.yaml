@@ -39,9 +39,12 @@ tolerations: []
 
 affinity: {}
 
-s3AccessKey: null
-s3Secret: null
-provider: null
-endpoint: null
-identity: null
-credentials: null
+s3:
+  identity: null
+  credential: null
+
+target:
+  provider: null
+  endpoint: null
+  identity: null
+  credentials: null
