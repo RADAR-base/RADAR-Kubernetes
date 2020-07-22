@@ -47,7 +47,7 @@ releases:
       - {{ .Values.radar_s3_connector | toYaml | indent 8 | trim }}
 
   - name: s3-proxy
-    chart: ../charts/s3proxy
+    chart: ../charts/s3-proxy
     installed: {{ .Values.s3_proxy._install }}
     values:
       - {{ .Values.s3_proxy | toYaml | indent 8 | trim }}
