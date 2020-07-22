@@ -22,8 +22,8 @@ data:
     store.url={{ .Values.s3Endpoint }}
     storage.class=io.confluent.connect.s3.storage.S3Storage
     format.class=io.confluent.connect.s3.format.avro.AvroFormat
-    transforms=keyToValue
-    transforms.keyToValue.type=org.radarbase.kafka.connect.transforms.KeyValueTransform
+    transforms=combineKeyValue
+    transforms.combineKeyValue.type=org.radarbase.kafka.connect.transforms.CombineKeyValue
     rotate.schedule.interval.ms = 900000
     timezone=UTC
     avro.codec=deflate
