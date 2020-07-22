@@ -1,0 +1,136 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "radar-jdbc-connector.fullname" . }}
+  labels:
+    {{- include "radar-jdbc-connector.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "radar-jdbc-connector.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      annotations:
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}      
+      labels:
+        app.kubernetes.io/name: {{ include "radar-jdbc-connector.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                  - key: "app.kubernetes.io/name"
+                    operator: In
+                    values:
+                    - {{ template "radar-jdbc-connector.name" . }}
+                  - key: "app.kubernetes.io/instance"
+                    operator: In
+                    values:
+                    - {{ .Release.Name }}
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          - name: CONNECT_BOOTSTRAP_SERVERS
+            value: "{{ .Values.kafka }}"
+          - name: CONNECT_REST_PORT
+            value: "8083"
+          - name: CONNECT_GROUP_ID
+            value: "default"
+          - name: CONNECT_CONFIG_STORAGE_TOPIC
+            value: "default.config"
+          - name: CONNECT_OFFSET_STORAGE_TOPIC
+            value: "default.offsets"
+          - name: CONNECT_STATUS_STORAGE_TOPIC
+            value: "default.status"
+          - name: CONNECT_KEY_CONVERTER
+            value: "io.confluent.connect.avro.AvroConverter"
+          - name: CONNECT_VALUE_CONVERTER
+            value: "io.confluent.connect.avro.AvroConverter"
+          - name: CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL
+            value: "{{ .Values.schema_registry }}"
+          - name: CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL
+            value: "{{ .Values.schema_registry }}"
+          - name: CONNECT_INTERNAL_KEY_CONVERTER
+            value: "org.apache.kafka.connect.json.JsonConverter"
+          - name: CONNECT_INTERNAL_VALUE_CONVERTER
+            value: "org.apache.kafka.connect.json.JsonConverter"
+          - name: CONNECT_OFFSET_STORAGE_FILE_FILENAME
+            value: "/tmp/connect2.offset"
+          - name: CONNECT_REST_ADVERTISED_HOST_NAME
+            value: "radar-jdbc-connector"
+          - name: CONNECT_ZOOKEEPER_CONNECT
+            value: "{{ .Values.zookeeper }}"
+          - name: CONNECT_CONSUMER_MAX_POLL_RECORDS
+            value: "500"
+          - name: CONNECT_CONSUMER_MAX_POLL_INTERVAL_MS
+            value: "300000"
+          - name: CONNECT_CONSUMER_SESSION_TIMEOUT_MS
+            value: "10000"
+          - name: CONNECT_CONSUMER_HEARTBEAT_INTERVAL_MS
+            value: "3000"
+          - name: CONNECT_CONSUMER_HEARTBEAT_INTERVAL_MS
+            value: /usr/share/java/kafka-connect/plugins
+          - name: CONNECT_LOG4J_ROOT_LOGLEVEL
+            value: WARN
+          - name: KAFKA_BROKERS
+            value: "{{ .Values.kafka_num_brokers }}"
+          - name: CONNECT_LOG4J_LOGGERS
+            value: "org.reflections=ERROR"
+          - name: CONNECTOR_PROPERTY_FILE_PREFIX
+            value: "sink-timescale"
+          ports:
+            - name: http
+              containerPort: 8083
+              protocol: TCP
+          livenessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - curl -sf localhost:8083/connectors/radar-timescale-sink/status | grep -o '\"state\":\"[^\"]*\"' | tr '\\n' ',' | grep -vq FAILED || exit 1
+            initialDelaySeconds: 15
+            periodSeconds: 60
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - curl -sf localhost:8083/connectors/radar-timescale-sink/status | grep -o '\"state\":\"[^\"]*\"' | tr '\\n' ',' | grep -vq FAILED || exit 1
+            initialDelaySeconds: 15
+            periodSeconds: 60
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/kafka-connect/sink-timescale
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "radar-jdbc-connector.fullname" . }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
