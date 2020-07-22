@@ -55,6 +55,12 @@ spec:
               secretKeyRef:
                 name: {{ template "management-portal.secretName" . }}
                 key: postgresql_password
+          - name: SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT
+            value: "15000"
+          - name: SPRING_DATASOURCE_HIKARI_VALIDATION_TIMEOUT
+            value: "15000"
+          - name: SPRING_DATASOURCE_HIKARI_LEAK_DETECTION_THRESHOLD
+            value: "30000"
           - name: MANAGEMENTPORTAL_MAIL_FROM
             value: {{ .Values.from_email }}
           - name: MANAGEMENTPORTAL_COMMON_BASEURL
@@ -94,7 +100,7 @@ spec:
               command:
               - /bin/sh
               - -c
-              - wget --spider localhost:8080/managementportal/oauth/token_key
+              - "wget -O - localhost:8080/managementportal/management/health | grep -v '\"status\": \"DOWN\"'"
             initialDelaySeconds: 60
             periodSeconds: 90
             timeoutSeconds: 5
@@ -105,7 +111,7 @@ spec:
               command:
               - /bin/sh
               - -c
-              - wget --spider localhost:8080/managementportal/oauth/token_key
+              - "wget -O - localhost:8080/managementportal/management/health | grep -v '\"status\": \"DOWN\"'"
             initialDelaySeconds: 60
             periodSeconds: 90
             timeoutSeconds: 5

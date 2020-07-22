@@ -1,0 +1,43 @@
+environments:
+  default:
+    values:
+    - ../base.yaml
+    - ../production.yaml
+
+helmDefaults:
+  atomic: true
+  timeout: 180
+
+releases:
+  - name: postgresql
+    chart: stable/postgresql
+    version: 5.3.3
+    wait: false
+    installed: {{ .Values.postgresql._install }}
+    values:
+      - "../charts/postgresql/values.yaml"
+      - {{ .Values.postgresql | toYaml | indent 8 | trim }}
+    set:
+      - name: postgresqlPassword
+        value: {{ .Values.postgres_password }}
+      - name: replication.password
+        value: {{ .Values.postgres_password }}
+
+  - name: management-portal
+    chart: ../charts/management-portal
+    installed: {{ .Values.management_portal._install }}
+    values:
+      - {{ .Values.management_portal | toYaml | indent 8 | trim }}
+    set:
+      - name: ingress.hosts
+        values: [{{ .Values.server_name }}]
+      - name: server_name
+        value: {{ .Values.server_name }}
+      - name: postgres.password
+        value: {{ .Values.postgres_password }}
+
+  - name: smtp
+    chart: ../charts/smtp
+    installed: {{ .Values.smtp._install }}
+    values:
+      - {{ .Values.smtp | toYaml | indent 8 | trim }}
