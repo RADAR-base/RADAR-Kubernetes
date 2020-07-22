@@ -347,9 +347,11 @@ radar_s3_connector:
 s3_proxy:
   _install: false
   replicaCount: 1
-  s3AccessKey: AKIAIOSFODNN7EXAMPLE
-  s3Secret: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-  provider: azureblob
+  s3:
+    identity: AKIAIOSFODNN7EXAMPLE
+    credential: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+  target:
+    provider: azureblob
 
 # --------------------------------------------------------- 30-confluent-cloud.yaml ---------------------------------------------------------
 
