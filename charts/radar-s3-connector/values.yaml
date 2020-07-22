@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: radarbase/kafka-connect-s3
+  repository: radarbase/kafka-connect-transform-s3
   tag: "5.5.1"
   pullPolicy: IfNotPresent
 
