@@ -2,7 +2,7 @@ environments:
   default:
     values:
     - ../base.yaml
-    - ../production.yaml
+    - ../../etc/production.yaml
     secrets:
     - ../../secrets/production.yaml
 
@@ -50,7 +50,7 @@ releases:
     wait: true
     installed: {{ .Values.catalog_server._install }}
     values:
-      - "../charts/postgresql/values.yaml"
+      - "../charts/catalog-server/values.yaml"
       - {{ .Values.catalog_server | toYaml | indent 8 | trim }}
       - {{ .Values.confluentCloud| toYaml | indent 8 | trim }}
     set:
