@@ -22,5 +22,5 @@ data:
     topics={{ .Values.topics }}
     # TimescaleDB server
     connection.url=jdbc:postgresql://{{ .Values.timescaledb.host }}/{{ .Values.timescaledb.database_name }}
-    connection.user=grafana
+    connection.user={{ .Values.timescaledb.username }}
     connection.password={{ .Values.timescaledb.password }}
