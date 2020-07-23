@@ -1,0 +1,40 @@
+repositories:
+  - name: stable
+    url: https://kubernetes-charts.storage.googleapis.com
+  - name: timescaledb
+    url: https://raw.githubusercontent.com/timescale/timescaledb-kubernetes/master/charts/repo/
+
+environments:
+  default:
+    values:
+      - ../base.yaml
+      - ../production.yaml
+
+helmDefaults:
+  atomic: true
+  timeout: 600
+
+releases:
+  - name: timescaledb
+    chart: timescaledb/timescaledb-single
+    installed: { { .Values.timescaledb._install } }
+    values:
+      - { { .Values.timescaledb | toYaml | indent 8 | trim } }
+
+  - name: radar-grafana
+    chart: stable/grafana
+    installed: { { .Values.radar_grafana._install } }
+    values:
+      - { { .Values.radar_grafana | toYaml | indent 8 | trim } }
+    set:
+      - name: adminPassword
+        value: { { .Values.grafana_password } }
+
+  - name: radar-jdbc-connector
+    chart: ../charts/radar-jdbc-connector
+    installed: { { .Values.radar_jdbc_connector._install } }
+    values:
+      - { { .Values.radar_jdbc_connector | toYaml | indent 8 | trim } }
+    set:
+      - name: kafka_num_brokers
+        value: { { .Values.kafka_num_brokers } }
