@@ -15,7 +15,7 @@ environments:
 helmDefaults:
   atomic: true
   force: true
-  timeout: 90
+  timeout: 240
   kubeContext: {{ .Values.kubeContext }}
   
 releases:

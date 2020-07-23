@@ -248,14 +248,20 @@ ceph:
 radar_output:
   _install: true
   replicaCount: 1
-  num_threads: 2
-  target_type: s3
-  source_type: s3
-  hdfs_namenodes: "[hdfs-namenode-0, hdfs-namenode-1]"
-  sourceBucketName: radar-intermediate-storage
-  targetBucketName: radar-output-storage
-  redisUrl: redis://redis-master:6379
-  minimumFileAge: 900
+  source:
+    s3:
+      endpoint: http://minio:9000/
+      accessToken: AKIAIOSFODNN7EXAMPLE
+      secretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      bucket: radar-intermediate-storage
+  target:
+    s3:
+      endpoint: http://minio:9000/
+      accessToken: AKIAIOSFODNN7EXAMPLE
+      secretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      bucket: radar-output-storage
+  redis:
+    url: redis://redis-master:6379
 
 # --------------------------------------------------------- 20-ingestion.yaml ---------------------------------------------------------
 
