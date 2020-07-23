@@ -246,7 +246,7 @@ initChownData:
 
 # Administrator credentials when not using an existing secret (see below)
 adminUser: admin
-adminPassword: strongpassword
+adminPassword: password
 
 # Use an existing secret for the admin user.
 # admin:
@@ -267,7 +267,10 @@ adminPassword: strongpassword
 # schedulerName:
 
 ## Extra environment variables that will be pass onto deployment pods
-env: {}
+env: 
+  POSTGRES_DB: grafana-metrics
+  POSTGRES_PASSWORD: pass
+  POSTGRES_HOST: timescaledb
 
 ## "valueFrom" environment variable references that will be added to deployment pods
 ## ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#envvarsource-v1-core
