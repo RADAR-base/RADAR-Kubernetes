@@ -317,3 +317,27 @@ radar_s3_connector:
   replicaCount: 1
   # The bucket name where intermediate data for cold storage should be written to.
   bucketName: radar_intermediate_storage
+
+
+# --------------------------------------------------------- 20-grafana.yaml ---------------------------------------------------------
+
+grafana_password: password
+
+timescaledb_password: password
+timescaledb_username: grafana
+timescaledb_db_name: grafana-metrics
+
+radar_grafana:
+  _install: true
+  replicaCount: 1
+
+timescaledb:
+  _install: true
+  replicaCount: 1
+  persistence:
+    size: 8Gi
+
+radar_jdbc_connector:
+  _install: true
+  replicaCount: 1
+
