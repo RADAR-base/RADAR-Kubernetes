@@ -49,6 +49,7 @@ livenessProbe:
 # schedulerName: "default-scheduler"
 
 image:
+## REPOSITORY TO BE CHANGED TO RADARBASE
   repository: mpgxvii/radar-grafana
   tag: latest
   sha: ""
