@@ -15,7 +15,7 @@ releases:
     installed: {{ .Values.ccSchemaRegistryProxy._install }}
     values:
       - {{ .Values.ccSchemaRegistryProxy | toYaml | indent 8 | trim }}
-      - {{ .Values.confluentCloud| toYaml | indent 8 | trim }}
+      - {{ .Values.confluent_cloud| toYaml | indent 8 | trim }}
     set:
       - name: service.externalName
         value: {{ .Values.ccSchemaRegistryProxy.externalName }}

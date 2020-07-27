@@ -88,7 +88,7 @@ velero:
           aws_secret_access_key=secretKey
 
 # --------------------------------------------------------- 10-base.yaml ---------------------------------------------------------
-confluentCloud:
+confluent_cloud:
   enabled: false
   cc:
     bootstrapServerurl: confluentBootstrapServers
