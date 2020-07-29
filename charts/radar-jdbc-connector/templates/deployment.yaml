@@ -77,8 +77,8 @@ spec:
             value: "10000"
           - name: CONNECT_CONSUMER_HEARTBEAT_INTERVAL_MS
             value: "3000"
-          - name: CONNECT_CONSUMER_HEARTBEAT_INTERVAL_MS
-            value: /usr/share/java/kafka-connect/plugins
+          - name: CONNECT_PLUGIN_PATH
+            value: /usr/share/kafka-connect/plugins
           - name: CONNECT_LOG4J_ROOT_LOGLEVEL
             value: WARN
           - name: KAFKA_BROKERS
@@ -117,7 +117,8 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - name: config
-              mountPath: /etc/kafka-connect/sink-timescale
+              mountPath: /etc/kafka-connect/sink-timescale.properties
+              subPath: sink-timescale.properties
       volumes:
         - name: config
           configMap:
