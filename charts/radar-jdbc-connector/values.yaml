@@ -5,7 +5,8 @@
 replicaCount: 2
 
 image:
-  repository: radarbase/radar-jdbc-connector
+## REPOSITORY TO BE CHANGED TO RADARBASE
+  repository: mpgxvii/radar-jdbc-connector
   tag: dev
   pullPolicy: IfNotPresent
 
