@@ -64,9 +64,9 @@ spec:
           - name: CONNECT_INTERNAL_VALUE_CONVERTER
             value: "org.apache.kafka.connect.json.JsonConverter"
           - name: CONNECT_OFFSET_STORAGE_FILE_FILENAME
-            value: "/tmp/connect2.offset"
+            value: "/var/lib/kafka-connect-jdbc/logs/connect.offsets"
           - name: CONNECT_REST_ADVERTISED_HOST_NAME
-            value: "radar-jdbc-connector"
+            value: "radar-jdbc-connector"          
           - name: CONNECT_ZOOKEEPER_CONNECT
             value: "{{ .Values.zookeeper }}"
           - name: CONNECT_CONSUMER_MAX_POLL_RECORDS

@@ -2,11 +2,10 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-replicaCount: 2
+replicaCount: 1
 
 image:
-## REPOSITORY TO BE CHANGED TO RADARBASE
-  repository: mpgxvii/radar-jdbc-connector
+  repository: radarbase/radar-jdbc-connector
   tag: dev
   pullPolicy: IfNotPresent
 
