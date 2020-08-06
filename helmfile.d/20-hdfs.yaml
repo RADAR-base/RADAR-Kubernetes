@@ -2,12 +2,14 @@ environments:
   default:
     values:
     - ../base.yaml
-    - ../production.yaml
+    - ../../etc/production.yaml
+    secrets:
+    - ../../secrets/production.yaml
 
 helmDefaults:
   atomic: true
   force: true
-  timeout: 600
+  timeout: 120
   kubeContext: {{ .Values.kubeContext }}
   
 releases:
@@ -32,10 +34,3 @@ releases:
     installed: {{ .Values.radar_output._install }}
     values:
       - {{ .Values.radar_output | toYaml | indent 8 | trim }}
-    set:
-      - name: s3Endpoint
-        value: {{ .Values.minio.s3Endpoint }}
-      - name: bucketAccessKey
-        value: {{ .Values.minio.accessKey }}
-      - name: bucketSecretKey
-        value: {{ .Values.minio.secretKey }}
