@@ -44,16 +44,22 @@ spec:
             value: "aws-v2-or-v4"
           - name: S3PROXY_IDENTITY
             value: "{{ .Values.s3.identity }}"
-          - name: S3PROXY_IDENTITY
-            value: "{{ .Values.s3.credential }}"
-          - name: JCLOUD_ENDPOINT
+          - name: S3PROXY_CREDENTIAL
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "s3-proxy.fullname" . }}
+                key: s3Credential
+          - name: JCLOUDS_ENDPOINT
             value: "{{ .Values.target.endpoint }}"
-          - name: JCLOUD_PROVIDER
+          - name: JCLOUDS_PROVIDER
             value: "{{ .Values.target.provider }}"
-          - name: JCLOUD_IDENTITY
+          - name: JCLOUDS_IDENTITY
             value: "{{ .Values.target.identity }}"
-          - name: JCLOUD_CREDENTIAL
-            value: "{{ .Values.target.credential }}"
+          - name: JCLOUDS_CREDENTIAL
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "s3-proxy.fullname" . }}
+                key: targetCredential
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}

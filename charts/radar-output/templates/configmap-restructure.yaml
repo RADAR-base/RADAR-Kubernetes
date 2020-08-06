@@ -72,7 +72,7 @@ data:
         # This may incur data loss if multiple measurements are recorded
         # at exactly the same time. By default, all values are considered
         # when looking at distinct lines.
-        # distinctFields: [key.sourceId, value.time]
+        distinctFields: [key.sourceId, value.time, value.timeReceived]
       # Format factory class
       # factory: org.radarbase.hdfs.data.FormatFactory
       # Additional format properties
