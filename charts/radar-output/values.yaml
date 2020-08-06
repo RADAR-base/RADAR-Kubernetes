@@ -102,5 +102,5 @@ worker:
   numThreads: 2
 
 paths:
-  input: output
-  output: ""
+  input: topics
+  output: output

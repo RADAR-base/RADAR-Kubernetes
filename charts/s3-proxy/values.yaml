@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: andrewgaul/s3proxy
-  tag: travis-1412
+  tag: travis-1430
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -47,4 +47,4 @@ target:
   provider: null
   endpoint: null
   identity: null
-  credentials: null
+  credential: null

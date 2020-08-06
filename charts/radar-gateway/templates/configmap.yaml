@@ -19,7 +19,6 @@ data:
       producer:
         bootstrap.servers: {{ .Values.bootstrapServers }}
         {{- if .Values.cc.enabled }}
-        bootstrap.servers: {{ .Values.bootstrapServers }}
         security.protocol: SASL_SSL
         sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="{{ .Values.cc.apiKey }}" password="{{ .Values.cc.apiSecret }}";
         ssl.endpoint.identification.algorithm: https
@@ -34,6 +33,7 @@ data:
       serialization:
         schema.registry.url: {{ .Values.schemaRegistry }}
         {{- if .Values.cc.enabled }}
+        basic.auth.credentials.source: USER_INFO
         schema.registry.basic.auth.user.info: {{ .Values.cc.schemaRegistryApiKey }}:{{ .Values.cc.schemaRegistryApiSecret }}
         {{ end }}
     auth:
