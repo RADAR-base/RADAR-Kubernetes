@@ -88,7 +88,7 @@ velero:
           aws_secret_access_key=secretKey
 
 # --------------------------------------------------------- 10-base.yaml ---------------------------------------------------------
-confluentCloud:
+confluent_cloud:
   enabled: false
   cc:
     bootstrapServerurl: confluentBootstrapServers
@@ -248,14 +248,20 @@ ceph:
 radar_output:
   _install: true
   replicaCount: 1
-  num_threads: 2
-  target_type: s3
-  source_type: s3
-  hdfs_namenodes: "[hdfs-namenode-0, hdfs-namenode-1]"
-  sourceBucketName: radar-intermediate-storage
-  targetBucketName: radar-output-storage
-  redisUrl: redis://redis-master:6379
-  minimumFileAge: 900
+  source:
+    s3:
+      endpoint: http://minio:9000/
+      accessToken: AKIAIOSFODNN7EXAMPLE
+      secretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      bucket: radar-intermediate-storage
+  target:
+    s3:
+      endpoint: http://minio:9000/
+      accessToken: AKIAIOSFODNN7EXAMPLE
+      secretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      bucket: radar-output-storage
+  redis:
+    url: redis://redis-master:6379
 
 # --------------------------------------------------------- 20-ingestion.yaml ---------------------------------------------------------
 
@@ -340,7 +346,18 @@ radar_s3_connector:
   replicaCount: 1
   # The bucket name where intermediate data for cold storage should be written to.
   bucketName: radar_intermediate_storage
+  bucketAccessKey: AKIAIOSFODNN7EXAMPLE
+  bucketSecretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+  s3Endpoint: http://minio:9000/
 
+s3_proxy:
+  _install: false
+  replicaCount: 1
+  s3:
+    identity: AKIAIOSFODNN7EXAMPLE
+    credential: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+  target:
+    provider: azureblob
 
 # --------------------------------------------------------- 30-confluent-cloud.yaml ---------------------------------------------------------
 

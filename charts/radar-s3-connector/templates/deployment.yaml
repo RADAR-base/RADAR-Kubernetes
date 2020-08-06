@@ -43,7 +43,47 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
           - name: CONNECT_BOOTSTRAP_SERVERS
-            value: "{{ .Values.kafka }}"
+            value: "{{ .Values.kafka.url }}"
+          - name: CONNECT_REQUEST_TIMEOUT_MS
+            value: "20000"
+          - name: CONNECT_RETRY_BACKOFF_MS
+            value: "500"
+          - name: CONNECT_SECURITY_PROTOCOL
+            value: "{{ .Values.kafka.securityProtocol }}"
+          - name: CONNECT_SASL_JAAS_CONFIG
+            value: "{{ .Values.kafka.saslJaasConfig }}"
+          - name: CONNECT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM
+            value: "{{ .Values.kafka.sslEndpointIdentificationAlgorithm }}"
+          - name: CONNECT_SASL_MECHANISM
+            value: "{{ .Values.kafka.saslMechanism }}"
+          - name: CONNECT_PRODUCER_BOOTSTRAP_SERVERS
+            value: "{{ .Values.kafka.url }}"
+          - name: CONNECT_PRODUCER_SECURITY_PROTOCOL
+            value: "{{ .Values.kafka.securityProtocol }}"
+          - name: CONNECT_PRODUCER_SASL_JAAS_CONFIG
+            value: "{{ .Values.kafka.saslJaasConfig }}"
+          - name: CONNECT_PRODUCER_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM
+            value: "{{ .Values.kafka.sslEndpointIdentificationAlgorithm }}"
+          - name: CONNECT_PRODUCER_SASL_MECHANISM
+            value: "{{ .Values.kafka.saslMechanism }}"
+          - name: CONNECT_PRODUCER_REQUEST_TIMEOUT_MS
+            value: "20000"
+          - name: CONNECT_PRODUCER_RETRY_BACKOFF_MS
+            value: "500"
+          - name: CONNECT_CONSUMER_BOOTSTRAP_SERVERS
+            value: "{{ .Values.kafka.url }}"
+          - name: CONNECT_CONSUMER_SECURITY_PROTOCOL
+            value: "{{ .Values.kafka.securityProtocol }}"
+          - name: CONNECT_CONSUMER_SASL_JAAS_CONFIG
+            value: "{{ .Values.kafka.saslJaasConfig }}"
+          - name: CONNECT_CONSUMER_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM
+            value: "{{ .Values.kafka.sslEndpointIdentificationAlgorithm }}"
+          - name: CONNECT_CONSUMER_SASL_MECHANISM
+            value: "{{ .Values.kafka.saslMechanism }}"
+          - name: CONNECT_CONSUMER_REQUEST_TIMEOUT_MS
+            value: "20000"
+          - name: CONNECT_CONSUMER_RETRY_BACKOFF_MS
+            value: "500"
           - name: CONNECT_REST_PORT
             value: "8083"
           - name: CONNECT_GROUP_ID
@@ -59,9 +99,25 @@ spec:
           - name: CONNECT_VALUE_CONVERTER
             value: "io.confluent.connect.avro.AvroConverter"
           - name: CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL
-            value: "{{ .Values.schema_registry }}"
+            value: "{{ .Values.schemaRegistry.url }}"
           - name: CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL
-            value: "{{ .Values.schema_registry }}"
+            value: "{{ .Values.schemaRegistry.url }}"
+          - name: CONNECT_KEY_CONVERTER_ENHANCED_AVRO_SCHEMA_SUPPORT
+            value: "false"
+          - name: CONNECT_VALUE_CONVERTER_ENHANCED_AVRO_SCHEMA_SUPPORT
+            value: "false"
+          - name: CONNECT_KEY_CONVERTER_BASIC_AUTH_CREDENTIALS_SOURCE
+            value: "USER_INFO"
+          - name: CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO
+            value: "{{ .Values.schemaRegistry.basicAuth }}"
+          - name: CONNECT_VALUE_CONVERTER_BASIC_AUTH_CREDENTIALS_SOURCE
+            value: "USER_INFO"
+          - name: CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO
+            value: "{{ .Values.schemaRegistry.basicAuth }}"
+          - name: CONNECT_BASIC_AUTH_CREDENTIALS_SOURCE
+            value: "USER_INFO"
+          - name: CONNECT_BASIC_AUTH_USER_INFO
+            value: "{{ .Values.schemaRegistry.basicAuth }}"
           - name: CONNECT_INTERNAL_KEY_CONVERTER
             value: "org.apache.kafka.connect.json.JsonConverter"
           - name: CONNECT_INTERNAL_VALUE_CONVERTER
@@ -70,16 +126,14 @@ spec:
             value: "/tmp/connect2.offset"
           - name: CONNECT_REST_ADVERTISED_HOST_NAME
             value: {{ include "radar-s3-connector.fullname" . }}
-          - name: CONNECT_ZOOKEEPER_CONNECT
-            value: "{{ .Values.zookeeper }}"
+          - name: CONNECT_PLUGIN_PATH
+            value: "/usr/share/kafka-connect/plugins"
           - name: CONNECTOR_PROPERTY_FILE_PREFIX
-            value: "sink-s3"
+            value: "sink-s3/sink-s3"
           - name: CONNECT_VALUE_CONVERTER_CONNECT_META_DATA
             value: "false"
           - name: KAFKA_HEAP_OPTS
             value: "-Xms256m -Xmx4g"
-          - name: KAFKA_BROKERS
-            value: "{{ .Values.kafka_num_brokers }}"
           - name: CONNECT_LOG4J_LOGGERS
             value: "org.reflections=ERROR"
           - name: AWS_ACCESS_KEY

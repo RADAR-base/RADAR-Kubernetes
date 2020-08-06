@@ -76,7 +76,7 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          args:
+          command:
             - radar-schemas-tools
             - serve
             - /schema/merged
