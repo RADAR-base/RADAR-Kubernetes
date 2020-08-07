@@ -146,6 +146,7 @@ management_portal:
     radar_upload_frontend: secret
     radar_rest_sources_backend: secret
     radarFitbitConnector: secret
+    morePromasysSync: secret
   sendGrid:
     enabled: false
     host: smtp
