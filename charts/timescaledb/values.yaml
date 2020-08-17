@@ -175,7 +175,20 @@ extraEnv: []
 ## Alternatively, you can put your *.conf under the files/conf.d/ directory
 ## https://github.com/bitnami/bitnami-docker-postgresql#allow-settings-to-be-loaded-from-files-other-than-the-default-postgresqlconf
 ##
-# postgresqlExtendedConf:
+postgresqlExtendedConf:
+  maxLocksPerTransaction: 1024
+  maxConnections: 200
+  sharedBuffers: 4GB
+  effectiveCacheSize: 12GB
+  maintenanceWorkMem: 1GB
+  checkpointCompletionTarget: 0.7
+  walBuffers: 16MB
+  defaultStatisticsTarget: 100
+  randomPageCost: 1.1
+  effectiveIoConcurrency: 200
+  workMem: 10485kB
+  minWalSize: 1GB
+  maxWalSize: 4GB
 
 ## PostgreSQL client authentication configuration
 ## Specify content for pg_hba.conf
