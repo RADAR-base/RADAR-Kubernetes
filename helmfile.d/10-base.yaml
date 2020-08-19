@@ -41,7 +41,7 @@ releases:
         value: radar-base-tls
       - name: ingress.tls[0].hosts
         values: ["{{ .Values.server_name }}"]
-        
+
   - name: catalog-server
     chart: ../charts/catalog-server
     wait: true
@@ -77,6 +77,17 @@ releases:
         values: [{{ .Values.server_name }}]
       - name: server_name
         value: {{ .Values.server_name }}
+      - name: postgres.password
+        value: {{ .Values.postgres_password }}
+
+  - name: app-config
+    chart: ../charts/app-config
+    installed: {{ .Values.app_config._install }}
+    values:
+      - {{ .Values.app_config | toYaml | indent 8 | trim }}
+    set:
+      - name: ingress.hosts
+        values: [{{ .Values.server_name }}]
       - name: postgres.password
         value: {{ .Values.postgres_password }}
 
