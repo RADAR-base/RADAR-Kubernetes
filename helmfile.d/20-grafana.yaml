@@ -40,6 +40,12 @@ releases:
         value: {{ .Values.timescaledb_db_name | quote }}
       - name: env.POSTGRES_PASSWORD
         value: {{ .Values.timescaledb_password }}
+      - name: ingress.hosts
+        values: ["dashboard.{{ .Values.server_name }}"]
+      - name: ingress.tls[0].secretName
+        value: radar-base-tls-dashboard
+      - name: ingress.tls[0].hosts
+        values: ["dashboard.{{ .Values.server_name }}"]
 
   - name: radar-jdbc-connector
     chart: ../charts/radar-jdbc-connector
