@@ -131,25 +131,25 @@ extraExposePorts: []
  #   type: ClusterIP
 
 ingress:
-  enabled: false
+  enabled: true
   # Values can be templated
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
   labels: {}
   path: /
   hosts:
-    - chart-example.local
+    - localhost
   ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
   extraPaths: []
   # - path: /*
   #   backend:
   #     serviceName: ssl-redirect
   #     servicePort: use-annotation
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+  tls:
+   - secretName: radar-base-tls-dashboard
+     hosts:
+       - localhost
 
 resources: {}
 #  limits:
@@ -266,7 +266,7 @@ adminPassword: password
 # schedulerName:
 
 ## Extra environment variables that will be pass onto deployment pods
-env: 
+env:
   POSTGRES_DB: grafana-metrics
   POSTGRES_PASSWORD: pass
   POSTGRES_HOST: timescaledb
