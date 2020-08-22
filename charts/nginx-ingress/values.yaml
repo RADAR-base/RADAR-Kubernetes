@@ -2,7 +2,7 @@ controller:
   # hostNetwork: "true"
   # dnsPolicy: "ClusterFirstWithHostNet"
   config:
-    ssl-redirect: "false"
+    ssl-redirect: "true"
     server-tokens: "false"
     http-snippet:
       limit_req_zone $binary_remote_addr zone=login_limit:10m rate=2r/s;
