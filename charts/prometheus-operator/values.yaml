@@ -16,6 +16,9 @@ prometheus-operator:
     prometheusSpec:
       serviceMonitorSelectorNilUsesHelmValues: "false"
       replicas: 1
+      resources:
+        requests:
+          memory: 1Gi
       storageSpec:
         volumeClaimTemplate:
           spec:
