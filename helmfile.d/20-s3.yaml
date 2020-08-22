@@ -14,7 +14,8 @@ helmDefaults:
   atomic: true
   force: true
   timeout: 600
-
+  kubeContext: {{ .Values.kubeContext }}
+  
 releases:
   - name: redis
     chart: bitnami/redis
