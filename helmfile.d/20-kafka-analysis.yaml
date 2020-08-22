@@ -7,7 +7,8 @@ environments:
 helmDefaults:
   atomic: true
   timeout: 600
-
+  kubeContext: {{ .Values.kubeContext }}
+  
 releases:
   - name: radar-backend-monitor
     chart: ../charts/radar-backend
@@ -18,7 +19,7 @@ releases:
     set:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
-    
+
   - name: radar-backend-stream
     chart: ../charts/radar-backend
     installed: {{ .Values.radar_backend_stream._install }}
