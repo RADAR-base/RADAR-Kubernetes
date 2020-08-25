@@ -2,7 +2,9 @@ environments:
   default:
     values:
       - ../base.yaml
-      - ../production.yaml
+      - ../../etc/production.yaml
+    secrets:
+      - ../../secrets/production.yaml
 
 helmDefaults:
   atomic: true
