@@ -23,3 +23,5 @@ data:
     radar_rest_sources_authorizer;res_restAuthorizer;;SOURCETYPE.READ,PROJECT.READ,SUBJECT.READ;authorization_code;https://{{ .Values.server_name }}/rest-sources/authorizer/login;;43200;86400;{};
     radar_fitbit_connector;res_restAuthorizer;{{ .Values.client_secrets.radarFitbitConnector }};SUBJECT.READ;client_credentials;;;43200;;{};
     more_promasys_sync_client;res_ManagementPortal;{{ .Values.client_secrets.morePromasysSync }};PROJECT.READ,PROJECT.CREATE,SUBJECT.READ,SUBJECT.CREATE;client_credentials;;;43200;;{};
+    radar_appconfig;res_ManagementPortal;test;SOURCETYPE.READ,MEASUREMENT.CREATE,PROJECT.READ,SUBJECT.READ,OAUTHCLIENTS.READ;{{ .Values.client_secrets.radarAppconfig }};;3600;78000;;
+    radar_appconfig_frontend;res_appconfig;;SOURCETYPE.READ,MEASUREMENT.CREATE,PROJECT.READ,PROJECT.CREATE,PROJECT.UPDATE,SUBJECT.READ,SUBJECT.UPDATE,OAUTHCLIENTS.READ;authorization_code,refresh_token;https://{{ .Values.server_name }}/appconfig/login;3600;78000;;

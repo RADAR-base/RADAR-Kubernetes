@@ -147,6 +147,7 @@ management_portal:
     radar_rest_sources_backend: secret
     radarFitbitConnector: secret
     morePromasysSync: secret
+    radarAppconfig: secret
   sendGrid:
     enabled: false
     host: smtp
@@ -155,7 +156,11 @@ management_portal:
     password: secret
     from: no-reply-more@chdr.nl
 
-
+app_config:
+  _install: true
+  replicaCount: 1  # should be 1
+  clientSecret: secret
+  
 smtp:
   _install: true
   replicaCount: 1
@@ -365,3 +370,25 @@ s3_proxy:
 ccSchemaRegistryProxy:
   _install: false
   externalName: schema-registry-domain
+
+# --------------------------------------------------------- 20-grafana.yaml ---------------------------------------------------------
+
+grafana_password: password
+
+timescaledb_password: password
+timescaledb_username: grafana
+timescaledb_db_name: grafana-metrics
+
+radar_grafana:
+  _install: true
+  replicaCount: 1
+
+timescaledb:
+  _install: true
+  replicaCount: 1
+  persistence:
+    size: 8Gi
+
+radar_jdbc_connector:
+  _install: true
+  replicaCount: 1
