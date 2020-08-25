@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: radarbase/radar-app-config
-  tag: latest
+  tag: 0.1.0
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
