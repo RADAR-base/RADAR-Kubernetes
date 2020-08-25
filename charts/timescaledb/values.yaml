@@ -168,7 +168,25 @@ extraEnv: []
 ## Alternatively, you can put your postgresql.conf under the files/ directory
 ## ref: https://www.postgresql.org/docs/current/static/runtime-config.html
 ##
-# postgresqlConfiguration:
+postgresqlConfiguration:
+  maxLocksPerTransaction: 1024
+  maxConnections: 200
+  sharedBuffers: 4GB
+  effectiveCacheSize: 12GB
+  maintenanceWorkMem: 1GB
+  checkpointCompletionTarget: 0.7
+  walBuffers: 16MB
+  defaultStatisticsTarget: 100
+  randomPageCost: 1.1
+  effectiveIoConcurrency: 200
+  workMem: 10485kB
+  minWalSize: 1GB
+  maxWalSize: 4GB
+  sharedPreloadLibraries: timescaledb
+  timescaledb.maxBackgroundWorkers: 8
+  maxParallelWorkers: 16
+  maxParallelWorkersPerGather: 8
+  maxWorkerProcesses: 27
 
 ## PostgreSQL extended configuration
 ## As above, but _appended_ to the main configuration
@@ -335,10 +353,13 @@ master:
   priorityClassName: ""
   ## Additional PostgreSQL Master Volume mounts
   ##
-  extraVolumeMounts: []
+  extraVolumeMounts: 
+    - name: postgresql-config
+      mountPath: /bitnami/postgresql/data/postgresql.conf
+      subPath: postgresql.conf
   ## Additional PostgreSQL Master Volumes
-  ##
-  extraVolumes: []
+  ##      
+  extraVolumes: []    
   ## Add sidecars to the pod
   ##
   ## For example:
@@ -520,3 +541,4 @@ metrics:
     timeoutSeconds: 5
     failureThreshold: 6
     successThreshold: 1
+    
