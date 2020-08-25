@@ -16,7 +16,7 @@ data:
       enhancerFactory: org.radarbase.appconfig.inject.ManagementPortalEnhancerFactory
 
     authentication:
-      url: http://managementportal:8080/managementportal/
+      url: http://management-portal:8080/managementportal
       clientId: {{ .Values.clientId }}
       clientSecret: {{ .Values.clientSecret }}
       resourceName: res_appconfig

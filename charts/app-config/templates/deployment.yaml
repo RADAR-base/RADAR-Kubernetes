@@ -29,6 +29,9 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+          - name: config
+            mountPath: /etc/radar-app-config/
           ports:
             - name: http
               containerPort: 8090
@@ -41,7 +44,6 @@ spec:
             tcpSocket:
               port: http
             timeoutSeconds: 5
-            name: radar-integration
           readinessProbe:
             failureThreshold: 3
             initialDelaySeconds: 5
@@ -52,6 +54,10 @@ spec:
             timeoutSeconds: 5
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "app-config.fullname" . }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
