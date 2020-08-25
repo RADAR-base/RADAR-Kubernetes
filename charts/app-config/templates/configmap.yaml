@@ -17,7 +17,7 @@ data:
 
     authentication:
       url: http://managementportal:8080/managementportal/
-      clientId: {{ .Values.clientId }}radar_appconfig
+      clientId: {{ .Values.clientId }}
       clientSecret: {{ .Values.clientSecret }}
       resourceName: res_appconfig
 
