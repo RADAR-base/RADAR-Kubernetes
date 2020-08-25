@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "app-config.fullname" . }}
+  labels:
+    app: {{ template "app-config.name" . }}
+    chart: {{ template "app-config.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  appconfig.yml: |
+    baseUri: http://0.0.0.0:8090/appconfig/api
+    isJmxEnabled: false
+
+    inject:
+      enhancerFactory: org.radarbase.appconfig.inject.ManagementPortalEnhancerFactory
+
+    authentication:
+      url: http://managementportal:8080/managementportal/
+      clientId: {{ .Values.clientId }}
+      clientSecret: {{ .Values.clientSecret }}
+      resourceName: res_appconfig
+
+    jdbc:
+      driver: "org.postgresql.Driver"
+      url: "jdbc:postgresql://{{ .Values.postgres.host }}:5432/appconfig"
+      user: {{ .Values.postgres.user }}
+      password: {{ .Values.postgres.password }}
