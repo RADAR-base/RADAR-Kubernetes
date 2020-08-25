@@ -81,6 +81,17 @@ releases:
       - name: postgres.password
         value: {{ .Values.postgres_password }}
 
+  - name: app-config
+    chart: ../charts/app-config
+    installed: {{ .Values.app_config._install }}
+    values:
+      - {{ .Values.app_config | toYaml | indent 8 | trim }}
+    set:
+      - name: ingress.hosts
+        values: [{{ .Values.server_name }}]
+      - name: postgres.password
+        value: {{ .Values.postgres_password }}
+
   - name: smtp
     chart: ../charts/smtp
     installed: {{ .Values.smtp._install }}

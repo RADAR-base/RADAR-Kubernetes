@@ -131,8 +131,13 @@ management_portal:
     radar_upload_frontend: secret
     radar_rest_sources_backend: secret
     radarFitbitConnector: secret
+    radarAppconfig: secret
 
-
+app_config:
+  _install: true
+  replicaCount: 1  # should be 1
+  clientSecret: secret
+  
 smtp:
   _install: true
   replicaCount: 1
