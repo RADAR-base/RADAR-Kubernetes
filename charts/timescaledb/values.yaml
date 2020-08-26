@@ -171,15 +171,15 @@ extraEnv: []
 postgresqlConfiguration:
   maxLocksPerTransaction: 1024
   maxConnections: 200
-  sharedBuffers: 4GB
-  effectiveCacheSize: 12GB
-  maintenanceWorkMem: 1GB
-  checkpointCompletionTarget: 0.7
+  sharedBuffers: 2GB
+  effectiveCacheSize: 6GB
+  maintenanceWorkMem: 512MB
+  checkpointCompletionTarget: 0.9
   walBuffers: 16MB
   defaultStatisticsTarget: 100
   randomPageCost: 1.1
   effectiveIoConcurrency: 200
-  workMem: 10485kB
+  workMem: 5242kB
   minWalSize: 1GB
   maxWalSize: 4GB
   sharedPreloadLibraries: timescaledb
@@ -187,6 +187,8 @@ postgresqlConfiguration:
   maxParallelWorkers: 16
   maxParallelWorkersPerGather: 8
   maxWorkerProcesses: 27
+  listenAddresses: |
+    '0.0.0.0'
 
 ## PostgreSQL extended configuration
 ## As above, but _appended_ to the main configuration
@@ -194,6 +196,7 @@ postgresqlConfiguration:
 ## https://github.com/bitnami/bitnami-docker-postgresql#allow-settings-to-be-loaded-from-files-other-than-the-default-postgresqlconf
 ##
 # postgresqlExtendedConf:
+
 
 ## PostgreSQL client authentication configuration
 ## Specify content for pg_hba.conf
@@ -353,13 +356,13 @@ master:
   priorityClassName: ""
   ## Additional PostgreSQL Master Volume mounts
   ##
-  extraVolumeMounts: 
+  extraVolumeMounts:
     - name: postgresql-config
       mountPath: /bitnami/postgresql/data/postgresql.conf
       subPath: postgresql.conf
   ## Additional PostgreSQL Master Volumes
-  ##      
-  extraVolumes: []    
+  ##
+  extraVolumes: []
   ## Add sidecars to the pod
   ##
   ## For example:
@@ -416,8 +419,11 @@ slave:
 ##
 resources:
   requests:
-    memory: 256Mi
-    cpu: 250m
+    memory: 4Gi
+    cpu: 1000m
+  limits:
+    memory: 8Gi
+    cpu: 1500m
 
 networkPolicy:
   ## Enable creation of NetworkPolicy resources. Only Ingress traffic is filtered for now.
@@ -541,4 +547,3 @@ metrics:
     timeoutSeconds: 5
     failureThreshold: 6
     successThreshold: 1
-    
