@@ -62,4 +62,3 @@ releases:
       - name: schema_registry
         value: {{ .Values.confluent_cloud.cc.schemaRegistryUrl }}
       {{ end }}
-

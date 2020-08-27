@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "radar-jdbc-connector.fullname" . }}
+  labels:
+    {{- include "radar-jdbc-connector.labels" . | nindent 4 }}
+data:
+  sink-timescale.properties: |
+    # Kafka consumer configuration
+    name = radar-timescale-sink
+    # Kafka connector configuration
+    connector.class = io.confluent.connect.jdbc.JdbcSinkConnector
+    tasks.max = 2
+    transforms=mergeKey,timestamp
+    transforms.mergeKey.type=org.radarbase.kafka.connect.transforms.MergeKey
+    transforms.timestamp.type=org.radarbase.kafka.connect.transforms.TimestampConverter
+    transforms.timestamp.fields=time,timeReceived,timeCompleted,timestamp
+    # Topics that will be consumed
+    topics = {{ .Values.topics }}
+    connection.url=jdbc:postgresql://{{ .Values.timescaledb.host }}/{{ .Values.timescaledb.database_name }}
+    connection.user={{ .Values.timescaledb.username }}
+    connection.password={{ .Values.timescaledb.password }}
+    dialect.name = TimescaleDBDatabaseDialect
+    insert.mode = upsert
+    pk.mode = record_value
+    pk.fields = time, userId, projectId
+    auto.create = true

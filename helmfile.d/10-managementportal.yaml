@@ -2,12 +2,11 @@ environments:
   default:
     values:
     - ../base.yaml
-    - ../production.yaml
+    - ../../etc/production.yaml
     secrets:
     - ../../secrets/production.yaml
 
 helmDefaults:
-  atomic: true
   timeout: 180
   kubeContext: {{ .Values.kubeContext }}
 
@@ -44,3 +43,12 @@ releases:
     installed: {{ .Values.smtp._install }}
     values:
       - {{ .Values.smtp | toYaml | indent 8 | trim }}
+
+  - name: app-config
+    chart: ../charts/app-config
+    installed: {{ .Values.app_config._install }}
+    values:
+      - {{ .Values.app_config | toYaml | indent 8 | trim }}
+    set:
+      - name: ingress.hosts
+        values: [{{ .Values.server_name }}]
