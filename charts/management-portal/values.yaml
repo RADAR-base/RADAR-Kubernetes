@@ -82,6 +82,7 @@ client_secrets:
   radar_rest_sources_backend: secret
   radarFitbitConnector: secret
   morePromasysSync: secret
+  radarAppconfig: secret
 
 sendGrid:
   enabled: false
