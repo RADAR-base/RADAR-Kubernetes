@@ -6,7 +6,7 @@ replicaCount: 2
 
 image:
   repository: radarbase/management-portal
-  tag: 0.5.8
+  tag: 0.6.0
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -57,6 +57,9 @@ postgres:
   host: postgresql-postgresql
   user: postgres
   password: password
+  ssl:
+    enabled: false
+    keystorepassword: keystorepassword
 
 from_email: from-email
 server_name: localhost
@@ -78,3 +81,13 @@ client_secrets:
   radar_upload_frontend: secret
   radar_rest_sources_backend: secret
   radarFitbitConnector: secret
+  morePromasysSync: secret
+  radarAppconfig: secret
+
+sendGrid:
+  enabled: false
+  host: smtp
+  port: 25
+  username: username
+  password: secret
+  from: no-reply-more@chdr.nl

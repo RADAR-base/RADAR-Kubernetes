@@ -43,7 +43,90 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
           - name: CONNECT_BOOTSTRAP_SERVERS
-            value: "{{ .Values.kafka }}"
+            value: "{{ .Values.kafka.url }}"
+          - name: CONNECT_REQUEST_TIMEOUT_MS
+            value: "20000"
+          - name: CONNECT_RETRY_BACKOFF_MS
+            value: "500"
+          - name: CONNECT_PRODUCER_BOOTSTRAP_SERVERS
+            value: "{{ .Values.kafka.url }}"
+          {{- if .Values.cc.enabled }}
+          - name: CONNECT_SECURITY_PROTOCOL
+            value: "SASL_SSL"
+          - name: CONNECT_SASL_JAAS_CONFIG
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "radar-s3-connector.fullname" . }}
+                key: kafkaSaslJaasConfig
+          - name: CONNECT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM
+            value: "https"
+          - name: CONNECT_SSL_ENABLED_PROTOCOLS
+            value: "TLSv1.2"
+          - name: CONNECT_SASL_MECHANISM
+            value: "PLAIN"
+          - name: CONNECT_PRODUCER_SECURITY_PROTOCOL
+            value: "SASL_SSL"
+          - name: CONNECT_PRODUCER_SASL_JAAS_CONFIG
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "radar-s3-connector.fullname" . }}
+                key: kafkaSaslJaasConfig
+          - name: CONNECT_PRODUCER_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM
+            value: "https"
+          - name: CONNECT_PRODUCER_SSL_ENABLED_PROTOCOLS
+            value: "TLSv1.2"
+          - name: CONNECT_PRODUCER_SASL_MECHANISM
+            value: "PLAIN"
+          - name: CONNECT_CONSUMER_SECURITY_PROTOCOL
+            value: "SASL_SSL"
+          - name: CONNECT_CONSUMER_SASL_JAAS_CONFIG
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "radar-s3-connector.fullname" . }}
+                key: kafkaSaslJaasConfig
+          - name: CONNECT_CONSUMER_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM
+            value: "https"
+          - name: CONNECT_CONSUMER_SSL_ENABLED_PROTOCOLS
+            value: "TLSv1.2"
+          - name: CONNECT_CONSUMER_SASL_MECHANISM
+            value: "PLAIN"
+          - name: CONNECT_KEY_CONVERTER_BASIC_AUTH_CREDENTIALS_SOURCE
+            value: "USER_INFO"
+          - name: CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "radar-s3-connector.fullname" . }}
+                key: schemaRegistryCredential
+          - name: CONNECT_VALUE_CONVERTER_BASIC_AUTH_CREDENTIALS_SOURCE
+            value: "USER_INFO"
+          - name: CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "radar-s3-connector.fullname" . }}
+                key: schemaRegistryCredential
+          - name: CONNECT_BASIC_AUTH_CREDENTIALS_SOURCE
+            value: "USER_INFO"
+          - name: CONNECT_BASIC_AUTH_USER_INFO
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "radar-s3-connector.fullname" . }}
+                key: schemaRegistryCredential
+          - name: CONNECT_SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "radar-s3-connector.fullname" . }}
+                key: schemaRegistryCredential
+          {{- end }}
+          - name: CONNECT_PRODUCER_REQUEST_TIMEOUT_MS
+            value: "20000"
+          - name: CONNECT_PRODUCER_RETRY_BACKOFF_MS
+            value: "500"
+          - name: CONNECT_CONSUMER_BOOTSTRAP_SERVERS
+            value: "{{ .Values.kafka.url }}"
+          - name: CONNECT_CONSUMER_REQUEST_TIMEOUT_MS
+            value: "20000"
+          - name: CONNECT_CONSUMER_RETRY_BACKOFF_MS
+            value: "500"
           - name: CONNECT_REST_PORT
             value: "8083"
           - name: CONNECT_GROUP_ID
@@ -58,34 +141,48 @@ spec:
             value: "io.confluent.connect.avro.AvroConverter"
           - name: CONNECT_VALUE_CONVERTER
             value: "io.confluent.connect.avro.AvroConverter"
+          - name: CONNECT_KEY_CONVERTER_SCHEMAS_ENABLE
+            value: "false"
+          - name: CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE
+            value: "false"
           - name: CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL
-            value: "{{ .Values.schema_registry }}"
+            value: "{{ .Values.schemaRegistry.url }}"
           - name: CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL
-            value: "{{ .Values.schema_registry }}"
+            value: "{{ .Values.schemaRegistry.url }}"
+          - name: CONNECT_KEY_CONVERTER_ENHANCED_AVRO_SCHEMA_SUPPORT
+            value: "false"
+          - name: CONNECT_VALUE_CONVERTER_ENHANCED_AVRO_SCHEMA_SUPPORT
+            value: "false"
           - name: CONNECT_INTERNAL_KEY_CONVERTER
             value: "org.apache.kafka.connect.json.JsonConverter"
           - name: CONNECT_INTERNAL_VALUE_CONVERTER
             value: "org.apache.kafka.connect.json.JsonConverter"
+          - name: CONNECT_OFFSET_FLUSH_INTERVAL_MS
+            value: "10000"
           - name: CONNECT_OFFSET_STORAGE_FILE_FILENAME
             value: "/tmp/connect2.offset"
           - name: CONNECT_REST_ADVERTISED_HOST_NAME
             value: {{ include "radar-s3-connector.fullname" . }}
-          - name: CONNECT_ZOOKEEPER_CONNECT
-            value: "{{ .Values.zookeeper }}"
+          - name: CONNECT_PLUGIN_PATH
+            value: "/usr/share/kafka-connect/plugins"
           - name: CONNECTOR_PROPERTY_FILE_PREFIX
-            value: "sink-s3"
+            value: "sink-s3/sink-s3"
           - name: CONNECT_VALUE_CONVERTER_CONNECT_META_DATA
             value: "false"
           - name: KAFKA_HEAP_OPTS
             value: "-Xms256m -Xmx4g"
-          - name: KAFKA_BROKERS
-            value: "{{ .Values.kafka_num_brokers }}"
           - name: CONNECT_LOG4J_LOGGERS
             value: "org.reflections=ERROR"
           - name: AWS_ACCESS_KEY
-            value: "{{ .Values.bucketAccessKey }}"
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "radar-s3-connector.fullname" . }}
+                key: awsAccessKey
           - name: AWS_SECRET_KEY
-            value: "{{ .Values.bucketSecretKey }}"
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "radar-s3-connector.fullname" . }}
+                key: awsSecretKey
           ports:
             - name: http
               containerPort: 8083
@@ -95,7 +192,7 @@ spec:
               command:
               - /bin/sh
               - -c
-              - curl  -sf localhost:8083/connectors/radar-s3-sink-connector/status | grep -o '\"state\":\"[^\"]*\"' | tr '\\n' ',' | grep -vq FAILED || exit 1
+              - curl -sf localhost:8083/connectors/radar-s3-sink-connector/status | grep -o '\"state\":\"[^\"]*\"' | tr '\\n' ',' | grep -vq FAILED || exit 1
             initialDelaySeconds: 5
             periodSeconds: 60
             timeoutSeconds: 3
