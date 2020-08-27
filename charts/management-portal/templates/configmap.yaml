@@ -10,9 +10,9 @@ metadata:
 data:
   oauth_client_details.csv: |
     client_id;resource_ids;client_secret;scope;authorized_grant_types;redirect_uri;authorities;access_token_validity;refresh_token_validity;additional_information;autoapprove
-    pRMT;res_ManagementPortal,res_gateway;{{ .Values.client_secrets.prmt }};MEASUREMENT.CREATE,SUBJECT.UPDATE,SUBJECT.READ,PROJECT.READ,SOURCETYPE.READ,SOURCE.READ,SOURCETYPE.READ,SOURCEDATA.READ,USER.READ,ROLE.READ;refresh_token,authorization_code;;;43200;7948800;{"dynamic_registration": true};
-    aRMT;res_ManagementPortal,res_gateway;{{ .Values.client_secrets.armt }};MEASUREMENT.CREATE,SUBJECT.UPDATE,SUBJECT.READ,PROJECT.READ,SOURCETYPE.READ,SOURCE.READ,SOURCETYPE.READ,SOURCEDATA.READ,USER.READ,ROLE.READ;refresh_token,authorization_code;;;43200;7948800;{"dynamic_registration": true};
-    THINC-IT;res_ManagementPortal,res_gateway;;MEASUREMENT.CREATE,SUBJECT.UPDATE,SUBJECT.READ,PROJECT.READ,SOURCETYPE.READ,SOURCE.READ,SOURCETYPE.READ,SOURCEDATA.READ,USER.READ,ROLE.READ;refresh_token,authorization_code;;;43200;7948800;{"dynamic_registration": true};
+    pRMT;res_ManagementPortal,res_gateway,res_appconfig;{{ .Values.client_secrets.prmt }};MEASUREMENT.CREATE,SUBJECT.UPDATE,SUBJECT.READ,PROJECT.READ,SOURCETYPE.READ,SOURCE.READ,SOURCETYPE.READ,SOURCEDATA.READ,USER.READ,ROLE.READ;refresh_token,authorization_code;;;43200;7948800;{"dynamic_registration": true};
+    aRMT;res_ManagementPortal,res_gateway,res_appconfig;{{ .Values.client_secrets.armt }};MEASUREMENT.CREATE,SUBJECT.UPDATE,SUBJECT.READ,PROJECT.READ,SOURCETYPE.READ,SOURCE.READ,SOURCETYPE.READ,SOURCEDATA.READ,USER.READ,ROLE.READ;refresh_token,authorization_code;;;43200;7948800;{"dynamic_registration": true};
+    THINC-IT;res_ManagementPortal,res_gateway,res_appconfig;;MEASUREMENT.CREATE,SUBJECT.UPDATE,SUBJECT.READ,PROJECT.READ,SOURCETYPE.READ,SOURCE.READ,SOURCETYPE.READ,SOURCEDATA.READ,USER.READ,ROLE.READ;refresh_token,authorization_code;;;43200;7948800;{"dynamic_registration": true};
     radar_restapi;res_ManagementPortal;secret;SUBJECT.READ,PROJECT.READ,SOURCE.READ,SOURCETYPE.READ,SOURCEDATA.READ;client_credentials;;;43200;259200;{};
     radar_redcap_integrator;res_ManagementPortal;{{ .Values.client_secrets.radar_redcap_integrator }};PROJECT.READ,SUBJECT.CREATE,SUBJECT.READ,SUBJECT.UPDATE;client_credentials;;;43200;259200;{};
     radar_dashboard;res_ManagementPortal,res_RestApi;;SUBJECT.READ,PROJECT.READ,SOURCE.READ,SOURCETYPE.READ,MEASUREMENT.READ;refresh_token,authorization_code;;;43200;259200;{};
@@ -23,5 +23,5 @@ data:
     radar_rest_sources_authorizer;res_restAuthorizer;;SOURCETYPE.READ,PROJECT.READ,SUBJECT.READ;authorization_code;https://{{ .Values.server_name }}/rest-sources/authorizer/login;;43200;86400;{};
     radar_fitbit_connector;res_restAuthorizer;{{ .Values.client_secrets.radarFitbitConnector }};SUBJECT.READ;client_credentials;;;43200;;{};
     more_promasys_sync_client;res_ManagementPortal;{{ .Values.client_secrets.morePromasysSync }};PROJECT.READ,PROJECT.CREATE,SUBJECT.READ,SUBJECT.CREATE;client_credentials;;;43200;;{};
-    radar_appconfig;res_ManagementPortal;test;SOURCETYPE.READ,MEASUREMENT.CREATE,PROJECT.READ,SUBJECT.READ,OAUTHCLIENTS.READ;{{ .Values.client_secrets.radarAppconfig }};;3600;78000;;
-    radar_appconfig_frontend;res_appconfig;;SOURCETYPE.READ,MEASUREMENT.CREATE,PROJECT.READ,PROJECT.CREATE,PROJECT.UPDATE,SUBJECT.READ,SUBJECT.UPDATE,OAUTHCLIENTS.READ;authorization_code,refresh_token;https://{{ .Values.server_name }}/appconfig/login;3600;78000;;
+    radar_appconfig;res_ManagementPortal,res_appconfig;{{ .Values.client_secrets.radarAppconfig }};SOURCETYPE.READ,MEASUREMENT.CREATE,PROJECT.READ,SUBJECT.READ,OAUTHCLIENTS.READ;client_credentials;;;900;;;
+    radar_appconfig_frontend;res_appconfig;;SOURCETYPE.READ,MEASUREMENT.CREATE,PROJECT.READ,PROJECT.CREATE,PROJECT.UPDATE,SUBJECT.READ,SUBJECT.UPDATE,OAUTHCLIENTS.READ;authorization_code,refresh_token;https://{{ .Values.server_name }}/appconfig/login;1800;78000;;

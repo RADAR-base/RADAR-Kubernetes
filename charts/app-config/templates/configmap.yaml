@@ -23,6 +23,8 @@ data:
 
     jdbc:
       driver: "org.postgresql.Driver"
-      url: "jdbc:postgresql://{{ .Values.postgres.host }}:5432/appconfig"
-      user: {{ .Values.postgres.user }}
-      password: {{ .Values.postgres.password }}
+      url: "{{ .Values.jdbc.url }}"
+      user: {{ .Values.jdbc.user }}
+      password: {{ .Values.jdbc.password }}
+      properties:
+        hibernate.dialect: {{ .Values.jdbc.dialect }}

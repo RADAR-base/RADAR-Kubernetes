@@ -52,5 +52,3 @@ releases:
     set:
       - name: ingress.hosts
         values: [{{ .Values.server_name }}]
-      - name: postgres.password
-        value: {{ .Values.postgres_password }}
