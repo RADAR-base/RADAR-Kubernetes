@@ -55,6 +55,9 @@ affinity: {}
 
 postgres:
   host: postgresql-postgresql
+  port: 5432
+  database: managementportal
+  connection_parameters: ""
   user: postgres
   password: password
   ssl:
