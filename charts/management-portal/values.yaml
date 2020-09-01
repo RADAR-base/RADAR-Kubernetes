@@ -84,8 +84,9 @@ client_secrets:
   radar_upload_frontend: secret
   radar_rest_sources_backend: secret
   radarFitbitConnector: secret
-  morePromasysSync: secret
   radarAppconfig: secret
+
+extra_oauth_clients: []
 
 smtp:
   enabled: false
