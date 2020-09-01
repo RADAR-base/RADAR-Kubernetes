@@ -154,7 +154,7 @@ management_portal:
     port: 25
     username: username
     password: secret
-    from: no-reply-more@chdr.nl
+    from: noreply@example.com
 
 app_config:
   _install: true
