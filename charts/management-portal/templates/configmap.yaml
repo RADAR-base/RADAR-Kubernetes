@@ -22,6 +22,8 @@ data:
     radar_rest_sources_auth_backend;res_ManagementPortal;{{ .Values.client_secrets.radar_rest_sources_backend }};PROJECT.READ,SOURCETYPE.READ,SUBJECT.READ,SOURCE.READ;client_credentials;;;43200;86400;{};
     radar_rest_sources_authorizer;res_restAuthorizer;;SOURCETYPE.READ,PROJECT.READ,SUBJECT.READ;authorization_code;https://{{ .Values.server_name }}/rest-sources/authorizer/login;;43200;86400;{};
     radar_fitbit_connector;res_restAuthorizer;{{ .Values.client_secrets.radarFitbitConnector }};SUBJECT.READ;client_credentials;;;43200;;{};
-    more_promasys_sync_client;res_ManagementPortal;{{ .Values.client_secrets.morePromasysSync }};PROJECT.READ,PROJECT.CREATE,SUBJECT.READ,SUBJECT.CREATE;client_credentials;;;43200;;{};
     radar_appconfig;res_ManagementPortal,res_appconfig;{{ .Values.client_secrets.radarAppconfig }};SOURCETYPE.READ,MEASUREMENT.CREATE,PROJECT.READ,SUBJECT.READ,OAUTHCLIENTS.READ;client_credentials;;;900;;;
     radar_appconfig_frontend;res_appconfig;;SOURCETYPE.READ,MEASUREMENT.CREATE,PROJECT.READ,PROJECT.CREATE,PROJECT.UPDATE,SUBJECT.READ,SUBJECT.UPDATE,OAUTHCLIENTS.READ;authorization_code,refresh_token;https://{{ .Values.server_name }}/appconfig/login;1800;78000;;
+    {{- range .Values.extra_oauth_clients }}
+    {{ . }}
+    {{- end }}
