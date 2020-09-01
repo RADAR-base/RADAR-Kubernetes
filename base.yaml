@@ -148,7 +148,7 @@ management_portal:
     radarFitbitConnector: secret
     morePromasysSync: secret
     radarAppconfig: secret
-  sendGrid:
+  smtp:
     enabled: false
     host: smtp
     port: 25
@@ -160,7 +160,7 @@ app_config:
   _install: true
   replicaCount: 1  # should be 1
   clientSecret: secret
-  
+
 smtp:
   _install: true
   replicaCount: 1
