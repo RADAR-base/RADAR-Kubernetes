@@ -12,7 +12,7 @@ environments:
 
 helmDefaults:
   atomic: true
-  force: true
+  # force: true
   timeout: 600
   kubeContext: {{ .Values.kubeContext }}
 
@@ -106,7 +106,8 @@ releases:
 
   - name: nginx-ingress
     chart: stable/nginx-ingress
-    version: 1.30.0
+    version: 1.40.2
+    force: false
     installed: {{ .Values.nginx_ingress._install }}
     values:
       - "../charts/nginx-ingress/values.yaml"
