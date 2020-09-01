@@ -87,10 +87,10 @@ client_secrets:
   morePromasysSync: secret
   radarAppconfig: secret
 
-sendGrid:
+smtp:
   enabled: false
   host: smtp
   port: 25
   username: username
   password: secret
-  from: no-reply-more@chdr.nl
+  from: noreply@example.com
