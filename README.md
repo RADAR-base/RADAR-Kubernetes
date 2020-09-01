@@ -1,9 +1,6 @@
 # RADAR-Kubernetes [![Build Status](https://travis-ci.org/RADAR-base/RADAR-Kubernetes.svg?branch=master)](https://travis-ci.org/RADAR-base/RADAR-Kubernetes)
 Kubernetes deployment of RADAR-base.
 
-**Note:**
-This repository is still in **alpha** stage and it's not ready for production use.
-
 
 ## Installation
 You need to have a working Kubernetes installation and there are 3 ways to have that:
@@ -22,7 +19,7 @@ You need to have a working Kubernetes installation and there are 3 ways to have 
   * [Minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/)
   * [K3S](https://k3s.io/)
 
-**Note 1:** This setup is currently only tested on [AWS EKS](https://aws.amazon.com/eks/) however because of cloud agnostic approach of Kubernetes you should be able install this stack on any Kubernetes installation. Also the idea behind using `helm` and `helmfile` has been allowing more complex and customized setups without too much change in the original repository, so if current approach isn't working in your environment you can easily change components to your needs.
+**Note 1:** This setup is currently only tested on AWS EKS, OpenStack Magnum and Azure ASK however because of cloud agnostic approach of Kubernetes you should be able install this stack on any Kubernetes installation. Also the idea behind using `helm` and `helmfile` has been allowing more complex and customized setups without too much change in the original repository, so if current approach isn't working in your environment you can easily change components to your needs.
 
 **Note 2:** If you're not using a cloud provider you need to make sure that you can [load balance](https://kubernetes.github.io/ingress-nginx/deploy/baremetal/) and [expose  applications](https://kubernetes.io/docs/concepts/services-networking/connect-applications-service/#exposing-the-service) and provide [persistent volumes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/).
 
@@ -36,9 +33,8 @@ You need to have following tools installed in your machine to install the stack:
 
 After installing them run following commands:
 ```shell
-git clone https://github.com/RADAR-base/RADAR-Kubernetes.git
+git clone --recurse-submodules https://github.com/RADAR-base/RADAR-Kubernetes.git
 cd RADAR-Kubernetes
-git clone https://github.com/RADAR-base/cp-helm-charts.git
 cp base.yaml production.yaml
 vim production.yaml  # Change setup parameters and configurations
 ./bin/keystore-init
@@ -202,29 +198,3 @@ Alternatively you can forward SSH port to your local machine and connect locally
 kubectl port-forward svc/radar-output 2222:22
 ```
 Now you can use "127.0.0.1" as `host` and "2222" as the `port` to connect to SFTP server.
-
-
-
-
-# - name: rook
-#   chart: rook-release/rook-ceph
-#   version: v1.2.3
-#   namespace: rook-ceph
-#   wait: true
-#   installed: {{ .Values.rook._install }}
-#
-# - name: ceph
-#   chart: ../charts/ceph
-#   namespace: rook-ceph
-#   wait: true
-#   installed: {{ .Values.ceph._install }}
-#   values:
-#     - {{ .Values.ceph | toYaml | indent 8 | trim }}
-
-#
-# - name: sftp
-#   chart: ../charts/sftp
-#   wait: true
-#   installed: {{ .Values.sftp._install }}
-#   values:
-#     - {{ .Values.sftp | toYaml | indent 8 | trim }}

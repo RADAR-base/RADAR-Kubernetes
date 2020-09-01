@@ -1,5 +1,4 @@
 /.env
-cp-helm-charts/
 kubernetes-HDFS/
 keystore.p12
 radar-is.yml
