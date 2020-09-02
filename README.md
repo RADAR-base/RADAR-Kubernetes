@@ -35,6 +35,7 @@ After installing them run following commands:
 ```shell
 git clone --recurse-submodules https://github.com/RADAR-base/RADAR-Kubernetes.git
 cd RADAR-Kubernetes
+cp environments.yaml.tmpl environments.yaml
 cp base.yaml production.yaml
 vim production.yaml  # Change setup parameters and configurations
 ./bin/keystore-init

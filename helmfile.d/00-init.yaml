@@ -1,14 +1,13 @@
+bases:
+- ../environments.yaml
+
+---
+
 repositories:
 - name: stable
   url: https://kubernetes-charts.storage.googleapis.com
 - name: elastic
   url: https://helm.elastic.co
-
-environments:
-  default:
-    values:
-    - ../base.yaml
-    - ../production.yaml
 
 helmDefaults:
   atomic: true

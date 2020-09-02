@@ -6,3 +6,4 @@ radar-is.yml
 production.yaml
 .idea/
 RADAR-Kubernetes.iml
+environments.yaml

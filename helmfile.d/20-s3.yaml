@@ -1,21 +1,20 @@
+bases:
+- ../environments.yaml
+
+---
+
 repositories:
 - name: stable
   url: https://kubernetes-charts.storage.googleapis.com
 - name: bitnami
   url: https://charts.bitnami.com/bitnami
 
-environments:
-  default:
-    values:
-      - ../base.yaml
-      - ../production.yaml
-
 helmDefaults:
   atomic: true
   force: true
   timeout: 600
   kubeContext: {{ .Values.kubeContext }}
-  
+
 releases:
   - name: redis
     chart: bitnami/redis
