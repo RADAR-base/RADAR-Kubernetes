@@ -1,16 +1,13 @@
-environments:
-  default:
-    values:
-    - ../base.yaml
-    - ../../etc/production.yaml
-    secrets:
-    - ../../secrets/production.yaml
+bases:
+- ../environments.yaml
+
+---
 
 helmDefaults:
   atomic: true
   timeout: 600
   kubeContext: {{ .Values.kubeContext }}
-  
+
 releases:
   - name: cp-kafka-rest
     chart: ../cp-helm-charts/charts/cp-kafka-rest
