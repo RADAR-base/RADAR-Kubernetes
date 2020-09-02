@@ -1,8 +1,7 @@
-environments:
-  default:
-    values:
-    - ../base.yaml
-    - ../production.yaml
+bases:
+- ../environments.yaml
+
+---
 
 helmDefaults:
   atomic: true
