@@ -1,12 +1,11 @@
+bases:
+- ../environments.yaml
+
+---
+
 repositories:
   - name: stable
     url: https://kubernetes-charts.storage.googleapis.com
-
-environments:
-  default:
-    values:
-      - ../base.yaml
-      - ../production.yaml
 
 helmDefaults:
   atomic: true

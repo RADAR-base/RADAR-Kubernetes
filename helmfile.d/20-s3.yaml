@@ -1,16 +1,13 @@
+bases:
+- ../environments.yaml
+
+---
+
 repositories:
 - name: stable
   url: https://kubernetes-charts.storage.googleapis.com
 - name: bitnami
   url: https://charts.bitnami.com/bitnami
-
-environments:
-  default:
-    values:
-      - ../base.yaml
-      - ../../etc/production.yaml
-    secrets:
-      - ../../secrets/production.yaml
 
 helmDefaults:
   atomic: false
