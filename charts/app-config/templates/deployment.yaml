@@ -29,22 +29,27 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          - name: JAVA_OPTS
+            value: "{{ .Values.javaOpts }}"
+          volumeMounts:
+          - name: config
+            mountPath: /etc/radar-app-config/
           ports:
             - name: http
               containerPort: 8090
               protocol: TCP
           livenessProbe:
             failureThreshold: 3
-            initialDelaySeconds: 5
+            initialDelaySeconds: 20
             periodSeconds: 60
             successThreshold: 1
             tcpSocket:
               port: http
             timeoutSeconds: 5
-            name: radar-integration
           readinessProbe:
             failureThreshold: 3
-            initialDelaySeconds: 5
+            initialDelaySeconds: 20
             periodSeconds: 60
             successThreshold: 1
             tcpSocket:
@@ -52,6 +57,10 @@ spec:
             timeoutSeconds: 5
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "app-config.fullname" . }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
