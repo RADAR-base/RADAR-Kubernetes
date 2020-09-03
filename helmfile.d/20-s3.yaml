@@ -10,9 +10,9 @@ repositories:
   url: https://charts.bitnami.com/bitnami
 
 helmDefaults:
-  atomic: true
+  atomic: false
   force: true
-  timeout: 600
+  timeout: 240
   kubeContext: {{ .Values.kubeContext }}
 
 releases:
@@ -43,13 +43,15 @@ releases:
     chart: ../charts/radar-s3-connector
     installed: {{ .Values.radar_s3_connector._install }}
     values:
+      - "../charts/radar-s3-connector/values.yaml"
       - {{ .Values.radar_s3_connector | toYaml | indent 8 | trim }}
+      - {{ .Values.confluent_cloud | toYaml | indent 8 | trim }}
     set:
-      - name: kafka_num_brokers
-        value: {{ .Values.kafka_num_brokers }}
-      - name: s3Endpoint
-        value: {{ .Values.minio.s3Endpoint }}
-      - name: bucketAccessKey
-        value: {{ .Values.minio.accessKey }}
-      - name: bucketSecretKey
-        value: {{ .Values.minio.secretKey }}
+      - name: cc.enabled
+        value: {{ .Values.confluent_cloud.enabled }}
+
+  - name: s3-proxy
+    chart: ../charts/s3-proxy
+    installed: {{ .Values.s3_proxy._install }}
+    values:
+      - {{ .Values.s3_proxy | toYaml | indent 8 | trim }}

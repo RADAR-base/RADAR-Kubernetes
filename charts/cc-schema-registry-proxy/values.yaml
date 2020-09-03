@@ -1,0 +1,18 @@
+
+replicaCount: 1
+
+service:
+  type: ExternalName
+  externalName: schema-registry-domain
+
+ingress:
+  enabled: true
+  path: "/schema/?(.*)"
+  hosts:
+    - localhost
+  tls:
+    secretName: radar-base-tls
+
+cc:
+  schemaRegistryApiKey: srApiKey
+  schemaRegistryApiSecret: srApiSecret

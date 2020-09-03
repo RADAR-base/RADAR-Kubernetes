@@ -6,4 +6,5 @@ radar-is.yml
 production.yaml
 .idea/
 RADAR-Kubernetes.iml
+postgreskeystore.jks
 environments.yaml

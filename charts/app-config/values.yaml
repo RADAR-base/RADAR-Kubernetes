@@ -52,11 +52,10 @@ resources:
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
   limits:
-    cpu: 100m
-    memory: 512Mi
+    cpu: 2
   requests:
     cpu: 100m
-    memory: 128Mi
+    memory: 768Mi
 
 nodeSelector: {}
 
@@ -64,10 +63,13 @@ tolerations: []
 
 affinity: {}
 
+javaOpts: "-Xmx550m"
 clientId: radar_appconfig
 clientSecret: secret
 
-postgres:
-  host: postgresql-postgresql
+jdbc:
+  driver: org.postgresql.Driver
+  url: jdbc:postgresql://postgresql-postgresql/appconfig
   user: postgres
   password: password
+  dialect: org.hibernate.dialect.PostgreSQLDialect

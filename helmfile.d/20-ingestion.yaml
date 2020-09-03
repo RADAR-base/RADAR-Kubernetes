@@ -22,6 +22,17 @@ releases:
     installed: {{ .Values.radar_gateway._install }}
     values:
       - {{ .Values.radar_gateway | toYaml | indent 8 | trim }}
+      - {{ .Values.confluent_cloud | toYaml | indent 8 | trim }}
     set:
       - name: ingress.hosts
         values: [{{ .Values.server_name }}]
+      - name: cc.enabled
+        value: {{ .Values.confluent_cloud.enabled }}
+      - name: serviceMonitor.enabled
+        value: {{ .Values.prometheus_operator._install }}
+      {{- if .Values.confluent_cloud.enabled }}
+      - name: schemaRegistry
+        value: {{ .Values.confluent_cloud.cc.schemaRegistryUrl }}
+      - name: bootstrapServers
+        value: {{ .Values.confluent_cloud.cc.bootstrapServerurl }}
+      {{ end }}
