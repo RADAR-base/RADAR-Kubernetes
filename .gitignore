@@ -8,3 +8,4 @@ production.yaml
 RADAR-Kubernetes.iml
 postgreskeystore.jks
 environments.yaml
+charts/management-portal/files/root.crt
