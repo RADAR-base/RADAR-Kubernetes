@@ -1,0 +1,25 @@
+environments:
+  default:
+    values:
+      - ../base.yaml
+      - ../../etc/production.yaml
+    secrets:
+      - ../../secrets/production.yaml
+
+helmDefaults:
+  atomic: true
+  timeout: 600
+  kubeContext: {{ .Values.kubeContext }}
+  
+releases:
+  - name: cc-schema-registry-proxy
+    chart: ../charts/cc-schema-registry-proxy
+    installed: {{ .Values.ccSchemaRegistryProxy._install }}
+    values:
+      - {{ .Values.ccSchemaRegistryProxy | toYaml | indent 8 | trim }}
+      - {{ .Values.confluent_cloud| toYaml | indent 8 | trim }}
+    set:
+      - name: service.externalName
+        value: {{ .Values.ccSchemaRegistryProxy.externalName }}
+      - name: ingress.hosts
+        values: [{{ .Values.server_name }}]

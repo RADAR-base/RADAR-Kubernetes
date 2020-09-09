@@ -24,29 +24,25 @@ prometheus-operator:
               requests:
                 storage: 2Gi
       ruleNamespaceSelector:
-        namespaceSelector:
-          matchNames:
-          - default
-          - monitoring
-          - cert-manager
-      ruleSelector:
-        namespaceSelector:
-          matchNames:
-          - default
-          - cert-manager
-          - monitoring
+        matchExpressions:
+          - key: name
+            operator: In
+            values:
+              - default
+              - monitoring
+              - graylog
+              - cert-manager
+              - kube-system
       serviceMonitorNamespaceSelector:
-        namespaceSelector:
-          matchNames:
-          - default
-          - cert-manager
-          - monitoring
-      serviceMonitorSelector:
-        namespaceSelector:
-          matchNames:
-          - default
-          - cert-manager
-          - monitoring
+        matchExpressions:
+          - key: name
+            operator: In
+            values:
+              - default
+              - monitoring
+              - graylog
+              - cert-manager
+              - kube-system
 
     ingress:
       enabled: true
@@ -85,6 +81,7 @@ prometheus-operator:
         group_wait: 30s
         receiver: "default"
         repeat_interval: 12h
+        routes: []
 
     ingress:
       enabled: true
