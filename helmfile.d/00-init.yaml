@@ -33,6 +33,8 @@ releases:
     set:
       - name: imageTag
         value: "6.8.6"
+      - name: resources.requests.memory
+        value: "1.5Gi"
 
   - name: graylog
     namespace: graylog
