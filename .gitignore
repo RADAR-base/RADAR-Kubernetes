@@ -1,5 +1,4 @@
 /.env
-cp-helm-charts/
 kubernetes-HDFS/
 keystore.p12
 radar-is.yml
@@ -7,3 +6,6 @@ radar-is.yml
 production.yaml
 .idea/
 RADAR-Kubernetes.iml
+postgreskeystore.jks
+environments.yaml
+charts/management-portal/files/root.crt

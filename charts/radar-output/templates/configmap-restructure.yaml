@@ -16,27 +16,40 @@ data:
       interval: 300
 
     source:
-      type: "{{ .Values.source_type }}"
+      type: "{{ .Values.source.type }}"
       # Minio S3 settings
       s3:
-        endpoint: "{{ .Values.s3Endpoint }}"
-        accessToken: "{{ .Values.bucketAccessKey }}"
-        secretKey: "{{ .Values.bucketSecretKey }}"
-        bucket: "{{ .Values.sourceBucketName }}"
+        endpoint: "{{ .Values.source.s3.endpoint }}"
+        accessToken: "{{ .Values.source.s3.accessToken }}"
+        secretKey: "{{ .Values.source.s3.secretKey }}"
+        bucket: "{{ .Values.source.s3.bucket }}"
+      azure:
+        endpoint: "{{ .Values.source.azure.endpoint }}"
+        username: "{{ .Values.source.azure.username }}"
+        password: "{{ .Values.source.azure.password }}"
+        accountName: "{{ .Values.source.azure.accountName }}"
+        accountKey: "{{ .Values.source.azure.accountKey }}"
+        sasToken: "{{ .Values.source.azure.sasToken }}"
+        container: "{{ .Values.source.azure.container }}"
 
     target:
-      type: "{{ .Values.target_type }}"
-      local:
-        userId: 0
-        groupId: 0
+      type: "{{ .Values.target.type }}"
       s3:
-        endpoint: "{{ .Values.s3Endpoint }}"
-        accessToken: "{{ .Values.bucketAccessKey }}"
-        secretKey: "{{ .Values.bucketSecretKey }}"
-        bucket: "{{ .Values.targetBucketName }}"
+        endpoint: "{{ .Values.target.s3.endpoint }}"
+        accessToken: "{{ .Values.target.s3.accessToken }}"
+        secretKey: "{{ .Values.target.s3.secretKey }}"
+        bucket: "{{ .Values.target.s3.bucket }}"
+      azure:
+        endpoint: "{{ .Values.target.azure.endpoint }}"
+        username: "{{ .Values.target.azure.username }}"
+        password: "{{ .Values.target.azure.password }}"
+        accountName: "{{ .Values.target.azure.accountName }}"
+        accountKey: "{{ .Values.target.azure.accountKey }}"
+        sasToken: "{{ .Values.target.azure.sasToken }}"
+        container: "{{ .Values.target.azure.container }}"
 
     redis:
-      uri: "{{ .Values.redisUrl }}"
+      uri: "{{ .Values.redis.url }}"
       lockPrefix: radar-output/lock/
 
     # Compression characteristics
@@ -59,7 +72,7 @@ data:
         # This may incur data loss if multiple measurements are recorded
         # at exactly the same time. By default, all values are considered
         # when looking at distinct lines.
-        # distinctFields: [key.sourceId, value.time]
+        distinctFields: [key.sourceId, value.time, value.timeReceived]
       # Format factory class
       # factory: org.radarbase.hdfs.data.FormatFactory
       # Additional format properties
@@ -72,10 +85,10 @@ data:
       # Maximum number of offsets in cache.
       cacheOffsetsSize: 500000
       # Number of threads to do processing with
-      numThreads: "{{ .Values.num_threads }}"
+      numThreads: "{{ .Values.worker.numThreads }}"
       # Maximum number of files to process in any given topic.
       # maxFilesPerTopic: null
-      minimumFileAge: {{ .Values.minimumFileAge }}
+      minimumFileAge: {{ .Values.worker.minimumFileAge }}
 
     cleaner:
       # Enable cleaning up old source files
@@ -95,11 +108,11 @@ data:
     paths:
       # Input directories in HDFS
       inputs:
-        - /topics
+        - "{{ .Values.paths.input }}"
       # Root temporary directory for local file processing.
       temp: /output/+tmp
       # Output directory
-      output: /
+      output: "{{ .Values.paths.output }}"
       # Output path construction factory
       # factory: org.radarbase.output.path.MonthlyObservationKeyPathFactory
       # Additional properties

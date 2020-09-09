@@ -1,12 +1,12 @@
-environments:
-  default:
-    values:
-    - ../base.yaml
-    - ../production.yaml
+bases:
+- ../environments.yaml
+
+---
 
 helmDefaults:
   atomic: true
   timeout: 600
+  kubeContext: {{ .Values.kubeContext }}
 
 releases:
   - name: radar-fitbit-connector
