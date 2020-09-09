@@ -13,7 +13,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}      
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
       labels:
         app.kubernetes.io/name: {{ include "radar-jdbc-connector.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
@@ -66,7 +66,7 @@ spec:
           - name: CONNECT_OFFSET_STORAGE_FILE_FILENAME
             value: "/var/lib/kafka-connect-jdbc/logs/connect.offsets"
           - name: CONNECT_REST_ADVERTISED_HOST_NAME
-            value: "radar-jdbc-connector"          
+            value: "radar-jdbc-connector"
           - name: CONNECT_ZOOKEEPER_CONNECT
             value: "{{ .Values.zookeeper }}"
           - name: CONNECT_CONSUMER_MAX_POLL_RECORDS
@@ -87,6 +87,8 @@ spec:
             value: "org.reflections=ERROR"
           - name: CONNECTOR_PROPERTY_FILE_PREFIX
             value: "sink-timescale"
+          - name: KAFKA_HEAP_OPTS
+            value: "-Xms1500m"            
           ports:
             - name: http
               containerPort: 8083
