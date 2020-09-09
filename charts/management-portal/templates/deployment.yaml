@@ -47,7 +47,7 @@ spec:
           - name: SPRING_PROFILES_ACTIVE
             value: "prod,swagger"
           - name: SPRING_DATASOURCE_URL
-            value: "jdbc:postgresql://{{ .Values.postgres.host }}:5432/managementportal"
+            value: "jdbc:postgresql://{{ .Values.postgres.host }}:{{ .Values.postgres.port }}/{{ .Values.postgres.database }}{{ .Values.postgres.connection_parameters }}"
           - name: SPRING_DATASOURCE_USERNAME
             value: {{ .Values.postgres.user }}
           - name: SPRING_DATASOURCE_PASSWORD
@@ -55,6 +55,12 @@ spec:
               secretKeyRef:
                 name: {{ template "management-portal.secretName" . }}
                 key: postgresql_password
+          - name: SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT
+            value: "15000"
+          - name: SPRING_DATASOURCE_HIKARI_VALIDATION_TIMEOUT
+            value: "15000"
+          - name: SPRING_DATASOURCE_HIKARI_LEAK_DETECTION_THRESHOLD
+            value: "30000"
           - name: MANAGEMENTPORTAL_MAIL_FROM
             value: {{ .Values.from_email }}
           - name: MANAGEMENTPORTAL_COMMON_BASEURL
@@ -82,9 +88,27 @@ spec:
           - name: SPRING_APPLICATION_JSON
             value: '{"managementportal":{"oauth":{"checkingKeyAliases":["{{ .Values.managementportal.oauth_checking_key_aliases_0 }}","{{ .Values.managementportal.oauth_checking_key_aliases_1 }}"]}}}'
           - name: JHIPSTER_SLEEP # gives time for the database to boot before the application
-            value: "10"
+            value: "0"
           - name: JAVA_OPTS  # maximum heap size for the JVM running ManagementPortal, increase this as necessary
             value: "-Xmx1500m"
+          {{- if .Values.smtp.enabled }}
+          - name: SPRING_MAIL_HOST
+            value: {{ .Values.smtp.host | quote }}
+          - name: SPRING_MAIL_PORT
+            value: {{ .Values.smtp.port | quote }}
+          - name: SPRING_MAIL_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "management-portal.secretName" . }}
+                key: smtpUsername
+          - name: SPRING_MAIL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "management-portal.secretName" . }}
+                key: smtpPassword
+          - name: SPRING_MAIL_FROM
+            value: {{ .Values.smtp.from | quote }}
+          {{ end }}
           ports:
             - name: http
               containerPort: 8080
@@ -94,7 +118,7 @@ spec:
               command:
               - /bin/sh
               - -c
-              - wget --spider localhost:8080/managementportal/oauth/token_key
+              - "wget -O - localhost:8080/managementportal/management/health | grep -v '\"status\": \"DOWN\"'"
             initialDelaySeconds: 60
             periodSeconds: 90
             timeoutSeconds: 5
@@ -105,7 +129,7 @@ spec:
               command:
               - /bin/sh
               - -c
-              - wget --spider localhost:8080/managementportal/oauth/token_key
+              - "wget -O - localhost:8080/managementportal/management/health | grep -v '\"status\": \"DOWN\"'"
             initialDelaySeconds: 60
             periodSeconds: 90
             timeoutSeconds: 5
@@ -118,6 +142,10 @@ spec:
               mountPath: /config/
             - name: keystore
               mountPath: /mp-includes/config/
+            {{- if .Values.postgres.ssl.enabled }}
+            - name: postgres-root-cert
+              mountPath: /root/.postgresql/
+            {{ end }}
       volumes:
         - name: config
           configMap:
@@ -125,6 +153,11 @@ spec:
         - name: keystore
           secret:
             secretName: {{ include "management-portal.fullname" . }}-keystore
+        {{- if .Values.postgres.ssl.enabled }}
+        - name: postgres-root-cert
+          secret:
+            secretName: {{ include "management-portal.fullname" . }}-root-cert
+        {{ end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
