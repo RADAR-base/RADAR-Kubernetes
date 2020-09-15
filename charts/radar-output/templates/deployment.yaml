@@ -34,7 +34,7 @@ spec:
             - -S
           env:
           - name: RADAR_HDFS_RESTRUCTURE_OPTS
-            value: "-Xms250m -Xmx3g"
+            value: "-Xms400m -Xmx3g"
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
