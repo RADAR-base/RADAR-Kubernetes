@@ -16,7 +16,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}      
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
       labels:
         app.kubernetes.io/name: {{ include "radar-s3-connector.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
@@ -170,7 +170,9 @@ spec:
           - name: CONNECT_VALUE_CONVERTER_CONNECT_META_DATA
             value: "false"
           - name: KAFKA_HEAP_OPTS
-            value: "-Xms256m -Xmx4g"
+            value: "-Xms3g -Xmx4g"
+          - name: KAFKA_BROKERS
+            value: "{{ .Values.kafka_num_brokers }}"
           - name: CONNECT_LOG4J_LOGGERS
             value: "org.reflections=ERROR"
           - name: AWS_ACCESS_KEY
