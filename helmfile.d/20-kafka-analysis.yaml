@@ -13,7 +13,7 @@ releases:
     chart: ../charts/radar-backend
     installed: {{ .Values.radar_backend_monitor._install }}
     values:
-      - "../charts/radar-backend/values-monitor.yaml"
+      - "../etc/radar-backend-monitor/values.yaml"
       - {{ .Values.radar_backend_monitor | toYaml | indent 8 | trim }}
     set:
       - name: kafka_num_brokers
@@ -23,7 +23,7 @@ releases:
     chart: ../charts/radar-backend
     installed: {{ .Values.radar_backend_stream._install }}
     values:
-      - "../charts/radar-backend/values-stream.yaml"
+      - "../etc/radar-backend-stream/values.yaml"
       - {{ .Values.radar_backend_stream | toYaml | indent 8 | trim }}
     set:
       - name: kafka_num_brokers

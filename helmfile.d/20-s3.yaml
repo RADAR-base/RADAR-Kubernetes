@@ -21,7 +21,7 @@ releases:
     version: 10.6.15
     installed: {{ .Values.redis._install }}
     values:
-      - "../charts/redis/values.yaml"
+      - "../etc/redis/values.yaml"
       - {{ .Values.redis | toYaml | indent 8 | trim }}
 
   - name: minio
@@ -29,7 +29,7 @@ releases:
     version: 5.0.26
     installed: {{ .Values.minio._install }}
     values:
-      - "../charts/minio/values.yaml"
+      - "../etc/minio/values.yaml"
       - {{ .Values.minio | toYaml | indent 8 | trim }}
     set:
       - name: ingress.hosts
@@ -43,7 +43,6 @@ releases:
     chart: ../charts/radar-s3-connector
     installed: {{ .Values.radar_s3_connector._install }}
     values:
-      - "../charts/radar-s3-connector/values.yaml"
       - {{ .Values.radar_s3_connector | toYaml | indent 8 | trim }}
       - {{ .Values.confluent_cloud | toYaml | indent 8 | trim }}
     set:

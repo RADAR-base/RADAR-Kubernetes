@@ -17,7 +17,7 @@ releases:
     wait: false
     installed: {{ .Values.postgresql._install }}
     values:
-      - "../charts/postgresql/values.yaml"
+      - "../etc/postgresql/values.yaml"
       - {{ .Values.postgresql | toYaml | indent 8 | trim }}
     set:
       - name: postgresqlPassword
