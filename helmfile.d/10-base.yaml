@@ -14,13 +14,14 @@ releases:
     wait: true
     installed: {{ .Values.cp_zookeeper._install }}
     values:
+      - "../etc/cp-zookeeper/values.yaml"
       - {{ .Values.cp_zookeeper | toYaml | indent 8 | trim }}
   - name: cp-kafka
     chart: ../cp-helm-charts/charts/cp-kafka
     wait: true
     installed: {{ .Values.cp_kafka._install }}
     values:
-      - "../charts/cp-kafka/values.yaml"
+      - "../etc/cp-kafka/values.yaml"
       - {{ .Values.cp_kafka | toYaml | indent 8 | trim }}
     set:
       - name: brokers
@@ -30,7 +31,7 @@ releases:
     wait: true
     installed: {{ .Values.cp_schema_registry._install }}
     values:
-      - "../charts/cp-schema-registry/values.yaml"
+      - "../etc/cp-schema-registry/values.yaml"
       - {{ .Values.cp_schema_registry | toYaml | indent 8 | trim }}
     set:
       - name: ingress.hosts[0].host
@@ -47,7 +48,6 @@ releases:
     wait: true
     installed: {{ .Values.catalog_server._install }}
     values:
-      - "../charts/catalog-server/values.yaml"
       - {{ .Values.catalog_server | toYaml | indent 8 | trim }}
       - {{ .Values.confluent_cloud | toYaml | indent 8 | trim }}
     set:

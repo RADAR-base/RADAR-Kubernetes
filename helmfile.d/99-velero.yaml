@@ -16,5 +16,4 @@ releases:
     version: 2.12.0
     installed: {{ .Values.velero._install }}
     values:
-      - "../charts/velero/values.yaml"
       - {{ .Values.velero | toYaml | indent 8 | trim }}

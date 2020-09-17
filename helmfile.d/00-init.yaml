@@ -22,7 +22,7 @@ releases:
     version: 3.11.5
     installed: {{ .Values.mongodb._install }}
     values:
-      - "../charts/mongodb/values.yaml"
+      - "../etc/mongodb/values.yaml"
       - {{ .Values.mongodb | toYaml | indent 8 | trim }}
 
   - name: elasticsearch
@@ -42,7 +42,7 @@ releases:
     version: 1.5.6
     installed: {{ .Values.graylog._install }}
     values:
-      - "../charts/graylog/values.yaml"
+      - "../etc/graylog/values.yaml"
       - {{ .Values.graylog | toYaml | indent 8 | trim }}
     set:
       - name: graylog.rootEmail
@@ -59,7 +59,6 @@ releases:
     chart: ../charts/fluentd
     installed: {{ .Values.fluentd._install }}
     values:
-      - "../charts/fluentd/values.yaml"
       - {{ .Values.fluentd | toYaml | indent 8 | trim }}
 
   - name: cert-manager
@@ -79,7 +78,6 @@ releases:
     namespace: monitoring
     installed: {{ .Values.prometheus_operator._install }}
     values:
-      - "../charts/prometheus-operator/values.yaml"
       - {{ .Values.prometheus_operator | toYaml | indent 8 | trim }}
     set:
       - name: server_name
@@ -111,7 +109,7 @@ releases:
     force: false
     installed: {{ .Values.nginx_ingress._install }}
     values:
-      - "../charts/nginx-ingress/values.yaml"
+      - "../etc/nginx-ingress/values.yaml"
       - {{ .Values.nginx_ingress | toYaml | indent 8 | trim }}
 
   - name: kafka-manager
