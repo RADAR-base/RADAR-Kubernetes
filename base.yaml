@@ -56,6 +56,10 @@ nginx_ingress:
   _install: true
   controller:
     replicaCount: 1
+  metrics:
+    enabled: "true"
+    serviceMonitor:
+      enabled: "true"
 
 kafka_manager:
   _install: true
@@ -66,6 +70,7 @@ kafka_manager:
 
 velero:
   _install: true
+  objectStorageBackupReplicaCount: 1
   local:
     accessKey: accessKey
     secretKey: secretKey
@@ -185,7 +190,7 @@ radar_hotstorage:
   persistence:
     size: 10Gi
 
-radar_mongodb-connector:
+radar_mongodb_connector:
   _install: true
   replicaCount: 1
 
