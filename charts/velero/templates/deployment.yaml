@@ -5,7 +5,7 @@ metadata:
   labels:
 {{ include "velero.labels" . | indent 4 }}
 spec:
-  replicas: {{ .Values.intermediateReplicaCount }}
+  replicas: {{ .Values.objectStorageBackupReplicaCount }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "velero.name" . }}
