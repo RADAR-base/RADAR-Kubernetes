@@ -17,7 +17,7 @@ repositories:
 releases:
   - name: postgresql
     chart: bitnami/postgresql
-    version: 8.6.4
+    version: 9.7.0
     wait: false
     installed: {{ .Values.postgresql._install }}
     values:
