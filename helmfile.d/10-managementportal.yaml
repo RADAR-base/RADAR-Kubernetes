@@ -35,8 +35,6 @@ releases:
         values: [{{ .Values.server_name }}]
       - name: server_name
         value: {{ .Values.server_name }}
-      - name: postgres.password
-        value: {{ .Values.postgres_password }}
 
   - name: smtp
     chart: ../charts/smtp
