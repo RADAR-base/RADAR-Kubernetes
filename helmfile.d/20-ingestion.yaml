@@ -14,7 +14,7 @@ releases:
     wait: false
     installed: {{ .Values.cp_kafka_rest._install }}
     values:
-      - "../charts/cp-kafka-rest/values.yaml"
+      - "../etc/cp-kafka-rest/values.yaml"
       - {{ .Values.cp_kafka_rest | toYaml | indent 8 | trim }}
 
   - name: radar-gateway

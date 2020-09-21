@@ -17,7 +17,7 @@ releases:
     chart: stable/postgresql
     installed: {{ .Values.timescaledb._install }}
     values:
-      - "../charts/timescaledb/values.yaml"
+      - "../etc/timescaledb/values.yaml"
       - {{ .Values.timescaledb | toYaml | indent 8 | trim }}
     set:
       - name: postgresqlPassword
@@ -31,7 +31,6 @@ releases:
     chart: stable/grafana
     installed: {{ .Values.radar_grafana._install }}
     values:
-      - "../charts/radar-grafana/values.yaml"
       - {{ .Values.radar_grafana | toYaml | indent 8 | trim }}
     set:
       - name: adminPassword
@@ -51,7 +50,6 @@ releases:
     chart: ../charts/radar-jdbc-connector
     installed: {{ .Values.radar_jdbc_connector._install }}
     values:
-      - "../charts/radar-jdbc-connector/values.yaml"
       - {{ .Values.radar_jdbc_connector | toYaml | indent 8 | trim }}
     set:
       - name: kafka_num_brokers

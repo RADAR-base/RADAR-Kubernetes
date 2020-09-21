@@ -15,7 +15,7 @@ releases:
     wait: false
     installed: {{ .Values.radar_upload_postgresql._install }}
     values:
-      - "../charts/radar-upload-postgresql/values.yaml"
+      - "../etc/radar-upload-postgresql/values.yaml"
       - {{ .Values.radar_upload_postgresql | toYaml | indent 8 | trim }}
     set:
       - name: postgresqlPassword
