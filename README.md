@@ -37,7 +37,9 @@ git clone --recurse-submodules https://github.com/RADAR-base/RADAR-Kubernetes.gi
 cd RADAR-Kubernetes
 cp environments.yaml.tmpl environments.yaml
 cp base.yaml production.yaml
+cp base.yaml.gotmpl production.yaml.gotmpl
 vim production.yaml  # Change setup parameters and configurations
+vim production.yaml.gotmpl  # Change setup parameters that require Go templating, such as reading input files
 ./bin/keystore-init
 helmfile sync --concurrency 1
 ```
