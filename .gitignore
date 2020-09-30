@@ -4,6 +4,7 @@ keystore.p12
 radar-is.yml
 *.tgz
 production.yaml
+production.yaml.gotmpl
 .idea/
 RADAR-Kubernetes.iml
 postgreskeystore.jks
