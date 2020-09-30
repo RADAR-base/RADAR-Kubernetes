@@ -47,7 +47,7 @@ image:
 ## volumePermissions: Change the owner of the persist volume mountpoint to RunAsUser:fsGroup
 ##
 volumePermissions:
-  enabled: true
+  enabled: false
   image:
     registry: docker.io
     repository: bitnami/minideb
@@ -118,7 +118,7 @@ replication:
   enabled: true
   user: repl_user
   password: repl_password
-  slaveReplicas: 1
+  slaveReplicas: 2
   ## Set synchronous commit mode: on, off, remote_apply, remote_write and local
   ## ref: https://www.postgresql.org/docs/9.6/runtime-config-wal.html#GUC-WAL-LEVEL
   ##
@@ -129,7 +129,7 @@ replication:
   numSynchronousReplicas: 1
   ## Replication Cluster application name. Useful for defining multiple replication policies
   ##
-  applicationName: radar
+  applicationName: my_application
 
 ## PostgreSQL admin password (used when `postgresqlUsername` is not `postgres`)
 ## ref: https://github.com/bitnami/bitnami-docker-postgresql/blob/master/README.md#creating-a-database-user-on-first-run (see note!)
@@ -155,12 +155,12 @@ postgresqlUsername: postgres
 ## Create a database
 ## ref: https://github.com/bitnami/bitnami-docker-postgresql/blob/master/README.md#creating-a-database-on-first-run
 ##
-postgresqlDatabase: managementportal 
+# postgresqlDatabase:
 
 ## PostgreSQL data dir
 ## ref: https://github.com/bitnami/bitnami-docker-postgresql/blob/master/README.md
 ##
-postgresqlDataDir: /bitnami/postgresql
+postgresqlDataDir: /bitnami/postgresql/data
 
 ## An array to add extra environment variables
 ## For example:
@@ -169,10 +169,7 @@ postgresqlDataDir: /bitnami/postgresql
 ##     value: "bar"
 ##
 # extraEnv:
-# Define custom environment variables to pass to the image here
-extraEnv:
-  - name: POSTGRES_MULTIPLE_DATABASES
-    value: managementportal,restsourceauthorizer,appconfig
+extraEnv: []
 
 ## Name of a ConfigMap containing extra env vars
 ##
@@ -232,35 +229,15 @@ masterAsStandBy:
 ## Specify dictionary of scripts to be run at first boot
 ## Alternatively, you can put your scripts under the files/docker-entrypoint-initdb.d directory
 ##
-initdbScripts:
-   multi-db-init.sh: |
-      #!/bin/bash
-      set -e
-      set -u
+# initdbScripts:
+#   my_init_script.sh: |
+#      #!/bin/sh
+#      echo "Do something."
 
-      function create_user_and_database() {
-        local database=$1
-        local database_exist=$(psql -U "$POSTGRES_USER" -tAc "SELECT 1 FROM pg_database WHERE datname='$database';")
-        if [[ "$database_exist" == 1 ]]; then
-          echo "Database $database already exists"
-        else
-          echo "Database $database does not exist"
-          echo "  Creating database '$database' for user '$POSTGRES_USER'"
-          psql -U "$POSTGRES_USER" -v ON_ERROR_STOP=1  <<-EOSQL
-          CREATE DATABASE "$database";
-          GRANT ALL PRIVILEGES ON DATABASE $database TO "$POSTGRES_USER";
-      EOSQL
-        fi
-      }
+## Specify the PostgreSQL username and password to execute the initdb scripts
+# initdbUser:
+# initdbPassword:
 
-      if [ -n "$POSTGRES_MULTIPLE_DATABASES" ]; then
-        echo "Multiple database creation requested: $POSTGRES_MULTIPLE_DATABASES"
-        #waiting for postgres
-        for db in $(echo $POSTGRES_MULTIPLE_DATABASES | tr ',' ' '); do
-          create_user_and_database $db
-        done
-        echo "Databases created"
-      fi
 ## ConfigMap with scripts to be run at first boot
 ## NOTE: This will override initdbScripts
 # initdbScriptsConfigMap:
@@ -455,8 +432,7 @@ master:
   labels: {}
   annotations: {}
   podLabels: {}
-  podAnnotations:
-    backup.velero.io/backup-volumes: data
+  podAnnotations: {}
   priorityClassName: ""
   ## Additional PostgreSQL Master Volume mounts
   ##
