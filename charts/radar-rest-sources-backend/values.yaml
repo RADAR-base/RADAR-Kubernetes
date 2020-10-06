@@ -21,7 +21,6 @@ ingress:
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
   path: "/rest-sources/backend/?(.*)"
   hosts:
     - localhost
@@ -48,12 +47,25 @@ affinity: {}
 
 postgres:
   host: postgresql-postgresql
+  port: 5432
+  database: restsourceauthorizer
+  connection_parameters: ""
   user: postgres
   password: password
-
+  ssl:
+    enabled: false
+    keystorepassword: keystorepassword
 
 fitbit_api_client: ""
 fitbit_api_secret: ""
 managementportal_host: management-portal
 
 client_secret: secret
+
+restSourceClients:
+  - sourceType: FitBit
+    authorizationEndpoint: https://www.fitbit.com/oauth2/authorize
+    tokenEndpoint: https://api.fitbit.com/oauth2/token
+    clientId: clientId
+    clientSecret: clientSecret
+    scope: activity heartrate sleep profile

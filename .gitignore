@@ -10,3 +10,4 @@ RADAR-Kubernetes.iml
 postgreskeystore.jks
 environments.yaml
 charts/management-portal/files/root.crt
+charts/radar-rest-sources-backend/files/root.crt

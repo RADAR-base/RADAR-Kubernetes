@@ -8,11 +8,27 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 data:
-  rest_source_clients_configs.yml: |
-    rest_source_clients:
-      - source_type: FitBit
-        authorization_endpoint: https://www.fitbit.com/oauth2/authorize
-        token_endpoint: https://api.fitbit.com/oauth2/token
-        client_id: {{ .Values.fitbit_api_client }}
-        client_secret: {{ .Values.fitbit_api_secret }}
-        scope: activity heartrate sleep profile
+  authorizer.yml: |
+    service:
+      # Interval time in minutes for syncing projects and subjects.
+      baseUri: http://0.0.0.0:8080/rest-sources/backend/
+      advertisedBaseUri: http://0.0.0.0:8080/rest-sources/backend/
+      enableCors: true
+
+    auth:
+      # Management Portal URL
+      managementPortalUrl: http://{{ .Values.managementportal_host }}:8080/managementportal/
+      # OAuth2 Client id of more-promasys-sync application
+      clientId: radar_rest_sources_auth_backend
+      # OAuth2 Client Secret of more_promasys_sync_client client
+      clientSecret: {{ .Values.client_secret }}
+
+    database:
+      driver: org.postgresql.Driver
+      url: jdbc:postgresql://{{ .Values.postgres.host }}:{{ .Values.postgres.port }}/{{ .Values.postgres.database }}{{ .Values.postgres.connection_parameters }}
+      user: {{ .Values.postgres.user }}
+      password: {{ .Values.postgres.password }}
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+
+    restSourceClients:
+      {{ .Values.restSourceClients | toYaml | nindent 8 }}

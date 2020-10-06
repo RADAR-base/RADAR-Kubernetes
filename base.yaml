@@ -218,7 +218,12 @@ radar_rest_sources_backend:
   _install: true
   replicaCount: 1
   postgres:
+    host: postgresql-postgresql
+    user: postgres
     password: password
+    ssl:
+      enabled: false
+      keystorepassword: keystorepassword
 # --------------------------------------------------------- 20-hfds.yaml ---------------------------------------------------------
 
 hdfs:
