@@ -43,9 +43,9 @@ releases:
     set:
       - name: ingress.hosts
         values: [{{ .Values.server_name }}]
-      - name: fitbit_api_client
+      - name: restSourceClients[0].clientId
         value: {{ .Values.fitbit_api_client }}
-      - name: fitbit_api_secret
+      - name: restSourceClients[0].clientSecret
         value: {{ .Values.fitbit_api_secret }}
       - name: client_secret
         value: {{ .Values.management_portal.client_secrets.radar_rest_sources_backend }}
