@@ -19,8 +19,8 @@ data:
     radar_upload_backend;res_ManagementPortal,res_upload;{{ .Values.client_secrets.radar_upload_backend }};SUBJECT.READ,PROJECT.READ;client_credentials;;;43200;86400;{"dynamic_registration": true};
     radar_upload_connect;res_ManagementPortal,res_upload;{{ .Values.client_secrets.radar_upload_connect }};SUBJECT.READ,SUBJECT.UPDATE,PROJECT.READ,SOURCE.READ,SOURCETYPE.READ,MEASUREMENT.CREATE;client_credentials;;;43200;259200;{};
     radar_upload_frontend;res_ManagementPortal,res_upload;{{ .Values.client_secrets.radar_upload_frontend }};SOURCETYPE.READ,MEASUREMENT.CREATE,PROJECT.READ,SUBJECT.READ;authorization_code;https://{{ .Values.server_name }}/upload/login,http://localhost:8080/upload/login;3600;78000;;
-    radar_rest_sources_auth_backend;res_ManagementPortal;{{ .Values.client_secrets.radar_rest_sources_backend }};PROJECT.READ,SOURCETYPE.READ,SUBJECT.READ,SOURCE.READ;client_credentials;;;43200;86400;{};
-    radar_rest_sources_authorizer;res_restAuthorizer;;SOURCETYPE.READ,PROJECT.READ,SUBJECT.READ;authorization_code;https://{{ .Values.server_name }}/rest-sources/authorizer/login;;43200;86400;{};
+    radar_rest_sources_auth_backend;res_ManagementPortal;{{ .Values.client_secrets.radar_rest_sources_backend }};PROJECT.READ,SUBJECT.READ;client_credentials;;;43200;86400;{};
+    radar_rest_sources_authorizer;res_restAuthorizer;;SOURCETYPE.READ,PROJECT.READ,SUBJECT.READ,SUBJECT.UPDATE;authorization_code;https://{{ .Values.server_name }}/rest-sources/authorizer/login;;43200;86400;{};
     radar_fitbit_connector;res_restAuthorizer;{{ .Values.client_secrets.radarFitbitConnector }};SUBJECT.READ;client_credentials;;;43200;;{};
     radar_appconfig;res_ManagementPortal,res_appconfig;{{ .Values.client_secrets.radarAppconfig }};SOURCETYPE.READ,MEASUREMENT.CREATE,PROJECT.READ,SUBJECT.READ,OAUTHCLIENTS.READ;client_credentials;;;900;;;
     radar_appconfig_frontend;res_appconfig;;SOURCETYPE.READ,MEASUREMENT.CREATE,PROJECT.READ,PROJECT.CREATE,PROJECT.UPDATE,SUBJECT.READ,SUBJECT.UPDATE,OAUTHCLIENTS.READ;authorization_code,refresh_token;https://{{ .Values.server_name }}/appconfig/login;1800;78000;;
