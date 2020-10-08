@@ -38,3 +38,4 @@ data:
         {{ end }}
     auth:
       managementPortalUrl: http://{{ .Values.managementportalHost }}:8080/managementportal
+      checkSourceId: {{ .Values.checkSourceId }}
