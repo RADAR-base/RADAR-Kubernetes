@@ -63,6 +63,7 @@ managementportalHost: management-portal
 schemaRegistry: http://cp-schema-registry:8081
 max_requests: 1000
 bootstrapServers: kafka-1:9092
+checkSourceId: true
 
 cc:
   enabled: false
