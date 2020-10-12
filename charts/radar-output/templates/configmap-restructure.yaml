@@ -114,9 +114,9 @@ data:
       # Output directory
       output: "{{ .Values.paths.output }}"
       # Output path construction factory
-      # factory: org.radarbase.output.path.MonthlyObservationKeyPathFactory
+      factory: {{ .Values.paths.factory }}
       # Additional properties
-      # properties: {}
+      properties: {{ .Values.paths.properties | toYaml | indent 8 | trim }}
 
     # Individual topic configuration
     topics: {}
