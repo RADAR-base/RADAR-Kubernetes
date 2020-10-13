@@ -107,4 +107,5 @@ paths:
   input: topics
   output: output
   factory: org.radarbase.output.path.MonthlyObservationKeyPathFactory
-  properties: {}
+  properties:
+    {}

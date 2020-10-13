@@ -116,7 +116,8 @@ data:
       # Output path construction factory
       factory: {{ .Values.paths.factory }}
       # Additional properties
-      properties: {{ .Values.paths.properties | toYaml | indent 8 | trim }}
+      properties:
+        {{ .Values.paths.properties | toYaml | indent 8 | trim }}
 
     # Individual topic configuration
     topics: {}
