@@ -13,7 +13,7 @@ data:
     #resourceConfig: org.radarbase.gateway.inject.ManagementPortalEnhancerFactory
 
     server:
-      baseUri: http://0.0.0.0/radar-gateway/
+      baseUri: http://0.0.0.0:{{ .Values.service.port }}/radar-gateway/
 
     kafka:
       producer:
