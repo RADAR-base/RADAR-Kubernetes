@@ -25,6 +25,28 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{/*
+Get the password secret.
+*/}}
+{{- define "app-config.secretName" -}}
+{{- if .Values.existingSecret }}
+    {{- printf "%s" .Values.existingSecret -}}
+{{- else -}}
+    {{- printf "%s" (include "app-config.fullname" .) -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return true if a secret object should be created
+*/}}
+{{- define "app-config.createSecret" -}}
+{{- if .Values.existingSecret }}
+{{- else if .Values.existingSecret -}}
+{{- else -}}
+    {{- true -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Create chart name and version as used by the chart label.
 */}}
 {{- define "app-config.chart" -}}

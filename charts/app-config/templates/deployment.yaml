@@ -12,6 +12,9 @@ spec:
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
+      annotations:
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secrets: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
       labels:
         app.kubernetes.io/name: {{ include "app-config.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
@@ -32,6 +35,31 @@ spec:
           env:
           - name: JAVA_OPTS
             value: "{{ .Values.javaOpts }}"
+          - name: MANAGEMENT_PORTAL_CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "app-config.secretName" . }}
+                key: managementPortalClientId
+          - name: MANAGEMENT_PORTAL_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "app-config.secretName" . }}
+                key: managementPortalClientSecret
+          - name: DATABASE_URL
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "app-config.secretName" . }}
+                key: databaseUrl
+          - name: DATABASE_USER
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "app-config.secretName" . }}
+                key: databaseUser
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "app-config.secretName" . }}
+                key: databasePassword
           volumeMounts:
           - name: config
             mountPath: /etc/radar-app-config/
