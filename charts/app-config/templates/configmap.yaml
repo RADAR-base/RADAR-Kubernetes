@@ -18,13 +18,8 @@ data:
     auth:
       managementPortal:
         url: http://management-portal:8080/managementportal
-        clientId: {{ .Values.clientId }}
-        clientSecret: {{ .Values.clientSecret }}
       jwtResourceName: res_appconfig
 
     database:
       driver: {{ .Values.jdbc.driver }}
-      url: "{{ .Values.jdbc.url }}"
-      user: {{ .Values.jdbc.user }}
-      password: {{ .Values.jdbc.password }}
       dialect: {{ .Values.jdbc.dialect }}
