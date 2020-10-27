@@ -11,7 +11,6 @@ repositories:
 
 helmDefaults:
   atomic: false
-  force: true
   timeout: 240
   kubeContext: {{ .Values.kubeContext }}
 
