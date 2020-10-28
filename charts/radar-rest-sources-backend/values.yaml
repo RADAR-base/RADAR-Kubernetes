@@ -19,6 +19,12 @@ service:
 ingress:
   enabled: true
   annotations:
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/affinity-mode: persistent
+    nginx.ingress.kubernetes.io/session-cookie-path: /rest-sources/
+    nginx.ingress.kubernetes.io/session-cookie-samesite: Strict
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "900"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "900"
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
   path: "/rest-sources/backend/?(.*)"
