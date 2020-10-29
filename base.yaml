@@ -153,6 +153,8 @@ management_portal:
     radarFitbitConnector: secret
     radarAppconfig: secret
   extra_oauth_clients: []
+  oauth_clients:
+    radarbase_app_clients: false
   smtp:
     enabled: false
     host: smtp
@@ -168,6 +170,8 @@ app_config:
   jdbc:
     password: password
 
+app_config_frontend:
+  _install: false
 smtp:
   _install: true
   replicaCount: 1

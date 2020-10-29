@@ -93,6 +93,19 @@ client_secrets:
   radarFitbitConnector: secret
   radarAppconfig: secret
 
+oauth_clients:
+  radarbase_app_clients: true
+  rest_api: false
+  radar_dashboard: false
+  redcap_integrator: false
+  upload_connect: false
+  upload_frontend: false
+  upload_backend: false
+  rest_sources_authorizer: false
+  rest_sources_backend: false
+  fitbit_connector: false
+  app_config_backend: false
+  app_config_frontend: false
 extra_oauth_clients: []
 
 smtp:
@@ -102,3 +115,4 @@ smtp:
   username: username
   password: secret
   from: noreply@example.com
+

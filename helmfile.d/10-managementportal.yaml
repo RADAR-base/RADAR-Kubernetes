@@ -36,6 +36,28 @@ releases:
         values: [{{ .Values.server_name }}]
       - name: server_name
         value: {{ .Values.server_name }}
+      - name: oauth_clients.rest_api
+        value: {{ .Values.radar_restapi._install }}
+      - name: oauth_clients.radar_dashboard
+        value: {{ .Values.radar_dashboard._install }}
+      - name: oauth_clients.redcap_integrator
+        value: {{ .Values.radar_integration._install }}
+      - name: oauth_clients.upload_connect
+        value: {{ .Values.radar_upload_source_connector._install }}
+      - name: oauth_clients.upload_frontend
+        value: {{ .Values.radar_upload_connect_frontend._install }}
+      - name: oauth_clients.upload_backend
+        value: {{ .Values.radar_upload_connect_backend._install }}
+      - name: oauth_clients.rest_sources_authorizer
+        value: {{ .Values.radar_rest_sources_authorizer._install }}
+      - name: oauth_clients.rest_sources_backend
+        value: {{ .Values.radar_rest_sources_backend._install }}
+      - name: oauth_clients.fitbit_connector
+        value: {{ .Values.radar_fitbit_connector._install }}
+      - name: oauth_clients.app_config_backend
+        value: {{ .Values.app_config._install }}
+      - name: oauth_clients.app_config_frontend
+        value: {{ .Values.app_config_frontend._install }}
 
   - name: smtp
     chart: ../charts/smtp
