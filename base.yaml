@@ -163,7 +163,7 @@ management_portal:
 
 app_config:
   _install: true
-  replicaCount: 1  # should be 1
+  replicaCount: 1
   clientSecret: secret
   jdbc:
     password: password
@@ -195,7 +195,12 @@ radar_rest_sources_backend:
   _install: true
   replicaCount: 1
   postgres:
+    host: postgresql-postgresql
+    user: postgres
     password: password
+    ssl:
+      enabled: false
+      keystorepassword: keystorepassword
 
 # --------------------------------------------------------- 20-ingestion.yaml ---------------------------------------------------------
 
@@ -309,7 +314,7 @@ radar_output:
       bucket: radar-output-storage
   redis:
     url: redis://redis-master:6379
-    
+
 # --------------------------------------------------------- 30-confluent-cloud.yaml ---------------------------------------------------------
 
 ccSchemaRegistryProxy:
