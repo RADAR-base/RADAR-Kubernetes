@@ -6,7 +6,7 @@ replicaCount: 2
 
 image:
   repository: radarbase/radar-gateway
-  tag: 0.5.1
+  tag: 0.5.3
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -14,7 +14,7 @@ fullnameOverride: ""
 
 service:
   type: ClusterIP
-  port: 80
+  port: 8080
 
 ingress:
   enabled: true
@@ -63,6 +63,7 @@ managementportalHost: management-portal
 schemaRegistry: http://cp-schema-registry:8081
 max_requests: 1000
 bootstrapServers: kafka-1:9092
+checkSourceId: true
 
 cc:
   enabled: false

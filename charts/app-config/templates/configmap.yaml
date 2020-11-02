@@ -15,16 +15,11 @@ data:
     inject:
       enhancerFactory: org.radarbase.appconfig.inject.ManagementPortalEnhancerFactory
 
-    authentication:
-      url: http://management-portal:8080/managementportal
-      clientId: {{ .Values.clientId }}
-      clientSecret: {{ .Values.clientSecret }}
-      resourceName: res_appconfig
+    auth:
+      managementPortal:
+        url: http://management-portal:8080/managementportal
+      jwtResourceName: res_appconfig
 
-    jdbc:
-      driver: "org.postgresql.Driver"
-      url: "{{ .Values.jdbc.url }}"
-      user: {{ .Values.jdbc.user }}
-      password: {{ .Values.jdbc.password }}
-      properties:
-        hibernate.dialect: {{ .Values.jdbc.dialect }}
+    database:
+      driver: {{ .Values.jdbc.driver }}
+      dialect: {{ .Values.jdbc.dialect }}
