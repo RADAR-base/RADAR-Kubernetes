@@ -53,3 +53,10 @@ releases:
     installed: {{ .Values.s3_proxy._install }}
     values:
       - {{ .Values.s3_proxy | toYaml | indent 8 | trim }}
+
+  - name: radar-output
+    chart: ../charts/radar-output
+    wait: true
+    installed: {{ .Values.radar_output._install }}
+    values:
+      - {{ .Values.radar_output | toYaml | indent 8 | trim }}
