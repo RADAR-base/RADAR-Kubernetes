@@ -21,6 +21,8 @@ releases:
       - "../etc/postgresql/values.yaml"
       - {{ .Values.postgresql | toYaml | indent 8 | trim }}
     set:
+      - name: postgresqlPostgresPassword
+        value: {{ .Values.postgres_password }}
       - name: postgresqlPassword
         value: {{ .Values.postgres_password }}
       - name: replication.password
