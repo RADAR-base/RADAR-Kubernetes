@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "management-portal.fullname" . }}-hazelcast
+  labels:
+    app.kubernetes.io/name: {{ include "management-portal.name" . }}-hazelcast
+    helm.sh/chart: {{ include "management-portal.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 5701
+      name: hazelcast
+  selector:
+    app.kubernetes.io/name: {{ include "management-portal.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
