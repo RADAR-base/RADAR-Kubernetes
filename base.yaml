@@ -178,29 +178,6 @@ smtp:
   persistence:
     size: 1Gi
 
-# --------------------------------------------------------- 20-dashboard.yaml ---------------------------------------------------------
-
-hotstorage_password: password
-
-radar_dashboard:
-  _install: true
-  replicaCount: 1
-
-radar_hotstorage:
-  _install: true
-  replicaCount: 1  # should be 1
-  persistence:
-    size: 10Gi
-
-radar_mongodb_connector:
-  _install: true
-  replicaCount: 1
-
-radar_restapi:
-  _install: true
-  replicaCount: 1
-
-
 # --------------------------------------------------------- 20-fitbit.yaml ---------------------------------------------------------
 fitbit_api_client: fitbit_api_client_id
 fitbit_api_secret: fitbit_api_client_secret
@@ -224,63 +201,6 @@ radar_rest_sources_backend:
     ssl:
       enabled: false
       keystorepassword: keystorepassword
-# --------------------------------------------------------- 20-hfds.yaml ---------------------------------------------------------
-
-hdfs:
-  _install: true
-  global:
-    zookeeperQuorumOverride: cp-zookeeper-0.cp-zookeeper-headless.default.svc.cluster.local:2181,cp-zookeeper-1.cp-zookeeper-headless.default.svc.cluster.local:2181,cp-zookeeper-2.cp-zookeeper-headless.default.svc.cluster.local:2181
-
-  hdfs-namenode-k8s:
-    persistence:
-      size: 5Gi
-
-  hdfs-datanode-k8s:
-    persistence:
-      size: 200Gi
-
-radar_connect_hdfs_sink:
-  _install: true
-  replicaCount: 1  # should be 1
-
-rook:
-  _install: false
-
-ceph:
-  _install: false
-  ceph_cluster:
-    mon:
-      count: 3
-      claim:
-        storage:
-          class: cinder
-          size: 10Gi
-    storage:
-      name: set1
-      count: 3
-      claim:
-        name: data
-        storage:
-          size: 200Gi
-          class: cinder
-
-radar_output:
-  _install: true
-  replicaCount: 1
-  source:
-    s3:
-      endpoint: http://minio:9000/
-      accessToken: AKIAIOSFODNN7EXAMPLE
-      secretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-      bucket: radar-intermediate-storage
-  target:
-    s3:
-      endpoint: http://minio:9000/
-      accessToken: AKIAIOSFODNN7EXAMPLE
-      secretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-      bucket: radar-output-storage
-  redis:
-    url: redis://redis-master:6379
 
 # --------------------------------------------------------- 20-ingestion.yaml ---------------------------------------------------------
 
@@ -293,7 +213,6 @@ radar_gateway:
   replicaCount: 1
 
 # --------------------------------------------------------- 20-kafka-analysis.yaml ---------------------------------------------------------
-
 
 radar_backend_monitor:
   _install: true
@@ -377,6 +296,24 @@ s3_proxy:
     credential: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
   target:
     provider: azureblob
+
+radar_output:
+  _install: true
+  replicaCount: 1
+  source:
+    s3:
+      endpoint: http://minio:9000/
+      accessToken: AKIAIOSFODNN7EXAMPLE
+      secretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      bucket: radar-intermediate-storage
+  target:
+    s3:
+      endpoint: http://minio:9000/
+      accessToken: AKIAIOSFODNN7EXAMPLE
+      secretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      bucket: radar-output-storage
+  redis:
+    url: redis://redis-master:6379
 
 # --------------------------------------------------------- 30-confluent-cloud.yaml ---------------------------------------------------------
 

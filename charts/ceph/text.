@@ -1,4 +1,0 @@
-dependencies:
-- name: rook-ceph
-  version: v1.2.3
-  repository: https://charts.rook.io/release
