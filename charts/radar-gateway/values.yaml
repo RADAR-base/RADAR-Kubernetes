@@ -65,6 +65,13 @@ max_requests: 1000
 bootstrapServers: kafka-1:9092
 checkSourceId: true
 
+adminProperties: {}
+
+producerProperties: {}
+  compression.type: lz4
+
+serializationProperties: {}
+
 cc:
   enabled: false
   apiKey: ccApikey
