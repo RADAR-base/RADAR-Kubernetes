@@ -67,7 +67,7 @@ checkSourceId: true
 
 adminProperties: {}
 
-producerProperties: {}
+producerProperties:
   compression.type: lz4
 
 serializationProperties: {}
