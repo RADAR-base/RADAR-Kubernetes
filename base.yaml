@@ -168,6 +168,10 @@ app_config:
   jdbc:
     password: password
 
+app_config_frontend:
+  _install: true
+  replicaCount: 1
+
 smtp:
   _install: true
   replicaCount: 1
