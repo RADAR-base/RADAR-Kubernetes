@@ -18,24 +18,35 @@ data:
     kafka:
       producer:
         bootstrap.servers: {{ .Values.bootstrapServers }}
+        {{- range $key, $value := .Values.producerProperties }}
+        {{ $key }}: {{ $value }}
+        {{- end }}
         {{- if .Values.cc.enabled }}
         security.protocol: SASL_SSL
         sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="{{ .Values.cc.apiKey }}" password="{{ .Values.cc.apiSecret }}";
         ssl.endpoint.identification.algorithm: https
         sasl.mechanism: PLAIN
+        {{- end }}
       admin:
         bootstrap.servers: {{ .Values.bootstrapServers }}
+        {{- range $key, $value := .Values.adminProperties }}
+        {{ $key }}: {{ $value }}
+        {{- end }}
+        {{- if .Values.cc.enabled }}
         security.protocol: SASL_SSL
         sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="{{ .Values.cc.apiKey }}" password="{{ .Values.cc.apiSecret }}";
         ssl.endpoint.identification.algorithm: https
         sasl.mechanism: PLAIN
-        {{ end }}
+        {{- end }}
       serialization:
         schema.registry.url: {{ .Values.schemaRegistry }}
+        {{- range $key, $value := .Values.serializationProperties }}
+        {{ $key }}: {{ $value }}
+        {{- end }}
         {{- if .Values.cc.enabled }}
         basic.auth.credentials.source: USER_INFO
         schema.registry.basic.auth.user.info: {{ .Values.cc.schemaRegistryApiKey }}:{{ .Values.cc.schemaRegistryApiSecret }}
-        {{ end }}
+        {{- end }}
     auth:
       managementPortalUrl: http://{{ .Values.managementportalHost }}:8080/managementportal
       checkSourceId: {{ .Values.checkSourceId }}
