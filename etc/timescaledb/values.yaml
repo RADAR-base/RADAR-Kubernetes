@@ -352,7 +352,12 @@ master:
   labels: {}
   annotations: {}
   podLabels: {}
-  podAnnotations: {}
+  podAnnotations:
+    backup.velero.io/backup-volumes: data
+    post.hook.backup.velero.io/command: '["/bin/fsfreeze", "--unfreeze", "/bitnami/postgresql"]'
+    post.hook.backup.velero.io/container: fsfreeze
+    pre.hook.backup.velero.io/command: '["/bin/fsfreeze", "--freeze", "/bitnami/postgresql"]'
+    pre.hook.backup.velero.io/container: fsfreeze
   priorityClassName: ""
   ## Additional PostgreSQL Master Volume mounts
   ##
@@ -373,7 +378,19 @@ master:
   ##     ports:
   ##       - name: portname
   ##         containerPort: 1234
-  sidecars: []
+  sidecars:
+  - name: fsfreeze
+    image: busybox
+      securityContext:
+        privileged: true
+      volumeMounts:
+        - mountPath: "/bitnami/postgresql"
+          name: data
+          readOnly: false
+      command:
+        - "/bin/sh"
+        - "-c"
+        - "sleep infinity"
 
 ##
 ## PostgreSQL Slave parameters
@@ -454,7 +471,7 @@ livenessProbe:
   enabled: true
   initialDelaySeconds: 30
   periodSeconds: 10
-  timeoutSeconds: 5
+  timeoutSeconds: 10
   failureThreshold: 6
   successThreshold: 1
 
@@ -462,7 +479,7 @@ readinessProbe:
   enabled: true
   initialDelaySeconds: 5
   periodSeconds: 10
-  timeoutSeconds: 5
+  timeoutSeconds: 10
   failureThreshold: 6
   successThreshold: 1
 
