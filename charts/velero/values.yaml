@@ -6,7 +6,7 @@ objectStorageBackupReplicaCount: 1
 
 mc_image:
   repository: minio/mc
-  tag: latest
+  tag: RELEASE.2020-09-03T00-08-28Z
   pullPolicy: IfNotPresent
 
 local:
