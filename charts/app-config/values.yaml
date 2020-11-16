@@ -6,12 +6,14 @@ replicaCount: 2
 
 image:
   repository: radarbase/radar-app-config
-  tag: 0.2.1.1
+  tag: 0.3.0.1
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
+
+namespace: default
 
 serviceAccount:
   # Specifies whether a service account should be created

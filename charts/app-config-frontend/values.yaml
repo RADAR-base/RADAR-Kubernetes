@@ -6,9 +6,9 @@ replicaCount: 1
 
 image:
   repository: radarbase/radar-app-config-frontend
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: 0.2.1.1
+  tag: 0.3.0
 
 imagePullSecrets: []
 nameOverride: ""
@@ -29,14 +29,13 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  port: 80
+  port: 8080
 
 ingress:
   enabled: true
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
   hosts:
     - paths:
         - "/appconfig($|/)(.*)"

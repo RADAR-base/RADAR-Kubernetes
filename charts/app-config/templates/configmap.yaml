@@ -23,3 +23,16 @@ data:
     database:
       driver: {{ .Values.jdbc.driver }}
       dialect: {{ .Values.jdbc.dialect }}
+
+    hazelcast:
+      network:
+        port: 5801
+        join:
+          multicastConfig:
+            enabled: false
+          kubernetesConfig:
+            enabled: true
+            properties:
+              service-name: {{ template "app-config.fullname" . }}
+              service-port: 5801
+              namespace: {{ .Values.namespace }}
