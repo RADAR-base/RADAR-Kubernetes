@@ -31,25 +31,25 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            - name: RACF_BASE_URL
+            - name: BASE_HREF
               value: /appconfig/
-            - name: RACF_AUTH_API
+            - name: AUTH_URL
               value: {{ .Values.authUrl }}
-            - name: RACF_AUTH_CALLBACK
+            - name: AUTH_CALLBACK_URL
               value: {{ .Values.authCallbackUrl }}
-            - name: RACF_BACKEND_URL
+            - name: APP_CONFIG_URL
               value: {{ .Values.backendUrl }}
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 8080
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /
+              path: /appconfig/
               port: http
           readinessProbe:
             httpGet:
-              path: /
+              path: /appconfig/
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
