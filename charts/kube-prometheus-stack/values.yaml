@@ -3,8 +3,10 @@ server_name: localhost
 nginx_auth: |
   test:$2y$05$/okvi.SPEUOHzFuW/lao0ejB.2XBQMDw2pNVxag8R.nKVr5Y/7pGm
 
-prometheus-operator:
+kube-prometheus-stack:
   prometheusOperator:
+    tls:
+      enabled: false
     admissionWebhooks:
       enabled: false
       patch:
@@ -53,7 +55,7 @@ prometheus-operator:
         kubernetes.io/ingress.class: nginx
         cert-manager.io/cluster-issuer: letsencrypt-prod
         nginx.ingress.kubernetes.io/auth-type: basic
-        nginx.ingress.kubernetes.io/auth-secret: prometheus-operator-nginx-auth
+        nginx.ingress.kubernetes.io/auth-secret: kube-prometheus-stack-nginx-auth
       hosts:
         - localhost
       tls:
@@ -116,7 +118,7 @@ prometheus-operator:
         kubernetes.io/ingress.class: nginx
         cert-manager.io/cluster-issuer: letsencrypt-prod
         nginx.ingress.kubernetes.io/auth-type: basic
-        nginx.ingress.kubernetes.io/auth-secret: prometheus-operator-nginx-auth
+        nginx.ingress.kubernetes.io/auth-secret: kube-prometheus-stack-nginx-auth
       hosts:
         - localhost
       tls:
