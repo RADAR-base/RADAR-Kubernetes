@@ -21,9 +21,9 @@ cert_manager:
 fluentd:
   _install: true
 
-prometheus_operator:
+kube_prometheus_stack:
   _install: true
-  prometheus-operator:
+  kube-prometheus-stack:
     prometheus:
       prometheusSpec:
         replicas: 1
