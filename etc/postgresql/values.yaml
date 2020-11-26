@@ -32,7 +32,7 @@ image:
   ## It turns BASH and NAMI debugging in minideb
   ## ref:  https://github.com/bitnami/minideb-extras/#turn-on-bash-debugging
   ##
-  debug: false
+  debug: true
 
 ## String to partially override postgresql.fullname template (will maintain the release name)
 ##
@@ -160,7 +160,7 @@ postgresqlDatabase: managementportal
 ## PostgreSQL data dir
 ## ref: https://github.com/bitnami/bitnami-docker-postgresql/blob/master/README.md
 ##
-postgresqlDataDir: /bitnami/postgresql
+postgresqlDataDir: /bitnami/postgresql/data
 
 ## An array to add extra environment variables
 ## For example:
