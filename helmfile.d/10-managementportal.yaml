@@ -70,7 +70,7 @@ releases:
       - name: ingress.hosts
         values: [{{ .Values.server_name }}]
       - name: clientSecret
-        value: {{ .Values.managment_portal.oauth_clients.radar_app_config.client_secret }}
+        value: {{ .Values.management_portal.oauth_clients.radar_appconfig.client_secret }}
 
   - name: app-config-frontend
     chart: ../charts/app-config-frontend
