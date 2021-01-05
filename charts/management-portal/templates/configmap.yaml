@@ -11,22 +11,22 @@ data:
   oauth_client_details.csv: |
     client_id;resource_ids;client_secret;scope;authorized_grant_types;redirect_uri;authorities;access_token_validity;refresh_token_validity;additional_information;autoapprove
     {{- range $clientId, $client := .Values.oauth_clients -}}
-      {{- if kindIs "map" $client -}}
-      {{- if $client.enable }}
-        {{ $clientId }};{{ join "," $client.resource_ids }};{{ $client.client_secret }};{{ join "," $client.scope }};{{ join "," $client.authorized_grant_types }};
-        {{- range $index, $redirect_uri := $client.redirect_uri -}}
-          {{- if gt $index 0 -}},{{- end -}}
-          {{- if regexMatch "^/" $redirect_uri -}}
-            https://{{ $.Values.server_name }}{{ $redirect_uri }}
-          {{- else -}}
-            {{ $redirect_uri }}
-          {{- end -}}
-        {{- end -}};
-        {{- $client.authorities | default "" }};
-        {{- int64 $client.access_token_validity }};
-        {{- int64 $client.refresh_token_validity | default 0 }};
-        {{- $client.additional_information | default "{}" }};
-        {{- $client.autoapprove | default "" }}
-      {{- end -}}
-      {{- end -}}
+    {{- if kindIs "map" $client -}}
+    {{- if $client.enable }}
+    {{ $clientId }};{{ join "," $client.resource_ids }};{{ $client.client_secret }};{{ join "," $client.scope }};{{ join "," $client.authorized_grant_types }};
+    {{- range $index, $redirect_uri := $client.redirect_uri -}}
+      {{- if gt $index 0 -}},{{- end -}}
+      {{- if regexMatch "^/" $redirect_uri -}}
+        https://{{ $.Values.server_name }}{{ $redirect_uri }}
+      {{- else -}}
+        {{ $redirect_uri }}
+    {{- end -}}
+    {{- end -}};
+    {{- $client.authorities | default "" }};
+    {{- int64 $client.access_token_validity }};
+    {{- int64 $client.refresh_token_validity | default 0 }};
+    {{- $client.additional_information | default "{}" }};
+    {{- join "," $client.autoapprove }}
+    {{- end -}}
+    {{- end -}}
     {{- end -}}
