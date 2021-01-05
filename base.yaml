@@ -142,19 +142,29 @@ management_portal:
     oauth_checking_key_aliases_0: radarbase-managementportal-ec
     oauth_checking_key_aliases_1: selfsigned
   from_email: me@example.com
-  client_secrets:
-    prmt: secret
-    armt: secret
-    radar_redcap_integrator: secret
-    radar_upload_backend: secret
-    radar_upload_connect: secret
-    radar_upload_frontend: secret
-    radar_rest_sources_backend: secret
-    radarFitbitConnector: secret
-    radarAppconfig: secret
-  extra_oauth_clients: []
   oauth_clients:
-    radarbase_app_clients: false
+    pRMT:
+      enable: true
+      client_secret: "saturday$SHARE$scale"
+    aRMT:
+      enable: true
+      client_secret: ""
+    radar_restapi:
+      client_secret: secret
+    radar_restapi:
+      client_secret: secret
+    radar_upload_backend:
+      client_secret: secret
+    radar_upload_connect:
+      client_secret: secret
+    radar_rest_sources_auth_backend:
+      client_secret: secret
+    radar_redcap_integrator:
+      client_secret: secret
+    radar_fitbit_connector:
+      client_secret: secret
+    radar_appconfig:
+      client_secret: secret
   smtp:
     enabled: false
     host: smtp
@@ -315,7 +325,6 @@ radar_integration:
   _install: true
   replicaCount: 1
   oauth_client_id: radar_redcap_integrator
-  oauth_client_secret: secret
   projects:
   - url: "http://example.com"
     project_id: "1"
