@@ -32,7 +32,7 @@ image:
   ## It turns BASH and NAMI debugging in minideb
   ## ref:  https://github.com/bitnami/minideb-extras/#turn-on-bash-debugging
   ##
-  debug: false
+  debug: true
 
 ## String to partially override postgresql.fullname template (will maintain the release name)
 ##
@@ -155,12 +155,12 @@ postgresqlUsername: postgres
 ## Create a database
 ## ref: https://github.com/bitnami/bitnami-docker-postgresql/blob/master/README.md#creating-a-database-on-first-run
 ##
-postgresqlDatabase: managementportal
+postgresqlDatabase: managementportal 
 
 ## PostgreSQL data dir
 ## ref: https://github.com/bitnami/bitnami-docker-postgresql/blob/master/README.md
 ##
-postgresqlDataDir: /bitnami/postgresql
+postgresqlDataDir: /bitnami/postgresql/data
 
 ## An array to add extra environment variables
 ## For example:
@@ -457,6 +457,10 @@ master:
   podLabels: {}
   podAnnotations:
     backup.velero.io/backup-volumes: data
+    post.hook.backup.velero.io/command: '["/bin/fsfreeze", "--unfreeze", "/bitnami/postgresql"]'
+    post.hook.backup.velero.io/container: fsfreeze
+    pre.hook.backup.velero.io/command: '["/bin/fsfreeze", "--freeze", "/bitnami/postgresql"]'
+    pre.hook.backup.velero.io/container: fsfreeze
   priorityClassName: ""
   ## Additional PostgreSQL Master Volume mounts
   ##
@@ -475,7 +479,19 @@ master:
   ##       - name: portname
   ##         containerPort: 1234
   ##
-  sidecars: []
+  sidecars:
+  - name: fsfreeze
+    image: busybox
+    securityContext:
+      privileged: true
+    volumeMounts:
+      - mountPath: "/bitnami/postgresql"
+        name: data
+        readOnly: false
+    command:
+      - "/bin/sh"
+      - "-c"
+      - "sleep infinity"
 
   ## Override the service configuration for master
   ##

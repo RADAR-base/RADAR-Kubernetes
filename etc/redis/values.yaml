@@ -18,7 +18,11 @@ sentinel:
 master:
   podAnnotations:
     backup.velero.io/backup-volumes: redis-data
-
+    post.hook.backup.velero.io/command: '["/bin/fsfreeze", "--unfreeze", "/data"]'
+    post.hook.backup.velero.io/container: fsfreeze
+    pre.hook.backup.velero.io/command: '["/bin/fsfreeze", "--freeze", "/data"]'
+    pre.hook.backup.velero.io/container: fsfreeze
+    
 # Redis may require some changes in the kernel of the host machine to work as expected, in particular increasing the somaxconn value and disabling transparent huge pages.
 sysctlImage:
   enabled: true

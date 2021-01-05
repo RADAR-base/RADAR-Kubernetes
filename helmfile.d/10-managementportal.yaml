@@ -36,10 +36,6 @@ releases:
         values: [{{ .Values.server_name }}]
       - name: server_name
         value: {{ .Values.server_name }}
-      - name: oauth_clients.radar_restapi.enable
-        value: {{ .Values.radar_restapi._install }}
-      - name: oauth_clients.radar_dashboard.enable
-        value: {{ .Values.radar_dashboard._install }}
       - name: oauth_clients.radar_redcap_integrator.enable
         value: {{ .Values.radar_integration._install }}
       - name: oauth_clients.radar_upload_connect.enable
@@ -75,3 +71,12 @@ releases:
         values: [{{ .Values.server_name }}]
       - name: clientSecret
         value: {{ .Values.managment_portal.oauth_clients.radar_app_config.client_secret }}
+
+  - name: app-config-frontend
+    chart: ../charts/app-config-frontend
+    installed: {{ .Values.app_config_frontend._install }}
+    values:
+      - {{ .Values.app_config_frontend | toYaml | indent 8 | trim }}
+    set:
+      - name: server_name
+        value: {{ .Values.server_name }}

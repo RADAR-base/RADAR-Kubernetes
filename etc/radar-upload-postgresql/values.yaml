@@ -427,6 +427,11 @@ master:
   podLabels: {}
   podAnnotations:
     backup.velero.io/backup-volumes: data
+    post.hook.backup.velero.io/command: '["/bin/fsfreeze", "--unfreeze", "/bitnami/postgresql"]'
+    post.hook.backup.velero.io/container: fsfreeze
+    pre.hook.backup.velero.io/command: '["/bin/fsfreeze", "--freeze", "/bitnami/postgresql"]'
+    pre.hook.backup.velero.io/container: fsfreeze
+
   priorityClassName: ""
   ## Additional PostgreSQL Master Volume mounts
   ##
@@ -445,7 +450,19 @@ master:
   ##       - name: portname
   ##         containerPort: 1234
   ##
-  sidecars: []
+  sidecars:
+  - name: fsfreeze
+    image: busybox
+      securityContext:
+        privileged: true
+      volumeMounts:
+        - mountPath: "/bitnami/postgresql"
+          name: data
+          readOnly: false
+      command:
+        - "/bin/sh"
+        - "-c"
+        - "sleep infinity"
 
   ## Override the service configuration for master
   ##

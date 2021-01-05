@@ -44,14 +44,14 @@ vim production.yaml.gotmpl  # Change setup parameters that require Go templating
 helmfile sync --concurrency 1
 ```
 
-Having `--concurrency 1` will make installation slower but it is necessary because some components such as `prometheus-operator` and `kafka-init` (aka `catalog-server`) should be installed in their specified order, if you've forgotten to use this flag the installation will not be successful and you need to go some cleaning before you can try to install again:
+Having `--concurrency 1` will make installation slower but it is necessary because some components such as `kube-prometheus-stack` and `kafka-init` (aka `catalog-server`) should be installed in their specified order, if you've forgotten to use this flag the installation will not be successful and you need to go some cleaning before you can try to install again:
 
-### prometheus-operator
-The Prometheus-operator will define a `ServiceMonitor` CRD that other services with monitoring enabled will use, so please make sure that Prometheus chart installs successfully before preceding. By default it's configured to wait for Prometheus deployment to be finished in 10 minutes if this time isn't enough for your environment change it accordingly. If the deployment has been failed for the first time then you should delete it first and then try installing the stack again:
+### kube-prometheus-stack
+The kube-prometheus-stack will define a `ServiceMonitor` CRD that other services with monitoring enabled will use, so please make sure that Prometheus chart installs successfully before preceding. By default it's configured to wait for Prometheus deployment to be finished in 10 minutes if this time isn't enough for your environment change it accordingly. If the deployment has been failed for the first time then you should delete it first and then try installing the stack again:
 ```
-helm del --purge prometheus-operator
-kubectl delete crd prometheuses.monitoring.coreos.com prometheusrules.monitoring.coreos.com servicemonitors.monitoring.coreos.com alertmanagers.monitoring.coreos.com podmonitors.monitoring.coreos.com
-kubectl delete psp prometheus-operator-alertmanager prometheus-operator-grafana prometheus-operator-grafana-test prometheus-operator-kube-state-metrics prometheus-operator-operator prometheus-operator-prometheus prometheus-operator-prometheus-node-exporter
+helm del --purge kube-prometheus-stack
+kubectl delete crd prometheuses.monitoring.coreos.com prometheusrules.monitoring.coreos.com servicemonitors.monitoring.coreos.com alertmanagers.monitoring.coreos.com podmonitors.monitoring.coreos.com alertmanagerconfigs.monitoring.coreos.com probes.monitoring.coreos.com thanosrulers.monitoring.coreos.com
+kubectl delete psp kube-prometheus-stack-alertmanager kube-prometheus-stack-grafana kube-prometheus-stack-grafana-test kube-prometheus-stack-kube-state-metrics kube-prometheus-stack-operator kube-prometheus-stack-prometheus kube-prometheus-stack-prometheus-node-exporter
 kubectl delete mutatingwebhookconfigurations prometheus-admission
 kubectl delete ValidatingWebhookConfiguration prometheus-admission
 ```
@@ -66,8 +66,8 @@ kubectl delete pvc datadir-0-cp-kafka-{0,1,2} datadir-cp-zookeeper-{0,1,2} datal
 ### Uninstall
 If you want to remove the Radar-base from your cluster you need set all of your `RADAR_INSTALL_*` variables in `.env` file to `false` and then run the `helmfile sync --concurrency 1` command to delete the charts after that you need to run following commands to remove all of the traces of the installation:
 ```
-kubectl delete crd prometheuses.monitoring.coreos.com prometheusrules.monitoring.coreos.com servicemonitors.monitoring.coreos.com alertmanagers.monitoring.coreos.com podmonitors.monitoring.coreos.com
-kubectl delete psp prometheus-operator-alertmanager prometheus-operator-grafana prometheus-operator-grafana-test prometheus-operator-kube-state-metrics prometheus-operator-operator prometheus-operator-prometheus prometheus-operator-prometheus-node-exporter
+kubectl delete crd prometheuses.monitoring.coreos.com prometheusrules.monitoring.coreos.com servicemonitors.monitoring.coreos.com alertmanagers.monitoring.coreos.com podmonitors.monitoring.coreos.com alertmanagerconfigs.monitoring.coreos.com probes.monitoring.coreos.com thanosrulers.monitoring.coreos.com
+kubectl delete psp kube-prometheus-stack-alertmanager kube-prometheus-stack-grafana kube-prometheus-stack-grafana-test kube-prometheus-stack-kube-state-metrics kube-prometheus-stack-operator kube-prometheus-stack-prometheus kube-prometheus-stack-prometheus-node-exporter
 kubectl delete mutatingwebhookconfigurations prometheus-admission
 kubectl delete ValidatingWebhookConfiguration prometheus-admission
 
@@ -141,16 +141,20 @@ smtp-57fff69b4f-gvrqv                            1/1     Running   0          1h
 If you have enabled monitoring and SSL you should see these as well:
 ```
 ➜ kubectl -n monitoring get pods                                                            
-NAME                                                      READY   STATUS    RESTARTS   AGE
-alertmanager-prometheus-operator-alertmanager-0           2/2     Running   0          1h
-prometheus-operator-grafana-6746956b44-krxzh              2/2     Running   0          1h
-prometheus-operator-kube-state-metrics-5d55bd954f-2zj4c   1/1     Running   0          1h
-prometheus-operator-operator-77c55d5484-m8c4p             1/1     Running   0          1h
-prometheus-operator-prometheus-node-exporter-6nrgj        1/1     Running   0          1h
-prometheus-operator-prometheus-node-exporter-7hdzh        1/1     Running   0          1h
-prometheus-operator-prometheus-node-exporter-xp86p        1/1     Running   0          1h
-prometheus-prometheus-operator-prometheus-0               3/3     Running   0          1h
-
+NAME                                                       READY   STATUS    RESTARTS   AGE
+kube-prometheus-stack-grafana-674bb6887f-2pgxh             2/2     Running   0          8m29s
+kube-prometheus-stack-kube-state-metrics-bbf56d7f5-tm2kg   1/1     Running   0          8m29s
+kube-prometheus-stack-operator-7d456878d7-bwrsx            1/1     Running   0          8m29s
+kube-prometheus-stack-prometheus-node-exporter-84n2m       1/1     Running   0          8m29s
+kube-prometheus-stack-prometheus-node-exporter-h5kgc       1/1     Running   0          8m29s
+kube-prometheus-stack-prometheus-node-exporter-p6mkb       1/1     Running   0          8m29s
+kube-prometheus-stack-prometheus-node-exporter-tmsk7       1/1     Running   0          8m29s
+kube-prometheus-stack-prometheus-node-exporter-vvk6d       1/1     Running   0          8m29s
+kube-prometheus-stack-prometheus-node-exporter-wp2t7       1/1     Running   0          8m29s
+kube-prometheus-stack-prometheus-node-exporter-zsls7       1/1     Running   0          8m29s
+prometheus-kube-prometheus-stack-prometheus-0              2/2     Running   1          8m21s
+prometheus-kube-prometheus-stack-prometheus-1              2/2     Running   1          8m21s
+prometheus-kube-prometheus-stack-prometheus-2              2/2     Running   1          8m21s
 ➜ kubectl -n cert-manager get pods
 NAME                            READY   STATUS    RESTARTS   AGE
 cert-manager-776cd4f499-688bm   1/1     Running   0          1h
