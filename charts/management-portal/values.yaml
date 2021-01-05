@@ -169,39 +169,6 @@ oauth_clients:
       - client_credentials
     access_token_validity: 900
 
-  radar_restapi:
-    enable: false
-    resource_ids:
-      - res_ManagementPortal
-    client_secret: ""
-    scope:
-      - PROJECT.READ
-      - SOURCE.READ
-      - SOURCEDATA.READ
-      - SOURCETYPE.READ
-      - SUBJECT.READ
-    authorized_grant_types:
-      - client_credentials
-    access_token_validity: 900
-
-  radar_dashboard:
-    enable: false
-    resource_ids:
-      - res_ManagementPortal
-      - res_RestApi
-    client_secret: ""
-    scope:
-      - MEASUREMENT.READ
-      - PROJECT.READ
-      - SOURCE.READ
-      - SOURCETYPE.READ
-      - SUBJECT.READ
-    authorized_grant_types:
-      - refresh_token
-      - authorization_code
-    access_token_validity: 900
-    refresh_token_validity: 43200
-
   radar_upload_backend:
     enable: false
     resource_ids:
