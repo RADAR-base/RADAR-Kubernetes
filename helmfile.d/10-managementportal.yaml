@@ -36,6 +36,24 @@ releases:
         values: [{{ .Values.server_name }}]
       - name: server_name
         value: {{ .Values.server_name }}
+      - name: oauth_clients.radar_redcap_integrator.enable
+        value: {{ .Values.radar_integration._install }}
+      - name: oauth_clients.radar_upload_connect.enable
+        value: {{ .Values.radar_upload_source_connector._install }}
+      - name: oauth_clients.radar_upload_frontend.enable
+        value: {{ .Values.radar_upload_connect_frontend._install }}
+      - name: oauth_clients.radar_upload_backend.enable
+        value: {{ .Values.radar_upload_connect_backend._install }}
+      - name: oauth_clients.radar_rest_sources_authorizer.enable
+        value: {{ .Values.radar_rest_sources_authorizer._install }}
+      - name: oauth_clients.radar_rest_sources_auth_backend.enable
+        value: {{ .Values.radar_rest_sources_backend._install }}
+      - name: oauth_clients.radar_fitbit_connector.enable
+        value: {{ .Values.radar_fitbit_connector._install }}
+      - name: oauth_clients.radar_appconfig.enable
+        value: {{ .Values.app_config._install }}
+      - name: oauth_clients.radar_appconfig_frontend.enable
+        value: {{ .Values.app_config_frontend._install }}
 
   - name: smtp
     chart: ../charts/smtp
@@ -51,6 +69,8 @@ releases:
     set:
       - name: ingress.hosts
         values: [{{ .Values.server_name }}]
+      - name: clientSecret
+        value: {{ .Values.managment_portal.oauth_clients.radar_app_config.client_secret }}
 
   - name: app-config-frontend
     chart: ../charts/app-config-frontend
