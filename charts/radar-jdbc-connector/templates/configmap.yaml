@@ -25,3 +25,6 @@ data:
     pk.mode = record_value
     pk.fields = time, userId, projectId
     auto.create = true
+    max.retries = 30
+    # Wait 15 minutes before retrying failed task
+    retry.backoff.ms = 900000
