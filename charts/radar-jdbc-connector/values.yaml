@@ -52,7 +52,7 @@ zookeeper: cp-zookeeper-headless:2181
 kafka: PLAINTEXT://cp-kafka-headless:9092
 kafka_num_brokers: "3"
 schema_registry: http://cp-schema-registry:8081
-topics: android_phone_relative_location, android_phone_battery_level, connect_upload_altoida_summary, connect_fitbit_intraday_heart_rate, connect_fitbit_intraday_calories, connect_fitbit_intraday_steps
+topics: android_phone_relative_location, android_phone_battery_level, connect_upload_altoida_summary, connect_fitbit_intraday_heart_rate, connect_fitbit_intraday_steps
 
 timescaledb:
   host: timescaledb
