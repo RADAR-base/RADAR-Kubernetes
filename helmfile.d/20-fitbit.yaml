@@ -48,4 +48,4 @@ releases:
       - name: restSourceClients[0].clientSecret
         value: {{ .Values.fitbit_api_secret }}
       - name: client_secret
-        value: {{ .Values.management_portal.oauth_clients.radar_rest_sources_backend.client_secret }}
+        value: {{ .Values.management_portal.oauth_clients.radar_rest_sources_auth_backend.client_secret }}
