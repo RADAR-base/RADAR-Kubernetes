@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: radarbase/radar-jdbc-connector
-  tag: dev
+  tag: latest
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
