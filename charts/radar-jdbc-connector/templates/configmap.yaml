@@ -28,3 +28,6 @@ data:
     max.retries = 30
     # Wait 15 minutes before retrying failed task
     retry.backoff.ms = 900000
+    connection.attempts = 20
+    # Wait 15 minutes before attempting connection 
+    connection.backoff.ms = 900000
