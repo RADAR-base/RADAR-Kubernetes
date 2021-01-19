@@ -98,7 +98,7 @@ spec:
               command:
               - /bin/sh
               - -c
-              - curl -sf localhost:8083/connectors/radar-timescale-sink/status | grep -o '\"state\":\"[^\"]*\"' | tr '\\n' ',' | grep -vq FAILED || exit 1
+              - ((curl -sf localhost:8083/connectors/radar-timescale-sink/tasks/0/status | grep -o '\"state\":\"[^\"]*\"' | tr '\\n' ',' | grep -vq FAILED) && (curl -sf localhost:8083/connectors/radar-timescale-sink/tasks/1/status | grep -o '\"state\":\"[^\"]*\"' | tr '\\n' ',' | grep -vq FAILED)) || exit 1
             initialDelaySeconds: 15
             periodSeconds: 60
             timeoutSeconds: 5
