@@ -40,7 +40,7 @@ releases:
       - name: postgres.password
         value: {{ .Values.radar_upload_postgres_password }}
       - name: client_secret
-        value: {{ .Values.management_portal.oauth_clients.radar_upload_connect_backend.client_secret }}
+        value: {{ .Values.management_portal.oauth_clients.radar_upload_backend.client_secret }}
 
   - name: radar-upload-connect-frontend
     chart: ../charts/radar-upload-connect-frontend

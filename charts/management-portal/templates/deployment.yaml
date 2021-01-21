@@ -108,6 +108,10 @@ spec:
                 key: smtpPassword
           - name: SPRING_MAIL_FROM
             value: {{ .Values.smtp.from | quote }}
+          - name: SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH
+            value: "true"
+          - name: SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE
+            value: {{ .Values.smtp.starttls | quote }}
           {{ end }}
           ports:
             - name: http
