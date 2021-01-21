@@ -302,4 +302,5 @@ smtp:
   username: username
   password: secret
   from: noreply@example.com
+  starttls: false
 
