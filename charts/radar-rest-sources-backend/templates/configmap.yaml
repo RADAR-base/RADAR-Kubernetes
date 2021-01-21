@@ -14,6 +14,8 @@ data:
       baseUri: http://0.0.0.0:8080/rest-sources/backend/
       advertisedBaseUri: http://0.0.0.0:8080/rest-sources/backend/
       enableCors: true
+      syncParticipantsIntervalMin: 2
+      stateStoreExpiryInMin: 15
 
     auth:
       # Management Portal URL
@@ -22,8 +24,6 @@ data:
       clientId: radar_rest_sources_auth_backend
       # OAuth2 Client Secret of more_promasys_sync_client client
       clientSecret: {{ .Values.client_secret }}
-      syncParticipantsIntervalMin: 2
-      stateStoreExpiryInMin: 15
 
     database:
       driver: org.postgresql.Driver
