@@ -10,6 +10,9 @@ repositories:
   url: https://helm.elastic.co
 - name: jetstack
   url: https://charts.jetstack.io
+- name: prometheus-community
+  url: https://prometheus-community.github.io/helm-charts
+
 
 helmDefaults:
   atomic: true
@@ -67,7 +70,13 @@ releases:
     namespace: cert-manager
     wait: true
     installed: {{ .Values.cert_manager._install }}
+    disableValidation: true
     chart: ../charts/cert-manager
+    hooks:
+      - events: ["presync"]
+        showlogs: true
+        command: "kubectl"
+        args: ["--context", "{{ .Values.kubeContext }}", "apply", "-f", "../charts/cert-manager/files/crds.yaml"]
     set:
       - name: server_name
         value: {{ .Values.server_name }}
@@ -79,6 +88,7 @@ releases:
     wait: true
     namespace: monitoring
     installed: {{ .Values.kube_prometheus_stack._install }}
+    disableValidation: true
     values:
       - {{ .Values.kube_prometheus_stack | toYaml | indent 8 | trim }}
     set:

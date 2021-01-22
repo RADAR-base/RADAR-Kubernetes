@@ -22,7 +22,7 @@ releases:
       - name: fitbit_api_secret
         value: {{ .Values.fitbit_api_secret }}
       - name: oauthClientSecret
-        value: {{ .Values.management_portal.client_secrets.radarFitbitConnector }}
+        value: {{ .Values.management_portal.oauth_clients.radar_fitbit_connector.client_secret }}
 
   - name: radar-rest-sources-authorizer
     chart: ../charts/radar-rest-sources-authorizer
@@ -48,4 +48,4 @@ releases:
       - name: restSourceClients[0].clientSecret
         value: {{ .Values.fitbit_api_secret }}
       - name: client_secret
-        value: {{ .Values.management_portal.client_secrets.radar_rest_sources_backend }}
+        value: {{ .Values.management_portal.oauth_clients.radar_rest_sources_auth_backend.client_secret }}
