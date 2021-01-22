@@ -5,7 +5,9 @@ bases:
 
 repositories:
   - name: stable
-    url: https://kubernetes-charts.storage.googleapis.com
+    url: https://charts.helm.sh/stable
+  - name: grafana
+    url: https://grafana.github.io/helm-charts
 
 helmDefaults:
   atomic: true
@@ -28,7 +30,7 @@ releases:
         value: {{ .Values.timescaledb_db_name }}
 
   - name: radar-grafana
-    chart: stable/grafana
+    chart: grafana/grafana
     installed: {{ .Values.radar_grafana._install }}
     values:
       - {{ .Values.radar_grafana | toYaml | indent 8 | trim }}
