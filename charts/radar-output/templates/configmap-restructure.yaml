@@ -92,7 +92,7 @@ data:
 
     cleaner:
       # Enable cleaning up old source files
-      enable: {{ .Values.cleaner.age > 0 }}
+      enable: {{ gt (int (toString (.Values.cleaner.age))) 0 }}
       # Interval in seconds to clean data
       interval: 1800  # 21 minutes
       # Number of days after which a source file is considered old
