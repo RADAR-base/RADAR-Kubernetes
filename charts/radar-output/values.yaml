@@ -85,6 +85,9 @@ worker:
   minimumFileAge: 900
   numThreads: 2
 
+cleaner:
+  age: 7
+
 paths:
   input: topics
   output: output

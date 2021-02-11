@@ -92,11 +92,11 @@ data:
 
     cleaner:
       # Enable cleaning up old source files
-      enable: true
+      enable: {{ .Values.cleaner.age > 0 }}
       # Interval in seconds to clean data
       interval: 1800  # 21 minutes
       # Number of days after which a source file is considered old
-      age: 7
+      age: {{ .Values.cleaner.age }}
 
     #storage:
       #factory: org.radarbase.hdfs.storage.LocalStorageDriver
