@@ -6,7 +6,7 @@ replicaCount: 2
 
 image:
   repository: radarbase/management-portal
-  tag: 0.6.0
+  tag: 0.6.4
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -303,4 +303,5 @@ smtp:
   password: secret
   from: noreply@example.com
   starttls: false
+  auth: true
 

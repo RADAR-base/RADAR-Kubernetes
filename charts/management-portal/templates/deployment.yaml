@@ -96,6 +96,7 @@ spec:
             value: {{ .Values.smtp.host | quote }}
           - name: SPRING_MAIL_PORT
             value: {{ .Values.smtp.port | quote }}
+          {{- if .Values.smtp.auth }}
           - name: SPRING_MAIL_USERNAME
             valueFrom:
               secretKeyRef:
@@ -106,10 +107,11 @@ spec:
               secretKeyRef:
                 name: {{ template "management-portal.secretName" . }}
                 key: smtpPassword
+          {{ end }}
           - name: SPRING_MAIL_FROM
             value: {{ .Values.smtp.from | quote }}
           - name: SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH
-            value: "true"
+            value: "{{ .Values.smtp.auth }}"
           - name: SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE
             value: {{ .Values.smtp.starttls | quote }}
           {{ end }}
