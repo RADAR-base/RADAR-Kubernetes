@@ -334,6 +334,8 @@ ccSchemaRegistryProxy:
 # --------------------------------------------------------- 20-grafana.yaml ---------------------------------------------------------
 
 grafana_password: password
+grafana_metrics_username: username
+grafana_metrics_password: passweord
 
 timescaledb_password: password
 timescaledb_username: grafana

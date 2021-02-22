@@ -45,6 +45,10 @@ releases:
         value: radar-base-tls-dashboard
       - name: ingress.tls[0].hosts
         values: ["dashboard.{{ .Values.server_name }}"]
+      - name: grafana.ini.metrics.basic_auth_username
+        value: {{ .Values.grafana_metrics_username }}
+      - name: grafana.ini.metrics.basic_auth_password
+        value: {{ .Values.grafana_metrics_password }}
 
   - name: radar-jdbc-connector
     chart: ../charts/radar-jdbc-connector
