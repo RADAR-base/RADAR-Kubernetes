@@ -308,7 +308,7 @@ extraVolumeMounts: []
 
 ## Pass the plugins you want installed as a list.
 ##
-plugins: ['digrich-bubblechart-panel']
+plugins: []
   # - digrich-bubblechart-panel
   # - grafana-clock-panel
 
@@ -411,10 +411,13 @@ grafana.ini:
     mode: console
   grafana_net:
     url: https://grafana.net
+  metrics:
+    basic_auth_username: username
+    basic_auth_password: password
 ## grafana Authentication can be enabled with the following values on grafana.ini
- # server:
+# server:
       # The full public facing url you use in browser, used for redirects and emails
- #    root_url:
+#    root_url:
  # https://grafana.com/docs/grafana/latest/auth/github/#enable-github-in-grafana
  # auth.github:
  #    enabled: false
