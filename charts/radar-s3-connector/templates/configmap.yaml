@@ -33,3 +33,11 @@ data:
     errors.deadletterqueue.context.headers.enable=true
     errors.retry.delay.max.ms=60000
     errors.retry.timeout=300000
+  healthcheck.sh: |
+    #!/bin/sh
+    STATUS=$(curl -sf localhost:8083/connectors/radar-s3-sink-connector/status | grep -o '\"state\":\"[^\"]*\"')
+    if echo "$STATUS" | tr '\\n' ',' | grep -q FAILED; then
+      exit 1
+    elif [ $(echo "$STATUS" | grep RUNNING | wc -l) -le 1 ]; then
+      exit 1
+    fi
