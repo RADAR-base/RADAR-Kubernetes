@@ -193,22 +193,20 @@ spec:
             exec:
               command:
               - /bin/sh
-              - -c
-              - STATUS=$(curl -sf localhost:8083/connectors/radar-s3-sink-connector/status | grep -o '\"state\":\"[^\"]*\"') || exit 1; ((echo -n "$STATUS" | tr '\\n' ',' | grep -vq FAILED) && ( [ $(echo -n "$STATUS" | grep RUNNING | wc -l) -gt 1 ] ) || exit 1
-            initialDelaySeconds: 5
+              - /etc/kafka-connect/sink-s3/healthcheck.sh
+            initialDelaySeconds: 40
             periodSeconds: 60
-            timeoutSeconds: 3
+            timeoutSeconds: 10
             successThreshold: 1
             failureThreshold: 3
           readinessProbe:
             exec:
               command:
               - /bin/sh
-              - -c
-              - STATUS=$(curl -sf localhost:8083/connectors/radar-s3-sink-connector/status | grep -o '\"state\":\"[^\"]*\"') || exit 1; ((echo -n "$STATUS" | tr '\\n' ',' | grep -vq FAILED) && ( [ $(echo -n "$STATUS" | grep RUNNING | wc -l) -gt 1 ] ) || exit 1
-            initialDelaySeconds: 5
+              - /etc/kafka-connect/sink-s3/healthcheck.sh
+            initialDelaySeconds: 40
             periodSeconds: 60
-            timeoutSeconds: 3
+            timeoutSeconds: 10
             successThreshold: 1
             failureThreshold: 3
           resources:
