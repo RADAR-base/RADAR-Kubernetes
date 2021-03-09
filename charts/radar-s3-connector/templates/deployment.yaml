@@ -194,7 +194,7 @@ spec:
               command:
               - /bin/sh
               - -c
-              - curl -sf localhost:8083/connectors/radar-s3-sink-connector/status | grep -o '\"state\":\"[^\"]*\"' | tr '\\n' ',' | grep -vq FAILED || exit 1
+              - STATUS=$(curl -sf localhost:8083/connectors/radar-s3-sink-connector/status | grep -o '\"state\":\"[^\"]*\"') || exit 1; ((echo -n "$STATUS" | tr '\\n' ',' | grep -vq FAILED) && ( [ $(echo -n "$STATUS" | grep RUNNING | wc -l) -gt 1 ] ) || exit 1
             initialDelaySeconds: 5
             periodSeconds: 60
             timeoutSeconds: 3
@@ -205,7 +205,7 @@ spec:
               command:
               - /bin/sh
               - -c
-              - curl  -sf localhost:8083/connectors/radar-s3-sink-connector/status | grep -o '\"state\":\"[^\"]*\"' | tr '\\n' ',' | grep -vq FAILED || exit 1
+              - STATUS=$(curl -sf localhost:8083/connectors/radar-s3-sink-connector/status | grep -o '\"state\":\"[^\"]*\"') || exit 1; ((echo -n "$STATUS" | tr '\\n' ',' | grep -vq FAILED) && ( [ $(echo -n "$STATUS" | grep RUNNING | wc -l) -gt 1 ] ) || exit 1
             initialDelaySeconds: 5
             periodSeconds: 60
             timeoutSeconds: 3
