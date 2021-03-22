@@ -60,7 +60,7 @@ spec:
           command: ["radar-gateway", "/etc/radar-gateway/gateway.yml"]
           env:
           - name: JAVA_OPTS
-            value: "-XX:GCTimeRatio=19 -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=30"
+            value: "-XX:GCTimeRatio=19 -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=30 --add-opens java.base/java.io=ALL-UNNAMED --add-opens java.management/javax.management.openmbean=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.management/javax.management=ALL-UNNAMED"
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
