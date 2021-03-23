@@ -52,7 +52,7 @@ releases:
         value: {{ .Values.radar_fitbit_connector._install }}
       - name: oauth_clients.radar_appconfig.enable
         value: {{ .Values.app_config._install }}
-      - name: oauth_clients.radar_appconfig_frontend.enable
+      - name: oauth_clients.appconfig_frontend.enable
         value: {{ .Values.app_config_frontend._install }}
 
   - name: smtp
