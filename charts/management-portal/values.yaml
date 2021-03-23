@@ -294,6 +294,15 @@ oauth_clients:
     refresh_token_validity: 78000
     redirect_uri:
       - /appconfig/login
+    autoapprove:
+      - MEASUREMENT.CREATE
+      - OAUTHCLIENTS.READ
+      - PROJECT.CREATE
+      - PROJECT.READ
+      - PROJECT.UPDATE
+      - SOURCETYPE.READ
+      - SUBJECT.READ
+      - SUBJECT.UPDATE
 
 smtp:
   enabled: false
