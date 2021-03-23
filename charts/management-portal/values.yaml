@@ -273,7 +273,7 @@ oauth_clients:
       - client_credentials
     access_token_validity: 900
 
-  radar_appconfig_frontend:
+  appconfig_frontend:
     enable: false
     resource_ids:
       - res_appconfig
