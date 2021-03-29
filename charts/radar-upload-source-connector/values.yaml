@@ -56,10 +56,21 @@ managementportal_host: management-portal
 radar_upload_connect_backend: radar-upload-connect-backend
 client_id: radar_upload_connect
 client_secret: upload_secret
-poll_interval: 1800000
+poll_interval: 60000
 record_converter_classes: org.radarbase.connect.upload.converter.altoida.AltoidaConverterFactory,org.radarbase.connect.upload.converter.axivity.AxivityConverterFactory,org.radarbase.connect.upload.converter.oxford.WearableCameraConverterFactory,org.radarbase.connect.upload.converter.gaitup.Physilog5ConverterFactory
 s3Endpoint: http://minio:9000/
 bucketAccessKey: access_key
 bucketSecretKey: secret
 targetBucketName: radar-output-storage
 uploaderType: s3
+
+task:
+  queueSize: 10000
+
+connect:
+  offsetFlushIntervalMs: 5000
+
+producer:
+  compressionType: lz4
+  bufferMemory: 2000000
+  batchSize: 200000
