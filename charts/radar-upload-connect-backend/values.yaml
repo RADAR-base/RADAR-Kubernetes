@@ -6,7 +6,7 @@ replicaCount: 2
 
 image:
   repository: radarbase/radar-upload-connect-backend
-  tag: 0.5.6
+  tag: 0.5.8
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -23,6 +23,7 @@ ingress:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/rewrite-target: /$1
     nginx.ingress.kubernetes.io/proxy-body-size: 200m
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
   path: "/upload/api/?(.*)"
   hosts:
     - localhost

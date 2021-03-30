@@ -70,6 +70,14 @@ spec:
             value: "{{ .Values.zookeeper }}"
           - name: CONNECT_VALUE_CONVERTER_CONNECT_META_DATA
             value: "false"
+          - name: CONNECT_OFFSET_FLUSH_INTERVAL_MS
+            value: {{ .Values.connect.offsetFlushIntervalMs | quote }}
+          - name: CONNECT_PRODUCER_COMPRESSION_TYPE
+            value: {{ .Values.producer.compressionType }}
+          - name: CONNECT_PRODUCER_BATCH_SIZE
+            value: {{ .Values.producer.batchSize | quote }}
+          - name: CONNECT_PRODUCER_BUFFER_MEMORY
+            value: {{ .Values.producer.bufferMemory | quote }}
           - name: CONNECTOR_PROPERTY_FILE_PREFIX
             value: "upload/source-upload"
           - name: KAFKA_HEAP_OPTS
