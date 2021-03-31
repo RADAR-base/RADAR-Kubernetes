@@ -123,8 +123,7 @@ spec:
             exec:
               command:
               - /bin/sh
-              - -c
-              - "wget -O - localhost:8080/managementportal/management/health | grep -v '\"status\": \"DOWN\"'"
+              - /config/healthcheck.sh
             initialDelaySeconds: 60
             periodSeconds: 90
             timeoutSeconds: 5
@@ -134,8 +133,7 @@ spec:
             exec:
               command:
               - /bin/sh
-              - -c
-              - "wget -O - localhost:8080/managementportal/management/health | grep -v '\"status\": \"DOWN\"'"
+              - /config/healthcheck.sh
             initialDelaySeconds: 60
             periodSeconds: 90
             timeoutSeconds: 5
