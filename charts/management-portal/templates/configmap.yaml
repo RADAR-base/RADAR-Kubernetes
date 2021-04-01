@@ -8,6 +8,12 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 data:
+  healthcheck.sh: |
+    #!/bin/sh
+    STATUS=$(wget -O - localhost:8080/managementportal/management/health)
+    if ! (echo "$STATUS" | grep -Fq 'db":{"status":"UP'); then
+      exit 1
+    fi
   oauth_client_details.csv: |
     client_id;resource_ids;client_secret;scope;authorized_grant_types;redirect_uri;authorities;access_token_validity;refresh_token_validity;additional_information;autoapprove
     {{- range $clientId, $client := .Values.oauth_clients -}}
