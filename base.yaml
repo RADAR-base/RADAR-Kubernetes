@@ -219,17 +219,14 @@ radar_upload_postgresql:
 radar_upload_connect_backend:
   _install: true
   replicaCount: 1
-  client_id: radar_upload_backend
 
 radar_upload_connect_frontend:
   _install: true
   replicaCount: 1
-  vue_app_client_id: radar_upload_frontend
 
 radar_upload_source_connector:
   _install: true
   replicaCount: 1
-  client_id: radar_upload_connect
 
 # --------------------------------------------------------- 20-s3-connector.yaml ---------------------------------------------------------
 
