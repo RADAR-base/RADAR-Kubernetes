@@ -267,7 +267,7 @@ radar_output:
       endpoint: http://minio:9000/
       bucket: radar-output-storage
   redis:
-    url: redis://redis-master:6379
+    uri: redis://redis-master:6379
 
 # --------------------------------------------------------- 30-confluent-cloud.yaml ---------------------------------------------------------
 

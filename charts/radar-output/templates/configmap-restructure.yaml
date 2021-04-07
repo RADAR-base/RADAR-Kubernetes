@@ -49,7 +49,7 @@ data:
         container: "{{ .Values.target.azure.container }}"
 
     redis:
-      uri: "{{ .Values.redis.url }}"
+      uri: "{{ .Values.redis.uri }}"
       lockPrefix: radar-output/lock/
 
     # Compression characteristics
