@@ -31,3 +31,11 @@ data:
     connection.attempts = 15
     # Wait 10 minutes before attempting connection 
     connection.backoff.ms = 600000
+  healthcheck.sh: |
+    #!/bin/sh
+    STATUS=$(curl -sf localhost:8083/connectors/radar-timescale-sink/status | grep -o '\"state\":\"[^\"]*\"')
+    if echo "$STATUS" | tr '\\n' ',' | grep -q FAILED; then
+      exit 1
+    elif [ $(echo "$STATUS" | grep RUNNING | wc -l) -le 1 ]; then
+      exit 1
+    fi
