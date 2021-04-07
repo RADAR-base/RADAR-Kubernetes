@@ -38,8 +38,11 @@ cd RADAR-Kubernetes
 cp environments.yaml.tmpl environments.yaml
 cp base.yaml production.yaml
 cp base.yaml.gotmpl production.yaml.gotmpl
+sops -e base.secrets.yaml > production.secrets.yaml
+vim environments.yaml # use the files you just created
 vim production.yaml  # Change setup parameters and configurations
 vim production.yaml.gotmpl  # Change setup parameters that require Go templating, such as reading input files
+sops production.secrets.yaml  # Change passwords and credentials
 ./bin/keystore-init
 helmfile sync --concurrency 1
 ```
