@@ -16,9 +16,9 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         checksum/secrets: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
         checksum/secrets-keystore: {{ include (print $.Template.BasePath "/secrets-keystore.yaml") . | sha256sum }}
+        checksum/secrets-oauth-clients: {{ include (print $.Template.BasePath "/secrets-oauth-clients.yaml") . | sha256sum }}
       labels:
         app.kubernetes.io/name: {{ include "management-portal.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
@@ -144,7 +144,7 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-            - name: config
+            - name: oauth-clients
               mountPath: /config/
             - name: keystore
               mountPath: /mp-includes/config/
@@ -153,9 +153,9 @@ spec:
               mountPath: /root/.postgresql/
             {{ end }}
       volumes:
-        - name: config
-          configMap:
-            name: {{ include "management-portal.fullname" . }}
+        - name: oauth-clients
+          secret:
+            secretName: {{ include "management-portal.fullname" . }}-oauth-clients
         - name: keystore
           secret:
             secretName: {{ include "management-portal.fullname" . }}-keystore
