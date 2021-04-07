@@ -52,7 +52,7 @@ tolerations: []
 affinity: {}
 
 postgres:
-  host: postgresql-postgresql
+  host: postgresql
   port: 5432
   database: restsourceauthorizer
   connection_parameters: ""
