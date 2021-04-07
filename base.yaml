@@ -130,6 +130,7 @@ management_portal:
   _install: true
   replicaCount: 1  # should be 1
   postgres:
+    host: postgresql
     password: password
     ssl:
       enabled: false
@@ -206,7 +207,7 @@ radar_rest_sources_backend:
   _install: true
   replicaCount: 1
   postgres:
-    host: postgresql-postgresql
+    host: postgresql
     user: postgres
     password: password
     ssl:
@@ -338,7 +339,7 @@ grafana_metrics_username: username
 grafana_metrics_password: passweord
 
 timescaledb_password: password
-timescaledb_username: grafana
+timescaledb_username: postgres
 timescaledb_db_name: grafana-metrics
 
 radar_grafana:

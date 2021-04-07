@@ -12,19 +12,21 @@ repositories:
   url: https://charts.jetstack.io
 - name: prometheus-community
   url: https://prometheus-community.github.io/helm-charts
-
+- name: bitnami
+  url: https://charts.bitnami.com/bitnami
+- name: kongz
+  url: https://charts.kong-z.com
+- name: ingress-nginx
+  url: https://kubernetes.github.io/ingress-nginx
 
 helmDefaults:
-  atomic: true
-  # force: true
-  timeout: 600
   kubeContext: {{ .Values.kubeContext }}
 
 releases:
   - name: mongodb
     namespace: graylog
-    chart: stable/mongodb-replicaset
-    version: 3.11.5
+    chart: bitnami/mongodb
+    version: 10.11.1
     installed: {{ .Values.mongodb._install }}
     values:
       - "../etc/mongodb/values.yaml"
@@ -33,18 +35,16 @@ releases:
   - name: elasticsearch
     namespace: graylog
     chart: elastic/elasticsearch
-    version: 7.6.0
+    version: 7.12.0
     installed: {{ .Values.elasticsearch._install }}
     set:
-      - name: imageTag
-        value: "6.8.6"
       - name: resources.requests.memory
-        value: "1.5Gi"
+        value: "1.0Gi"
 
   - name: graylog
     namespace: graylog
-    chart: stable/graylog
-    version: 1.5.6
+    chart: kongz/graylog
+    version: 1.7.9
     installed: {{ .Values.graylog._install }}
     values:
       - "../etc/graylog/values.yaml"
@@ -61,7 +61,8 @@ releases:
 
   - name: fluentd
     namespace: graylog
-    chart: ../charts/fluentd
+    chart: bitnami/fluentd
+    version: 3.6.4
     installed: {{ .Values.fluentd._install }}
     values:
       - {{ .Values.fluentd | toYaml | indent 8 | trim }}
@@ -116,10 +117,11 @@ releases:
         values: ["grafana.{{ .Values.server_name }}"]
 
   - name: nginx-ingress
-    chart: stable/nginx-ingress
-    version: 1.40.2
+    chart: ingress-nginx/ingress-nginx
+    version: 3.25.0
     force: false
     installed: {{ .Values.nginx_ingress._install }}
+    disableValidation: true
     values:
       - "../etc/nginx-ingress/values.yaml"
       - {{ .Values.nginx_ingress | toYaml | indent 8 | trim }}

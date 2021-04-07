@@ -71,7 +71,7 @@ clientSecret: secret
 
 jdbc:
   driver: org.postgresql.Driver
-  url: jdbc:postgresql://postgresql-postgresql/appconfig
+  url: jdbc:postgresql://postgresql:5432/appconfig
   user: postgres
   password: password
   dialect: org.hibernate.dialect.PostgreSQLDialect

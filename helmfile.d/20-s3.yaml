@@ -6,6 +6,8 @@ bases:
 repositories:
 - name: stable
   url: https://charts.helm.sh/stable
+- name: minio
+  url: https://helm.min.io/
 - name: bitnami
   url: https://charts.bitnami.com/bitnami
 
@@ -24,8 +26,8 @@ releases:
       - {{ .Values.redis | toYaml | indent 8 | trim }}
 
   - name: minio
-    chart: stable/minio
-    version: 5.0.26
+    chart: minio/minio
+    version: 8.0.10
     installed: {{ .Values.minio._install }}
     values:
       - "../etc/minio/values.yaml"

@@ -61,7 +61,7 @@ affinity: {}
 #keystore: {{ exec "sops" (list "-d" "keystore.p12") | b64enc | quote }}
 
 postgres:
-  host: postgresql-postgresql
+  host: postgresql
   port: 5432
   database: managementportal
   connection_parameters: ""
