@@ -13,6 +13,9 @@ data:
     {{- range $clientId, $client := .Values.oauth_clients -}}
     {{- if kindIs "map" $client -}}
     {{- if $client.enable }}
+    {{ if has "client_credentials" $client.authorized_grant_types -}}
+    {{- required (print "management_portal.oauth_clients."  $clientId " must have client_secret: it has client_credentials grant type")  $client.client_secret -}}
+    {{- end -}}
     {{ $clientId }};{{ join "," $client.resource_ids }};{{ $client.client_secret }};{{ join "," $client.scope }};{{ join "," $client.authorized_grant_types }};
     {{- range $index, $redirect_uri := $client.redirect_uri -}}
       {{- if gt $index 0 -}},{{- end -}}
