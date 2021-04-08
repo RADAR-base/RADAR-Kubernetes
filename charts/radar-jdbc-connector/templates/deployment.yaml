@@ -86,7 +86,7 @@ spec:
           - name: CONNECT_LOG4J_LOGGERS
             value: "org.reflections=ERROR"
           - name: CONNECTOR_PROPERTY_FILE_PREFIX
-            value: "sink-timescale"
+            value: "sink-timescale/sink-timescale"
           - name: KAFKA_HEAP_OPTS
             value: "-Xms1500m"            
           ports:
@@ -97,8 +97,7 @@ spec:
             exec:
               command:
               - /bin/sh
-              - -c
-              - ((curl -sf localhost:8083/connectors/radar-timescale-sink/tasks/0/status | grep -o '\"state\":\"[^\"]*\"' | tr '\\n' ',' | grep -vq FAILED) && (curl -sf localhost:8083/connectors/radar-timescale-sink/tasks/1/status | grep -o '\"state\":\"[^\"]*\"' | tr '\\n' ',' | grep -vq FAILED)) || exit 1
+              - /etc/kafka-connect/sink-timescale/healthcheck.sh
             initialDelaySeconds: 15
             periodSeconds: 60
             timeoutSeconds: 5
@@ -108,8 +107,7 @@ spec:
             exec:
               command:
               - /bin/sh
-              - -c
-              - curl -sf localhost:8083/connectors/radar-timescale-sink/status | grep -o '\"state\":\"[^\"]*\"' | tr '\\n' ',' | grep -vq FAILED || exit 1
+              - /etc/kafka-connect/sink-timescale/healthcheck.sh
             initialDelaySeconds: 15
             periodSeconds: 60
             timeoutSeconds: 5
@@ -119,8 +117,7 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - name: config
-              mountPath: /etc/kafka-connect/sink-timescale.properties
-              subPath: sink-timescale.properties
+              mountPath: /etc/kafka-connect/sink-timescale
       volumes:
         - name: config
           configMap:
