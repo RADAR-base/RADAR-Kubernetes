@@ -83,7 +83,7 @@ cp_zookeeper:
 cp_kafka:
   _install: true
   persistence:
-    size: 30Gi
+    size: 10Gi
 
 cp_schema_registry:
   _install: true
@@ -286,6 +286,8 @@ radar_grafana:
 timescaledb:
   _install: true
   replicaCount: 1
+  replication:
+    enable: false
   persistence:
     size: 8Gi
 
