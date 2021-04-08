@@ -22,7 +22,7 @@ releases:
       - name: fitbit_api_secret
         value: {{ .Values.fitbit_api_secret }}
       - name: oauthClientSecret
-        value: {{ .Values.management_portal.oauth_clients.radar_fitbit_connector.client_secret }}
+        value: {{ if hasKey .Values.management_portal.oauth_clients "radar_fitbit_connector" -}}{{ .Values.management_portal.oauth_clients.radar_fitbit_connector.client_secret }}{{- end }}
 
   - name: radar-rest-sources-authorizer
     chart: ../charts/radar-rest-sources-authorizer
@@ -43,9 +43,11 @@ releases:
     set:
       - name: ingress.hosts
         values: [{{ .Values.server_name }}]
-      - name: restSourceClients[0].clientId
+      - name: restSourceClients.fitbit.clientId
         value: {{ .Values.fitbit_api_client }}
-      - name: restSourceClients[0].clientSecret
+      - name: restSourceClients.fitbit.clientSecret
         value: {{ .Values.fitbit_api_secret }}
+      - name: restSourceClients.fitbit.enable
+        value: {{ .Values.radar_fitbit_connector._install }}
       - name: client_secret
-        value: {{ .Values.management_portal.oauth_clients.radar_rest_sources_auth_backend.client_secret }}
+        value: {{ if hasKey .Values.management_portal.oauth_clients "radar_rest_sources_auth_backend" -}}{{ .Values.management_portal.oauth_clients.radar_rest_sources_auth_backend.client_secret }}{{- end }}
