@@ -6,7 +6,7 @@ replicaCount: 1
 
 image_output:
   repository: radarbase/radar-output-restructure
-  tag: 1.1.4.1
+  tag: 1.1.6.1
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
@@ -91,5 +91,5 @@ cleaner:
 paths:
   input: topics
   output: output
-  factory: org.radarbase.output.path.MonthlyObservationKeyPathFactory
+  factory: org.radarbase.output.path.ObservationKeyPathFactory
   properties: {}
