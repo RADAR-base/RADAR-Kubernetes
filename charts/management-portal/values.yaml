@@ -253,6 +253,7 @@ oauth_clients:
     client_secret: ""
     scope:
       - SUBJECT.READ
+      - MEASUREMENT.CREATE
     authorized_grant_types:
       - client_credentials
     access_token_validity: 900

@@ -10,8 +10,7 @@ graylog:
 
 mongodb:
   _install: true
-  architecture: standalone
-  useStatefulSet: true
+  architecture: replicaset
 
 elasticsearch:
   _install: true
