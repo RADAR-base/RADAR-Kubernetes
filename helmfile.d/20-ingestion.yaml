@@ -29,7 +29,7 @@ releases:
       - name: cc.enabled
         value: {{ .Values.confluent_cloud.enabled }}
       - name: serviceMonitor.enabled
-        value: {{ .Values.prometheus_operator._install }}
+        value: {{ .Values.kube_prometheus_stack._install }}
       {{- if .Values.confluent_cloud.enabled }}
       - name: schemaRegistry
         value: {{ .Values.confluent_cloud.cc.schemaRegistryUrl }}
