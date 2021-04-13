@@ -6,7 +6,7 @@ replicaCount: 2
 
 image:
   repository: radarbase/management-portal
-  tag: 0.6.4
+  tag: 0.7.0
   pullPolicy: IfNotPresent
 
 nameOverride: ""
