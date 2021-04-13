@@ -54,10 +54,29 @@ spec:
           value: "3"
         - name: RADAR_NUM_REPLICATION_FACTOR
           value: "3"
+        {{- if .Values.cc.enabled }}
+        - name: CC_CONFIG_FILE_PATH
+          value: "/etc/config/java-config.properties"
+        - name: CC_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "catalog-server.fullname" . }}
+              key: srApiKey
+        - name: CC_API_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "catalog-server.fullname" . }}
+              key: srApiSecret
+        command:
+          - "cc_topic_init.sh"
+        volumeMounts:
+          - name: cc-java-config
+            mountPath: /etc/config/
+        {{ end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          args:
+          command:
             - radar-schemas-tools
             - serve
             - /schema/merged
@@ -112,6 +131,11 @@ spec:
         {{- else }}
           emptyDir: {}
         {{ end }}
+        {{- if .Values.cc.enabled }}
+        - name: cc-java-config
+          configMap:
+            name: {{ include "catalog-server.fullname" . }}-java-config
+        {{- end -}}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

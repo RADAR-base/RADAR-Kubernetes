@@ -1,12 +1,12 @@
-environments:
-  default:
-    values:
-    - ../base.yaml
-    - ../production.yaml
+bases:
+- ../environments.yaml
+
+---
 
 helmDefaults:
   atomic: true
   timeout: 600
+  kubeContext: {{ .Values.kubeContext }}
 
 releases:
   - name: radar-fitbit-connector
@@ -22,7 +22,7 @@ releases:
       - name: fitbit_api_secret
         value: {{ .Values.fitbit_api_secret }}
       - name: oauthClientSecret
-        value: {{ .Values.management_portal.client_secrets.radarFitbitConnector }}
+        value: {{ .Values.management_portal.oauth_clients.radar_fitbit_connector.client_secret }}
 
   - name: radar-rest-sources-authorizer
     chart: ../charts/radar-rest-sources-authorizer
@@ -34,6 +34,7 @@ releases:
         values: [{{ .Values.server_name }}]
       - name: serverName
         value: {{ .Values.server_name }}
+
   - name: radar-rest-sources-backend
     chart: ../charts/radar-rest-sources-backend
     installed: {{ .Values.radar_rest_sources_backend._install }}
@@ -42,11 +43,9 @@ releases:
     set:
       - name: ingress.hosts
         values: [{{ .Values.server_name }}]
-      - name: postgres.password
-        value: {{ .Values.postgres_password }}
-      - name: fitbit_api_client
+      - name: restSourceClients[0].clientId
         value: {{ .Values.fitbit_api_client }}
-      - name: fitbit_api_secret
+      - name: restSourceClients[0].clientSecret
         value: {{ .Values.fitbit_api_secret }}
       - name: client_secret
-        value: {{ .Values.management_portal.client_secrets.radar_rest_sources_backend }}
+        value: {{ .Values.management_portal.oauth_clients.radar_rest_sources_auth_backend.client_secret }}

@@ -1,21 +1,25 @@
-environments:
-  default:
-    values:
-    - ../base.yaml
-    - ../production.yaml
+bases:
+- ../environments.yaml
+
+---
+
+repositories:
+- name: bitnami
+  url: https://charts.bitnami.com/bitnami
 
 helmDefaults:
   atomic: true
   timeout: 600
+  kubeContext: {{ .Values.kubeContext }}
 
 releases:
   - name: radar-upload-postgresql
-    chart: stable/postgresql
-    version: 5.3.3
+    chart: bitnami/postgresql
+    version: 9.6.0
     wait: false
     installed: {{ .Values.radar_upload_postgresql._install }}
     values:
-      - "../charts/radar-upload-postgresql/values.yaml"
+      - "../etc/radar-upload-postgresql/values.yaml"
       - {{ .Values.radar_upload_postgresql | toYaml | indent 8 | trim }}
     set:
       - name: postgresqlPassword
@@ -36,7 +40,7 @@ releases:
       - name: postgres.password
         value: {{ .Values.radar_upload_postgres_password }}
       - name: client_secret
-        value: {{ .Values.management_portal.client_secrets.radar_upload_backend }}
+        value: {{ .Values.management_portal.oauth_clients.radar_upload_backend.client_secret }}
 
   - name: radar-upload-connect-frontend
     chart: ../charts/radar-upload-connect-frontend
@@ -57,11 +61,11 @@ releases:
     set:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
-      - name: client_secret
-        value: {{ .Values.management_portal.client_secrets.radar_upload_connect }}
       - name: s3Endpoint
         value: {{ .Values.minio.s3Endpoint }}
       - name: bucketAccessKey
         value: {{ .Values.minio.accessKey }}
       - name: bucketSecretKey
         value: {{ .Values.minio.secretKey }}
+      - name: client_secret
+        value: {{ .Values.management_portal.oauth_clients.radar_upload_connect.client_secret }}

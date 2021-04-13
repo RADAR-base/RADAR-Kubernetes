@@ -16,7 +16,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}      
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
       labels:
         app.kubernetes.io/name: {{ include "radar-integration.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
@@ -54,18 +54,14 @@ spec:
               port: 8080
             timeoutSeconds: 5
             name: radar-integration
-            ports:
-              - containerPort: 8080
-                name: http
-                protocol: TCP
-            readinessProbe:
-              failureThreshold: 3
-              initialDelaySeconds: 5
-              periodSeconds: 60
-              successThreshold: 1
-              tcpSocket:
-                port: 8080
-              timeoutSeconds: 5
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 5
+            periodSeconds: 60
+            successThreshold: 1
+            tcpSocket:
+              port: 8080
+            timeoutSeconds: 5
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:

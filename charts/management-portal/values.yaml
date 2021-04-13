@@ -6,7 +6,7 @@ replicaCount: 2
 
 image:
   repository: radarbase/management-portal
-  tag: 0.5.8
+  tag: 0.6.4
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -40,12 +40,12 @@ resources:
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
+  limits:
+    cpu: 2
+    memory: 1.7Gi
   requests:
     cpu: 100m
-    memory: 128Mi
+    memory: 512Mi
 
 nodeSelector: {}
 
@@ -53,10 +53,23 @@ tolerations: []
 
 affinity: {}
 
+# B64 encoded Binary keystore file
+# With helmfile, this can be set in a production.yaml.gotmpl
+# file by setting
+#keystore: {{ readFile "keystore.p12" | b64enc | quote }}
+# or with SOPS
+#keystore: {{ exec "sops" (list "-d" "keystore.p12") | b64enc | quote }}
+
 postgres:
   host: postgresql-postgresql
+  port: 5432
+  database: managementportal
+  connection_parameters: ""
   user: postgres
   password: password
+  ssl:
+    enabled: false
+    keystorepassword: keystorepassword
 
 from_email: from-email
 server_name: localhost
@@ -69,12 +82,235 @@ managementportal:
   frontend_client_secret: xxx
   common_admin_password: xxx
 
-client_secrets:
-  prmt: secret
-  armt: secret
-  radar_redcap_integrator: secret
-  radar_upload_backend: secret
-  radar_upload_connect: secret
-  radar_upload_frontend: secret
-  radar_rest_sources_backend: secret
-  radarFitbitConnector: secret
+oauth_clients:
+  pRMT:
+    enable: false
+    resource_ids:
+      - res_gateway
+      - res_ManagementPortal
+      - res_appconfig
+    client_secret: ""
+    scope:
+      - MEASUREMENT.CREATE
+      - PROJECT.READ
+      - ROLE.READ
+      - SOURCE.READ
+      - SOURCEDATA.READ
+      - SOURCETYPE.READ
+      - SUBJECT.READ
+      - SUBJECT.UPDATE
+      - USER.READ
+    authorized_grant_types:
+      - refresh_token
+      - authorization_code
+    access_token_validity: 43200
+    refresh_token_validity: 7948800
+    additional_information: '{"dynamic_registration": true}'
+
+  aRMT:
+    enable: false
+    resource_ids:
+      - res_gateway
+      - res_ManagementPortal
+      - res_appconfig
+    client_secret: ""
+    scope:
+      - MEASUREMENT.CREATE
+      - PROJECT.READ
+      - ROLE.READ
+      - SOURCE.READ
+      - SOURCEDATA.READ
+      - SOURCETYPE.READ
+      - SUBJECT.READ
+      - SUBJECT.UPDATE
+      - USER.READ
+    authorized_grant_types:
+      - refresh_token
+      - authorization_code
+    access_token_validity: 43200
+    refresh_token_validity: 7948800
+    additional_information: '{"dynamic_registration": true}'
+
+  THINC-IT:
+    enable: false
+    resource_ids:
+      - res_gateway
+      - res_ManagementPortal
+      - res_appconfig
+    client_secret: ""
+    scope:
+      - MEASUREMENT.CREATE
+      - PROJECT.READ
+      - ROLE.READ
+      - SOURCE.READ
+      - SOURCEDATA.READ
+      - SOURCETYPE.READ
+      - SUBJECT.READ
+      - SUBJECT.UPDATE
+      - USER.READ
+    authorized_grant_types:
+      - refresh_token
+      - authorization_code
+    access_token_validity: 43200
+    refresh_token_validity: 7948800
+    additional_information: '{"dynamic_registration": true}'
+
+  radar_redcap_integrator:
+    enable: false
+    resource_ids:
+      - res_ManagementPortal
+    client_secret: ""
+    scope:
+      - PROJECT.READ
+      - SUBJECT.CREATE
+      - SUBJECT.READ
+      - SUBJECT.UPDATE
+    authorized_grant_types:
+      - client_credentials
+    access_token_validity: 900
+
+  radar_upload_backend:
+    enable: false
+    resource_ids:
+      - res_ManagementPortal
+    client_secret: ""
+    scope:
+      - PROJECT.READ
+      - SUBJECT.READ
+    authorized_grant_types:
+      - client_credentials
+    access_token_validity: 900
+    additional_information: '{"dynamic_registration": true}'
+
+  radar_upload_connect:
+    enable: false
+    resource_ids:
+      - res_ManagementPortal
+      - res_upload
+    client_secret: ""
+    scope:
+      - MEASUREMENT.CREATE
+      - PROJECT.READ
+      - SOURCE.READ
+      - SOURCETYPE.READ
+      - SUBJECT.READ
+      - SUBJECT.UPDATE
+    authorized_grant_types:
+      - client_credentials
+    access_token_validity: 900
+
+  radar_upload_frontend:
+    enable: false
+    resource_ids:
+      - res_ManagementPortal
+      - res_upload
+    client_secret: ""
+    scope:
+      - MEASUREMENT.CREATE
+      - PROJECT.READ
+      - SOURCETYPE.READ
+      - SUBJECT.READ
+    authorized_grant_types:
+      - authorization_code
+    access_token_validity: 900
+    redirect_uri:
+      - /upload/login
+      - http://localhost:8080/upload/login
+
+  radar_rest_sources_auth_backend:
+    enable: false
+    resource_ids:
+      - res_ManagementPortal
+      - res_upload
+    client_secret: ""
+    scope:
+      - PROJECT.READ
+      - SUBJECT.READ
+    authorized_grant_types:
+      - client_credentials
+    access_token_validity: 900
+
+  radar_rest_sources_authorizer:
+    enable: false
+    resource_ids:
+      - res_restAuthorizer
+    client_secret: ""
+    scope:
+      - PROJECT.READ
+      - SOURCETYPE.READ
+      - SUBJECT.READ
+      - SUBJECT.UPDATE
+    authorized_grant_types:
+      - authorization_code
+    access_token_validity: 900
+    redirect_uri:
+      - /rest-sources/authorizer/login
+
+  radar_fitbit_connector:
+    enable: false
+    resource_ids:
+      - res_restAuthorizer
+    client_secret: ""
+    scope:
+      - SUBJECT.READ
+    authorized_grant_types:
+      - client_credentials
+    access_token_validity: 900
+
+  radar_appconfig:
+    enable: false
+    resource_ids:
+      - res_ManagementPortal
+      - res_appconfig
+    client_secret: ""
+    scope:
+      - MEASUREMENT.CREATE
+      - OAUTHCLIENTS.READ
+      - PROJECT.READ
+      - SOURCETYPE.READ
+      - SUBJECT.READ
+    authorized_grant_types:
+      - client_credentials
+    access_token_validity: 900
+
+  appconfig_frontend:
+    enable: false
+    resource_ids:
+      - res_appconfig
+    client_secret: ""
+    scope:
+      - MEASUREMENT.CREATE
+      - OAUTHCLIENTS.READ
+      - PROJECT.CREATE
+      - PROJECT.READ
+      - PROJECT.UPDATE
+      - SOURCETYPE.READ
+      - SUBJECT.READ
+      - SUBJECT.UPDATE
+    authorized_grant_types:
+      - authorization_code
+      - refresh_token
+    access_token_validity: 900
+    refresh_token_validity: 78000
+    redirect_uri:
+      - /appconfig/login
+    autoapprove:
+      - MEASUREMENT.CREATE
+      - OAUTHCLIENTS.READ
+      - PROJECT.CREATE
+      - PROJECT.READ
+      - PROJECT.UPDATE
+      - SOURCETYPE.READ
+      - SUBJECT.READ
+      - SUBJECT.UPDATE
+
+smtp:
+  enabled: false
+  host: smtp
+  port: 25
+  username: username
+  password: secret
+  from: noreply@example.com
+  starttls: false
+  auth: true
+

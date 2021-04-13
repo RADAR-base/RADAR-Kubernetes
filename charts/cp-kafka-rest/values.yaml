@@ -1,7 +1,0 @@
-cp-schema-registry:
-  url: "http://cp-schema-registry:8081"
-
-cp-zookeeper:
-  url: "cp-zookeeper-headless:2181"
-
-imageTag: 5.3.1

@@ -22,7 +22,7 @@ spec:
       {{- range $hosts }}
         - {{ . | quote }}
       {{- end }}
-      secretName: {{ .secretName }}
+      secretName: {{ .Values.ingress.tls.secretName }}
 {{- end }}
   rules:
   {{- range .Values.ingress.hosts }}

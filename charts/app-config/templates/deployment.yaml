@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "app-config.fullname" . }}
+  labels:
+{{ include "app-config.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "app-config.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      annotations:
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secrets: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
+      labels:
+        app.kubernetes.io/name: {{ include "app-config.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ template "app-config.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          - name: JAVA_OPTS
+            value: "{{ .Values.javaOpts }}"
+          - name: MANAGEMENT_PORTAL_CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "app-config.secretName" . }}
+                key: managementPortalClientId
+          - name: MANAGEMENT_PORTAL_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "app-config.secretName" . }}
+                key: managementPortalClientSecret
+          - name: DATABASE_URL
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "app-config.secretName" . }}
+                key: databaseUrl
+          - name: DATABASE_USER
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "app-config.secretName" . }}
+                key: databaseUser
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "app-config.secretName" . }}
+                key: databasePassword
+          volumeMounts:
+          - name: config
+            mountPath: /etc/radar-app-config/
+          ports:
+            - name: http
+              containerPort: 8090
+              protocol: TCP
+            - name: hazelcast
+              containerPort: 5801
+              protocol: TCP
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 20
+            periodSeconds: 60
+            successThreshold: 1
+            tcpSocket:
+              port: http
+            timeoutSeconds: 5
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 20
+            periodSeconds: 60
+            successThreshold: 1
+            tcpSocket:
+              port: http
+            timeoutSeconds: 5
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "app-config.fullname" . }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

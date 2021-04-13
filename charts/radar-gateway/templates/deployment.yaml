@@ -60,28 +60,30 @@ spec:
           command: ["radar-gateway", "/etc/radar-gateway/gateway.yml"]
           env:
           - name: JAVA_OPTS
-            value: "-XX:GCTimeRatio=19 -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=30"
+            value: "-XX:GCTimeRatio=19 -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=30 --add-opens java.base/java.io=ALL-UNNAMED --add-opens java.management/javax.management.openmbean=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.management/javax.management=ALL-UNNAMED"
           ports:
             - name: http
-              containerPort: 80
+              containerPort: {{ .Values.service.port }}
               protocol: TCP
           livenessProbe:
-            exec:
-              command:
-              - /bin/sh
-              - -c
-              - curl -Is localhost/radar-gateway/topics 2>&1 | grep -q 401 || exit 1
+            httpGet:
+              path: /radar-gateway/health
+              port: http
+              httpHeaders:
+                - name: Accept
+                  value: application/json
             initialDelaySeconds: 5
             periodSeconds: 90
             timeoutSeconds: 5
             successThreshold: 1
             failureThreshold: 3
           readinessProbe:
-            exec:
-              command:
-              - /bin/sh
-              - -c
-              - curl -Is localhost/radar-gateway/topics 2>&1 | grep -q 401 || exit 1
+            httpGet:
+              path: /radar-gateway/health
+              port: http
+              httpHeaders:
+                - name: Accept
+                  value: application/json
             initialDelaySeconds: 5
             periodSeconds: 90
             timeoutSeconds: 5

@@ -1,4 +1,0 @@
-#podManagementPolicy: Parallel
-syncLimit: 2
-initLimit: 5
-imageTag: 5.3.1
