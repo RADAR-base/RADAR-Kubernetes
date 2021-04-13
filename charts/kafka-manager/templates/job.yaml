@@ -5,11 +5,7 @@ kind: Job
 metadata:
   name: "{{ template "kafka-manager.bootstrap.fullname" . }}-{{ $scriptHash }}"
   labels:
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app.kubernetes.io/name: {{ include "kafka-manager.name" . }}
-    app.kubernetes.io/version: {{ .Chart.AppVersion | replace "+" "_" | trunc 63 }}
-    helm.sh/chart: {{ include "kafka-manager.chart" . }}
+{{ include "kafka-manager.labels" . | indent 4 }}
 spec:
   template:
     metadata:

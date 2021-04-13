@@ -4,7 +4,7 @@
 
 server_name: localhost
 maintainer_email: me@example.com
-
+installCRDs: true
 
 prometheus:
   enabled: true

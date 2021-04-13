@@ -1,0 +1,82 @@
+bases:
+- ../environments.yaml
+
+---
+
+helmDefaults:
+  timeout: 180
+  kubeContext: {{ .Values.kubeContext }}
+
+repositories:
+- name: bitnami
+  url: https://charts.bitnami.com/bitnami
+
+releases:
+  - name: postgresql
+    chart: bitnami/postgresql
+    version: 9.6.0
+    wait: false
+    installed: {{ .Values.postgresql._install }}
+    values:
+      - "../etc/postgresql/values.yaml"
+      - {{ .Values.postgresql | toYaml | indent 8 | trim }}
+    set:
+      - name: postgresqlPassword
+        value: {{ .Values.postgres_password }}
+      - name: replication.password
+        value: {{ .Values.postgres_password }}
+
+  - name: management-portal
+    chart: ../charts/management-portal
+    installed: {{ .Values.management_portal._install }}
+    values:
+      - {{ .Values.management_portal | toYaml | indent 8 | trim }}
+    set:
+      - name: ingress.hosts
+        values: [{{ .Values.server_name }}]
+      - name: server_name
+        value: {{ .Values.server_name }}
+      - name: oauth_clients.radar_redcap_integrator.enable
+        value: {{ .Values.radar_integration._install }}
+      - name: oauth_clients.radar_upload_connect.enable
+        value: {{ .Values.radar_upload_source_connector._install }}
+      - name: oauth_clients.radar_upload_frontend.enable
+        value: {{ .Values.radar_upload_connect_frontend._install }}
+      - name: oauth_clients.radar_upload_backend.enable
+        value: {{ .Values.radar_upload_connect_backend._install }}
+      - name: oauth_clients.radar_rest_sources_authorizer.enable
+        value: {{ .Values.radar_rest_sources_authorizer._install }}
+      - name: oauth_clients.radar_rest_sources_auth_backend.enable
+        value: {{ .Values.radar_rest_sources_backend._install }}
+      - name: oauth_clients.radar_fitbit_connector.enable
+        value: {{ .Values.radar_fitbit_connector._install }}
+      - name: oauth_clients.radar_appconfig.enable
+        value: {{ .Values.app_config._install }}
+      - name: oauth_clients.appconfig_frontend.enable
+        value: {{ .Values.app_config_frontend._install }}
+
+  - name: smtp
+    chart: ../charts/smtp
+    installed: {{ .Values.smtp._install }}
+    values:
+      - {{ .Values.smtp | toYaml | indent 8 | trim }}
+
+  - name: app-config
+    chart: ../charts/app-config
+    installed: {{ .Values.app_config._install }}
+    values:
+      - {{ .Values.app_config | toYaml | indent 8 | trim }}
+    set:
+      - name: ingress.hosts
+        values: [{{ .Values.server_name }}]
+      - name: clientSecret
+        value: {{ .Values.management_portal.oauth_clients.radar_appconfig.client_secret }}
+
+  - name: app-config-frontend
+    chart: ../charts/app-config-frontend
+    installed: {{ .Values.app_config_frontend._install }}
+    values:
+      - {{ .Values.app_config_frontend | toYaml | indent 8 | trim }}
+    set:
+      - name: server_name
+        value: {{ .Values.server_name }}

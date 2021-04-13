@@ -1,3 +1,4 @@
+kubeContext: default
 server_name: example.com
 maintainer_email: MAINTAINER_EMAIL
 kafka_num_brokers: 3
@@ -20,9 +21,9 @@ cert_manager:
 fluentd:
   _install: true
 
-prometheus_operator:
+kube_prometheus_stack:
   _install: true
-  prometheus-operator:
+  kube-prometheus-stack:
     prometheus:
       prometheusSpec:
         replicas: 1
@@ -55,6 +56,10 @@ nginx_ingress:
   _install: true
   controller:
     replicaCount: 1
+  metrics:
+    enabled: "true"
+    serviceMonitor:
+      enabled: "true"
 
 kafka_manager:
   _install: true
@@ -65,6 +70,7 @@ kafka_manager:
 
 velero:
   _install: true
+  objectStorageBackupReplicaCount: 1
   local:
     accessKey: accessKey
     secretKey: secretKey
@@ -87,6 +93,15 @@ velero:
           aws_secret_access_key=secretKey
 
 # --------------------------------------------------------- 10-base.yaml ---------------------------------------------------------
+confluent_cloud:
+  enabled: false
+  cc:
+    bootstrapServerurl: confluentBootstrapServers
+    apiKey: ccApikey
+    apiSecret: ccApiSecret
+    schemaRegistryApiKey: srApiKey
+    schemaRegistryApiSecret: srApiSecret
+    schemaRegistryUrl: confluentSchemaRegistryUrl
 
 cp_zookeeper:
   _install: true
@@ -104,6 +119,7 @@ cp_schema_registry:
 catalog_server:
   _install: true
   replicaCount: 1
+  schema_registry: http://cp-schema-registry:8081
 
 postgresql:
   _install: true
@@ -113,6 +129,11 @@ postgresql:
 management_portal:
   _install: true
   replicaCount: 1  # should be 1
+  postgres:
+    password: password
+    ssl:
+      enabled: false
+      keystorepassword: keystorepassword
   managementportal:
     catalogue_server_enable_auto_import: true
     common_admin_password: password
@@ -121,16 +142,42 @@ management_portal:
     oauth_checking_key_aliases_0: radarbase-managementportal-ec
     oauth_checking_key_aliases_1: selfsigned
   from_email: me@example.com
-  client_secrets:
-    prmt: secret
-    armt: secret
-    radar_redcap_integrator: secret
-    radar_upload_backend: secret
-    radar_upload_connect: secret
-    radar_upload_frontend: secret
-    radar_rest_sources_backend: secret
-    radarFitbitConnector: secret
+  oauth_clients:
+    pRMT:
+      enable: true
+      client_secret: "saturday$SHARE$scale"
+    aRMT:
+      enable: true
+      client_secret: ""
+    radar_upload_backend:
+      client_secret: secret
+    radar_upload_connect:
+      client_secret: secret
+    radar_rest_sources_auth_backend:
+      client_secret: secret
+    radar_redcap_integrator:
+      client_secret: secret
+    radar_fitbit_connector:
+      client_secret: secret
+    radar_appconfig:
+      client_secret: secret
+  smtp:
+    enabled: false
+    host: smtp
+    port: 25
+    username: username
+    password: secret
+    from: noreply@example.com
 
+app_config:
+  _install: true
+  replicaCount: 1
+  jdbc:
+    password: password
+
+app_config_frontend:
+  _install: true
+  replicaCount: 1
 
 smtp:
   _install: true
@@ -141,29 +188,6 @@ smtp:
     password: password
   persistence:
     size: 1Gi
-
-# --------------------------------------------------------- 20-dashboard.yaml ---------------------------------------------------------
-
-hotstorage_password: password
-
-radar_dashboard:
-  _install: true
-  replicaCount: 1
-
-radar_hotstorage:
-  _install: true
-  replicaCount: 1  # should be 1
-  persistence:
-    size: 10Gi
-
-radar_mongodb-connector:
-  _install: true
-  replicaCount: 1
-
-radar_restapi:
-  _install: true
-  replicaCount: 1
-
 
 # --------------------------------------------------------- 20-fitbit.yaml ---------------------------------------------------------
 fitbit_api_client: fitbit_api_client_id
@@ -181,58 +205,13 @@ radar_rest_sources_authorizer:
 radar_rest_sources_backend:
   _install: true
   replicaCount: 1
-
-# --------------------------------------------------------- 20-hfds.yaml ---------------------------------------------------------
-
-hdfs:
-  _install: true
-  global:
-    zookeeperQuorumOverride: cp-zookeeper-0.cp-zookeeper-headless.default.svc.cluster.local:2181,cp-zookeeper-1.cp-zookeeper-headless.default.svc.cluster.local:2181,cp-zookeeper-2.cp-zookeeper-headless.default.svc.cluster.local:2181
-
-  hdfs-namenode-k8s:
-    persistence:
-      size: 5Gi
-
-  hdfs-datanode-k8s:
-    persistence:
-      size: 200Gi
-
-radar_connect_hdfs_sink:
-  _install: true
-  replicaCount: 1  # should be 1
-
-rook:
-  _install: false
-
-ceph:
-  _install: false
-  ceph_cluster:
-    mon:
-      count: 3
-      claim:
-        storage:
-          class: cinder
-          size: 10Gi
-    storage:
-      name: set1
-      count: 3
-      claim:
-        name: data
-        storage:
-          size: 200Gi
-          class: cinder
-
-radar_output:
-  _install: true
-  replicaCount: 1
-  num_threads: 2
-  target_type: s3
-  source_type: s3
-  hdfs_namenodes: "[hdfs-namenode-0, hdfs-namenode-1]"
-  sourceBucketName: radar-intermediate-storage
-  targetBucketName: radar-output-storage
-  redisUrl: redis://redis-master:6379
-  minimumFileAge: 900
+  postgres:
+    host: postgresql-postgresql
+    user: postgres
+    password: password
+    ssl:
+      enabled: false
+      keystorepassword: keystorepassword
 
 # --------------------------------------------------------- 20-ingestion.yaml ---------------------------------------------------------
 
@@ -245,7 +224,6 @@ radar_gateway:
   replicaCount: 1
 
 # --------------------------------------------------------- 20-kafka-analysis.yaml ---------------------------------------------------------
-
 
 radar_backend_monitor:
   _install: true
@@ -263,7 +241,6 @@ radar_integration:
   _install: true
   replicaCount: 1
   oauth_client_id: radar_redcap_integrator
-  oauth_client_secret: secret
   projects:
   - url: "http://example.com"
     project_id: "1"
@@ -317,3 +294,63 @@ radar_s3_connector:
   replicaCount: 1
   # The bucket name where intermediate data for cold storage should be written to.
   bucketName: radar_intermediate_storage
+  bucketAccessKey: AKIAIOSFODNN7EXAMPLE
+  bucketSecretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+  s3Endpoint: http://minio:9000/
+
+s3_proxy:
+  _install: false
+  replicaCount: 1
+  s3:
+    identity: AKIAIOSFODNN7EXAMPLE
+    credential: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+  target:
+    provider: azureblob
+
+radar_output:
+  _install: true
+  replicaCount: 1
+  source:
+    s3:
+      endpoint: http://minio:9000/
+      accessToken: AKIAIOSFODNN7EXAMPLE
+      secretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      bucket: radar-intermediate-storage
+  target:
+    s3:
+      endpoint: http://minio:9000/
+      accessToken: AKIAIOSFODNN7EXAMPLE
+      secretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      bucket: radar-output-storage
+  redis:
+    url: redis://redis-master:6379
+
+# --------------------------------------------------------- 30-confluent-cloud.yaml ---------------------------------------------------------
+
+ccSchemaRegistryProxy:
+  _install: false
+  externalName: schema-registry-domain
+
+# --------------------------------------------------------- 20-grafana.yaml ---------------------------------------------------------
+
+grafana_password: password
+grafana_metrics_username: username
+grafana_metrics_password: passweord
+
+timescaledb_password: password
+timescaledb_username: grafana
+timescaledb_db_name: grafana-metrics
+
+radar_grafana:
+  _install: true
+  replicaCount: 1
+
+timescaledb:
+  _install: true
+  replicaCount: 1
+  persistence:
+    size: 8Gi
+
+radar_jdbc_connector:
+  _install: true
+  replicaCount: 1

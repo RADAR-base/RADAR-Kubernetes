@@ -1,13 +1,12 @@
-environments:
-  default:
-    values:
-    - ../base.yaml
-    - ../production.yaml
+bases:
+- ../environments.yaml
+
+---
 
 helmDefaults:
   atomic: true
-  force: true
   timeout: 600
+  kubeContext: {{ .Values.kubeContext }}
 
 releases:
   - name: velero
@@ -16,5 +15,4 @@ releases:
     version: 2.12.0
     installed: {{ .Values.velero._install }}
     values:
-      - "../charts/velero/values.yaml"
       - {{ .Values.velero | toYaml | indent 8 | trim }}

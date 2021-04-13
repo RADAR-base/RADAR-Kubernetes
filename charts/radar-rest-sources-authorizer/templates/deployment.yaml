@@ -61,24 +61,20 @@ spec:
               containerPort: 80
               protocol: TCP
           livenessProbe:
-            exec:
-              command:
-              - /bin/sh
-              - -c
-              - wget --spider http://localhost:80
+            httpGet:
+              path: /
+              port: http
             initialDelaySeconds: 5
-            periodSeconds: 90
+            periodSeconds: 30
             timeoutSeconds: 3
             successThreshold: 1
             failureThreshold: 3
           readinessProbe:
-            exec:
-              command:
-              - /bin/sh
-              - -c
-              - wget --spider http://localhost:80
+            httpGet:
+              path: /
+              port: http
             initialDelaySeconds: 5
-            periodSeconds: 90
+            periodSeconds: 10
             timeoutSeconds: 3
             successThreshold: 1
             failureThreshold: 3

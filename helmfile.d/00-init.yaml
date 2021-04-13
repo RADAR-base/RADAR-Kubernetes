@@ -1,19 +1,24 @@
+bases:
+- ../environments.yaml
+
+---
+
 repositories:
 - name: stable
-  url: https://kubernetes-charts.storage.googleapis.com
+  url: https://charts.helm.sh/stable
 - name: elastic
   url: https://helm.elastic.co
+- name: jetstack
+  url: https://charts.jetstack.io
+- name: prometheus-community
+  url: https://prometheus-community.github.io/helm-charts
 
-environments:
-  default:
-    values:
-    - ../base.yaml
-    - ../production.yaml
 
 helmDefaults:
   atomic: true
-  force: true
+  # force: true
   timeout: 600
+  kubeContext: {{ .Values.kubeContext }}
 
 releases:
   - name: mongodb
@@ -22,7 +27,7 @@ releases:
     version: 3.11.5
     installed: {{ .Values.mongodb._install }}
     values:
-      - "../charts/mongodb/values.yaml"
+      - "../etc/mongodb/values.yaml"
       - {{ .Values.mongodb | toYaml | indent 8 | trim }}
 
   - name: elasticsearch
@@ -33,6 +38,8 @@ releases:
     set:
       - name: imageTag
         value: "6.8.6"
+      - name: resources.requests.memory
+        value: "1.5Gi"
 
   - name: graylog
     namespace: graylog
@@ -40,7 +47,7 @@ releases:
     version: 1.5.6
     installed: {{ .Values.graylog._install }}
     values:
-      - "../charts/graylog/values.yaml"
+      - "../etc/graylog/values.yaml"
       - {{ .Values.graylog | toYaml | indent 8 | trim }}
     set:
       - name: graylog.rootEmail
@@ -57,58 +64,64 @@ releases:
     chart: ../charts/fluentd
     installed: {{ .Values.fluentd._install }}
     values:
-      - "../charts/fluentd/values.yaml"
       - {{ .Values.fluentd | toYaml | indent 8 | trim }}
 
   - name: cert-manager
     namespace: cert-manager
     wait: true
     installed: {{ .Values.cert_manager._install }}
+    disableValidation: true
     chart: ../charts/cert-manager
+    hooks:
+      - events: ["presync"]
+        showlogs: true
+        command: "kubectl"
+        args: ["--context", "{{ .Values.kubeContext }}", "apply", "-f", "../charts/cert-manager/files/crds.yaml"]
     set:
       - name: server_name
         value: {{ .Values.server_name }}
       - name: maintainer_email
         value: {{ .Values.maintainer_email }}
 
-  - name: prometheus-operator
-    chart: ../charts/prometheus-operator
+  - name: kube-prometheus-stack
+    chart: ../charts/kube-prometheus-stack
     wait: true
     namespace: monitoring
-    installed: {{ .Values.prometheus_operator._install }}
+    installed: {{ .Values.kube_prometheus_stack._install }}
+    disableValidation: true
     values:
-      - "../charts/prometheus-operator/values.yaml"
-      - {{ .Values.prometheus_operator | toYaml | indent 8 | trim }}
+      - {{ .Values.kube_prometheus_stack | toYaml | indent 8 | trim }}
     set:
       - name: server_name
         value: {{ .Values.server_name }}
-      - name: prometheus-operator.prometheus.ingress.hosts
+      - name: kube-prometheus-stack.prometheus.ingress.hosts
         values: ["prometheus.{{ .Values.server_name }}"]
-      - name: prometheus-operator.prometheus.ingress.tls[0].secretName
+      - name: kube-prometheus-stack.prometheus.ingress.tls[0].secretName
         value: radar-base-tls-prometheus
-      - name: prometheus-operator.prometheus.ingress.tls[0].hosts
+      - name: kube-prometheus-stack.prometheus.ingress.tls[0].hosts
         values: ["prometheus.{{ .Values.server_name }}"]
 
-      - name: prometheus-operator.alertmanager.ingress.hosts
+      - name: kube-prometheus-stack.alertmanager.ingress.hosts
         values: ["alertmanager.{{ .Values.server_name }}"]
-      - name: prometheus-operator.alertmanager.ingress.tls[0].secretName
+      - name: kube-prometheus-stack.alertmanager.ingress.tls[0].secretName
         value: radar-base-tls-alertmanager
-      - name: prometheus-operator.alertmanager.ingress.tls[0].hosts
+      - name: kube-prometheus-stack.alertmanager.ingress.tls[0].hosts
         values: ["alertmanager.{{ .Values.server_name }}"]
 
-      - name: prometheus-operator.grafana.ingress.hosts
+      - name: kube-prometheus-stack.grafana.ingress.hosts
         values: ["grafana.{{ .Values.server_name }}"]
-      - name: prometheus-operator.grafana.ingress.tls[0].secretName
+      - name: kube-prometheus-stack.grafana.ingress.tls[0].secretName
         value: radar-base-tls-grafana
-      - name: prometheus-operator.grafana.ingress.tls[0].hosts
+      - name: kube-prometheus-stack.grafana.ingress.tls[0].hosts
         values: ["grafana.{{ .Values.server_name }}"]
 
   - name: nginx-ingress
     chart: stable/nginx-ingress
-    version: 1.30.0
+    version: 1.40.2
+    force: false
     installed: {{ .Values.nginx_ingress._install }}
     values:
-      - "../charts/nginx-ingress/values.yaml"
+      - "../etc/nginx-ingress/values.yaml"
       - {{ .Values.nginx_ingress | toYaml | indent 8 | trim }}
 
   - name: kafka-manager

@@ -43,48 +43,43 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-          - name: SPRING_DATASOURCE_URL
-            value: "jdbc:postgresql://{{ .Values.postgres.host }}:5432/restsourceauthorizer"
-          - name: SPRING_DATASOURCE_USERNAME
-            value: {{ .Values.postgres.user }}
-          - name: SPRING_DATASOURCE_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: {{ template "radar-rest-sources-backend.secretName" . }}
-                key: postgresql_password
           - name: REST_SOURCE_AUTHORIZER_SOURCE_CLIENTS_FILE_PATH
-            value: app-includes/rest_source_clients_configs.yml
+            value: /etc/radar-rest-sources-backend/authorizer.yml
           - name: REST_SOURCE_AUTHORIZER_VALIDATOR
             value: "managementportal"
-          - name: REST_SOURCE_AUTHORIZER_MANAGEMENT_PORTAL_BASE_URL
-            value: "http://{{ .Values.managementportal_host }}:8080/managementportal"
-          - name: REST_SOURCE_AUTHORIZER_MANAGEMENT_PORTAL_OAUTH_CLIENT_ID
-            value: "radar_rest_sources_auth_backend"
-          - name: REST_SOURCE_AUTHORIZER_MANAGEMENT_PORTAL_OAUTH_CLIENT_SECRET
-            value: {{ .Values.client_secret }}
           - name: REST_SOURCE_AUTHORIZER_AUTH_PUBLIC_KEY_ENDPOINTS_0
             value: "http://{{ .Values.managementportal_host }}:8080/managementportal/oauth/token_key"
           - name: APP_SLEEP
             value: "10"   # gives time for the database to boot before the application
+          command:
+          - authorizer-app-backend
+          - /etc/radar-rest-sources-backend/authorizer.yml
+          imagePullPolicy: Always
           ports:
             - name: http
               containerPort: 8080
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /health
+              path: /rest-sources/backend/health
               port: 8080
+              httpHeaders:
+                - name: Accept
+                  value: application/json
             initialDelaySeconds: 5
-            periodSeconds: 300
+            periodSeconds: 30
             timeoutSeconds: 3
             successThreshold: 1
             failureThreshold: 3
           readinessProbe:
             httpGet:
-              path: /health
+              path: /rest-sources/backend/health
               port: 8080
+              httpHeaders:
+                - name: Accept
+                  value: application/json              
             initialDelaySeconds: 5
-            periodSeconds: 60
+            periodSeconds: 15
             timeoutSeconds: 3
             successThreshold: 1
             failureThreshold: 3
@@ -92,11 +87,20 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - name: config
-              mountPath: /app-includes/
+              mountPath: /etc/radar-rest-sources-backend/
+            {{- if .Values.postgres.ssl.enabled }}
+            - name: postgres-root-cert
+              mountPath: /root/.postgresql/
+            {{ end }}
       volumes:
         - name: config
           configMap:
             name: {{ include "radar-rest-sources-backend.fullname" . }}
+        {{- if .Values.postgres.ssl.enabled }}
+        - name: postgres-root-cert
+          secret:
+            secretName: {{ include "radar-rest-sources-backend.fullname" . }}-root-cert
+        {{ end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

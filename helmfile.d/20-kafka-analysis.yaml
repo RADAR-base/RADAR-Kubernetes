@@ -1,29 +1,29 @@
-environments:
-  default:
-    values:
-    - ../base.yaml
-    - ../production.yaml
+bases:
+- ../environments.yaml
+
+---
 
 helmDefaults:
   atomic: true
   timeout: 600
+  kubeContext: {{ .Values.kubeContext }}
 
 releases:
   - name: radar-backend-monitor
     chart: ../charts/radar-backend
     installed: {{ .Values.radar_backend_monitor._install }}
     values:
-      - "../charts/radar-backend/values-monitor.yaml"
+      - "../etc/radar-backend-monitor/values.yaml"
       - {{ .Values.radar_backend_monitor | toYaml | indent 8 | trim }}
     set:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
-    
+
   - name: radar-backend-stream
     chart: ../charts/radar-backend
     installed: {{ .Values.radar_backend_stream._install }}
     values:
-      - "../charts/radar-backend/values-stream.yaml"
+      - "../etc/radar-backend-stream/values.yaml"
       - {{ .Values.radar_backend_stream | toYaml | indent 8 | trim }}
     set:
       - name: kafka_num_brokers

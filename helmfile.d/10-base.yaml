@@ -1,12 +1,12 @@
-environments:
-  default:
-    values:
-    - ../base.yaml
-    - ../production.yaml
+bases:
+- ../environments.yaml
+
+---
 
 helmDefaults:
   atomic: true
   timeout: 600
+  kubeContext: {{ .Values.kubeContext }}
 
 releases:
   - name: cp-zookeeper
@@ -14,23 +14,26 @@ releases:
     wait: true
     installed: {{ .Values.cp_zookeeper._install }}
     values:
+      - "../etc/cp-zookeeper/values.yaml"
       - {{ .Values.cp_zookeeper | toYaml | indent 8 | trim }}
+
   - name: cp-kafka
     chart: ../cp-helm-charts/charts/cp-kafka
     wait: true
     installed: {{ .Values.cp_kafka._install }}
     values:
-      - "../charts/cp-kafka/values.yaml"
+      - "../etc/cp-kafka/values.yaml"
       - {{ .Values.cp_kafka | toYaml | indent 8 | trim }}
     set:
       - name: brokers
         value: {{ .Values.kafka_num_brokers }}
+
   - name: cp-schema-registry
     chart: ../cp-helm-charts/charts/cp-schema-registry
     wait: true
     installed: {{ .Values.cp_schema_registry._install }}
     values:
-      - "../charts/cp-schema-registry/values.yaml"
+      - "../etc/cp-schema-registry/values.yaml"
       - {{ .Values.cp_schema_registry | toYaml | indent 8 | trim }}
     set:
       - name: ingress.hosts[0].host
@@ -41,47 +44,20 @@ releases:
         value: radar-base-tls
       - name: ingress.tls[0].hosts
         values: ["{{ .Values.server_name }}"]
-        
+
   - name: catalog-server
     chart: ../charts/catalog-server
     wait: true
     installed: {{ .Values.catalog_server._install }}
     values:
-      - "../charts/postgresql/values.yaml"
       - {{ .Values.catalog_server | toYaml | indent 8 | trim }}
+      - {{ .Values.confluent_cloud | toYaml | indent 8 | trim }}
     set:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
-
-  - name: postgresql
-    chart: stable/postgresql
-    version: 5.3.3
-    wait: false
-    installed: {{ .Values.postgresql._install }}
-    values:
-      - "../charts/postgresql/values.yaml"
-      - {{ .Values.postgresql | toYaml | indent 8 | trim }}
-    set:
-      - name: postgresqlPassword
-        value: {{ .Values.postgres_password }}
-      - name: replication.password
-        value: {{ .Values.postgres_password }}
-
-  - name: management-portal
-    chart: ../charts/management-portal
-    installed: {{ .Values.management_portal._install }}
-    values:
-      - {{ .Values.management_portal | toYaml | indent 8 | trim }}
-    set:
-      - name: ingress.hosts
-        values: [{{ .Values.server_name }}]
-      - name: server_name
-        value: {{ .Values.server_name }}
-      - name: postgres.password
-        value: {{ .Values.postgres_password }}
-
-  - name: smtp
-    chart: ../charts/smtp
-    installed: {{ .Values.smtp._install }}
-    values:
-      - {{ .Values.smtp | toYaml | indent 8 | trim }}
+      - name: cc.enabled
+        value: {{ .Values.confluent_cloud.enabled }}
+      {{- if .Values.confluent_cloud.enabled }}
+      - name: schema_registry
+        value: {{ .Values.confluent_cloud.cc.schemaRegistryUrl }}
+      {{ end }}

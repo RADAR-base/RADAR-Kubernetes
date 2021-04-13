@@ -1,0 +1,34 @@
+image: confluentinc/cp-kafka
+imageTag: 5.3.1
+
+customEnv:
+  KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+  KAFKA_LOG_RETENTION_HOURS: "730"
+  KAFKA_MESSAGE_MAX_BYTES: "4000048"
+  KAFKA_LOG4J_LOGGERS: kafka.producer.async.DefaultEventHandler=INFO,kafka.controller=INFO,state.change.logger=INFO
+  KAFKA_COMPRESSION_TYPE: lz4
+  KAFKA_INTER_BROKER_PROTOCOL_VERSION: "1.1"
+  KAFKA_LOG_MESSAGE_FORMAT_VERSION: "1.1"
+  KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
+  KAFKA_OFFSETS_RETENTION_MINUTES: "10080"
+  KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: "16000"
+
+
+cp-zookeeper:
+  enabled: false
+  url: "cp-zookeeper-headless:2181"
+
+persistence:
+  size: 2Gi
+
+resources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 1Gi
