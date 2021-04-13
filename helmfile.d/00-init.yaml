@@ -14,6 +14,8 @@ repositories:
   url: https://charts.bitnami.com/bitnami
 - name: kongz
   url: https://charts.kong-z.com
+- name: fluent
+  url: https://fluent.github.io/helm-charts
 - name: ingress-nginx
   url: https://kubernetes.github.io/ingress-nginx
 
@@ -35,6 +37,9 @@ releases:
     chart: elastic/elasticsearch
     version: 7.12.0
     installed: {{ .Values.elasticsearch._install }}
+    values:
+      - "../etc/elasticsearch/values.yaml"
+      - {{ .Values.elasticsearch | toYaml | indent 8 | trim }}
     set:
       - name: resources.requests.memory
         value: "1.0Gi"
@@ -57,13 +62,14 @@ releases:
       - name: graylog.ingress.tls[0].hosts
         values: ["graylog.{{ .Values.server_name }}"]
 
-  - name: fluentd
+  - name: fluent-bit
     namespace: graylog
-    chart: bitnami/fluentd
-    version: 3.6.4
-    installed: {{ .Values.fluentd._install }}
+    chart: fluent/fluent-bit
+    version: 0.15.4
+    installed: {{ .Values.fluent_bit._install }}
     values:
-      - {{ .Values.fluentd | toYaml | indent 8 | trim }}
+      - "../etc/fluent-bit/values.yaml"
+      - {{ .Values.fluent_bit | toYaml | indent 8 | trim }}
 
   - name: cert-manager
     namespace: cert-manager

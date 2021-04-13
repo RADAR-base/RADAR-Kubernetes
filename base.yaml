@@ -18,7 +18,7 @@ elasticsearch:
 cert_manager:
   _install: true
 
-fluentd:
+fluent_bit:
   _install: true
 
 kube_prometheus_stack:
