@@ -8,6 +8,12 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 data:
+  healthcheck.sh: |
+     #!/bin/sh
+     STATUS=$(curl -s --max-time 4 localhost:8090/kafka/health)
+     if ! (echo "$STATUS" | grep -Fq '"kafka":{"status":"UP"'); then
+       exit 1
+     fi
   gateway.yml: |
     # Resource config class
     #resourceConfig: org.radarbase.gateway.inject.ManagementPortalEnhancerFactory
