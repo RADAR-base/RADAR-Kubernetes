@@ -8,6 +8,12 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 data:
+  healthcheck.sh: |
+    #!/bin/sh
+    STATUS=$(curl -s localhost:8090/appconfig/api/health)
+    if ! (echo "$STATUS" | grep -Fq 'db":{"status":"UP'); then
+      exit 1
+    fi
   appconfig.yml: |
     baseUri: http://0.0.0.0:8090/appconfig/api
     isJmxEnabled: false
