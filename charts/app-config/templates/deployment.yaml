@@ -71,20 +71,24 @@ spec:
               containerPort: 5801
               protocol: TCP
           livenessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - /etc/radar-app-config/healthcheck.sh
             failureThreshold: 3
             initialDelaySeconds: 20
             periodSeconds: 60
             successThreshold: 1
-            tcpSocket:
-              port: http
             timeoutSeconds: 5
           readinessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - /etc/radar-app-config/healthcheck.sh
             failureThreshold: 3
             initialDelaySeconds: 20
             periodSeconds: 60
             successThreshold: 1
-            tcpSocket:
-              port: http
             timeoutSeconds: 5
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
