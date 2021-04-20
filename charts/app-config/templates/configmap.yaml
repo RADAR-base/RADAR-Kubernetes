@@ -10,7 +10,7 @@ metadata:
 data:
   healthcheck.sh: |
     #!/bin/sh
-    STATUS=$(curl -s localhost:8090/appconfig/api/health)
+    STATUS=$(curl -s --max-time 4 localhost:8090/appconfig/api/health)
     if ! (echo "$STATUS" | grep -Fq 'db":{"status":"UP'); then
       exit 1
     fi
