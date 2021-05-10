@@ -11,7 +11,7 @@ data:
   source-fitbit.properties: |
     name=radar-fitbit-source
     connector.class=org.radarbase.connect.rest.fitbit.FitbitSourceConnector
-    tasks.max=4
+    tasks.max={{ .Values.connector_num_tasks }}
     rest.source.base.url=https://api.fitbit.com
     rest.source.poll.interval.ms=5000
     rest.source.request.generator.class=org.radarbase.connect.rest.fitbit.request.FitbitRequestGenerator
