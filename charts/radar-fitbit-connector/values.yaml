@@ -69,6 +69,8 @@ kafka: PLAINTEXT://cp-kafka-headless:9092
 kafka_num_brokers: "3"
 schema_registry: http://cp-schema-registry:8081
 
+connector_num_tasks: "5"
+
 radar_rest_sources_backend: radar-rest-sources-backend
 fitbit_api_client: ""
 fitbit_api_secret: ""
