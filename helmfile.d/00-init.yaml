@@ -35,11 +35,9 @@ releases:
     chart: elastic/elasticsearch
     version: 7.6.0
     installed: {{ .Values.elasticsearch._install }}
-    set:
-      - name: imageTag
-        value: "6.8.6"
-      - name: resources.requests.memory
-        value: "1.5Gi"
+    values:
+      - "../etc/elasticsearch/values.yaml"
+      - {{ .Values.elasticsearch | toYaml | indent 8 | trim }}
 
   - name: graylog
     namespace: graylog
