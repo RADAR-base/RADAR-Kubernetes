@@ -1,0 +1,5 @@
+imageTag: "6.8.6"
+antiAffinity: "best effort"
+resources:
+    requests:
+      memory: 1.5Gi
