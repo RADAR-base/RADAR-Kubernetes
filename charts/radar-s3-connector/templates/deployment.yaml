@@ -176,6 +176,7 @@ spec:
             value: "{{ .Values.kafka_num_brokers }}"
           - name: CONNECT_LOG4J_LOGGERS
             value: "org.reflections=ERROR"
+          {{- if and .Values.bucketAccessKey .Values.bucketSecretKey }}
           - name: AWS_ACCESS_KEY
             valueFrom:
               secretKeyRef:
@@ -186,6 +187,7 @@ spec:
               secretKeyRef:
                 name: {{ template "radar-s3-connector.fullname" . }}
                 key: awsSecretKey
+          {{- end }}
           ports:
             - name: http
               containerPort: 8083
