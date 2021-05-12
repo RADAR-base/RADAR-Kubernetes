@@ -62,7 +62,7 @@ serviceMonitor:
 managementportalHost: management-portal
 schemaRegistry: http://cp-schema-registry:8081
 max_requests: 1000
-bootstrapServers: cp-kafka:9092
+bootstrapServers: cp-kafka-headless:9092
 checkSourceId: true
 
 adminProperties: {}

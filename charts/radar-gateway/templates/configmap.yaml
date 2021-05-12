@@ -10,7 +10,7 @@ metadata:
 data:
   healthcheck.sh: |
      #!/bin/sh
-     STATUS=$(curl -s --max-time 4 localhost:8090/kafka/health)
+     STATUS=$(curl -s --max-time 4 localhost:{{ .Values.service.port }}/kafka/health)
      if ! (echo "$STATUS" | grep -Fq '"kafka":{"status":"UP"'); then
        exit 1
      fi
@@ -19,7 +19,7 @@ data:
     #resourceConfig: org.radarbase.gateway.inject.ManagementPortalEnhancerFactory
 
     server:
-      baseUri: http://0.0.0.0:{{ .Values.service.port }}/radar-gateway/
+      baseUri: http://0.0.0.0:{{ .Values.service.port }}/kafka/
 
     kafka:
       producer:
