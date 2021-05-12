@@ -69,6 +69,8 @@ kafka_num_brokers: "3"
 schema_registry: http://cp-schema-registry:8081
 
 radar_rest_sources_backend_url: http://radar-rest-sources-backend:8080/rest-sources/backend/
+connector_num_tasks: "5"
+
 fitbit_api_client: ""
 fitbit_api_secret: ""
 

@@ -10,7 +10,7 @@ metadata:
 data:
   healthcheck.sh: |
     #!/bin/sh
-    STATUS=$(wget -O - localhost:8080/managementportal/management/health)
+    STATUS=$(wget -T 1 -O - localhost:8080/managementportal/management/health)
     if ! (echo "$STATUS" | grep -Fq 'db":{"status":"UP'); then
       exit 1
     fi

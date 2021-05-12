@@ -40,9 +40,6 @@ releases:
     values:
       - "../etc/elasticsearch/values.yaml"
       - {{ .Values.elasticsearch | toYaml | indent 8 | trim }}
-    set:
-      - name: resources.requests.memory
-        value: "1.0Gi"
 
   - name: graylog
     namespace: graylog

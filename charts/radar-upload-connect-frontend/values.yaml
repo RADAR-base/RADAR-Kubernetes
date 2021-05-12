@@ -6,7 +6,7 @@ replicaCount: 2
 
 image:
   repository: radarbase/radar-upload-connect-frontend
-  tag: 0.5.8
+  tag: 0.5.9
   pullPolicy: IfNotPresent
 
 nameOverride: ""
