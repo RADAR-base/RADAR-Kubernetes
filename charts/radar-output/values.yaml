@@ -79,7 +79,7 @@ target:
     container: ""
 
 redis:
-  url: redis://redis-master:6379
+  uri: redis://redis-master:6379
 
 worker:
   minimumFileAge: 900

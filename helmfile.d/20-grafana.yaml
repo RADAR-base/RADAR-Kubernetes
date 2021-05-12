@@ -4,17 +4,18 @@ bases:
 ---
 
 repositories:
-  - name: stable
-    url: https://charts.helm.sh/stable
+  - name: grafana
+    url: https://grafana.github.io/helm-charts
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
 
 helmDefaults:
-  atomic: true
-  timeout: 600
   kubeContext: {{ .Values.kubeContext }}
 
 releases:
   - name: timescaledb
-    chart: stable/postgresql
+    chart: bitnami/postgresql
+    version: 9.6.0
     installed: {{ .Values.timescaledb._install }}
     values:
       - "../etc/timescaledb/values.yaml"
@@ -28,7 +29,8 @@ releases:
         value: {{ .Values.timescaledb_db_name }}
 
   - name: radar-grafana
-    chart: stable/grafana
+    chart: grafana/grafana
+    version: 6.7.1
     installed: {{ .Values.radar_grafana._install }}
     values:
       - {{ .Values.radar_grafana | toYaml | indent 8 | trim }}

@@ -33,4 +33,8 @@ data:
       dialect: org.hibernate.dialect.PostgreSQLDialect
 
     restSourceClients:
-      {{ .Values.restSourceClients | toYaml | nindent 8 }}
+      {{- range $clientId, $client := .Values.restSourceClients -}}
+      {{- if $client.enable -}}
+      {{ (list (omit $client "enable")) | toYaml | nindent 6 }}
+      {{- end -}}
+      {{- end }}
