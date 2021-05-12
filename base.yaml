@@ -129,6 +129,8 @@ management_portal:
 app_config:
   _install: true
   replicaCount: 1
+  jdbc:
+    url: jdbc:postgresql://postgresql:5432/appconfig
 
 app_config_frontend:
   _install: true
