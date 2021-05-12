@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ---
 clusterName: "elasticsearch"
 nodeGroup: "master"
@@ -73,7 +74,7 @@ esJavaOpts: "-Xmx1g -Xms1g"
 resources:
   requests:
     cpu: "1000m"
-    memory: "2Gi"
+    memory: "1.5Gi"
   limits:
     cpu: "1000m"
     memory: "2Gi"
@@ -162,7 +163,7 @@ antiAffinityTopologyKey: "kubernetes.io/hostname"
 
 # Hard means that by default pods will only be scheduled if there are enough nodes for them
 # and that they will never end up on the same node. Setting this to soft will do this "best effort"
-antiAffinity: "hard"
+antiAffinity: "best effort"
 
 # This is the node affinity settings as defined in
 # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#node-affinity-beta-feature
