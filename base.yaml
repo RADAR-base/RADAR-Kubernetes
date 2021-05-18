@@ -112,7 +112,6 @@ management_portal:
     common_privacy_policy_url: http://info.thehyve.nl/radar-cns-privacy-policy
     oauth_checking_key_aliases_0: radarbase-managementportal-ec
     oauth_checking_key_aliases_1: selfsigned
-  from_email: me@example.com
   oauth_clients:
     pRMT:
       enable: true

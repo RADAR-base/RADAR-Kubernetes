@@ -63,7 +63,7 @@ spec:
           - name: SPRING_DATASOURCE_HIKARI_LEAK_DETECTION_THRESHOLD
             value: "30000"
           - name: MANAGEMENTPORTAL_MAIL_FROM
-            value: {{ .Values.from_email }}
+            value: {{ .Values.smtp.from }}
           - name: MANAGEMENTPORTAL_COMMON_BASEURL
             value: https://{{ .Values.server_name }}
           - name: MANAGEMENTPORTAL_COMMON_MANAGEMENT_PORTAL_BASE_URL
