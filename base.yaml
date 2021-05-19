@@ -134,6 +134,8 @@ app_config:
 app_config_frontend:
   _install: true
   replicaCount: 1
+  authUrl: https://example.com/managementportal/oauth
+  callbackUrl: https://example.com/appconfig/login
 
 smtp:
   _install: false

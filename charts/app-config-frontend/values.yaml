@@ -62,7 +62,6 @@ tolerations: []
 
 affinity: {}
 
-server_name: localhost
 authUrl: http://localhost/managementportal/oauth
 authCallbackUrl: http://localhost/appconfig/login
 backendUrl: /appconfig/api
