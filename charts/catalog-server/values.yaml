@@ -5,8 +5,8 @@
 replicaCount: 2
 
 image:
-  repository: radarbase/kafka-init
-  tag: 0.5.11-rc0
+  repository: radarbase/radar-schemas-tools
+  tag: 0.7.0
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -43,7 +43,7 @@ resources:
     memory: 256Mi
 
 persistence:
-  enabled: false
+  enabled: true
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
   ## If undefined (the default) or set to null, no storageClassName spec is
@@ -56,7 +56,7 @@ persistence:
   ## the existingClaim variable
   # existingClaim: your-claim
   accessMode: ReadWriteOnce
-  size: 1Gi
+  size: 5Mi
 
 nodeSelector: {}
 
@@ -65,8 +65,12 @@ tolerations: []
 affinity: {}
 
 kafka_num_brokers: 3
-zookeeper: cp-zookeeper-headless:2181
+kafka: cp-kafka-headless:9092
 schema_registry: http://cp-schema-registry:8081
+
+specificationsExclude:
+# - active/*
+# - passive/*1.0.0*
 
 cc:
   enabled: false
