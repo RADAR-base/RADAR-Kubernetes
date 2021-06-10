@@ -23,6 +23,10 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name }}
       annotations:      
         backup.velero.io/backup-volumes: config
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- if .Values.cc.enabled }}
+        checksum/configmap-java-config: {{ include (print $.Template.BasePath "/configmap-java-config.yaml") . | sha256sum }}
+        {{- end }}
     spec:
       affinity:
         podAntiAffinity:
@@ -43,9 +47,11 @@ spec:
       initContainers:
       - name: kafka-init
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        args:
+          - topic_init.sh
         env:
-        - name: KAFKA_ZOOKEEPER_CONNECT
-          value: "{{ .Values.zookeeper }}"
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: "{{ .Values.kafka }}"
         - name: KAFKA_SCHEMA_REGISTRY
           value: "{{ .Values.schema_registry }}"
         - name: KAFKA_NUM_BROKERS
@@ -55,64 +61,52 @@ spec:
         - name: RADAR_NUM_REPLICATION_FACTOR
           value: "3"
         {{- if .Values.cc.enabled }}
-        - name: CC_CONFIG_FILE_PATH
+        - name: KAFKA_CONFIG_PATH
           value: "/etc/config/java-config.properties"
-        - name: CC_API_KEY
+        - name: SCHEMA_REGISTRY_API_KEY
           valueFrom:
             secretKeyRef:
               name: {{ template "catalog-server.fullname" . }}
               key: srApiKey
-        - name: CC_API_SECRET
+        - name: SCHEMA_REGISTRY_API_SECRET
           valueFrom:
             secretKeyRef:
               name: {{ template "catalog-server.fullname" . }}
               key: srApiSecret
-        command:
-          - "cc_topic_init.sh"
+        {{- end }}
         volumeMounts:
+          - name: config
+            mountPath: /etc/radar-schemas
+          - name: config-schemas
+            mountPath: /schema/conf
+          {{- if .Values.cc.enabled }}
           - name: cc-java-config
             mountPath: /etc/config/
-        {{ end }}
+          {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          command:
-            - radar-schemas-tools
-            - serve
+          args:
+            - radar-catalog-server
             - /schema/merged
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          env:
-          - name: KAFKA_ZOOKEEPER_CONNECT
-            value: "{{ .Values.zookeeper }}"
-          - name: KAFKA_SCHEMA_REGISTRY
-            value: "{{ .Values.schema_registry }}"
-          - name: KAFKA_NUM_BROKERS
-            value: "{{ .Values.kafka_num_brokers }}"
-          - name: RADAR_NUM_PARTITIONS
-            value: "3"
-          - name: RADAR_NUM_REPLICATION_FACTOR
-            value: "{{ .Values.kafka_num_brokers }}"
           ports:
             - name: http
               containerPort: 9010
               protocol: TCP
           livenessProbe:
-            exec:
-              command:
-              - /bin/sh
-              - -c
-              - curl -f localhost:9010/source-types
+            httpGet:
+              path: /source-types
+              port: http
             initialDelaySeconds: 5
             periodSeconds: 60
             timeoutSeconds: 5
             successThreshold: 1
             failureThreshold: 3
           readinessProbe:
-            exec:
-              command:
-              - /bin/sh
-              - -c
-              - curl -f localhost:9010/source-types
+            httpGet:
+              path: /source-types
+              port: http
             initialDelaySeconds: 5
             periodSeconds: 60
             timeoutSeconds: 5
@@ -122,15 +116,20 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - name: config
+              mountPath: /etc/radar-schemas
+            - name: config-schemas
               mountPath: /schema/conf
       volumes:
         - name: config
+          configMap:
+            name: {{ include "catalog-server.fullname" . }}
+        - name: config-schemas
         {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
             claimName: {{ .Values.persistence.existingClaim | default (include "catalog-server.fullname" .) }}
         {{- else }}
           emptyDir: {}
-        {{ end }}
+        {{- end }}
         {{- if .Values.cc.enabled }}
         - name: cc-java-config
           configMap:
