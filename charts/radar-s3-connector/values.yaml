@@ -58,6 +58,7 @@ topics: android_phone_usage_event_output,android_biovotion_vsm1_acceleration,and
 s3Endpoint: http://minio:9000/
 s3Tagging: false
 s3PartSize: 5242880
+s3Region:
 flushSize: 10000
 rotateInterval: 900000
 maxTasks: 4
