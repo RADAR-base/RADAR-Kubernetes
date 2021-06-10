@@ -21,7 +21,9 @@ data:
     s3.part.size={{ .Values.s3PartSize | int }}
     s3.object.tagging={{ .Values.s3Tagging }}
     connect.meta.data=false
+    {{- if not .Values.s3Region }}
     store.url={{ .Values.s3Endpoint }}
+    {{- end }}
     storage.class=io.confluent.connect.s3.storage.S3Storage
     format.class=io.confluent.connect.s3.format.avro.AvroFormat
     transforms=combineKeyValue
