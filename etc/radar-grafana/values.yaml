@@ -432,8 +432,7 @@ extraVolumeMounts: []
 
 ## Pass the plugins you want installed as a list.
 ##
-plugins:
-  - flant-statusmap-panel
+plugins: {}
   # - digrich-bubblechart-panel
   # - grafana-clock-panel
 
