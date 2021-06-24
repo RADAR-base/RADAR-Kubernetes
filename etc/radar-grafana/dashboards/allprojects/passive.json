@@ -15,19 +15,11 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 1,
   "links": [],
   "panels": [
     {
-      "content": "\n## Fitbit Wear Time\n\nThis is the Fitbit wear time based on intraday heart rate (steps for now). This is based on the percentage of data available per hour.\n\n\n",
       "datasource": null,
       "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
-        "overrides": []
-      },
       "gridPos": {
         "h": 3,
         "w": 24,
@@ -35,7 +27,11 @@
         "y": 0
       },
       "id": 8,
-      "mode": "markdown",
+      "options": {
+        "content": "\n## Fitbit Wear Time\n\nThis is the Fitbit wear time based on intraday heart rate (steps for now). This is based on the percentage of data available per hour.\n\n\n",
+        "mode": "markdown"
+      },
+      "pluginVersion": "8.0.1",
       "targets": [
         {
           "format": "time_series",
@@ -47,7 +43,9 @@
           "select": [
             [
               {
-                "params": ["value"],
+                "params": [
+                  "value"
+                ],
                 "type": "column"
               }
             ]
@@ -64,58 +62,31 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "",
       "type": "text"
     },
     {
-      "cards": {
-        "cardHSpacing": 2,
-        "cardMinWidth": 5,
-        "cardRound": null,
-        "cardVSpacing": 2
-      },
-      "color": {
-        "cardColor": "#b4ff00",
-        "colorScale": "linear",
-        "colorScheme": "interpolateYlGnBu",
-        "defaultColor": "#757575",
-        "exponent": 0.5,
-        "max": null,
-        "min": null,
-        "mode": "spectrum",
-        "thresholds": [
-          {
-            "color": "#FFF899",
-            "value": "0"
-          },
-          {
-            "color": "#E0B400",
-            "value": "1"
-          }
-        ]
-      },
-      "data": {
-        "decimals": null,
-        "unitFormat": "short"
-      },
       "datasource": null,
       "description": "",
       "fieldConfig": {
         "defaults": {
+          "color": {
+            "mode": "continuous-blues"
+          },
           "custom": {
-            "align": null
+            "fillOpacity": 70,
+            "lineWidth": 0
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "super-light-red",
                 "value": null
               },
               {
-                "color": "red",
-                "value": 80
+                "color": "light-blue",
+                "value": 50
               }
             ]
           }
@@ -126,21 +97,32 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 4
+        "y": 3
       },
-      "highlightCards": true,
       "id": 12,
-      "legend": {
-        "show": true
+      "options": {
+        "alignValue": "left",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "auto",
+        "tooltip": {
+          "mode": "single"
+        }
       },
-      "nullPointMode": "as zero",
       "pluginVersion": "7.0.3",
       "targets": [
         {
           "format": "time_series",
           "group": [
             {
-              "params": ["1h", "none"],
+              "params": [
+                "1h",
+                "none"
+              ],
               "type": "time"
             }
           ],
@@ -151,15 +133,21 @@
           "select": [
             [
               {
-                "params": ["\"batteryLevel\""],
+                "params": [
+                  "\"batteryLevel\""
+                ],
                 "type": "column"
               },
               {
-                "params": ["count"],
+                "params": [
+                  "count"
+                ],
                 "type": "aggregate"
               },
               {
-                "params": ["\"batteryLevel\""],
+                "params": [
+                  "\"batteryLevel\""
+                ],
                 "type": "alias"
               }
             ]
@@ -179,23 +167,7 @@
       "timeFrom": null,
       "timeShift": null,
       "title": "Fitbit Wear Time Percentage",
-      "tooltip": {
-        "show": true
-      },
-      "type": "flant-statusmap-panel",
-      "useMax": true,
-      "xAxis": {
-        "labelFormat": "%a %m/%d",
-        "minBucketWidthToShowWeekends": 4,
-        "show": true,
-        "showCrosshair": true,
-        "showWeekends": true
-      },
-      "yAxis": {
-        "show": true,
-        "showCrosshair": false
-      },
-      "yAxisSort": "metrics"
+      "type": "state-timeline"
     },
     {
       "aliasColors": {},
@@ -205,7 +177,7 @@
       "datasource": null,
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "links": []
         },
         "overrides": []
       },
@@ -215,7 +187,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 13
+        "y": 11
       },
       "hiddenSeries": false,
       "id": 13,
@@ -232,9 +204,10 @@
       "linewidth": 1,
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "percentage": false,
+      "pluginVersion": "8.0.1",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -247,7 +220,10 @@
           "format": "time_series",
           "group": [
             {
-              "params": ["1h", "none"],
+              "params": [
+                "1h",
+                "none"
+              ],
               "type": "time"
             }
           ],
@@ -258,15 +234,21 @@
           "select": [
             [
               {
-                "params": ["\"batteryLevel\""],
+                "params": [
+                  "\"batteryLevel\""
+                ],
                 "type": "column"
               },
               {
-                "params": ["count"],
+                "params": [
+                  "count"
+                ],
                 "type": "aggregate"
               },
               {
-                "params": ["\"batteryLevel\""],
+                "params": [
+                  "\"batteryLevel\""
+                ],
                 "type": "alias"
               }
             ]
@@ -325,23 +307,20 @@
       }
     },
     {
-      "content": "\n## Passive RMT Record Count\n\nThis is the passive rmt app battery record count.\n",
       "datasource": null,
       "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
-        "overrides": []
-      },
       "gridPos": {
         "h": 3,
         "w": 24,
         "x": 0,
-        "y": 22
+        "y": 19
       },
       "id": 7,
-      "mode": "markdown",
+      "options": {
+        "content": "\n## Passive RMT Record Count\n\nThis is the passive rmt app battery record count.\n",
+        "mode": "markdown"
+      },
+      "pluginVersion": "8.0.1",
       "targets": [
         {
           "format": "time_series",
@@ -353,7 +332,9 @@
           "select": [
             [
               {
-                "params": ["value"],
+                "params": [
+                  "value"
+                ],
                 "type": "column"
               }
             ]
@@ -370,44 +351,33 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "",
       "type": "text"
     },
     {
-      "cards": {
-        "cardHSpacing": 2,
-        "cardMinWidth": 5,
-        "cardRound": null,
-        "cardVSpacing": 2
-      },
-      "color": {
-        "cardColor": "#b4ff00",
-        "colorScale": "linear",
-        "colorScheme": "interpolateOranges",
-        "defaultColor": "#757575",
-        "exponent": 0.5,
-        "max": null,
-        "min": null,
-        "mode": "spectrum",
-        "thresholds": [
-          {
-            "color": "#FFF899",
-            "value": "0"
-          },
-          {
-            "color": "#E0B400",
-            "value": "1"
-          }
-        ]
-      },
-      "data": {
-        "decimals": null,
-        "unitFormat": "short"
-      },
       "datasource": null,
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "color": {
+            "mode": "continuous-blues"
+          },
+          "custom": {
+            "fillOpacity": 70,
+            "lineWidth": 0
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
         },
         "overrides": []
       },
@@ -415,20 +385,31 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 26
+        "y": 22
       },
-      "highlightCards": true,
       "id": 5,
-      "legend": {
-        "show": true
+      "options": {
+        "alignValue": "left",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "auto",
+        "tooltip": {
+          "mode": "single"
+        }
       },
-      "nullPointMode": "as zero",
       "targets": [
         {
           "format": "time_series",
           "group": [
             {
-              "params": ["1h", "none"],
+              "params": [
+                "1h",
+                "none"
+              ],
               "type": "time"
             }
           ],
@@ -439,15 +420,21 @@
           "select": [
             [
               {
-                "params": ["\"batteryLevel\""],
+                "params": [
+                  "\"batteryLevel\""
+                ],
                 "type": "column"
               },
               {
-                "params": ["count"],
+                "params": [
+                  "count"
+                ],
                 "type": "aggregate"
               },
               {
-                "params": ["\"batteryLevel\""],
+                "params": [
+                  "\"batteryLevel\""
+                ],
                 "type": "alias"
               }
             ]
@@ -467,27 +454,11 @@
       "timeFrom": null,
       "timeShift": null,
       "title": "Phone Battery Level Record Count",
-      "tooltip": {
-        "show": true
-      },
-      "type": "flant-statusmap-panel",
-      "useMax": true,
-      "xAxis": {
-        "labelFormat": "%a %m/%d",
-        "minBucketWidthToShowWeekends": 4,
-        "show": true,
-        "showCrosshair": true,
-        "showWeekends": true
-      },
-      "yAxis": {
-        "show": true,
-        "showCrosshair": false
-      },
-      "yAxisSort": "metrics"
+      "type": "state-timeline"
     }
   ],
-  "refresh": false,
-  "schemaVersion": 25,
+  "refresh": "",
+  "schemaVersion": 30,
   "style": "light",
   "tags": [],
   "templating": {
@@ -513,5 +484,5 @@
   "timezone": "",
   "title": "Passive Completion",
   "uid": "HPhW_AZGk",
-  "version": 35
+  "version": 7
 }
