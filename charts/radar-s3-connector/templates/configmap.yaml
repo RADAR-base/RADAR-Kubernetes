@@ -11,7 +11,7 @@ data:
   sink-s3.properties: |
     name=radar-s3-sink-connector
     connector.class=io.confluent.connect.s3.S3SinkConnector
-    tasks.max={{ .Values.maxTasks }}
+    tasks.max={{ .Values.maxTasks | int }}
     topics={{ .Values.topics }}
     flush.size={{ .Values.flushSize | int }}
     s3.bucket.name={{ .Values.bucketName }}
