@@ -54,6 +54,11 @@ releases:
         value: {{ .Values.app_config._install }}
       - name: oauth_clients.appconfig_frontend.enable
         value: {{ .Values.app_config_frontend._install }}
+      - name: oauth_clients.grafana_dashboard.enable
+        value: {{ .Values.radar_grafana._install }}
+      - name: oauth_clients.grafana_dashboard.redirect_uri
+        values:
+          - "https://dashboard.{{ .Values.server_name }}/login/generic_oauth"
 
   - name: smtp
     chart: ../charts/smtp

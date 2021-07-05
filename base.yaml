@@ -284,6 +284,8 @@ timescaledb_db_name: grafana-metrics
 radar_grafana:
   _install: true
   replicaCount: 1
+  env:
+    GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/allprojects/home.json
 
 timescaledb:
   _install: true
