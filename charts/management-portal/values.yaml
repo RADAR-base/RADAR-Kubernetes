@@ -303,6 +303,22 @@ oauth_clients:
       - SOURCETYPE.READ
       - SUBJECT.READ
       - SUBJECT.UPDATE
+  grafana_dashboard:
+    enable: false
+    resource_ids:
+      - res_ManagementPortal
+    client_secret: ""
+    scope:
+      - USER.READ
+    authorized_grant_types:
+      - authorization_code
+      - refresh_token
+    access_token_validity: 900
+    refresh_token_validity: 78000
+    redirect_uri:
+      - http://dashboard.localhost/login/generic_oauth
+    autoapprove:
+      - USER.READ
 
 smtp:
   enabled: false

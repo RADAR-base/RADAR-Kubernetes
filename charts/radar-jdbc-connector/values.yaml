@@ -55,7 +55,7 @@ schema_registry: http://cp-schema-registry:8081
 topics: android_phone_relative_location, android_phone_battery_level, connect_upload_altoida_summary, connect_fitbit_intraday_heart_rate, connect_fitbit_intraday_steps
 
 timescaledb:
-  host: timescaledb
+  host: timescaledb-postgresql-headless
   username: grafana
   password: password
   database_name: grafana-metrics
