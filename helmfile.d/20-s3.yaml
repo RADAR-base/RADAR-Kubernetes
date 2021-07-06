@@ -34,7 +34,7 @@ releases:
       - name: ingress.hosts
         values: ["s3.{{ .Values.server_name }}"]
       - name: ingress.tls[0].secretName
-        value: radar-base-tls
+        value: radar-base-tls-s3
       - name: ingress.tls[0].hosts
         values: ["s3.{{ .Values.server_name }}"]
 
