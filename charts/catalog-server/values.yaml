@@ -6,7 +6,7 @@ replicaCount: 2
 
 image:
   repository: radarbase/radar-schemas-tools
-  tag: 0.7.0
+  tag: 0.7.1
   pullPolicy: IfNotPresent
 
 nameOverride: ""
