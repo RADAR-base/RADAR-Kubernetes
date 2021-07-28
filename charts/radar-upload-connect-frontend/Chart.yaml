@@ -3,3 +3,8 @@ appVersion: "0.5.9"
 description: A Helm chart for Kubernetes
 name: radar-upload-connect-frontend
 version: 0.1.1
+maintainers:
+  - email: keyvan@thehyve.nl
+    name: Keyvan Hedayati
+  - email: joris@thehyve.nl
+    name: Joris Borgdorff

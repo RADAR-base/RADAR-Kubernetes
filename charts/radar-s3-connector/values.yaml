@@ -65,3 +65,7 @@ maxTasks: 4
 bucketAccessKey: access_key
 bucketSecretKey: secret
 bucketName: radar_intermediate_storage
+
+cc:
+  bootstrapServerurl: ""
+  schemaRegistryUrl: ""
