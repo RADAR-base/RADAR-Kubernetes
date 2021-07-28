@@ -5,8 +5,11 @@
 replicaCount: 2
 
 image:
+  # -- Management Portal image repository
   repository: radarbase/management-portal
+  # -- Management Portal image tag (immutable tags are recommended)
   tag: 0.7.0
+  # -- Management Portal image pull policy
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -329,4 +332,3 @@ smtp:
   from: noreply@example.com
   starttls: false
   auth: true
-
