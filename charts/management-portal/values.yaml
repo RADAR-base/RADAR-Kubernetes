@@ -2,6 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# -- 	Number of Management Portal replicas to deploy
 replicaCount: 2
 
 image:
@@ -12,15 +13,22 @@ image:
   # -- Management Portal image pull policy
   pullPolicy: IfNotPresent
 
+# -- String to partially override management-portal.fullname template with a string (will prepend the release name)
 nameOverride: ""
+# -- String to fully override management-portal.fullname template with a string
 fullnameOverride: ""
 
 service:
+  # -- Kubernetes Service type
   type: ClusterIP
+  # -- Management Portal port
   port: 8080
 
 ingress:
+  # -- Enable ingress controller resource
   enabled: true
+  # -- Annotations that define default ingress class, certificate issuer and rate limiter
+  # @default -- check values.yaml
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
@@ -32,28 +40,38 @@ ingress:
       location /managementportal/api/meta-token/ {
         limit_req zone=login_limit;
       }
+  # -- Path within the url structure
   path: "/managementportal"
+  # -- Hosts to accept requests from
   hosts:
     - localhost
   tls:
+    # -- TLS Secret Name
     secretName: radar-base-tls
+
 
 resources:
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+
+  # -- CPU/Memory resource limits
   limits:
     cpu: 2
     memory: 1.7Gi
+  # -- CPU/Memory resource requests
   requests:
     cpu: 100m
     memory: 512Mi
 
+# -- Node labels for pod assignment
 nodeSelector: {}
 
+# -- Toleration labels for pod assignment
 tolerations: []
 
+# -- Affinity labels for pod assignment
 affinity: {}
 
 # B64 encoded Binary keystore file
@@ -84,7 +102,19 @@ managementportal:
   frontend_client_secret: xxx
   common_admin_password: xxx
 
+smtp:
+  enabled: false
+  host: smtp
+  port: 25
+  username: username
+  password: secret
+  from: noreply@example.com
+  starttls: false
+  auth: true
+
 oauth_clients:
+  # -- Oauth Client configuration for pRMT
+  # @default -- check values.yaml
   pRMT:
     enable: false
     resource_ids:
@@ -109,6 +139,8 @@ oauth_clients:
     refresh_token_validity: 7948800
     additional_information: '{"dynamic_registration": true}'
 
+  # -- Oauth Client configuration for aRMT
+  # @default -- check values.yaml
   aRMT:
     enable: false
     resource_ids:
@@ -133,6 +165,8 @@ oauth_clients:
     refresh_token_validity: 7948800
     additional_information: '{"dynamic_registration": true}'
 
+  # -- Oauth Client configuration for THINC-IT
+  # @default -- check values.yaml
   THINC-IT:
     enable: false
     resource_ids:
@@ -157,6 +191,8 @@ oauth_clients:
     refresh_token_validity: 7948800
     additional_information: '{"dynamic_registration": true}'
 
+  # -- Oauth Client configuration for REDCAP integrator
+  # @default -- check values.yaml
   radar_redcap_integrator:
     enable: false
     resource_ids:
@@ -171,6 +207,8 @@ oauth_clients:
       - client_credentials
     access_token_validity: 900
 
+  # -- Oauth Client configuration for Upload backend
+  # @default -- check values.yaml
   radar_upload_backend:
     enable: false
     resource_ids:
@@ -184,6 +222,8 @@ oauth_clients:
     access_token_validity: 900
     additional_information: '{"dynamic_registration": true}'
 
+  # -- Oauth Client configuration for Upload connect
+  # @default -- check values.yaml
   radar_upload_connect:
     enable: false
     resource_ids:
@@ -201,6 +241,8 @@ oauth_clients:
       - client_credentials
     access_token_validity: 900
 
+  # -- Oauth Client configuration for Upload frontend
+  # @default -- check values.yaml
   radar_upload_frontend:
     enable: false
     resource_ids:
@@ -219,6 +261,8 @@ oauth_clients:
       - /upload/login
       - http://localhost:8080/upload/login
 
+  # -- Oauth Client configuration for Rest Sources Backend
+  # @default -- check values.yaml
   radar_rest_sources_auth_backend:
     enable: false
     resource_ids:
@@ -232,6 +276,8 @@ oauth_clients:
       - client_credentials
     access_token_validity: 900
 
+  # -- Oauth Client configuration for Rest Sources Authorizer
+  # @default -- check values.yaml
   radar_rest_sources_authorizer:
     enable: false
     resource_ids:
@@ -248,6 +294,8 @@ oauth_clients:
     redirect_uri:
       - /rest-sources/authorizer/login
 
+  # -- Oauth Client configuration for Fitbit connector
+  # @default -- check values.yaml
   radar_fitbit_connector:
     enable: false
     resource_ids:
@@ -260,6 +308,8 @@ oauth_clients:
       - client_credentials
     access_token_validity: 900
 
+  # -- Oauth Client configuration for Appconfig
+  # @default -- check values.yaml
   radar_appconfig:
     enable: false
     resource_ids:
@@ -276,6 +326,8 @@ oauth_clients:
       - client_credentials
     access_token_validity: 900
 
+  # -- Oauth Client configuration for Appconfig Frontend
+  # @default -- check values.yaml
   appconfig_frontend:
     enable: false
     resource_ids:
@@ -306,6 +358,9 @@ oauth_clients:
       - SOURCETYPE.READ
       - SUBJECT.READ
       - SUBJECT.UPDATE
+
+  # -- Oauth Client configuration for Grafana Dashboard
+  # @default -- check values.yaml
   grafana_dashboard:
     enable: false
     resource_ids:
@@ -322,13 +377,3 @@ oauth_clients:
       - http://dashboard.localhost/login/generic_oauth
     autoapprove:
       - USER.READ
-
-smtp:
-  enabled: false
-  host: smtp
-  port: 25
-  username: username
-  password: secret
-  from: noreply@example.com
-  starttls: false
-  auth: true
