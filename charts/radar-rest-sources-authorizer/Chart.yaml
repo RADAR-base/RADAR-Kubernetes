@@ -3,3 +3,8 @@ appVersion: "3.2.0"
 description: A Helm chart for Kubernetes
 name: radar-rest-sources-authorizer
 version: 0.2.0
+maintainers:
+  - email: keyvan@thehyve.nl
+    name: Keyvan Hedayati
+  - email: joris@thehyve.nl
+    name: Joris Borgdorff

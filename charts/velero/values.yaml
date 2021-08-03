@@ -23,7 +23,7 @@ backup:
   intermediateBucketName: radar-intermediate-storage
   outputBucketName: radar-output-storage
 
-#----
+# ----
 velero:
   initContainers:
     - name: velero-plugin-for-aws
@@ -53,9 +53,9 @@ velero:
       # Additional provider-specific configuration. See link above
       # for details of required/optional fields for your provider.
       config:
-       region: eu-central-1
-       s3ForcePathStyle: "true"
-       s3Url: "https://s3.amazon.com"
+        region: eu-central-1
+        s3ForcePathStyle: "true"
+        s3Url: "https://s3.amazon.com"
 
   credentials:
     secretContents:
@@ -97,9 +97,9 @@ velero:
         includeClusterResources: true
         snapshotVolumes: false
         includedNamespaces:
-         - cert-manager
-         - default
-         - graylog
-         - kubernetes-dashboard
-         - monitoring
-         - velero
+          - cert-manager
+          - default
+          - graylog
+          - kubernetes-dashboard
+          - monitoring
+          - velero

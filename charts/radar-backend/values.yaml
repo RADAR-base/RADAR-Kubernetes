@@ -48,8 +48,8 @@ tolerations: []
 
 affinity: {}
 
-#command: "monitor"
-#command: "stream"
+# command: "monitor"
+# command: "stream"
 
 zookeeper: cp-zookeeper-headless:2181
 kafka: cp-kafka-headless:9092
@@ -67,4 +67,3 @@ smtp:
 
 persistence:
   enabled: false
-
