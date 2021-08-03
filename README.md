@@ -2,7 +2,10 @@
 The repository contains Helm charts and other configuration needed to install RADAR-base on a Kubernetes cluster.
 
 ## Prerequisites
-#### Kubernetes cluster 
+### Infrastructure
+Before installation you need to have these applications or services available.
+
+#### Kubernetes cluster
 You need to have a working Kubernetes installation and there are 3 ways to have that:
 * From cloud providers such as: [AWS](https://aws.amazon.com/eks/), [GCP](https://cloud.google.com/kubernetes-engine/), [Azure](https://docs.microsoft.com/en-us/azure/aks/), etc
 * Install it on your own servers with: [Rancher](https://rancher.com/), [Kubespray](https://github.com/kubernetes-sigs/kubespray), [Kubeadm](https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/), [OpenShift](https://www.okd.io/), etc
@@ -30,20 +33,19 @@ You can also send the RADAR-Base output data to this object storage, which can p
 #### (Optional) Managed services
 Radar-Kubernetes provides Kafka cluster, PostgreSQL server, Object storage, Log server and Monitoring system inside the cluster but you can disable these bundled  components and use an externally managed services like Confluent Cloud, Azure Database for PostgreSQL, AWS S3, etc instead.
 
-#### (Optional) Firebase account
-Firebase account is needed in case you want to use RADAR-Base mobile apps to collect data.
-
 #### (Optional) Fitbit account
 Fitbit account is needed in case you want to use Fitbit wearables to collect data.
+
+
+### Local machine
+
+You need to have following tools installed in your local machine to install the stack: [Git](https://git-scm.com/downloads), [Java](https://openjdk.java.net/install/), [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/), [helm](https://github.com/helm/helm#install), [helm-diff](https://github.com/databus23/helm-diff#install), [helm-secrets](https://github.com/zendesk/helm-secrets), [sops](https://github.com/mozilla/sops), [helmfile](https://github.com/roboll/helmfile#installation). You can click on the links to go the installation page of each tools. After installing Kubectl make sure you add credentials of Kubernetes cluster to it.
 
 ## Installation
 > In this guide it is assumed that you're using Linux in your local machine but you can follow these steps with little to no change in MacOS and Windows as well.
 
 #### Prepare
-
-You need to have following tools installed in your local machine to install the stack: [Git](https://git-scm.com/downloads), [Java](https://openjdk.java.net/install/), [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/), [helm](https://github.com/helm/helm#install), [helm-diff](https://github.com/databus23/helm-diff#install), [helm-secrets](https://github.com/zendesk/helm-secrets), [sops](https://github.com/mozilla/sops), [helmfile](https://github.com/roboll/helmfile#installation). You can click on the links to go the installation page of each tools. After installing Kubectl make sure you add credentials of Kubernetes cluster to it.
-
-Next step is to clone the repository to your local machine. Following command will take care of that while also making sure confluent helm charts such as Kafka and Zookeeper are also downloaded as a submodule with `--recurse-submodules` flag. Using `--branch` will make sure to use latest development branch.
+First step is to clone the repository to your local machine. Following command will take care of that while also making sure confluent helm charts such as Kafka and Zookeeper are also downloaded as a submodule with `--recurse-submodules` flag. Using `--branch` will make sure to use latest development branch.
 ```shell
 git clone --branch dev --recurse-submodules https://github.com/RADAR-base/RADAR-Kubernetes.git
 ```
@@ -64,17 +66,17 @@ vim production.yaml.gotmpl  # Change setup parameters that require Go templating
 sops production.secrets.yaml  # Change passwords and credentials
 ```
 
-The final preparation step is to create a certificate for Management Portal to sign requests. 
+The final preparation step is to create a certificate for Management Portal to sign requests.
 ```shell
 ./bin/keystore-init
 ```
 
 #### Install
-Finally you can start installing the RADAR-Base stack. Having `--concurrency 1` will make installation slower but it is necessary because some components such as `kube-prometheus-stack` and `kafka-init` (aka `catalog-server`) should be installed in their specified order. If you've forgotten to use this flag the installation might not be successful and you should follow [Uninstallation](https://github.com/RADAR-base/RADAR-Kubernetes/tree/dev#uninstall) steps to clean up the Kubernetes cluster before you can try again.
+Finally you can start installing the RADAR-Base stack. Having `--concurrency 1` will make installation slower but it is necessary because some components such as `kube-prometheus-stack` and `kafka-init` (aka `catalog-server`) should be installed in their specified order. If you've forgotten to use this flag the installation might not be successful and you should follow [Uninstallation](#uninstall) steps to clean up the Kubernetes cluster before you can try again.
 ```shell
 helmfile sync --concurrency 1
 ```
-Depending on you cluster this will take a few minutes to run. During the installation you can monitor the process more closely by running `kubectl get pods` and checking if new pods successfully enter Running status and are fully Ready or not. 
+Depending on you cluster this will take a few minutes to run. During the installation you can monitor the process more closely by running `kubectl get pods` and checking if new pods successfully enter Running status and are fully Ready or not.
 
 If an application doesn't become fully ready installation will fail and you need to figure out the issue. In order to do this you can use `kubectl describe pods <podname>` and `kubcetl logs <podname>` to even more closely inspect pods status and health during the installation, fore some components such as aforementioned `kube-prometheus-stack` and `kafka-init` you might need to remove everything before trying again but for most other components you can just run installation command again.
 
@@ -142,7 +144,7 @@ prometheus-kube-prometheus-stack-prometheus-0              2/2     Running   1  
 prometheus-kube-prometheus-stack-prometheus-1              2/2     Running   1          8m21s
 prometheus-kube-prometheus-stack-prometheus-2              2/2     Running   1          8m21s
 
-➜ kubectl -n graylog get pods 
+➜ kubectl -n graylog get pods
 NAME                           READY   STATUS      RESTARTS   AGE
 elasticsearch-master-0         1/1     Running     0          8m21s
 elasticsearch-master-1         1/1     Running     0          8m21s
@@ -178,7 +180,7 @@ Other ways to ensure that installation have been successful is to check applicat
 ➜  kubectl exec -it cp-kafka-0 -c cp-kafka-broker -- kafka-topics --zookeeper cp-zookeeper-headless:2181 --list | wc -l
 273
 ```
-Number of topics can be more or less than this number depending on components that you have activated. 
+Number of topics can be more or less than this number depending on components that you have activated.
 
 ## Usage
 ### Accessing the applications
