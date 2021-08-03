@@ -56,9 +56,9 @@ affinity: {}
 # B64 encoded Binary keystore file
 # With helmfile, this can be set in a production.yaml.gotmpl
 # file by setting
-#keystore: {{ readFile "keystore.p12" | b64enc | quote }}
+#   keystore: {{ readFile "keystore.p12" | b64enc | quote }}
 # or with SOPS
-#keystore: {{ exec "sops" (list "-d" "keystore.p12") | b64enc | quote }}
+#   keystore: {{ exec "sops" (list "-d" "keystore.p12") | b64enc | quote }}
 
 postgres:
   host: postgresql
@@ -329,4 +329,3 @@ smtp:
   from: noreply@example.com
   starttls: false
   auth: true
-

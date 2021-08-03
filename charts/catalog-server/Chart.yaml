@@ -3,3 +3,8 @@ appVersion: "0.7.1"
 description: A Helm chart for Kubernetes
 name: catalog-server
 version: 0.2.1
+maintainers:
+  - email: keyvan@thehyve.nl
+    name: Keyvan Hedayati
+  - email: joris@thehyve.nl
+    name: Joris Borgdorff

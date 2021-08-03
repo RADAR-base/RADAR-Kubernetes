@@ -41,10 +41,10 @@ affinity: {}
 
 s3:
   identity: null
-  credential: null
+  credential: ""
 
 target:
   provider: null
   endpoint: null
   identity: null
-  credential: null
+  credential: ""
