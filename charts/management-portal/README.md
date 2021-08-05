@@ -1,5 +1,4 @@
 
-* PV provisioner support in the underlying infrastructure
 
 # management-portal
 
@@ -25,6 +24,7 @@ A Helm chart for RADAR-Base Management Portal
 * Kubernetes 1.17+
 * Kubectl 1.17+
 * Helm 3.1.0+
+* PV provisioner support in the underlying infrastructure
 
 ## Values
 
