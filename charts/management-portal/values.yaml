@@ -100,7 +100,9 @@ postgres:
     enabled: false
     keystorepassword: keystorepassword
 
+# -- domain name of the server
 server_name: localhost
+# -- Hostname of the catalogue-server
 catalogue_server: catalog-server
 managementportal:
   # -- set to true, if automatic source-type import from catalogue server should be enabled
