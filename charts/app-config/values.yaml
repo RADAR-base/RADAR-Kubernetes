@@ -90,13 +90,21 @@ tolerations: []
 # -- Affinity labels for pod assignment
 affinity: {}
 
+# -- Standard JAVA_OPTS that should be passed to this service
 javaOpts: "-Xmx550m"
+# -- OAuth2 client id
 clientId: radar_appconfig
+# -- OAuth2 client secret
 clientSecret: secret
 
 jdbc:
+  # -- JDBC Driver to connect to the database.
   driver: org.postgresql.Driver
+  # -- JDBC Connection url of the database.
   url: jdbc:postgresql://postgresql:5432/appconfig
+  # -- Username of the database
   user: postgres
+  # -- Password of the user
   password: password
+  # -- JDBC dialect to use for JDBC Connection
   dialect: org.hibernate.dialect.PostgreSQLDialect

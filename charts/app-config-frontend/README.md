@@ -12,6 +12,7 @@ A Helm chart for Kubernetes
 | ---- | ------ | --- |
 | Keyvan Hedayati | keyvan@thehyve.nl |  |
 | Joris Borgdorff | joris@thehyve.nl |  |
+| Nivethika Mahasivam | nivethika@thehyve.nl |  |
 
 ## Prerequisites
 * Kubernetes 1.17+
@@ -43,6 +44,6 @@ A Helm chart for Kubernetes
 | nodeSelector | object | `{}` | Node labels for pod assignment |
 | tolerations | list | `[]` | Toleration labels for pod assignment |
 | affinity | object | `{}` | Affinity labels for pod assignment |
-| authUrl | string | `"http://localhost/managementportal/oauth"` |  |
-| authCallbackUrl | string | `"http://localhost/appconfig/login"` |  |
-| backendUrl | string | `"/appconfig/api"` |  |
+| authUrl | string | `"http://localhost/managementportal/oauth"` | Authorization URL of the IDP |
+| authCallbackUrl | string | `"http://localhost/appconfig/login"` | Callback URL to where authorization-code should be returned |
+| backendUrl | string | `"/appconfig/api"` | Base-URL of the App Config backend service |

@@ -12,6 +12,7 @@ A Helm chart for Kubernetes
 | ---- | ------ | --- |
 | Keyvan Hedayati | keyvan@thehyve.nl |  |
 | Joris Borgdorff | joris@thehyve.nl |  |
+| Nivethika Mahasivam | nivethika@thehyve.nl |  |
 
 ## Prerequisites
 * Kubernetes 1.17+
@@ -46,11 +47,11 @@ A Helm chart for Kubernetes
 | nodeSelector | object | `{}` | Node labels for pod assignment |
 | tolerations | list | `[]` | Toleration labels for pod assignment |
 | affinity | object | `{}` | Affinity labels for pod assignment |
-| javaOpts | string | `"-Xmx550m"` |  |
-| clientId | string | `"radar_appconfig"` |  |
-| clientSecret | string | `"secret"` |  |
-| jdbc.driver | string | `"org.postgresql.Driver"` |  |
-| jdbc.url | string | `"jdbc:postgresql://postgresql:5432/appconfig"` |  |
-| jdbc.user | string | `"postgres"` |  |
-| jdbc.password | string | `"password"` |  |
-| jdbc.dialect | string | `"org.hibernate.dialect.PostgreSQLDialect"` |  |
+| javaOpts | string | `"-Xmx550m"` | Standard JAVA_OPTS that should be passed to this service |
+| clientId | string | `"radar_appconfig"` | OAuth2 client id |
+| clientSecret | string | `"secret"` | OAuth2 client secret |
+| jdbc.driver | string | `"org.postgresql.Driver"` | JDBC Driver to connect to the database. |
+| jdbc.url | string | `"jdbc:postgresql://postgresql:5432/appconfig"` | JDBC Connection url of the database. |
+| jdbc.user | string | `"postgres"` | Username of the database |
+| jdbc.password | string | `"password"` | Password of the user |
+| jdbc.dialect | string | `"org.hibernate.dialect.PostgreSQLDialect"` | JDBC dialect to use for JDBC Connection |
