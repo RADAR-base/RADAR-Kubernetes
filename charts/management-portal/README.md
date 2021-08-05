@@ -56,8 +56,8 @@ A Helm chart for RADAR-Base Management Portal
 | postgres.password | string | `"password"` | password of the postgres user |
 | postgres.ssl.enabled | bool | `false` | set to true of the connecting to postgres using SSL |
 | postgres.ssl.keystorepassword | string | `"keystorepassword"` |  |
-| server_name | string | `"localhost"` |  |
-| catalogue_server | string | `"catalog-server"` |  |
+| server_name | string | `"localhost"` | domain name of the server |
+| catalogue_server | string | `"catalog-server"` | Hostname of the catalogue-server |
 | managementportal.catalogue_server_enable_auto_import | string | `"false"` | set to true, if automatic source-type import from catalogue server should be enabled |
 | managementportal.common_privacy_policy_url | string | `"http://info.thehyve.nl/radar-cns-privacy-policy"` | Override with a publicly resolvable url of the privacy-policy url for your set-up. This can be overridden on a project basis as well. |
 | managementportal.oauth_checking_key_aliases_0 | string | `"radarbase-managementportal-ec"` | Keystore alias to sign JWT tokens from Management Portal |
@@ -67,8 +67,8 @@ A Helm chart for RADAR-Base Management Portal
 | smtp.enabled | bool | `false` | set to true, if SMTP server should be enabled. Required to be true for production setup |
 | smtp.host | string | `"smtp"` | Hostname of the SMTP server |
 | smtp.port | int | `25` | Port of the SMTP server |
-| smtp.username | string | `"username"` | Username of the email address |
-| smtp.password | string | `"secret"` | Password of the email address |
+| smtp.username | string | `"username"` | Username of the SMTP server |
+| smtp.password | string | `"secret"` | Password of the SMTP server |
 | smtp.from | string | `"noreply@example.com"` | Email address which should be used to send activation emails |
 | smtp.starttls | bool | `false` | set to true,if ttls should be enabled |
 | smtp.auth | bool | `true` | set to true, if the account should be authenticated before sending emails |
