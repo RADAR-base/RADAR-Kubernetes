@@ -1,4 +1,3 @@
-charts/catalog-server/
 charts/cc-schema-registry-proxy/
 charts/cert-manager/
 charts/kafka-manager/

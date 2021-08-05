@@ -64,18 +64,28 @@ tolerations: []
 
 affinity: {}
 
+# -- number of Kafka brokers to look for
 kafka_num_brokers: 3
+# -- URI of Kafka brokers
 kafka: cp-kafka-headless:9092
+# -- URL of the confluent schema registry
 schema_registry: http://cp-schema-registry:8081
 
+# -- List of paths of specifications relative to specifications folder, if any of the specifications should be excluded from automatically registering topics and schemas.
 specificationsExclude:
 # - active/*
 # - passive/*1.0.0*
 
 cc:
+  # -- set to true if using Confluent Cloud for kafka cluster and schema registry
   enabled: false
+  # -- URL of the bootstrap server of Confluent Cloud based kafka cluster
   bootstrapServerurl: confluent-url
+  # -- API key of the Confluent Cloud based kafka cluster
   apiKey: ccApikey
+  # -- API secret of the Confluent Cloud based kafka cluster
   apiSecret: ccApiSecret
+  # -- API key of the Confluent Cloud based schema registry
   schemaRegistryApiKey: srApiKey
+  # -- API secret of the Confluent Cloud based schema registry
   schemaRegistryApiSecret: srApiSecret
