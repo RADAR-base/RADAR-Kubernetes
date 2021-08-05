@@ -81,35 +81,58 @@ affinity: {}
 # or with SOPS
 #   keystore: {{ exec "sops" (list "-d" "keystore.p12") | b64enc | quote }}
 
+# Configuration of the Postgres data base to store data from Management Portal
 postgres:
+  # -- host name of the postgres db
   host: postgresql
+  # -- post of the postgres db
   port: 5432
+  # -- database name
   database: managementportal
+  # -- additional JDBC connection parameters e.g. sslmode=verify-full
   connection_parameters: ""
+  # -- postgres user
   user: postgres
+  # -- password of the postgres user
   password: password
   ssl:
+    # -- set to true of the connecting to postgres using SSL
     enabled: false
     keystorepassword: keystorepassword
 
 server_name: localhost
 catalogue_server: catalog-server
 managementportal:
+  # -- set to true, if automatic source-type import from catalogue server should be enabled
   catalogue_server_enable_auto_import: "false"
+  # -- Override with a publicly resolvable url of the privacy-policy url for your set-up. This can be overridden on a project basis as well.
   common_privacy_policy_url: http://info.thehyve.nl/radar-cns-privacy-policy
+  # -- Keystore alias to sign JWT tokens from Management Portal
   oauth_checking_key_aliases_0: radarbase-managementportal-ec
+  # -- Keystore alias to sign JWT tokens from Management Portal
   oauth_checking_key_aliases_1: selfsigned
+  # -- OAuth Client secret of the Management Portal frontend application
   frontend_client_secret: xxx
+  # -- Admin password of the default admin user created by the system
   common_admin_password: xxx
 
+# Configurations of the SMTP server to send activation emails from Management Portal
 smtp:
+  # -- set to true, if SMTP server should be enabled. Required to be true for production setup
   enabled: false
+  # -- Hostname of the SMTP server
   host: smtp
+  # -- Port of the SMTP server
   port: 25
+  # -- Username of the email address
   username: username
+  # -- Password of the email address
   password: secret
+  # -- Email address which should be used to send activation emails
   from: noreply@example.com
+  # -- set to true,if ttls should be enabled
   starttls: false
+  # -- set to true, if the account should be authenticated before sending emails
   auth: true
 
 oauth_clients:

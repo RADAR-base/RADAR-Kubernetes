@@ -6,6 +6,13 @@
 
 A Helm chart for Kubernetes
 
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| Keyvan Hedayati | keyvan@thehyve.nl |  |
+| Joris Borgdorff | joris@thehyve.nl |  |
+
 ## Prerequisites
 * Kubernetes 1.17+
 * Kubectl 1.17+
