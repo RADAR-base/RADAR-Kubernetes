@@ -47,5 +47,7 @@ tolerations: []
 
 affinity: {}
 
+# -- OAuth2 client id of the application registered in Management Portal. It is assumed that this is a public client with empty client secret.
 clientId: radar_rest_sources_authorizer
+# -- Domain name of the server
 serverName: localhost

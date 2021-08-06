@@ -63,18 +63,29 @@ tolerations: []
 
 affinity: {}
 
+# -- URI of Zookeeper instances of the cluster
 zookeeper: cp-zookeeper-headless:2181
+# -- URI of Kafka brokers of the cluster
 kafka: PLAINTEXT://cp-kafka-headless:9092
+# -- Number of Kafka brokers. This is used to validate the cluster availability at connector init.
 kafka_num_brokers: "3"
+# -- URL of the Kafka schema registry
 schema_registry: http://cp-schema-registry:8081
 
+# -- Base URL of the rest-sources-authorizer-backend service
 radar_rest_sources_backend_url: http://radar-rest-sources-backend:8080/rest-sources/backend/
+# -- Number of connector tasks to be used in connector.properties
 connector_num_tasks: "5"
-
+# -- Fitbit API client id.
 fitbit_api_client: ""
+# -- Fitbit API client secret.
 fitbit_api_secret: ""
 
+# -- OAuth2 client id from Management Portal
 oauthClientId: radar_fitbit_connector
+# -- OAuth2 client secret from Management Portal
 oauthClientSecret: secret
+# -- Hostname of Management Portal. This will be used to create URLs to access Management Portal
 managementportal_host: management-portal
+# -- Set to true, if intraday access data should be collected by the connector. This will be set in connector.properties.
 includeIntradayData: true
