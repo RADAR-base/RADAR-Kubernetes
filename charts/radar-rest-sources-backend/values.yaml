@@ -51,27 +51,44 @@ tolerations: []
 
 affinity: {}
 
+# Configuration of the Postgres data base to store data from Rest sources authorizer backend
 postgres:
+  # -- host name of the postgres db
   host: postgresql
+  # -- post of the postgres db
   port: 5432
+  # -- database name
   database: restsourceauthorizer
+  # -- additional JDBC connection parameters e.g. sslmode=verify-full
   connection_parameters: ""
+  # -- postgres user
   user: postgres
+  # -- password of the postgres user
   password: password
   ssl:
+    # -- set to true of the connecting to postgres using SSL
     enabled: false
     keystorepassword: keystorepassword
 
+# -- hostname of the Management Portal
 managementportal_host: management-portal
 
+# -- OAuth client secret of the radar-rest-sources-backend client from Management Portal
 client_secret: secret
 
 restSourceClients:
   fitbit:
+    # -- set to true, if Fitbit client should be used
     enable: false
+    # -- Type of the data sources
     sourceType: FitBit
+    # -- Authorization endpoint for Fitbit authentication and authorization
     authorizationEndpoint: https://www.fitbit.com/oauth2/authorize
+    # -- Token endpoint to request access-token from FitBit
     tokenEndpoint: https://api.fitbit.com/oauth2/token
+    # -- FitBit client id
     clientId:
+    # -- FitBit client secret
     clientSecret:
+    # -- List of scopes of the data that should be collected from Fitbit. For details, please refer to https://dev.fitbit.com/build/reference/web-api/developer-guide/application-design/#Scopes
     scope: activity heartrate sleep profile
