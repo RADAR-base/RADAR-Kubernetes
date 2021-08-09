@@ -78,13 +78,13 @@ producerProperties:
 serializationProperties: {}
 
 cc:
-  # set to true, if requests should be forwarded to Confluent Cloud based brokers.
+  # -- set to true, if requests should be forwarded to Confluent Cloud based brokers.
   enabled: false
-  # Confluent Cloud cluster API key
+  # -- Confluent Cloud cluster API key
   apiKey: ccApikey
-  # Confluent Cloud cluster API secret
+  # -- Confluent Cloud cluster API secret
   apiSecret: ccApiSecret
-  # Confluent Cloud schema registry API key
+  # -- Confluent Cloud schema registry API key
   schemaRegistryApiKey: srApiKey
-  # Confluent Cloud schema registry API secret
+  # -- Confluent Cloud schema registry API secret
   schemaRegistryApiSecret: srApiSecret
