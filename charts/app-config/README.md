@@ -24,7 +24,6 @@ A Helm chart for RADAR-base application config (app-config) backend service
 * Kubernetes 1.17+
 * Kubectl 1.17+
 * Helm 3.1.0+
-* PV provisioner support in the underlying infrastructure
 
 ## Values
 

@@ -2,13 +2,10 @@ charts/cert-manager/
 charts/kafka-manager/
 charts/kube-prometheus-stack/
 charts/radar-backend/
-charts/radar-fitbit-connector/
 charts/radar-gateway/
 charts/radar-integration/
 charts/radar-jdbc-connector/
 charts/radar-output/
-charts/radar-rest-sources-authorizer/
-charts/radar-rest-sources-backend/
 charts/radar-s3-connector/
 charts/radar-upload-connect-backend/
 charts/radar-upload-connect-frontend/
