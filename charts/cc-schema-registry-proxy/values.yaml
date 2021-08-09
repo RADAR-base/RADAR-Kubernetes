@@ -13,5 +13,7 @@ ingress:
     secretName: radar-base-tls
 
 cc:
+  # -- Confluent cloud schema registry API key
   schemaRegistryApiKey: srApiKey
+  # -- Confluent cloud schema registry API secret
   schemaRegistryApiSecret: srApiSecret
