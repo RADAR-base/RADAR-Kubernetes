@@ -4,7 +4,7 @@
 
 ![Version: 0.1.3](https://img.shields.io/badge/Version-0.1.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.5.6](https://img.shields.io/badge/AppVersion-0.5.6-informational?style=flat-square)
 
-A Helm chart for RADAR-base gateway.
+A Helm chart for RADAR-base gateway. For more details of the configurations, see https://github.com/RADAR-base/RADAR-Gateway/blob/master/gateway.yml.
 
 **Homepage:** <https://radar-base.org>
 
@@ -51,16 +51,16 @@ A Helm chart for RADAR-base gateway.
 | tolerations | list | `[]` |  |
 | affinity | object | `{}` |  |
 | serviceMonitor.enabled | bool | `true` |  |
-| managementportalHost | string | `"management-portal"` |  |
-| schemaRegistry | string | `"http://cp-schema-registry:8081"` |  |
-| max_requests | int | `1000` |  |
-| bootstrapServers | string | `"cp-kafka-headless:9092"` |  |
-| checkSourceId | bool | `true` |  |
-| adminProperties | object | `{}` |  |
-| producerProperties."compression.type" | string | `"lz4"` |  |
-| serializationProperties | object | `{}` |  |
-| cc.enabled | bool | `false` |  |
-| cc.apiKey | string | `"ccApikey"` |  |
-| cc.apiSecret | string | `"ccApiSecret"` |  |
-| cc.schemaRegistryApiKey | string | `"srApiKey"` |  |
-| cc.schemaRegistryApiSecret | string | `"srApiSecret"` |  |
+| managementportalHost | string | `"management-portal"` | Host name of the management portal application |
+| schemaRegistry | string | `"http://cp-schema-registry:8081"` | Schema Registry URL |
+| max_requests | int | `1000` | Not used. To be confirmed |
+| bootstrapServers | string | `"cp-kafka-headless:9092"` | Kafka broker URLs |
+| checkSourceId | bool | `true` | set to true, if sources in access token should be validated |
+| adminProperties | object | `{}` | Additional Kafka Admin Client settings as key value pairs. Read from https://kafka.apache.org/documentation/#adminclientconfigs. |
+| producerProperties | object | `{"compression.type":"lz4"}` | Kafka producer properties as key value pairs. Read from https://kafka.apache.org/documentation/#producerconfigs. |
+| serializationProperties | object | `{}` | Additional Kafka serialization settings, used in KafkaAvroSerializer. Read from [io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig]. |
+| cc.enabled | bool | `false` | set to true, if requests should be forwarded to Confluent Cloud based brokers. |
+| cc.apiKey | string | `"ccApikey"` | Confluent Cloud cluster API key |
+| cc.apiSecret | string | `"ccApiSecret"` | Confluent Cloud cluster API secret |
+| cc.schemaRegistryApiKey | string | `"srApiKey"` | Confluent Cloud schema registry API key |
+| cc.schemaRegistryApiSecret | string | `"srApiSecret"` | Confluent Cloud schema registry API secret |
