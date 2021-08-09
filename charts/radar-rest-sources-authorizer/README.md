@@ -24,31 +24,27 @@ A Helm chart for the front-end application of RADAR-base Rest Sources Authorizer
 * Kubernetes 1.17+
 * Kubectl 1.17+
 * Helm 3.1.0+
-* PV provisioner support in the underlying infrastructure
 
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| replicaCount | int | `2` |  |
-| image.repository | string | `"radarbase/radar-rest-source-authorizer"` |  |
-| image.tag | string | `"3.2.0"` |  |
-| image.pullPolicy | string | `"IfNotPresent"` |  |
-| nameOverride | string | `""` |  |
-| fullnameOverride | string | `""` |  |
-| service.type | string | `"ClusterIP"` |  |
-| service.port | int | `80` |  |
-| ingress.enabled | bool | `true` |  |
-| ingress.annotations."kubernetes.io/ingress.class" | string | `"nginx"` |  |
-| ingress.annotations."cert-manager.io/cluster-issuer" | string | `"letsencrypt-prod"` |  |
-| ingress.annotations."nginx.ingress.kubernetes.io/rewrite-target" | string | `"/$1"` |  |
-| ingress.path | string | `"/rest-sources/authorizer/?(.*)"` |  |
-| ingress.hosts[0] | string | `"localhost"` |  |
-| ingress.tls.secretName | string | `"radar-base-tls"` |  |
-| resources.requests.cpu | string | `"100m"` |  |
-| resources.requests.memory | string | `"128Mi"` |  |
-| nodeSelector | object | `{}` |  |
-| tolerations | list | `[]` |  |
-| affinity | object | `{}` |  |
+| replicaCount | int | `2` | Number of radar-fitbit-connector replicas to deploy |
+| image.repository | string | `"radarbase/radar-rest-source-authorizer"` | radar-rest-sources-authorizer image repository |
+| image.tag | string | `"3.2.0"` | radar-rest-sources-authorizer image tag (immutable tags are recommended) Overrides the image tag whose default is the chart appVersion. |
+| image.pullPolicy | string | `"IfNotPresent"` | radar-rest-sources-authorizer image pull policy |
+| nameOverride | string | `""` | String to partially override radar-rest-sources-authorizer.fullname template with a string (will prepend the release name) |
+| fullnameOverride | string | `""` | String to fully override radar-rest-sources-authorizer.fullname template with a string |
+| service.type | string | `"ClusterIP"` | Kubernetes Service type |
+| service.port | int | `80` | radar-rest-sources-authorizer port |
+| ingress.enabled | bool | `true` | Enable ingress controller resource |
+| ingress.annotations | object | check values.yaml | Annotations that define default ingress class, certificate issuer |
+| ingress.path | string | `"/rest-sources/authorizer/?(.*)"` | Path within the url structure |
+| ingress.hosts | list | `["localhost"]` | Hosts to accept requests from |
+| ingress.tls.secretName | string | `"radar-base-tls"` | TLS Secret Name |
+| resources.requests | object | `{"cpu":"100m","memory":"128Mi"}` | CPU/Memory resource requests |
+| nodeSelector | object | `{}` | Node labels for pod assignment |
+| tolerations | list | `[]` | Toleration labels for pod assignment |
+| affinity | object | `{}` | Affinity labels for pod assignment |
 | clientId | string | `"radar_rest_sources_authorizer"` | OAuth2 client id of the application registered in Management Portal. It is assumed that this is a public client with empty client secret. |
 | serverName | string | `"localhost"` | Domain name of the server |

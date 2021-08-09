@@ -24,37 +24,28 @@ A Helm chart for the backend application of RADAR-base Rest Sources Authorizer
 * Kubernetes 1.17+
 * Kubectl 1.17+
 * Helm 3.1.0+
-* PV provisioner support in the underlying infrastructure
 
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| replicaCount | int | `2` |  |
-| image.repository | string | `"radarbase/radar-rest-source-auth-backend"` |  |
-| image.tag | string | `"3.2.0"` |  |
-| image.pullPolicy | string | `"IfNotPresent"` |  |
-| nameOverride | string | `""` |  |
-| fullnameOverride | string | `""` |  |
-| service.type | string | `"ClusterIP"` |  |
-| service.port | int | `8080` |  |
-| ingress.enabled | bool | `true` |  |
-| ingress.annotations."nginx.ingress.kubernetes.io/affinity" | string | `"cookie"` |  |
-| ingress.annotations."nginx.ingress.kubernetes.io/affinity-mode" | string | `"persistent"` |  |
-| ingress.annotations."nginx.ingress.kubernetes.io/session-cookie-path" | string | `"/rest-sources/"` |  |
-| ingress.annotations."nginx.ingress.kubernetes.io/session-cookie-samesite" | string | `"Strict"` |  |
-| ingress.annotations."nginx.ingress.kubernetes.io/session-cookie-max-age" | string | `"900"` |  |
-| ingress.annotations."nginx.ingress.kubernetes.io/session-cookie-expires" | string | `"900"` |  |
-| ingress.annotations."kubernetes.io/ingress.class" | string | `"nginx"` |  |
-| ingress.annotations."cert-manager.io/cluster-issuer" | string | `"letsencrypt-prod"` |  |
-| ingress.path | string | `"/rest-sources/backend/?(.*)"` |  |
-| ingress.hosts[0] | string | `"localhost"` |  |
-| ingress.tls.secretName | string | `"radar-base-tls"` |  |
-| resources.requests.cpu | string | `"100m"` |  |
-| resources.requests.memory | string | `"400Mi"` |  |
-| nodeSelector | object | `{}` |  |
-| tolerations | list | `[]` |  |
-| affinity | object | `{}` |  |
+| replicaCount | int | `2` | Number of radar-rest-sources-backend replicas to deploy |
+| image.repository | string | `"radarbase/radar-rest-source-auth-backend"` | radar-rest-sources-backend image repository |
+| image.tag | string | `"3.2.0"` | radar-rest-sources-backend image tag (immutable tags are recommended) Overrides the image tag whose default is the chart appVersion. |
+| image.pullPolicy | string | `"IfNotPresent"` | radar-rest-sources-backend image pull policy |
+| nameOverride | string | `""` | String to partially override radar-rest-sources-backend.fullname template with a string (will prepend the release name) |
+| fullnameOverride | string | `""` | String to fully override radar-rest-sources-backend.fullname template with a string |
+| service.type | string | `"ClusterIP"` | Kubernetes Service type |
+| service.port | int | `8080` | radar-rest-sources-backend port |
+| ingress.enabled | bool | `true` | Enable ingress controller resource |
+| ingress.annotations | object | check values.yaml | Annotations that define default ingress class, certificate issuer and session configuration |
+| ingress.path | string | `"/rest-sources/backend/?(.*)"` | Path within the url structure |
+| ingress.hosts | list | `["localhost"]` | Hosts to accept requests from |
+| ingress.tls.secretName | string | `"radar-base-tls"` | TLS Secret Name |
+| resources.requests | object | `{"cpu":"100m","memory":"400Mi"}` | CPU/Memory resource requests |
+| nodeSelector | object | `{}` | Node labels for pod assignment |
+| tolerations | list | `[]` | Toleration labels for pod assignment |
+| affinity | object | `{}` | Affinity labels for pod assignment |
 | postgres.host | string | `"postgresql"` | host name of the postgres db |
 | postgres.port | int | `5432` | post of the postgres db |
 | postgres.database | string | `"restsourceauthorizer"` | database name |
