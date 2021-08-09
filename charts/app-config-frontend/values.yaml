@@ -17,9 +17,9 @@ image:
 # -- Docker registry secret names as an array
 imagePullSecrets: []
 
-# -- String to partially override management-portal.fullname template with a string (will prepend the release name)
+# -- String to partially override app-config-frontend.fullname template with a string (will prepend the release name)
 nameOverride: ""
-# -- String to fully override management-portal.fullname template with a string
+# -- String to fully override app-config-frontend.fullname template with a string
 fullnameOverride: ""
 
 # -- Annotations for Appconfig frontend pods
