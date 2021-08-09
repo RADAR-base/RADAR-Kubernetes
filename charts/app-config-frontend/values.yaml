@@ -2,23 +2,34 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-replicaCount: 1
+# -- Number of Appconfig frontend replicas to deploy
+replicaCount: 2
 
 image:
+  # -- Appconfig frontend image repository
   repository: radarbase/radar-app-config-frontend
-  pullPolicy: IfNotPresent
+  # -- Appconfig frontend image tag (immutable tags are recommended)
   # Overrides the image tag whose default is the chart appVersion.
   tag: 0.3.2
+  # -- Appconfig frontend image pull policy
+  pullPolicy: IfNotPresent
 
+# -- Docker registry secret names as an array
 imagePullSecrets: []
+
+# -- String to partially override app-config-frontend.fullname template with a string (will prepend the release name)
 nameOverride: ""
+# -- String to fully override app-config-frontend.fullname template with a string
 fullnameOverride: ""
 
+# -- Annotations for Appconfig frontend pods
 podAnnotations: {}
 
+# -- Configure Appconfig pods' Security Context
 podSecurityContext: {}
   # fsGroup: 2000
 
+# -- Configure Appconfig containers' Security Context
 securityContext: {}
   # capabilities:
   #   drop:
@@ -28,40 +39,57 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
+  # -- Kubernetes Service type
   type: ClusterIP
+  # -- Appconfig frontend port
   port: 8080
 
 ingress:
+  # -- Enable ingress controller resource
   enabled: true
+  # -- Annotations that define default ingress class, certificate issuer
+  # @default -- check values.yaml
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
   hosts:
+    # -- Path within the url structure
     - paths:
-        - "/appconfig($|/)(.*)"
+        - '/appconfig($|/)(.*)'
+
+  # -- Utilize TLS backend in ingress
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
 
-resources: {}
+resources:
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
 
+  # -- CPU/Memory resource limits
+  limits:
+    cpu: 200m
+    memory: 512Mi
+  # -- CPU/Memory resource requests
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# -- Node labels for pod assignment
 nodeSelector: {}
 
+# -- Toleration labels for pod assignment
 tolerations: []
 
+# -- Affinity labels for pod assignment
 affinity: {}
 
+# -- Authorization URL of the IDP
 authUrl: http://localhost/managementportal/oauth
+# -- Callback URL to where authorization-code should be returned
 authCallbackUrl: http://localhost/appconfig/login
+# -- Base-URL of the App Config backend service
 backendUrl: /appconfig/api

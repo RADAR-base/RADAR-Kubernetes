@@ -2,22 +2,34 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# -- Number of radar-rest-sources-backend replicas to deploy
 replicaCount: 2
 
 image:
+  # -- radar-rest-sources-backend image repository
   repository: radarbase/radar-rest-source-auth-backend
+  # -- radar-rest-sources-backend image tag (immutable tags are recommended)
+  # Overrides the image tag whose default is the chart appVersion.
   tag: 3.2.0
+  # -- radar-rest-sources-backend image pull policy
   pullPolicy: IfNotPresent
 
+# -- String to partially override radar-rest-sources-backend.fullname template with a string (will prepend the release name)
 nameOverride: ""
+# -- String to fully override radar-rest-sources-backend.fullname template with a string
 fullnameOverride: ""
 
 service:
+  # -- Kubernetes Service type
   type: ClusterIP
+  # -- radar-rest-sources-backend port
   port: 8080
 
 ingress:
+  # -- Enable ingress controller resource
   enabled: true
+  # -- Annotations that define default ingress class, certificate issuer and session configuration
+  # @default -- check values.yaml
   annotations:
     nginx.ingress.kubernetes.io/affinity: cookie
     nginx.ingress.kubernetes.io/affinity-mode: persistent
@@ -27,10 +39,13 @@ ingress:
     nginx.ingress.kubernetes.io/session-cookie-expires: "900"
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
+  # -- Path within the url structure
   path: "/rest-sources/backend/?(.*)"
+  # -- Hosts to accept requests from
   hosts:
     - localhost
   tls:
+    # -- TLS Secret Name
     secretName: radar-base-tls
 
 resources:
@@ -41,37 +56,59 @@ resources:
   # limits:
   #   cpu: 100m
   #   memory: 128Mi
+  
+  # -- CPU/Memory resource requests
   requests:
     cpu: 100m
     memory: 400Mi
 
+# -- Node labels for pod assignment
 nodeSelector: {}
 
+# -- Toleration labels for pod assignment
 tolerations: []
 
+# -- Affinity labels for pod assignment
 affinity: {}
 
+# Configuration of the Postgres data base to store data from Rest sources authorizer backend
 postgres:
+  # -- host name of the postgres db
   host: postgresql
+  # -- post of the postgres db
   port: 5432
+  # -- database name
   database: restsourceauthorizer
+  # -- additional JDBC connection parameters e.g. sslmode=verify-full
   connection_parameters: ""
+  # -- postgres user
   user: postgres
+  # -- password of the postgres user
   password: password
   ssl:
+    # -- set to true of the connecting to postgres using SSL
     enabled: false
     keystorepassword: keystorepassword
 
+# -- hostname of the Management Portal
 managementportal_host: management-portal
 
+# -- OAuth client secret of the radar-rest-sources-backend client from Management Portal
 client_secret: secret
 
 restSourceClients:
   fitbit:
+    # -- set to true, if Fitbit client should be used
     enable: false
+    # -- Type of the data sources
     sourceType: FitBit
+    # -- Authorization endpoint for Fitbit authentication and authorization
     authorizationEndpoint: https://www.fitbit.com/oauth2/authorize
+    # -- Token endpoint to request access-token from FitBit
     tokenEndpoint: https://api.fitbit.com/oauth2/token
+    # -- FitBit client id
     clientId:
+    # -- FitBit client secret
     clientSecret:
+    # -- List of scopes of the data that should be collected from Fitbit. For details, please refer to https://dev.fitbit.com/build/reference/web-api/developer-guide/application-design/#Scopes
     scope: activity heartrate sleep profile
