@@ -46,50 +46,83 @@ persistence:
   # accessMode: ReadWriteOnce
   # size: 30Gi
 
+
 source:
+  # -- Type of the intermediate storage of the RADAR-base pipeline e.g. s3, hdfs
   type: s3
   s3:
+    # -- s3 endpoint of the intermediate storage
     endpoint: "http://minio:9000"
+    # -- s3 access-key of the intermediate storage
     accessToken: access_key
+    # -- s3 secret-key of the intermediate storage
     secretKey: secret
+    # -- s3 bucket name of the intermediate storage
     bucket: radar-intermediate-storage
   azure:
+    # -- Azure endpoint of the intermediate storage
     endpoint: ""
+    # -- Azure username to access the s3 endpoint when using personal login
     username: ""
+    # -- Azure password when using personal login
     password: ""
+    # -- Azure account name when using shared access tokens
     accountName: ""
+    # -- Azure account key when using shared access tokens
     accountKey: ""
+    # -- Azure SAS(shared access signature) token when using shared access tokens
     sasToken: ""
+    # -- Azure blob container name
     container: ""
 
 target:
+  # -- Type of the output storage of the RADAR-base pipeline e.g. s3, local
   type: s3
   s3:
+    # -- s3 endpoint of the output storage
     endpoint: "http://minio:9000"
+    # -- s3 access-key of the output storage
     accessToken: access_key
+    # -- s3 secret-key of the output storage
     secretKey: secret
+    # -- s3 bucket name of the output storage
     bucket: radar-output-storage
   azure:
+    # -- Azure endpoint of the output storage
     endpoint: ""
+    # -- Azure username to access the s3 endpoint when using personal login
     username: ""
+    # -- Azure password when using personal login
     password: ""
+    # -- Azure account name when using shared access tokens
     accountName: ""
+    # -- Azure account key when using shared access tokens
     accountKey: ""
+    # -- Azure SAS(shared access signature) token when using shared access tokens
     sasToken: ""
+    # -- Azure blob container name
     container: ""
 
 redis:
+  # -- URL of the redis database
   uri: redis://redis-master:6379
 
 worker:
+  # -- Minimum amount of time in seconds since a file was last modified for it to be considered for processing.
   minimumFileAge: 900
+  # -- Number of threads to do processing on
   numThreads: 2
 
 cleaner:
+  # -- Number of days after which a source file is considered old
   age: 7
 
 paths:
+  # -- Relative path to intermediate storage root to browse for data
   input: topics
+  # -- Relative path to output storage to write data
   output: output
+  # -- # Output path construction factory
   factory: org.radarbase.output.path.ObservationKeyPathFactory
+  # -- Additional properties. For details see https://github.com/RADAR-base/radar-output-restructure/blob/master/restructure.yml
   properties: {}
