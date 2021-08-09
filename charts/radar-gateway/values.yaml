@@ -59,22 +59,32 @@ affinity: {}
 serviceMonitor:
   enabled: true
 
+# -- Host name of the management portal application
 managementportalHost: management-portal
+# -- Schema Registry URL
 schemaRegistry: http://cp-schema-registry:8081
+# -- Not used. To be confirmed
 max_requests: 1000
+# -- Kafka broker URLs
 bootstrapServers: cp-kafka-headless:9092
+# -- set to true, if sources in access token should be validated
 checkSourceId: true
-
+# -- Additional Kafka Admin Client settings as key value pairs. Read from https://kafka.apache.org/documentation/#adminclientconfigs.
 adminProperties: {}
-
+# -- Kafka producer properties as key value pairs. Read from https://kafka.apache.org/documentation/#producerconfigs.
 producerProperties:
   compression.type: lz4
-
+# -- Additional Kafka serialization settings, used in KafkaAvroSerializer. Read from [io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig].
 serializationProperties: {}
 
 cc:
+  # set to true, if requests should be forwarded to Confluent Cloud based brokers.
   enabled: false
+  # Confluent Cloud cluster API key
   apiKey: ccApikey
+  # Confluent Cloud cluster API secret
   apiSecret: ccApiSecret
+  # Confluent Cloud schema registry API key
   schemaRegistryApiKey: srApiKey
+  # Confluent Cloud schema registry API secret
   schemaRegistryApiSecret: srApiSecret
