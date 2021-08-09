@@ -20,7 +20,6 @@ A Helm chart for Confluent Cloud schema registry proxy. This proxy service is us
 * Kubernetes 1.17+
 * Kubectl 1.17+
 * Helm 3.1.0+
-* PV provisioner support in the underlying infrastructure
 
 ## Values
 
