@@ -137,23 +137,9 @@ smtp:
   # -- set to true, if the account should be authenticated before sending emails
   auth: true
 
-
-# List of OAuth client configurations supported by RADAR-base. Each client should be enabled separately, if relevant and used in the installation.
-# Each client configuration has the following setup.
-#  <client_id>: # client id
-#    enabled: false # set to true, if it should be enabled. Default is false.
-#    resource_ids: # list of resources that can be accessed by this client.
-#    client_secret: # Client secret. For public clients, the secret can be empty.
-#    scope: # List of permissions allowed for this client
-#    authorized_grant_types: # List of OAuth2 grant types that can be used by this client. e.g. authorization_code, refresh_token,client_credentials
-#    access_token_validity: # Lifetime of the access token for this client in seconds
-#    refresh_token_validity: # Lifetime of the refresh token for this client in seconds
-#    additional_information: # A JSON string containing additional meta-data of this client. e.g. {"dynamic_registration": true} should be set for clients which can automatically register a data source for a subject
-#    redirect_uri: # Redirect URL for clients which have authorization_code grant-type enabled.
-#    autoapprove: # List of permissions that can auto-approved when authorization-code flow succeeds.
+# -- Oauth Client configuration
+# @default -- check values.yaml
 oauth_clients:
-  # -- Oauth Client configuration for pRMT
-  # @default -- check values.yaml
   pRMT:
     enable: false
     resource_ids:
@@ -178,8 +164,6 @@ oauth_clients:
     refresh_token_validity: 7948800
     additional_information: '{"dynamic_registration": true}'
 
-  # -- Oauth Client configuration for aRMT
-  # @default -- check values.yaml
   aRMT:
     enable: false
     resource_ids:
@@ -204,8 +188,6 @@ oauth_clients:
     refresh_token_validity: 7948800
     additional_information: '{"dynamic_registration": true}'
 
-  # -- Oauth Client configuration for THINC-IT
-  # @default -- check values.yaml
   THINC-IT:
     enable: false
     resource_ids:
@@ -230,8 +212,6 @@ oauth_clients:
     refresh_token_validity: 7948800
     additional_information: '{"dynamic_registration": true}'
 
-  # -- Oauth Client configuration for REDCAP integrator
-  # @default -- check values.yaml
   radar_redcap_integrator:
     enable: false
     resource_ids:
@@ -246,8 +226,6 @@ oauth_clients:
       - client_credentials
     access_token_validity: 900
 
-  # -- Oauth Client configuration for Upload backend
-  # @default -- check values.yaml
   radar_upload_backend:
     enable: false
     resource_ids:
@@ -261,8 +239,6 @@ oauth_clients:
     access_token_validity: 900
     additional_information: '{"dynamic_registration": true}'
 
-  # -- Oauth Client configuration for Upload connect
-  # @default -- check values.yaml
   radar_upload_connect:
     enable: false
     resource_ids:
@@ -280,8 +256,6 @@ oauth_clients:
       - client_credentials
     access_token_validity: 900
 
-  # -- Oauth Client configuration for Upload frontend
-  # @default -- check values.yaml
   radar_upload_frontend:
     enable: false
     resource_ids:
@@ -300,8 +274,6 @@ oauth_clients:
       - /upload/login
       - http://localhost:8080/upload/login
 
-  # -- Oauth Client configuration for Rest Sources Backend
-  # @default -- check values.yaml
   radar_rest_sources_auth_backend:
     enable: false
     resource_ids:
@@ -315,8 +287,6 @@ oauth_clients:
       - client_credentials
     access_token_validity: 900
 
-  # -- Oauth Client configuration for Rest Sources Authorizer
-  # @default -- check values.yaml
   radar_rest_sources_authorizer:
     enable: false
     resource_ids:
@@ -333,8 +303,6 @@ oauth_clients:
     redirect_uri:
       - /rest-sources/authorizer/login
 
-  # -- Oauth Client configuration for Fitbit connector
-  # @default -- check values.yaml
   radar_fitbit_connector:
     enable: false
     resource_ids:
@@ -347,8 +315,6 @@ oauth_clients:
       - client_credentials
     access_token_validity: 900
 
-  # -- Oauth Client configuration for Appconfig
-  # @default -- check values.yaml
   radar_appconfig:
     enable: false
     resource_ids:
@@ -365,8 +331,6 @@ oauth_clients:
       - client_credentials
     access_token_validity: 900
 
-  # -- Oauth Client configuration for Appconfig Frontend
-  # @default -- check values.yaml
   appconfig_frontend:
     enable: false
     resource_ids:
@@ -398,8 +362,6 @@ oauth_clients:
       - SUBJECT.READ
       - SUBJECT.UPDATE
 
-  # -- Oauth Client configuration for Grafana Dashboard
-  # @default -- check values.yaml
   grafana_dashboard:
     enable: false
     resource_ids:

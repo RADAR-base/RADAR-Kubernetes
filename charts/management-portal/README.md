@@ -24,7 +24,6 @@ A Helm chart for RADAR-Base Management Portal
 * Kubernetes 1.17+
 * Kubectl 1.17+
 * Helm 3.1.0+
-* PV provisioner support in the underlying infrastructure
 
 ## Values
 
@@ -72,18 +71,21 @@ A Helm chart for RADAR-Base Management Portal
 | smtp.from | string | `"noreply@example.com"` | Email address which should be used to send activation emails |
 | smtp.starttls | bool | `false` | set to true,if ttls should be enabled |
 | smtp.auth | bool | `true` | set to true, if the account should be authenticated before sending emails |
-| oauth_clients.pRMT | object | check values.yaml | Oauth Client configuration for pRMT |
-| oauth_clients.aRMT | object | check values.yaml | Oauth Client configuration for aRMT |
-| oauth_clients.THINC-IT | object | check values.yaml | Oauth Client configuration for THINC-IT |
-| oauth_clients.radar_redcap_integrator | object | check values.yaml | Oauth Client configuration for REDCAP integrator |
-| oauth_clients.radar_upload_backend | object | check values.yaml | Oauth Client configuration for Upload backend |
-| oauth_clients.radar_upload_connect | object | check values.yaml | Oauth Client configuration for Upload connect |
-| oauth_clients.radar_upload_frontend | object | check values.yaml | Oauth Client configuration for Upload frontend |
-| oauth_clients.radar_rest_sources_auth_backend | object | check values.yaml | Oauth Client configuration for Rest Sources Backend |
-| oauth_clients.radar_rest_sources_authorizer | object | check values.yaml | Oauth Client configuration for Rest Sources Authorizer |
-| oauth_clients.radar_fitbit_connector | object | check values.yaml | Oauth Client configuration for Fitbit connector |
-| oauth_clients.radar_appconfig | object | check values.yaml | Oauth Client configuration for Appconfig |
-| oauth_clients.appconfig_frontend | object | check values.yaml | Oauth Client configuration for Appconfig Frontend |
-| oauth_clients.grafana_dashboard | object | check values.yaml | Oauth Client configuration for Grafana Dashboard |
+| oauth_clients | object | check values.yaml | Oauth Client configuration |
 
 ## OAuth Client Configuration
+List of OAuth client configurations supported by RADAR-base. Each client should be enabled separately, if relevant and used in the installation.
+Each client configuration has the following setup:
+```
+<client_id>: # client id
+  enabled: false # set to true, if it should be enabled. Default is false.
+  resource_ids: # list of resources that can be accessed by this client.
+  client_secret: # Client secret. For public clients, the secret can be empty.
+  scope: # List of permissions allowed for this client
+  authorized_grant_types: # List of OAuth2 grant types that can be used by this client. e.g. authorization_code, refresh_token,client_credentials
+  access_token_validity: # Lifetime of the access token for this client in seconds
+  refresh_token_validity: # Lifetime of the refresh token for this client in seconds
+  additional_information: # A JSON string containing additional meta-data of this client. e.g. {"dynamic_registration": true} should be set for clients which can automatically register a data source for a subject
+  redirect_uri: # Redirect URL for clients which have authorization_code grant-type enabled.
+  autoapprove: # List of permissions that can auto-approved when authorization-code flow succeeds.
+```
