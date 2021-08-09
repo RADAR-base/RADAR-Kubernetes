@@ -2,22 +2,34 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# -- Number of radar-rest-sources-backend replicas to deploy
 replicaCount: 2
 
 image:
+  # -- radar-rest-sources-backend image repository
   repository: radarbase/radar-rest-source-auth-backend
+  # -- radar-rest-sources-backend image tag (immutable tags are recommended)
+  # Overrides the image tag whose default is the chart appVersion.
   tag: 3.2.0
+  # -- radar-rest-sources-backend image pull policy
   pullPolicy: IfNotPresent
 
+# -- String to partially override radar-rest-sources-backend.fullname template with a string (will prepend the release name)
 nameOverride: ""
+# -- String to fully override radar-rest-sources-backend.fullname template with a string
 fullnameOverride: ""
 
 service:
+  # -- Kubernetes Service type
   type: ClusterIP
+  # -- radar-rest-sources-backend port
   port: 8080
 
 ingress:
+  # -- Enable ingress controller resource
   enabled: true
+  # -- Annotations that define default ingress class, certificate issuer and session configuration
+  # @default -- check values.yaml
   annotations:
     nginx.ingress.kubernetes.io/affinity: cookie
     nginx.ingress.kubernetes.io/affinity-mode: persistent
@@ -27,10 +39,13 @@ ingress:
     nginx.ingress.kubernetes.io/session-cookie-expires: "900"
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
+  # -- Path within the url structure
   path: "/rest-sources/backend/?(.*)"
+  # -- Hosts to accept requests from
   hosts:
     - localhost
   tls:
+    # -- TLS Secret Name
     secretName: radar-base-tls
 
 resources:
@@ -41,14 +56,19 @@ resources:
   # limits:
   #   cpu: 100m
   #   memory: 128Mi
+  
+  # -- CPU/Memory resource requests
   requests:
     cpu: 100m
     memory: 400Mi
 
+# -- Node labels for pod assignment
 nodeSelector: {}
 
+# -- Toleration labels for pod assignment
 tolerations: []
 
+# -- Affinity labels for pod assignment
 affinity: {}
 
 # Configuration of the Postgres data base to store data from Rest sources authorizer backend

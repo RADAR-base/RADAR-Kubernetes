@@ -30,27 +30,25 @@ A Helm chart for RADAR-base fitbit connector
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| replicaCount | int | `1` |  |
-| image.repository | string | `"radarbase/kafka-connect-rest-fitbit-source"` |  |
-| image.tag | string | `"0.3.3"` |  |
-| image.pullPolicy | string | `"IfNotPresent"` |  |
-| nameOverride | string | `""` |  |
-| fullnameOverride | string | `""` |  |
-| service.type | string | `"ClusterIP"` |  |
-| service.port | int | `8083` |  |
-| ingress.enabled | bool | `false` |  |
-| ingress.annotations | object | `{}` |  |
-| ingress.hosts[0].host | string | `"chart-example.local"` |  |
-| ingress.hosts[0].paths | list | `[]` |  |
-| ingress.tls | list | `[]` |  |
-| resources.requests.cpu | string | `"100m"` |  |
-| resources.requests.memory | string | `"1Gi"` |  |
-| persistence.enabled | bool | `true` |  |
-| persistence.accessMode | string | `"ReadWriteOnce"` |  |
-| persistence.size | string | `"5Gi"` |  |
-| nodeSelector | object | `{}` |  |
-| tolerations | list | `[]` |  |
-| affinity | object | `{}` |  |
+| replicaCount | int | `1` | Number of radar-fitbit-connector replicas to deploy |
+| image.repository | string | `"radarbase/kafka-connect-rest-fitbit-source"` | radar-fitbit-connector image repository |
+| image.tag | string | `"0.3.3"` | radar-fitbit-connector image tag (immutable tags are recommended) Overrides the image tag whose default is the chart appVersion. |
+| image.pullPolicy | string | `"IfNotPresent"` | radar-fitbit-connector image pull policy |
+| nameOverride | string | `""` | String to partially override radar-fitbit-connector.fullname template with a string (will prepend the release name) |
+| fullnameOverride | string | `""` | String to fully override radar-fitbit-connector.fullname template with a string |
+| service.type | string | `"ClusterIP"` | Kubernetes Service type |
+| service.port | int | `8083` | radar-fitbit-connector port |
+| ingress.enabled | bool | `false` | Enable ingress controller resource |
+| ingress.annotations | object | `{}` | Annotations to define default ingress class, certificate issuer |
+| ingress.hosts | list | check values.yaml | Hosts to listen to incoming requests |
+| ingress.tls | list | `[]` | TLS secrets for certificates |
+| resources.requests | object | `{"cpu":"100m","memory":"1Gi"}` | CPU/Memory resource requests |
+| persistence.enabled | bool | `true` | Enable persistence using PVC |
+| persistence.accessMode | string | `"ReadWriteOnce"` | PVC Access Mode for radar-fitbit-connector volume |
+| persistence.size | string | `"5Gi"` | PVC Storage Request for radar-fitbit-connector volume |
+| nodeSelector | object | `{}` | Node labels for pod assignment |
+| tolerations | list | `[]` | Toleration labels for pod assignment |
+| affinity | object | `{}` | Affinity labels for pod assignment |
 | zookeeper | string | `"cp-zookeeper-headless:2181"` | URI of Zookeeper instances of the cluster |
 | kafka | string | `"PLAINTEXT://cp-kafka-headless:9092"` | URI of Kafka brokers of the cluster |
 | kafka_num_brokers | string | `"3"` | Number of Kafka brokers. This is used to validate the cluster availability at connector init. |
