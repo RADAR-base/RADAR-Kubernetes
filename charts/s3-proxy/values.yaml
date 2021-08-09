@@ -40,11 +40,18 @@ tolerations: []
 affinity: {}
 
 s3:
+  # -- Credentials used to access this proxy
   identity: null
+  # -- Credentials used to access this proxy
   credential: ""
 
+# -- Where requests should be proxied to
 target:
+  # -- Target provider
   provider: null
+  # -- Target endpoint
   endpoint: null
+  # -- Target identity
   identity: null
+  # -- Target credential
   credential: ""
