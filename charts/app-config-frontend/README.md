@@ -24,7 +24,6 @@ A Helm chart for the frontend application of RADAR-base application config
 * Kubernetes 1.17+
 * Kubectl 1.17+
 * Helm 3.1.0+
-* PV provisioner support in the underlying infrastructure
 
 ## Values
 
@@ -35,8 +34,8 @@ A Helm chart for the frontend application of RADAR-base application config
 | image.tag | string | `"0.3.2"` | Appconfig frontend image tag (immutable tags are recommended) Overrides the image tag whose default is the chart appVersion. |
 | image.pullPolicy | string | `"IfNotPresent"` | Appconfig frontend image pull policy |
 | imagePullSecrets | list | `[]` | Docker registry secret names as an array |
-| nameOverride | string | `""` | String to partially override management-portal.fullname template with a string (will prepend the release name) |
-| fullnameOverride | string | `""` | String to fully override management-portal.fullname template with a string |
+| nameOverride | string | `""` | String to partially override app-config-frontend.fullname template with a string (will prepend the release name) |
+| fullnameOverride | string | `""` | String to fully override app-config-frontend.fullname template with a string |
 | podAnnotations | object | `{}` | Annotations for Appconfig frontend pods |
 | podSecurityContext | object | `{}` | Configure Appconfig pods' Security Context |
 | securityContext | object | `{}` | Configure Appconfig containers' Security Context |

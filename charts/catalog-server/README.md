@@ -30,27 +30,27 @@ A Helm chart for RADAR-base catalogue server
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| replicaCount | int | `2` |  |
-| image.repository | string | `"radarbase/radar-schemas-tools"` |  |
-| image.tag | string | `"0.7.1"` |  |
-| image.pullPolicy | string | `"IfNotPresent"` |  |
-| nameOverride | string | `""` |  |
-| fullnameOverride | string | `""` |  |
-| service.type | string | `"ClusterIP"` |  |
-| service.port | int | `9010` |  |
-| ingress.enabled | bool | `false` |  |
-| ingress.annotations | object | `{}` |  |
+| replicaCount | int | `2` | Number of catalog-server replicas to deploy |
+| image.repository | string | `"radarbase/radar-schemas-tools"` | catalog-server image repository |
+| image.tag | string | `"0.7.1"` | catalog-server image tag (immutable tags are recommended) Overrides the image tag whose default is the chart appVersion. |
+| image.pullPolicy | string | `"IfNotPresent"` | catalog-server image pull policy |
+| nameOverride | string | `""` | String to partially override management-portal.fullname template with a string (will prepend the release name) |
+| fullnameOverride | string | `""` | String to fully override management-portal.fullname template with a string |
+| service.type | string | `"ClusterIP"` | Kubernetes Service type |
+| service.port | int | `9010` | catalog-server port |
+| ingress.enabled | bool | `false` | Enable ingress controller resource |
+| ingress.annotations | object | `{}` | Annotations to define default ingress class, certificate issuer |
 | ingress.hosts[0].host | string | `"chart-example.local"` |  |
 | ingress.hosts[0].paths | list | `[]` |  |
 | ingress.tls | list | `[]` |  |
 | resources.requests.cpu | string | `"100m"` |  |
 | resources.requests.memory | string | `"256Mi"` |  |
-| persistence.enabled | bool | `true` |  |
+| persistence.enabled | bool | `true` | Enable persistence using PVC |
 | persistence.accessMode | string | `"ReadWriteOnce"` |  |
-| persistence.size | string | `"5Mi"` |  |
-| nodeSelector | object | `{}` |  |
-| tolerations | list | `[]` |  |
-| affinity | object | `{}` |  |
+| persistence.size | string | `"5Mi"` | PVC Storage Request for catalog-server volume |
+| nodeSelector | object | `{}` | Node labels for pod assignment |
+| tolerations | list | `[]` | Toleration labels for pod assignment |
+| affinity | object | `{}` | Affinity labels for pod assignment |
 | kafka_num_brokers | int | `3` | number of Kafka brokers to look for |
 | kafka | string | `"cp-kafka-headless:9092"` | URI of Kafka brokers |
 | schema_registry | string | `"http://cp-schema-registry:8081"` | URL of the confluent schema registry |
