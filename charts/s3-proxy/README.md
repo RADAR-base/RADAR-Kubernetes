@@ -24,7 +24,6 @@ A Helm chart for S3 Proxy. It uses https://hub.docker.com/r/andrewgaul/s3proxy t
 * Kubernetes 1.17+
 * Kubectl 1.17+
 * Helm 3.1.0+
-* PV provisioner support in the underlying infrastructure
 
 ## Values
 
