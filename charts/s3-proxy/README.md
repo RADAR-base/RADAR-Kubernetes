@@ -30,25 +30,23 @@ A Helm chart for S3 Proxy. It uses https://hub.docker.com/r/andrewgaul/s3proxy t
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| replicaCount | int | `1` |  |
-| image.repository | string | `"andrewgaul/s3proxy"` |  |
-| image.tag | string | `"travis-1430"` |  |
-| image.pullPolicy | string | `"IfNotPresent"` |  |
-| nameOverride | string | `""` |  |
-| fullnameOverride | string | `""` |  |
-| service.type | string | `"ClusterIP"` |  |
-| service.port | int | `80` |  |
-| ingress.enabled | bool | `false` |  |
-| ingress.annotations | object | `{}` |  |
-| ingress.tls | list | `[]` |  |
-| resources.requests.cpu | string | `"100m"` |  |
-| resources.requests.memory | string | `"128Mi"` |  |
-| nodeSelector | object | `{}` |  |
-| tolerations | list | `[]` |  |
-| affinity | object | `{}` |  |
+| replicaCount | int | `1` | Number of s3-proxy replicas to deploy |
+| image.repository | string | `"andrewgaul/s3proxy"` | s3-proxy image repository |
+| image.tag | string | `"travis-1430"` | s3-proxy image tag (immutable tags are recommended) Overrides the image tag whose default is the chart appVersion. |
+| image.pullPolicy | string | `"IfNotPresent"` | s3-proxy image pull policy |
+| nameOverride | string | `""` | String to partially override s3-proxy.fullname template with a string (will prepend the release name) |
+| service.type | string | `"ClusterIP"` | Kubernetes Service type |
+| service.port | int | `80` | s3-proxy port |
+| ingress.enabled | bool | `false` | Enable ingress controller resource |
+| ingress.annotations | object | `{}` | Annotations to define default ingress class, certificate issuer |
+| ingress.tls | list | `[]` | Utilize TLS backend in ingress |
+| resources.requests | object | `{"cpu":"100m","memory":"128Mi"}` | CPU/Memory resource requests |
+| nodeSelector | object | `{}` | Node labels for pod assignment |
+| tolerations | list | `[]` | Toleration labels for pod assignment |
+| affinity | object | `{}` | Affinity labels for pod assignment |
 | s3.identity | string | `nil` | Credentials used to access this proxy |
 | s3.credential | string | `""` | Credentials used to access this proxy |
-| target | object | `{"credential":"","endpoint":null,"identity":null,"provider":null}` | Where requests should be proxied to |
+| target | object | Check below | Where requests should be proxied to |
 | target.provider | string | `nil` | Target provider |
 | target.endpoint | string | `nil` | Target endpoint |
 | target.identity | string | `nil` | Target identity |

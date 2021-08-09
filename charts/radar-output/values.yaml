@@ -2,15 +2,24 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# -- Number of Appconfig frontend replicas to deploy
 replicaCount: 1
 
 image:
+  # -- Appconfig frontend image repository
   repository: radarbase/radar-output-restructure
+  # -- Appconfig frontend image tag (immutable tags are recommended)
+  # Overrides the image tag whose default is the chart appVersion.
   tag: 1.2.1
+  # -- Appconfig frontend image pull policy
   pullPolicy: IfNotPresent
 
+# -- Docker registry secret names as an array
 imagePullSecrets: []
+
+# -- String to partially override radar-output.fullname template with a string (will prepend the release name)
 nameOverride: ""
+# -- String to fully override radar-output.fullname template with a string
 fullnameOverride: ""
 
 resources:
@@ -18,19 +27,26 @@ resources:
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+
+  # -- CPU/Memory resource limits
   limits:
     cpu: 1000m
+  # -- CPU/Memory resource requests
   requests:
     cpu: 100m
     memory: 400Mi
 
+# -- Node labels for pod assignment
 nodeSelector: {}
 
+# -- Toleration labels for pod assignment
 tolerations: []
 
+# -- Affinity labels for pod assignment
 affinity: {}
 
 persistence:
+   # -- Enable persistence using PVC
   enabled: false
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -45,7 +61,6 @@ persistence:
   # existingClaim: your-claim
   # accessMode: ReadWriteOnce
   # size: 30Gi
-
 
 source:
   # -- Type of the intermediate storage of the RADAR-base pipeline e.g. s3, hdfs
