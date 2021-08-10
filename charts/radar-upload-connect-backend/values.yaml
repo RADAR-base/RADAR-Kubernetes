@@ -62,11 +62,18 @@ tolerations: []
 
 affinity: {}
 
+# -- OAuth client id of the upload connect backend application
 client_id: radar_upload_backend
+# -- Oauth client secret of the upload connect backend
 client_secret: secret
 postgres:
+  # -- Host name of the database to store uploaded data and metadata
   host: radar-upload-postgresql-postgresql
+  # -- Database username
   user: postgres
+  # -- Database password
   password: password
+# -- Host name of the management portal application
 managementportal_host: management-portal
+# -- Server name or domain name
 serverName: localhost
