@@ -2,9 +2,11 @@
 
 # velero
 
-![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
+![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
 
-A Helm chart for Kubernetes
+A Helm chart for Velero, this chart is an overlay for Velero and adds some default values and a deployment to mirror the local object storage to a remote location.
+
+**Homepage:** <https://velero.io>
 
 ## Maintainers
 
@@ -13,11 +15,23 @@ A Helm chart for Kubernetes
 | Keyvan Hedayati | keyvan@thehyve.nl |  |
 | Joris Borgdorff | joris@thehyve.nl |  |
 
+## Source Code
+
+* <https://github.com/vmware-tanzu/helm-charts/tree/main/charts/velero>
+
 ## Prerequisites
 * Kubernetes 1.17+
 * Kubectl 1.17+
 * Helm 3.1.0+
 * S3-compatible object storage
+
+## Requirements
+
+Kubernetes: `<=1.17`
+
+| Repository | Name | Version |
+|------------|------|---------|
+| https://vmware-tanzu.github.io/helm-charts | velero | 2.12.0 |
 
 ## Values
 
