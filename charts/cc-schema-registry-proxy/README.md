@@ -25,12 +25,12 @@ A Helm chart for Confluent Cloud schema registry proxy. This proxy service is us
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| replicaCount | int | `1` |  |
-| service.type | string | `"ExternalName"` |  |
-| service.externalName | string | `"schema-registry-domain"` |  |
-| ingress.enabled | bool | `true` |  |
-| ingress.path | string | `"/schema/?(.*)"` |  |
-| ingress.hosts[0] | string | `"localhost"` |  |
-| ingress.tls.secretName | string | `"radar-base-tls"` |  |
+| replicaCount | int | `1` | Number of cc-schema-registry-proxy replicas to deploy |
+| service.type | string | `"ExternalName"` | Kubernetes Service type, |
+| service.externalName | string | `"schema-registry-domain"` | Domain name used for pointing to actual schema registry instance |
+| ingress.enabled | bool | `true` | Enable ingress controller resource |
+| ingress.path | string | `"/schema/?(.*)"` | Path within the url structure |
+| ingress.hosts | list | `["localhost"]` | Hosts to listen requests from |
+| ingress.tls.secretName | string | `"radar-base-tls"` | Name of the secret that contains TLS certificates |
 | cc.schemaRegistryApiKey | string | `"srApiKey"` | Confluent cloud schema registry API key |
 | cc.schemaRegistryApiSecret | string | `"srApiSecret"` | Confluent cloud schema registry API secret |
