@@ -2,22 +2,34 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# -- Number of radar-gateway replicas to deploy
 replicaCount: 2
 
 image:
+  # -- radar-gateway image repository
   repository: radarbase/radar-gateway
+  # -- radar-gateway image tag (immutable tags are recommended)
+  # Overrides the image tag whose default is the chart appVersion.
   tag: 0.5.6
+  # -- radar-gateway image pull policy
   pullPolicy: IfNotPresent
 
+# -- String to partially override radar-gateway.fullname template with a string (will prepend the release name)
 nameOverride: ""
+# -- String to fully override radar-gateway.fullname template with a string
 fullnameOverride: ""
 
 service:
+  # -- Kubernetes Service type
   type: ClusterIP
+  # -- radar-gateway port
   port: 8080
 
 ingress:
+  # -- Enable ingress controller resource
   enabled: true
+  # -- Annotations that define default ingress class, certificate issuer and deny access to sensitive URLs
+  # @default -- check values.yaml
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
@@ -32,10 +44,13 @@ ingress:
       location ~* /kafka/topics/.+/partitions {
         deny all;
       }
+  # -- Path within the url structure
   path: "/kafka/?(.*)"
+  # -- Hosts to accept requests from
   hosts:
     - localhost
   tls:
+    # -- Name of the secret that contains TLS certificates
     secretName: radar-base-tls
 
 resources:
@@ -46,17 +61,23 @@ resources:
   # limits:
   #   cpu: 100m
   #   memory: 128Mi
+
+  # -- CPU/Memory resource requests
   requests:
     cpu: 100m
     memory: 128Mi
 
+# -- Node labels for pod assignment
 nodeSelector: {}
 
+# -- Toleration labels for pod assignment
 tolerations: []
 
+# -- Affinity labels for pod assignment
 affinity: {}
 
 serviceMonitor:
+  # -- Enable metrics to be collected via Prometheus-operator
   enabled: true
 
 # -- Host name of the management portal application

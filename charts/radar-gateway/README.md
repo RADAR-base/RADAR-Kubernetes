@@ -29,28 +29,24 @@ A Helm chart for RADAR-base gateway. For more details of the configurations, see
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| replicaCount | int | `2` |  |
-| image.repository | string | `"radarbase/radar-gateway"` |  |
-| image.tag | string | `"0.5.6"` |  |
-| image.pullPolicy | string | `"IfNotPresent"` |  |
-| nameOverride | string | `""` |  |
-| fullnameOverride | string | `""` |  |
-| service.type | string | `"ClusterIP"` |  |
-| service.port | int | `8080` |  |
-| ingress.enabled | bool | `true` |  |
-| ingress.annotations."kubernetes.io/ingress.class" | string | `"nginx"` |  |
-| ingress.annotations."cert-manager.io/cluster-issuer" | string | `"letsencrypt-prod"` |  |
-| ingress.annotations."nginx.ingress.kubernetes.io/rewrite-target" | string | `"/kafka/$1"` |  |
-| ingress.annotations."nginx.ingress.kubernetes.io/server-snippet" | string | `"location ^~ /kafka/consumers {\n  deny all;\n}\nlocation ^~ /kafka/brokers {\n  deny all;\n}\nlocation ~* /kafka/topics/.+/partitions {\n  deny all;\n}\n"` |  |
-| ingress.path | string | `"/kafka/?(.*)"` |  |
-| ingress.hosts[0] | string | `"localhost"` |  |
-| ingress.tls.secretName | string | `"radar-base-tls"` |  |
-| resources.requests.cpu | string | `"100m"` |  |
-| resources.requests.memory | string | `"128Mi"` |  |
-| nodeSelector | object | `{}` |  |
-| tolerations | list | `[]` |  |
-| affinity | object | `{}` |  |
-| serviceMonitor.enabled | bool | `true` |  |
+| replicaCount | int | `2` | Number of radar-gateway replicas to deploy |
+| image.repository | string | `"radarbase/radar-gateway"` | radar-gateway image repository |
+| image.tag | string | `"0.5.6"` | radar-gateway image tag (immutable tags are recommended) Overrides the image tag whose default is the chart appVersion. |
+| image.pullPolicy | string | `"IfNotPresent"` | radar-gateway image pull policy |
+| nameOverride | string | `""` | String to partially override radar-gateway.fullname template with a string (will prepend the release name) |
+| fullnameOverride | string | `""` | String to fully override radar-gateway.fullname template with a string |
+| service.type | string | `"ClusterIP"` | Kubernetes Service type |
+| service.port | int | `8080` | radar-gateway port |
+| ingress.enabled | bool | `true` | Enable ingress controller resource |
+| ingress.annotations | object | check values.yaml | Annotations that define default ingress class, certificate issuer and deny access to sensitive URLs |
+| ingress.path | string | `"/kafka/?(.*)"` | Path within the url structure |
+| ingress.hosts | list | `["localhost"]` | Hosts to accept requests from |
+| ingress.tls.secretName | string | `"radar-base-tls"` | Name of the secret that contains TLS certificates |
+| resources.requests | object | `{"cpu":"100m","memory":"128Mi"}` | CPU/Memory resource requests |
+| nodeSelector | object | `{}` | Node labels for pod assignment |
+| tolerations | list | `[]` | Toleration labels for pod assignment |
+| affinity | object | `{}` | Affinity labels for pod assignment |
+| serviceMonitor.enabled | bool | `true` | Enable metrics to be collected via Prometheus-operator |
 | managementportalHost | string | `"management-portal"` | Host name of the management portal application |
 | schemaRegistry | string | `"http://cp-schema-registry:8081"` | Schema Registry URL |
 | max_requests | int | `1000` | Not used. To be confirmed |
