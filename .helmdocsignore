@@ -1,13 +1,8 @@
-charts/cc-schema-registry-proxy/
 charts/cert-manager/
 charts/kafka-manager/
 charts/kube-prometheus-stack/
 charts/radar-backend/
-charts/radar-gateway/
 charts/radar-integration/
 charts/radar-jdbc-connector/
-charts/radar-output/
-charts/radar-s3-connector/
-charts/s3-proxy/
 charts/smtp/
 charts/velero/
