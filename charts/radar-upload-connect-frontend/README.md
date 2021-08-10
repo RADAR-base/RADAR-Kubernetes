@@ -29,25 +29,22 @@ A Helm chart for RADAR-base upload connector frontend application
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| replicaCount | int | `2` |  |
-| image.repository | string | `"radarbase/radar-upload-connect-frontend"` |  |
-| image.tag | string | `"0.5.9"` |  |
-| image.pullPolicy | string | `"IfNotPresent"` |  |
-| nameOverride | string | `""` |  |
-| fullnameOverride | string | `""` |  |
-| service.type | string | `"ClusterIP"` |  |
-| service.port | int | `80` |  |
-| ingress.enabled | bool | `true` |  |
-| ingress.annotations."kubernetes.io/ingress.class" | string | `"nginx"` |  |
-| ingress.annotations."cert-manager.io/cluster-issuer" | string | `"letsencrypt-prod"` |  |
-| ingress.annotations."nginx.ingress.kubernetes.io/rewrite-target" | string | `"/$1"` |  |
-| ingress.path | string | `"/upload/?(.*)"` |  |
-| ingress.hosts[0] | string | `"localhost"` |  |
-| ingress.tls.secretName | string | `"radar-base-tls"` |  |
-| resources.requests.cpu | string | `"100m"` |  |
-| resources.requests.memory | string | `"128Mi"` |  |
-| nodeSelector | object | `{}` |  |
-| tolerations | list | `[]` |  |
-| affinity | object | `{}` |  |
+| replicaCount | int | `2` | Number of radar-upload-connect-frontend replicas to deploy |
+| image.repository | string | `"radarbase/radar-upload-connect-frontend"` | radar-upload-connect-frontend image repository |
+| image.tag | string | `"0.5.9"` | radar-upload-connect-frontend image tag (immutable tags are recommended) Overrides the image tag whose default is the chart appVersion. |
+| image.pullPolicy | string | `"IfNotPresent"` | radar-upload-connect-frontend image pull policy |
+| nameOverride | string | `""` | String to partially override radar-upload-connect-frontend.fullname template with a string (will prepend the release name) |
+| fullnameOverride | string | `""` | String to fully override radar-upload-connect-frontend.fullname template with a string |
+| service.type | string | `"ClusterIP"` | Kubernetes Service type |
+| service.port | int | `80` | radar-upload-connect-frontend port |
+| ingress.enabled | bool | `true` | Enable ingress controller resource |
+| ingress.annotations | object | check values.yaml | Annotations that define default ingress class, certificate issuer |
+| ingress.path | string | `"/upload/?(.*)"` | Path within the url structure |
+| ingress.hosts | list | `["localhost"]` | Host to listen to requests to |
+| ingress.tls.secretName | string | `"radar-base-tls"` | Name of the secret containing TLS certificates |
+| resources.requests | object | `{"cpu":"100m","memory":"128Mi"}` | CPU/Memory resource requests |
+| nodeSelector | object | `{}` | Node labels for pod assignment |
+| tolerations | list | `[]` | Toleration labels for pod assignment |
+| affinity | object | `{}` | Affinity labels for pod assignment |
 | server_name | string | `"localhost"` | Server name or domain name |
 | vue_app_client_id | string | `"radar_upload_frontend"` | OAuth2 client id of the upload connect frontend application |
