@@ -46,5 +46,7 @@ tolerations: []
 
 affinity: {}
 
+# -- Server name or domain name
 server_name: localhost
+# -- Oauth client id of the upload connect frontend application
 vue_app_client_id: radar_upload_frontend
