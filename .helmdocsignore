@@ -1,4 +1,3 @@
-charts/cc-schema-registry-proxy/
 charts/cert-manager/
 charts/kafka-manager/
 charts/kube-prometheus-stack/
