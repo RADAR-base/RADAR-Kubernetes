@@ -54,8 +54,8 @@ A Helm chart for RADAR-base upload connector backend application.
 | nodeSelector | object | `{}` |  |
 | tolerations | list | `[]` |  |
 | affinity | object | `{}` |  |
-| client_id | string | `"radar_upload_backend"` | OAuth client id of the upload connect backend application |
-| client_secret | string | `"secret"` | Oauth client secret of the upload connect backend |
+| client_id | string | `"radar_upload_backend"` | OAuth2 client id of the upload connect backend application |
+| client_secret | string | `"secret"` | OAuth2 client secret of the upload connect backend |
 | postgres.host | string | `"radar-upload-postgresql-postgresql"` | Host name of the database to store uploaded data and metadata |
 | postgres.user | string | `"postgres"` | Database username |
 | postgres.password | string | `"password"` | Database password |

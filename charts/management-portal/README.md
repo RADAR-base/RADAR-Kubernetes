@@ -61,7 +61,7 @@ A Helm chart for RADAR-Base Management Portal
 | managementportal.common_privacy_policy_url | string | `"http://info.thehyve.nl/radar-cns-privacy-policy"` | Override with a publicly resolvable url of the privacy-policy url for your set-up. This can be overridden on a project basis as well. |
 | managementportal.oauth_checking_key_aliases_0 | string | `"radarbase-managementportal-ec"` | Keystore alias to sign JWT tokens from Management Portal |
 | managementportal.oauth_checking_key_aliases_1 | string | `"selfsigned"` | Keystore alias to sign JWT tokens from Management Portal |
-| managementportal.frontend_client_secret | string | `"xxx"` | OAuth Client secret of the Management Portal frontend application |
+| managementportal.frontend_client_secret | string | `"xxx"` | OAuth2 Client secret of the Management Portal frontend application |
 | managementportal.common_admin_password | string | `"xxx"` | Admin password of the default admin user created by the system |
 | smtp.enabled | bool | `false` | set to true, if SMTP server should be enabled. Required to be true for production setup |
 | smtp.host | string | `"smtp"` | Hostname of the SMTP server |
@@ -71,7 +71,7 @@ A Helm chart for RADAR-Base Management Portal
 | smtp.from | string | `"noreply@example.com"` | Email address which should be used to send activation emails |
 | smtp.starttls | bool | `false` | set to true,if ttls should be enabled |
 | smtp.auth | bool | `true` | set to true, if the account should be authenticated before sending emails |
-| oauth_clients | object | check values.yaml | Oauth Client configuration |
+| oauth_clients | object | check values.yaml | OAuth2 Client configuration |
 
 ## OAuth Client Configuration
 List of OAuth client configurations supported by RADAR-base. Each client should be enabled separately, if relevant and used in the installation.
