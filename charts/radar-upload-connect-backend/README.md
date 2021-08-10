@@ -24,36 +24,28 @@ A Helm chart for RADAR-base upload connector backend application.
 * Kubernetes 1.17+
 * Kubectl 1.17+
 * Helm 3.1.0+
-* PV provisioner support in the underlying infrastructure
 
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| replicaCount | int | `2` |  |
-| image.repository | string | `"radarbase/radar-upload-connect-backend"` |  |
-| image.tag | string | `"0.5.9"` |  |
-| image.pullPolicy | string | `"IfNotPresent"` |  |
-| nameOverride | string | `""` |  |
-| fullnameOverride | string | `""` |  |
-| service.type | string | `"ClusterIP"` |  |
-| service.port | int | `8085` |  |
-| ingress.enabled | bool | `true` |  |
-| ingress.annotations."kubernetes.io/ingress.class" | string | `"nginx"` |  |
-| ingress.annotations."cert-manager.io/cluster-issuer" | string | `"letsencrypt-prod"` |  |
-| ingress.annotations."nginx.ingress.kubernetes.io/rewrite-target" | string | `"/$1"` |  |
-| ingress.annotations."nginx.ingress.kubernetes.io/proxy-body-size" | string | `"200m"` |  |
-| ingress.annotations."nginx.ingress.kubernetes.io/proxy-request-buffering" | string | `"off"` |  |
-| ingress.path | string | `"/upload/api/?(.*)"` |  |
-| ingress.hosts[0] | string | `"localhost"` |  |
-| ingress.tls.secretName | string | `"radar-base-tls"` |  |
-| resources.requests.cpu | string | `"100m"` |  |
-| resources.requests.memory | string | `"2Gi"` |  |
-| persistence.enabled | bool | `true` |  |
-| persistence.existingClaim | string | `"radar-output"` |  |
-| nodeSelector | object | `{}` |  |
-| tolerations | list | `[]` |  |
-| affinity | object | `{}` |  |
+| replicaCount | int | `2` | Number of radar-upload-connect-backend replicas to deploy |
+| image.repository | string | `"radarbase/radar-upload-connect-backend"` | radar-upload-connect-backend image repository |
+| image.tag | string | `"0.5.9"` | radar-upload-connect-backend image tag (immutable tags are recommended) Overrides the image tag whose default is the chart appVersion. |
+| image.pullPolicy | string | `"IfNotPresent"` | radar-upload-connect-backend image pull policy |
+| nameOverride | string | `""` | String to partially override radar-upload-connect-backend.fullname template with a string (will prepend the release name) |
+| fullnameOverride | string | `""` | String to fully override radar-upload-connect-backend.fullname template with a string |
+| service.type | string | `"ClusterIP"` | Kubernetes Service type |
+| service.port | int | `8085` | radar-upload-connect-backend port |
+| ingress.enabled | bool | `true` | Enable ingress controller resource |
+| ingress.annotations | object | check values.yaml | Annotations that define default ingress class, certificate issuer and proxy settings |
+| ingress.path | string | `"/upload/api/?(.*)"` | Path within the url structure |
+| ingress.hosts | list | `["localhost"]` | Host to listen to requests to |
+| ingress.tls.secretName | string | `"radar-base-tls"` | Name of the secret containing TLS certificates |
+| resources.requests | object | `{"cpu":"100m","memory":"2Gi"}` | CPU/Memory resource requests |
+| nodeSelector | object | `{}` | Node labels for pod assignment |
+| tolerations | list | `[]` | Toleration labels for pod assignment |
+| affinity | object | `{}` | Affinity labels for pod assignment |
 | client_id | string | `"radar_upload_backend"` | OAuth2 client id of the upload connect backend application |
 | client_secret | string | `"secret"` | OAuth2 client secret of the upload connect backend |
 | postgres.host | string | `"radar-upload-postgresql-postgresql"` | Host name of the database to store uploaded data and metadata |
@@ -61,4 +53,3 @@ A Helm chart for RADAR-base upload connector backend application.
 | postgres.password | string | `"password"` | Database password |
 | managementportal_host | string | `"management-portal"` | Host name of the management portal application |
 | serverName | string | `"localhost"` | Server name or domain name |
-
