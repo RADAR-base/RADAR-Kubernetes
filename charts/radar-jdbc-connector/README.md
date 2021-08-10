@@ -8,11 +8,12 @@ A Helm chart for RADAR-base JDBC Kafka connector. This is a fork of the Kafka JD
 
 ## Maintainers
 
-| Name                | Email                | Url |
-| ------------------- | -------------------- | --- |
-| Keyvan Hedayati     | keyvan@thehyve.nl    |     |
-| Joris Borgdorff     | joris@thehyve.nl     |     |
-| Nivethika Mahasivam | nivethika@thehyve.nl |     |
+| Name                | Email                   | Url |
+| ------------------- | ----------------------- | --- |
+| Keyvan Hedayati     | keyvan@thehyve.nl       |     |
+| Joris Borgdorff     | joris@thehyve.nl        |     |
+| Nivethika Mahasivam | nivethika@thehyve.nl    |     |
+| Pauline Conde       | pauline.conde@kcl.ac.uk |     |
 
 ## Source Code
 
