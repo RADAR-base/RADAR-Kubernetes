@@ -63,20 +63,10 @@ affinity: {}
 kafka:
   # -- Kafka broker URLs
   url: PLAINTEXT://cp-kafka-headless:9092
-  # -- Not used. To be confirmed
-  securityProtocol: PLAINTEXT
-  # -- Not used. To be confirmed
-  saslJaasConfig: ""
-  # -- Not used. To be confirmed
-  saslMechanism: GSSAPI
-  # -- Not used. To be confirmed
-  sslEndpointIdentificationAlgorithm: https
 
 schemaRegistry:
   # Schema registry URL
   url: http://cp-schema-registry:8081
-  # -- Not used. To be confirmed
-  basicAuth: ""
 
 # -- List of topics to be consumed by the sink connector separated by comma.
 # @default -- check values.yaml
