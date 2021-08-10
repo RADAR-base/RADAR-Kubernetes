@@ -1,4 +1,9 @@
 apiVersion: v2
 name: radar-jdbc-connector
 description: A Helm chart for Kubernetes
-version: 0.1.0
+version: 0.1.1
+maintainers:
+  - email: keyvan@thehyve.nl
+    name: Keyvan Hedayati
+  - email: joris@thehyve.nl
+    name: Joris Borgdorff

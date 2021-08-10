@@ -439,23 +439,27 @@ plugins: []
 ## Configure grafana datasources
 ## ref: http://docs.grafana.org/administration/provisioning/#datasources
 ##
-datasources: {}
-#  datasources.yaml:
-#    apiVersion: 1
-#    datasources:
-#    - name: Prometheus
-#      type: prometheus
-#      url: http://prometheus-prometheus-server
-#      access: proxy
-#      isDefault: true
-#    - name: CloudWatch
-#        type: cloudwatch
-#        access: proxy
-#        uid: cloudwatch
-#        editable: false
-#        jsonData:
-#          authType: credentials
-#          defaultRegion: us-east-1
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - id: 1
+        orgId: 1
+        name: PostgreSQL
+        type: postgres
+        typeLogoUrl: public/app/plugins/datasource/postgres/img/postgresql_logo.svg
+        access: proxy
+        url: ${POSTGRES_HOST}
+        password: ${POSTGRES_PASSWORD}
+        user: ${POSTGRES_USER}
+        database: ${POSTGRES_DB}
+        basicAuth: false
+        isDefault: true
+        jsonData:
+          postgresVersion: 1200
+          timescaledb: true
+          sslmode: disable
+        readOnly: true
 
 ## Configure notifiers
 ## ref: http://docs.grafana.org/administration/provisioning/#alert-notification-channels

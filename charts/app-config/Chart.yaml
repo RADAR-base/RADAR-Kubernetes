@@ -1,5 +1,15 @@
 apiVersion: v1
 appVersion: "0.3.2"
-description: A Helm chart for Kubernetes
+description: A Helm chart for RADAR-base application config (app-config) backend service
 name: app-config
 version: 0.1.1
+sources: ["https://github.com/RADAR-base/radar-app-config"]
+type: application
+home: "https://radar-base.org"
+maintainers:
+  - email: keyvan@thehyve.nl
+    name: Keyvan Hedayati
+  - email: joris@thehyve.nl
+    name: Joris Borgdorff
+  - email: nivethika@thehyve.nl
+    name: Nivethika Mahasivam
