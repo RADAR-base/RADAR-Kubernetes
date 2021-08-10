@@ -20,9 +20,9 @@ data:
     auth:
       # Management Portal URL
       managementPortalUrl: http://{{ .Values.managementportal_host }}:8080/managementportal/
-      # OAuth2 Client id of more-promasys-sync application
+      # OAuth2 Client id of rest sources authorizer backend
       clientId: radar_rest_sources_auth_backend
-      # OAuth2 Client Secret of more_promasys_sync_client client
+      # OAuth2 Client Secret of rest sources authorizer backend client
       clientSecret: {{ .Values.client_secret }}
 
     database:

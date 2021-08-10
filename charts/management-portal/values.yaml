@@ -113,7 +113,7 @@ managementportal:
   oauth_checking_key_aliases_0: radarbase-managementportal-ec
   # -- Keystore alias to sign JWT tokens from Management Portal
   oauth_checking_key_aliases_1: selfsigned
-  # -- OAuth Client secret of the Management Portal frontend application
+  # -- OAuth2 Client secret of the Management Portal frontend application
   frontend_client_secret: xxx
   # -- Admin password of the default admin user created by the system
   common_admin_password: xxx
@@ -137,7 +137,7 @@ smtp:
   # -- set to true, if the account should be authenticated before sending emails
   auth: true
 
-# -- Oauth Client configuration
+# -- OAuth2 Client configuration
 # @default -- check values.yaml
 oauth_clients:
   pRMT:
