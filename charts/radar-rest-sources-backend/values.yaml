@@ -93,7 +93,7 @@ postgres:
 # -- hostname of the Management Portal
 managementportal_host: management-portal
 
-# -- OAuth client secret of the radar-rest-sources-backend client from Management Portal
+# -- OAuth2 client secret of the radar-rest-sources-backend client from Management Portal
 client_secret: secret
 
 restSourceClients:

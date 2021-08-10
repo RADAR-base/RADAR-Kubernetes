@@ -60,9 +60,9 @@ schema_registry: http://cp-schema-registry:8081
 managementportal_host: management-portal
 # -- Host name of the upload connect backend application
 radar_upload_connect_backend: radar-upload-connect-backend
-# -- OAuth Client Id of the Upload connector
+# -- OAuth2 Client Id of the Upload connector
 client_id: radar_upload_connect
-# -- OAuth Client secret of the Upload connector
+# -- OAuth2 Client secret of the Upload connector
 client_secret: upload_secret
 # -- How often the connector should poll for new records from upload connect backend in milliseconds.
 poll_interval: 60000

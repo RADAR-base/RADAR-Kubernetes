@@ -50,4 +50,4 @@ A Helm chart for RADAR-base upload connector frontend application
 | tolerations | list | `[]` |  |
 | affinity | object | `{}` |  |
 | server_name | string | `"localhost"` | Server name or domain name |
-| vue_app_client_id | string | `"radar_upload_frontend"` | Oauth client id of the upload connect frontend application |
+| vue_app_client_id | string | `"radar_upload_frontend"` | OAuth2 client id of the upload connect frontend application |

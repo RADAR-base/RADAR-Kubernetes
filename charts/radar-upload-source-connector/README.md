@@ -53,8 +53,8 @@ A Helm chart for RADAR-base upload kafka connector.
 | schema_registry | string | `"http://cp-schema-registry:8081"` | Schema registry URL |
 | managementportal_host | string | `"management-portal"` | Host name of the Management Portal application |
 | radar_upload_connect_backend | string | `"radar-upload-connect-backend"` | Host name of the upload connect backend application |
-| client_id | string | `"radar_upload_connect"` | OAuth Client Id of the Upload connector |
-| client_secret | string | `"upload_secret"` | OAuth Client secret of the Upload connector |
+| client_id | string | `"radar_upload_connect"` | OAuth2 Client Id of the Upload connector |
+| client_secret | string | `"upload_secret"` | OAuth2 Client secret of the Upload connector |
 | poll_interval | int | `60000` | How often the connector should poll for new records from upload connect backend in milliseconds. |
 | record_converter_classes | string | `"org.radarbase.connect.upload.converter.altoida.AltoidaConverterFactory,org.radarbase.connect.upload.converter.axivity.AxivityConverterFactory,org.radarbase.connect.upload.converter.oxford.WearableCameraConverterFactory,org.radarbase.connect.upload.converter.gaitup.Physilog5ConverterFactory"` | List of converter classes to be activated as comma separated values. |
 | uploaderType | string | `"s3"` | Uploader type for converters which directly write the files bypassing the Kafka processing. e.g. images and binaries. |

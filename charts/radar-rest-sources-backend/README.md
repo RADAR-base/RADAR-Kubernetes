@@ -55,7 +55,7 @@ A Helm chart for the backend application of RADAR-base Rest Sources Authorizer
 | postgres.ssl.enabled | bool | `false` | set to true of the connecting to postgres using SSL |
 | postgres.ssl.keystorepassword | string | `"keystorepassword"` |  |
 | managementportal_host | string | `"management-portal"` | hostname of the Management Portal |
-| client_secret | string | `"secret"` | OAuth client secret of the radar-rest-sources-backend client from Management Portal |
+| client_secret | string | `"secret"` | OAuth2 client secret of the radar-rest-sources-backend client from Management Portal |
 | restSourceClients.fitbit.enable | bool | `false` | set to true, if Fitbit client should be used |
 | restSourceClients.fitbit.sourceType | string | `"FitBit"` | Type of the data sources |
 | restSourceClients.fitbit.authorizationEndpoint | string | `"https://www.fitbit.com/oauth2/authorize"` | Authorization endpoint for Fitbit authentication and authorization |

@@ -62,9 +62,9 @@ tolerations: []
 
 affinity: {}
 
-# -- OAuth client id of the upload connect backend application
+# -- OAuth2 client id of the upload connect backend application
 client_id: radar_upload_backend
-# -- Oauth client secret of the upload connect backend
+# -- OAuth2 client secret of the upload connect backend
 client_secret: secret
 postgres:
   # -- Host name of the database to store uploaded data and metadata
