@@ -1,7 +1,11 @@
 ingress:
+  # -- Enable ingress controller resource
   enabled: true
+  # -- Hosts to accept requests from
   hosts:
     - s3.example.com
+  # -- Annotations that define default ingress class, certificate issuer
+  # @default -- check values.yaml
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
@@ -14,28 +18,45 @@ resources:
   # limits:
   #   cpu: 100m
   #   memory: 128Mi
+
+  # -- CPU/Memory resource requests
   requests:
     cpu: 100m
     memory: 400Mi
 
-
+# -- Number of nodes, 4 is minimum for distributed mode
 replicas: 4
+
+# -- MinIO server mode
 mode: distributed
 
 persistence:
+  # -- Size of persistent volume claim
   size: 20Gi
 
+# -- Default access key (5 to 20 characters)
 accessKey: AKIAIOSFODNN7EXAMPLE
+# -- Default secret key (8 to 40 characters)
 secretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
 metrics:
+  # -- Set this to true to create ServiceMonitor for Prometheus operator
   serviceMonitor:
     enabled: true
 
 buckets:
-  - name: radar-intermediate-storage
+
+  - # -- Bucket used for intermediate storage of RADAR-Base data
+    name: radar-intermediate-storage
+    # -- Public access is disabled for this bucket
     policy: none
+    # -- Don't purge the bucket if already exists
     purge: false
-  - name: radar-output-storage
+
+
+  - # -- Bucket used for output storage of RADAR-Base data
+    name: radar-output-storage
+    # -- Public access is disabled for this bucket
     policy: none
+    # -- Don't purge the bucket if already exists
     purge: false

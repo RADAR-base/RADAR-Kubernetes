@@ -1,0 +1,11 @@
+charts/cert-manager/
+charts/kafka-manager/
+charts/kube-prometheus-stack/
+charts/radar-backend/
+charts/radar-integration/
+charts/radar-jdbc-connector/
+charts/radar-upload-connect-backend/
+charts/radar-upload-connect-frontend/
+charts/radar-upload-source-connector/
+charts/smtp/
+charts/velero/

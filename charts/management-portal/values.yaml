@@ -2,22 +2,33 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# -- 	Number of Management Portal replicas to deploy
 replicaCount: 2
 
 image:
+  # -- Management Portal image repository
   repository: radarbase/management-portal
+  # -- Management Portal image tag (immutable tags are recommended)
   tag: 0.7.0
+  # -- Management Portal image pull policy
   pullPolicy: IfNotPresent
 
+# -- String to partially override management-portal.fullname template with a string (will prepend the release name)
 nameOverride: ""
+# -- String to fully override management-portal.fullname template with a string
 fullnameOverride: ""
 
 service:
+  # -- Kubernetes Service type
   type: ClusterIP
+  # -- Management Portal port
   port: 8080
 
 ingress:
+  # -- Enable ingress controller resource
   enabled: true
+  # -- Annotations that define default ingress class, certificate issuer and rate limiter
+  # @default -- check values.yaml
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
@@ -29,58 +40,105 @@ ingress:
       location /managementportal/api/meta-token/ {
         limit_req zone=login_limit;
       }
+  # -- Path within the url structure
   path: "/managementportal"
+  # -- Hosts to accept requests from
   hosts:
     - localhost
   tls:
+    # -- TLS Secret Name
     secretName: radar-base-tls
+
 
 resources:
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+
+  # -- CPU/Memory resource limits
   limits:
     cpu: 2
     memory: 1.7Gi
+  # -- CPU/Memory resource requests
   requests:
     cpu: 100m
     memory: 512Mi
 
+# -- Node labels for pod assignment
 nodeSelector: {}
 
+# -- Toleration labels for pod assignment
 tolerations: []
 
+# -- Affinity labels for pod assignment
 affinity: {}
 
 # B64 encoded Binary keystore file
 # With helmfile, this can be set in a production.yaml.gotmpl
 # file by setting
-#keystore: {{ readFile "keystore.p12" | b64enc | quote }}
+#   keystore: {{ readFile "keystore.p12" | b64enc | quote }}
 # or with SOPS
-#keystore: {{ exec "sops" (list "-d" "keystore.p12") | b64enc | quote }}
+#   keystore: {{ exec "sops" (list "-d" "keystore.p12") | b64enc | quote }}
 
+# Configuration of the Postgres data base to store data from Management Portal
 postgres:
+  # -- host name of the postgres db
   host: postgresql
+  # -- post of the postgres db
   port: 5432
+  # -- database name
   database: managementportal
+  # -- additional JDBC connection parameters e.g. sslmode=verify-full
   connection_parameters: ""
+  # -- postgres user
   user: postgres
+  # -- password of the postgres user
   password: password
   ssl:
+    # -- set to true of the connecting to postgres using SSL
     enabled: false
     keystorepassword: keystorepassword
 
+# -- domain name of the server
 server_name: localhost
+# -- Hostname of the catalogue-server
 catalogue_server: catalog-server
 managementportal:
+  # -- set to true, if automatic source-type import from catalogue server should be enabled
   catalogue_server_enable_auto_import: "false"
+  # -- Override with a publicly resolvable url of the privacy-policy url for your set-up. This can be overridden on a project basis as well.
   common_privacy_policy_url: http://info.thehyve.nl/radar-cns-privacy-policy
+  # -- Keystore alias to sign JWT tokens from Management Portal
   oauth_checking_key_aliases_0: radarbase-managementportal-ec
+  # -- Keystore alias to sign JWT tokens from Management Portal
   oauth_checking_key_aliases_1: selfsigned
+  # -- OAuth Client secret of the Management Portal frontend application
   frontend_client_secret: xxx
+  # -- Admin password of the default admin user created by the system
   common_admin_password: xxx
 
+# Configurations of the SMTP server to send activation emails from Management Portal
+smtp:
+  # -- set to true, if SMTP server should be enabled. Required to be true for production setup
+  enabled: false
+  # -- Hostname of the SMTP server
+  host: smtp
+  # -- Port of the SMTP server
+  port: 25
+  # -- Username of the SMTP server
+  username: username
+  # -- Password of the SMTP server
+  password: secret
+  # -- Email address which should be used to send activation emails
+  from: noreply@example.com
+  # -- set to true,if ttls should be enabled
+  starttls: false
+  # -- set to true, if the account should be authenticated before sending emails
+  auth: true
+
+# -- Oauth Client configuration
+# @default -- check values.yaml
 oauth_clients:
   pRMT:
     enable: false
@@ -303,6 +361,7 @@ oauth_clients:
       - SOURCETYPE.READ
       - SUBJECT.READ
       - SUBJECT.UPDATE
+
   grafana_dashboard:
     enable: false
     resource_ids:
@@ -319,14 +378,3 @@ oauth_clients:
       - http://dashboard.localhost/login/generic_oauth
     autoapprove:
       - USER.READ
-
-smtp:
-  enabled: false
-  host: smtp
-  port: 25
-  username: username
-  password: secret
-  from: noreply@example.com
-  starttls: false
-  auth: true
-
