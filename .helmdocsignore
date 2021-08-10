@@ -6,11 +6,8 @@ charts/radar-backend/
 charts/radar-gateway/
 charts/radar-integration/
 charts/radar-jdbc-connector/
-charts/radar-output/
-charts/radar-s3-connector/
 charts/radar-upload-connect-backend/
 charts/radar-upload-connect-frontend/
 charts/radar-upload-source-connector/
-charts/s3-proxy/
 charts/smtp/
 charts/velero/
