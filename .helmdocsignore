@@ -1,4 +1,3 @@
-charts/cert-manager/
 charts/kafka-manager/
 charts/kube-prometheus-stack/
 charts/radar-backend/
