@@ -1,6 +1,5 @@
 charts/cert-manager/
 charts/kafka-manager/
-charts/kube-prometheus-stack/
 charts/radar-backend/
 charts/radar-integration/
 charts/radar-jdbc-connector/
