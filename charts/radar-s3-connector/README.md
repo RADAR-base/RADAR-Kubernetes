@@ -12,9 +12,9 @@ A Helm chart for RADAR-base s3 connector. This connector uses Confluent s3 conne
 
 | Name | Email | Url |
 | ---- | ------ | --- |
-| Keyvan Hedayati | keyvan@thehyve.nl |  |
-| Joris Borgdorff | joris@thehyve.nl |  |
-| Nivethika Mahasivam | nivethika@thehyve.nl |  |
+| Keyvan Hedayati | keyvan@thehyve.nl | https://www.thehyve.nl |
+| Joris Borgdorff | joris@thehyve.nl | https://www.thehyve.nl/experts/joris-borgdorff |
+| Nivethika Mahasivam | nivethika@thehyve.nl | https://www.thehyve.nl/experts/nivethika-mahasivam |
 
 ## Source Code
 
@@ -47,12 +47,7 @@ A Helm chart for RADAR-base s3 connector. This connector uses Confluent s3 conne
 | tolerations | list | `[]` | Toleration labels for pod assignment |
 | affinity | object | `{}` | Affinity labels for pod assignment |
 | kafka.url | string | `"PLAINTEXT://cp-kafka-headless:9092"` | Kafka broker URLs |
-| kafka.securityProtocol | string | `"PLAINTEXT"` | Not used. To be confirmed |
-| kafka.saslJaasConfig | string | `""` | Not used. To be confirmed |
-| kafka.saslMechanism | string | `"GSSAPI"` | Not used. To be confirmed |
-| kafka.sslEndpointIdentificationAlgorithm | string | `"https"` | Not used. To be confirmed |
 | schemaRegistry.url | string | `"http://cp-schema-registry:8081"` |  |
-| schemaRegistry.basicAuth | string | `""` | Not used. To be confirmed |
 | topics | string | check values.yaml | List of topics to be consumed by the sink connector separated by comma. |
 | s3Endpoint | string | `"http://minio:9000/"` | Target S3 endpoint url |
 | s3Tagging | bool | `false` | set to true, if S3 objects should be tagged with start and end offsets, as well as record count. |
