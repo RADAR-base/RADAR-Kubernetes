@@ -32,6 +32,13 @@ Kubernetes: `<=1.17`
 | Repository | Name | Version |
 |------------|------|---------|
 | https://charts.jetstack.io | cert-manager | v1.1.0 |
+## Requirements
+
+Kubernetes: `<=1.17`
+
+| Repository | Name | Version |
+|------------|------|---------|
+| https://charts.jetstack.io | cert-manager | v1.1.0 |
 
 ## Values
 
