@@ -38,10 +38,6 @@ A Helm chart for RADAR-base s3 connector. This connector uses Confluent s3 conne
 | fullnameOverride | string | `""` | String to fully override radar-s3-connector.fullname template with a string |
 | service.type | string | `"ClusterIP"` | Kubernetes Service type |
 | service.port | int | `8083` | radar-s3-connector port |
-| ingress.enabled | bool | `false` | Enable ingress controller resource |
-| ingress.annotations | object | `{}` | Annotations to define default ingress class, certificate issuer |
-| ingress.hosts | list | `[{"host":"chart-example.local","paths":[]}]` | Hosts to listen to incoming requests |
-| ingress.tls | list | `[]` | Utilize TLS backend in ingress |
 | resources.requests | object | `{"cpu":"100m","memory":"3Gi"}` | CPU/Memory resource requests |
 | nodeSelector | object | `{}` | Node labels for pod assignment |
 | tolerations | list | `[]` | Toleration labels for pod assignment |

@@ -41,7 +41,6 @@ A Helm chart for RADAR-base output restructure service. This application reads d
 | nodeSelector | object | `{}` | Node labels for pod assignment |
 | tolerations | list | `[]` | Toleration labels for pod assignment |
 | affinity | object | `{}` | Affinity labels for pod assignment |
-| persistence.enabled | bool | `false` | Enable persistence using PVC |
 | source.type | string | `"s3"` | Type of the intermediate storage of the RADAR-base pipeline e.g. s3, hdfs |
 | source.s3.endpoint | string | `"http://minio:9000"` | s3 endpoint of the intermediate storage |
 | source.s3.accessToken | string | `"access_key"` | s3 access-key of the intermediate storage |
