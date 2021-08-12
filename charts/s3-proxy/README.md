@@ -36,9 +36,6 @@ A Helm chart for S3 Proxy. It uses https://hub.docker.com/r/andrewgaul/s3proxy t
 | nameOverride | string | `""` | String to partially override s3-proxy.fullname template with a string (will prepend the release name) |
 | service.type | string | `"ClusterIP"` | Kubernetes Service type |
 | service.port | int | `80` | s3-proxy port |
-| ingress.enabled | bool | `false` | Enable ingress controller resource |
-| ingress.annotations | object | `{}` | Annotations to define default ingress class, certificate issuer |
-| ingress.tls | list | `[]` | Utilize TLS backend in ingress |
 | resources.requests | object | `{"cpu":"100m","memory":"128Mi"}` | CPU/Memory resource requests |
 | nodeSelector | object | `{}` | Node labels for pod assignment |
 | tolerations | list | `[]` | Toleration labels for pod assignment |

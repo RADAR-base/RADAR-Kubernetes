@@ -38,11 +38,6 @@ A Helm chart for RADAR-base catalogue server
 | fullnameOverride | string | `""` | String to fully override management-portal.fullname template with a string |
 | service.type | string | `"ClusterIP"` | Kubernetes Service type |
 | service.port | int | `9010` | catalog-server port |
-| ingress.enabled | bool | `false` | Enable ingress controller resource |
-| ingress.annotations | object | `{}` | Annotations to define default ingress class, certificate issuer |
-| ingress.hosts[0].host | string | `"chart-example.local"` |  |
-| ingress.hosts[0].paths | list | `[]` |  |
-| ingress.tls | list | `[]` |  |
 | resources.requests.cpu | string | `"100m"` |  |
 | resources.requests.memory | string | `"256Mi"` |  |
 | persistence.enabled | bool | `true` | Enable persistence using PVC |

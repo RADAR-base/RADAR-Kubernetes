@@ -38,10 +38,6 @@ A Helm chart for RADAR-base fitbit connector
 | fullnameOverride | string | `""` | String to fully override radar-fitbit-connector.fullname template with a string |
 | service.type | string | `"ClusterIP"` | Kubernetes Service type |
 | service.port | int | `8083` | radar-fitbit-connector port |
-| ingress.enabled | bool | `false` | Enable ingress controller resource |
-| ingress.annotations | object | `{}` | Annotations to define default ingress class, certificate issuer |
-| ingress.hosts | list | check values.yaml | Hosts to listen to incoming requests |
-| ingress.tls | list | `[]` | TLS secrets for certificates |
 | resources.requests | object | `{"cpu":"100m","memory":"1Gi"}` | CPU/Memory resource requests |
 | persistence.enabled | bool | `true` | Enable persistence using PVC |
 | persistence.accessMode | string | `"ReadWriteOnce"` | PVC Access Mode for radar-fitbit-connector volume |
