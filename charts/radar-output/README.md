@@ -29,13 +29,15 @@ A Helm chart for RADAR-base output restructure service. This application reads d
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| replicaCount | int | `1` | Number of Appconfig frontend replicas to deploy |
-| image.repository | string | `"radarbase/radar-output-restructure"` | Appconfig frontend image repository |
-| image.tag | string | `"1.2.1"` | Appconfig frontend image tag (immutable tags are recommended) Overrides the image tag whose default is the chart appVersion. |
-| image.pullPolicy | string | `"IfNotPresent"` | Appconfig frontend image pull policy |
+| replicaCount | int | `1` | Number of radar-output replicas to deploy |
+| image.repository | string | `"radarbase/radar-output-restructure"` | radar-output image repository |
+| image.tag | string | `"1.2.1"` | radar-output image tag (immutable tags are recommended) Overrides the image tag whose default is the chart appVersion. |
+| image.pullPolicy | string | `"IfNotPresent"` | radar-output image pull policy |
 | imagePullSecrets | list | `[]` | Docker registry secret names as an array |
 | nameOverride | string | `""` | String to partially override radar-output.fullname template with a string (will prepend the release name) |
 | fullnameOverride | string | `""` | String to fully override radar-output.fullname template with a string |
+| podSecurityContext | object | `{}` | Configure radar-output pods' Security Context |
+| securityContext | object | `{}` | Configure radar-output containers' Security Context |
 | resources.limits | object | `{"cpu":"1000m"}` | CPU/Memory resource limits |
 | resources.requests | object | `{"cpu":"100m","memory":"400Mi"}` | CPU/Memory resource requests |
 | nodeSelector | object | `{}` | Node labels for pod assignment |

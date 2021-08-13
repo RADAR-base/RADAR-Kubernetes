@@ -14,10 +14,26 @@ image:
   # -- catalog-server image pull policy
   pullPolicy: IfNotPresent
 
-# -- String to partially override management-portal.fullname template with a string (will prepend the release name)
+# -- Docker registry secret names as an array
+imagePullSecrets: []
+
+# -- String to partially override catalog-server.fullname template with a string (will prepend the release name)
 nameOverride: ""
-# -- String to fully override management-portal.fullname template with a string
+# -- String to fully override catalog-server.fullname template with a string
 fullnameOverride: ""
+
+# -- Configure catalog-server pods' Security Context
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# -- Configure Appconfig containers' Security Context
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
 
 service:
   # -- Kubernetes Service type

@@ -42,6 +42,9 @@ Kubernetes: `<=1.17`
 | mc_image.repository | string | `"minio/mc"` | Object storage backup pod image repository |
 | mc_image.tag | string | `"RELEASE.2020-09-03T00-08-28Z"` | Object storage backup pod image tag (immutable tags are recommended) |
 | mc_image.pullPolicy | string | `"IfNotPresent"` | Object storage backup pod image pull policy |
+| imagePullSecrets | list | `[]` | Docker registry secret names as an array |
+| podSecurityContext | object | `{}` | Configure object storage backup pod pods' Security Context |
+| securityContext | object | `{}` | Configure object storage backup pod containers' Security Context |
 | local.address | string | `"minio.default:9000"` | Address of local object storage to backup data from |
 | local.accessKey | string | `"accessKey"` | Access key of local object storage |
 | local.secretKey | string | `"secretKey"` | Secret key of local object storage |

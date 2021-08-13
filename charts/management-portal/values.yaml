@@ -13,10 +13,26 @@ image:
   # -- Management Portal image pull policy
   pullPolicy: IfNotPresent
 
+# -- Docker registry secret names as an array
+imagePullSecrets: []
+
 # -- String to partially override management-portal.fullname template with a string (will prepend the release name)
 nameOverride: ""
 # -- String to fully override management-portal.fullname template with a string
 fullnameOverride: ""
+
+# -- Configure management-portal pods' Security Context
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# -- Configure management-portal containers' Security Context
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
 
 service:
   # -- Kubernetes Service type

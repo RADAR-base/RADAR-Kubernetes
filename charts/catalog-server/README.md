@@ -34,8 +34,11 @@ A Helm chart for RADAR-base catalogue server
 | image.repository | string | `"radarbase/radar-schemas-tools"` | catalog-server image repository |
 | image.tag | string | `"0.7.1"` | catalog-server image tag (immutable tags are recommended) Overrides the image tag whose default is the chart appVersion. |
 | image.pullPolicy | string | `"IfNotPresent"` | catalog-server image pull policy |
-| nameOverride | string | `""` | String to partially override management-portal.fullname template with a string (will prepend the release name) |
-| fullnameOverride | string | `""` | String to fully override management-portal.fullname template with a string |
+| imagePullSecrets | list | `[]` | Docker registry secret names as an array |
+| nameOverride | string | `""` | String to partially override catalog-server.fullname template with a string (will prepend the release name) |
+| fullnameOverride | string | `""` | String to fully override catalog-server.fullname template with a string |
+| podSecurityContext | object | `{}` | Configure catalog-server pods' Security Context |
+| securityContext | object | `{}` | Configure Appconfig containers' Security Context |
 | service.type | string | `"ClusterIP"` | Kubernetes Service type |
 | service.port | int | `9010` | catalog-server port |
 | resources.requests.cpu | string | `"100m"` |  |

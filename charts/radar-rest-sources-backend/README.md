@@ -33,8 +33,11 @@ A Helm chart for the backend application of RADAR-base Rest Sources Authorizer
 | image.repository | string | `"radarbase/radar-rest-source-auth-backend"` | radar-rest-sources-backend image repository |
 | image.tag | string | `"3.2.0"` | radar-rest-sources-backend image tag (immutable tags are recommended) Overrides the image tag whose default is the chart appVersion. |
 | image.pullPolicy | string | `"IfNotPresent"` | radar-rest-sources-backend image pull policy |
+| imagePullSecrets | list | `[]` | Docker registry secret names as an array |
 | nameOverride | string | `""` | String to partially override radar-rest-sources-backend.fullname template with a string (will prepend the release name) |
 | fullnameOverride | string | `""` | String to fully override radar-rest-sources-backend.fullname template with a string |
+| podSecurityContext | object | `{}` | Configure radar-rest-sources-backend pods' Security Context |
+| securityContext | object | `{}` | Configure radar-rest-sources-backend containers' Security Context |
 | service.type | string | `"ClusterIP"` | Kubernetes Service type |
 | service.port | int | `8080` | radar-rest-sources-backend port |
 | ingress.enabled | bool | `true` | Enable ingress controller resource |

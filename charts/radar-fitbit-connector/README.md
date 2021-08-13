@@ -34,8 +34,11 @@ A Helm chart for RADAR-base fitbit connector
 | image.repository | string | `"radarbase/kafka-connect-rest-fitbit-source"` | radar-fitbit-connector image repository |
 | image.tag | string | `"0.3.3"` | radar-fitbit-connector image tag (immutable tags are recommended) Overrides the image tag whose default is the chart appVersion. |
 | image.pullPolicy | string | `"IfNotPresent"` | radar-fitbit-connector image pull policy |
+| imagePullSecrets | list | `[]` | Docker registry secret names as an array |
 | nameOverride | string | `""` | String to partially override radar-fitbit-connector.fullname template with a string (will prepend the release name) |
 | fullnameOverride | string | `""` | String to fully override radar-fitbit-connector.fullname template with a string |
+| podSecurityContext | object | `{}` | Configure radar-fitbit-connector pods' Security Context |
+| securityContext | object | `{}` | Configure radar-fitbit-connector containers' Security Context |
 | service.type | string | `"ClusterIP"` | Kubernetes Service type |
 | service.port | int | `8083` | radar-fitbit-connector port |
 | resources.requests | object | `{"cpu":"100m","memory":"1Gi"}` | CPU/Memory resource requests |

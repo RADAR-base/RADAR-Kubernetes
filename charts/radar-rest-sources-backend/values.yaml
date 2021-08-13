@@ -14,10 +14,26 @@ image:
   # -- radar-rest-sources-backend image pull policy
   pullPolicy: IfNotPresent
 
+# -- Docker registry secret names as an array
+imagePullSecrets: []
+
 # -- String to partially override radar-rest-sources-backend.fullname template with a string (will prepend the release name)
 nameOverride: ""
 # -- String to fully override radar-rest-sources-backend.fullname template with a string
 fullnameOverride: ""
+
+# -- Configure radar-rest-sources-backend pods' Security Context
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# -- Configure radar-rest-sources-backend containers' Security Context
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
 
 service:
   # -- Kubernetes Service type
@@ -56,7 +72,7 @@ resources:
   # limits:
   #   cpu: 100m
   #   memory: 128Mi
-  
+
   # -- CPU/Memory resource requests
   requests:
     cpu: 100m
