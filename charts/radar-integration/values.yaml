@@ -9,8 +9,26 @@ image:
   tag: 0.1.0
   pullPolicy: IfNotPresent
 
+# -- Docker registry secret names as an array
+imagePullSecrets: []
+
+# -- String to partially override radar-integration.fullname template with a string (will prepend the release name)
 nameOverride: ""
+# -- String to fully override radar-integration.fullname template with a string
 fullnameOverride: ""
+
+# -- Configure radar-integration pods' Security Context
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# -- Configure radar-integration containers' Security Context
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
 
 service:
   type: ClusterIP

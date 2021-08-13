@@ -12,8 +12,9 @@ A Helm chart for cert-manager. This chart is an overly just to make sure `cluste
 
 | Name | Email | Url |
 | ---- | ------ | --- |
-| Keyvan Hedayati | keyvan@thehyve.nl |  |
-| Joris Borgdorff | joris@thehyve.nl |  |
+| Keyvan Hedayati | keyvan@thehyve.nl | https://www.thehyve.nl |
+| Joris Borgdorff | joris@thehyve.nl | https://www.thehyve.nl/experts/joris-borgdorff |
+| Nivethika Mahasivam | nivethika@thehyve.nl | https://www.thehyve.nl/experts/nivethika-mahasivam |
 
 ## Source Code
 
@@ -25,8 +26,6 @@ A Helm chart for cert-manager. This chart is an overly just to make sure `cluste
 * Helm 3.1.0+
 
 ## Requirements
-
-Kubernetes: `<=1.17`
 
 | Repository | Name | Version |
 |------------|------|---------|

@@ -2,7 +2,7 @@
 
 # radar-s3-connector
 
-![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
+![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 5.5.1](https://img.shields.io/badge/AppVersion-5.5.1-informational?style=flat-square)
 
 A Helm chart for RADAR-base s3 connector. This connector uses Confluent s3 connector with a custom data transformers. These configurations enable a sink connector. See full list of properties here https://docs.confluent.io/kafka-connect-s3-sink/current/configuration_options.html#s3-configuration-options
 
@@ -12,9 +12,9 @@ A Helm chart for RADAR-base s3 connector. This connector uses Confluent s3 conne
 
 | Name | Email | Url |
 | ---- | ------ | --- |
-| Keyvan Hedayati | keyvan@thehyve.nl |  |
-| Joris Borgdorff | joris@thehyve.nl |  |
-| Nivethika Mahasivam | nivethika@thehyve.nl |  |
+| Keyvan Hedayati | keyvan@thehyve.nl | https://www.thehyve.nl |
+| Joris Borgdorff | joris@thehyve.nl | https://www.thehyve.nl/experts/joris-borgdorff |
+| Nivethika Mahasivam | nivethika@thehyve.nl | https://www.thehyve.nl/experts/nivethika-mahasivam |
 
 ## Source Code
 
@@ -34,25 +34,19 @@ A Helm chart for RADAR-base s3 connector. This connector uses Confluent s3 conne
 | image.repository | string | `"radarbase/kafka-connect-transform-s3"` | radar-s3-connector image repository |
 | image.tag | string | `"5.5.1"` | radar-s3-connector image tag (immutable tags are recommended) Overrides the image tag whose default is the chart appVersion. |
 | image.pullPolicy | string | `"IfNotPresent"` | radar-s3-connector image pull policy |
+| imagePullSecrets | list | `[]` | Docker registry secret names as an array |
 | nameOverride | string | `""` | String to partially override radar-s3-connector.fullname template with a string (will prepend the release name) |
 | fullnameOverride | string | `""` | String to fully override radar-s3-connector.fullname template with a string |
+| podSecurityContext | object | `{}` | Configure radar-s3-connector pods' Security Context |
+| securityContext | object | `{}` | Configure radar-s3-connector containers' Security Context |
 | service.type | string | `"ClusterIP"` | Kubernetes Service type |
 | service.port | int | `8083` | radar-s3-connector port |
-| ingress.enabled | bool | `false` | Enable ingress controller resource |
-| ingress.annotations | object | `{}` | Annotations to define default ingress class, certificate issuer |
-| ingress.hosts | list | `[{"host":"chart-example.local","paths":[]}]` | Hosts to listen to incoming requests |
-| ingress.tls | list | `[]` | Utilize TLS backend in ingress |
 | resources.requests | object | `{"cpu":"100m","memory":"3Gi"}` | CPU/Memory resource requests |
 | nodeSelector | object | `{}` | Node labels for pod assignment |
 | tolerations | list | `[]` | Toleration labels for pod assignment |
 | affinity | object | `{}` | Affinity labels for pod assignment |
 | kafka.url | string | `"PLAINTEXT://cp-kafka-headless:9092"` | Kafka broker URLs |
-| kafka.securityProtocol | string | `"PLAINTEXT"` | Not used. To be confirmed |
-| kafka.saslJaasConfig | string | `""` | Not used. To be confirmed |
-| kafka.saslMechanism | string | `"GSSAPI"` | Not used. To be confirmed |
-| kafka.sslEndpointIdentificationAlgorithm | string | `"https"` | Not used. To be confirmed |
 | schemaRegistry.url | string | `"http://cp-schema-registry:8081"` |  |
-| schemaRegistry.basicAuth | string | `""` | Not used. To be confirmed |
 | topics | string | check values.yaml | List of topics to be consumed by the sink connector separated by comma. |
 | s3Endpoint | string | `"http://minio:9000/"` | Target S3 endpoint url |
 | s3Tagging | bool | `false` | set to true, if S3 objects should be tagged with start and end offsets, as well as record count. |

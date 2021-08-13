@@ -2,9 +2,9 @@
 
 # management-portal
 
-![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.6.4](https://img.shields.io/badge/AppVersion-0.6.4-informational?style=flat-square)
+![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.7.0](https://img.shields.io/badge/AppVersion-0.7.0-informational?style=flat-square)
 
-A Helm chart for RADAR-Base Management Portal
+A Helm chart for RADAR-Base Management Portal to manage projects and participants throughout RADAR-base.
 
 **Homepage:** <https://radar-base.org>
 
@@ -12,9 +12,9 @@ A Helm chart for RADAR-Base Management Portal
 
 | Name | Email | Url |
 | ---- | ------ | --- |
-| Keyvan Hedayati | keyvan@thehyve.nl |  |
-| Joris Borgdorff | joris@thehyve.nl |  |
-| Nivethika Mahasivam | nivethika@thehyve.nl |  |
+| Keyvan Hedayati | keyvan@thehyve.nl | https://www.thehyve.nl |
+| Joris Borgdorff | joris@thehyve.nl | https://www.thehyve.nl/experts/joris-borgdorff |
+| Nivethika Mahasivam | nivethika@thehyve.nl | https://www.thehyve.nl/experts/nivethika-mahasivam |
 
 ## Source Code
 
@@ -33,8 +33,11 @@ A Helm chart for RADAR-Base Management Portal
 | image.repository | string | `"radarbase/management-portal"` | Management Portal image repository |
 | image.tag | string | `"0.7.0"` | Management Portal image tag (immutable tags are recommended) |
 | image.pullPolicy | string | `"IfNotPresent"` | Management Portal image pull policy |
+| imagePullSecrets | list | `[]` | Docker registry secret names as an array |
 | nameOverride | string | `""` | String to partially override management-portal.fullname template with a string (will prepend the release name) |
 | fullnameOverride | string | `""` | String to fully override management-portal.fullname template with a string |
+| podSecurityContext | object | `{}` | Configure management-portal pods' Security Context |
+| securityContext | object | `{}` | Configure management-portal containers' Security Context |
 | service.type | string | `"ClusterIP"` | Kubernetes Service type |
 | service.port | int | `8080` | Management Portal port |
 | ingress.enabled | bool | `true` | Enable ingress controller resource |

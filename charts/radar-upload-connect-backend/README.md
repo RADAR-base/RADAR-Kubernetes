@@ -4,7 +4,7 @@
 
 ![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.5.9](https://img.shields.io/badge/AppVersion-0.5.9-informational?style=flat-square)
 
-A Helm chart for RADAR-base upload connector backend application.
+A Helm chart for RADAR-base upload connector backend application. This application is an upload system that stores uploaded data and its metadata in PostgreSQL for later processing.
 
 **Homepage:** <https://radar-base.org>
 
@@ -12,9 +12,9 @@ A Helm chart for RADAR-base upload connector backend application.
 
 | Name | Email | Url |
 | ---- | ------ | --- |
-| Keyvan Hedayati | keyvan@thehyve.nl |  |
-| Joris Borgdorff | joris@thehyve.nl |  |
-| Nivethika Mahasivam | nivethika@thehyve.nl |  |
+| Keyvan Hedayati | keyvan@thehyve.nl | https://www.thehyve.nl |
+| Joris Borgdorff | joris@thehyve.nl | https://www.thehyve.nl/experts/joris-borgdorff |
+| Nivethika Mahasivam | nivethika@thehyve.nl | https://www.thehyve.nl/experts/nivethika-mahasivam |
 
 ## Source Code
 
@@ -33,8 +33,11 @@ A Helm chart for RADAR-base upload connector backend application.
 | image.repository | string | `"radarbase/radar-upload-connect-backend"` | radar-upload-connect-backend image repository |
 | image.tag | string | `"0.5.9"` | radar-upload-connect-backend image tag (immutable tags are recommended) Overrides the image tag whose default is the chart appVersion. |
 | image.pullPolicy | string | `"IfNotPresent"` | radar-upload-connect-backend image pull policy |
+| imagePullSecrets | list | `[]` | Docker registry secret names as an array |
 | nameOverride | string | `""` | String to partially override radar-upload-connect-backend.fullname template with a string (will prepend the release name) |
 | fullnameOverride | string | `""` | String to fully override radar-upload-connect-backend.fullname template with a string |
+| podSecurityContext | object | `{}` | Configure radar-upload-connect-backend pods' Security Context |
+| securityContext | object | `{}` | Configure radar-upload-connect-backend containers' Security Context |
 | service.type | string | `"ClusterIP"` | Kubernetes Service type |
 | service.port | int | `8085` | radar-upload-connect-backend port |
 | ingress.enabled | bool | `true` | Enable ingress controller resource |

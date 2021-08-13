@@ -1,6 +1,6 @@
 apiVersion: v2
 name: app-config-frontend
-description: A Helm chart for the frontend application of RADAR-base application config
+description: A Helm chart for the frontend application of RADAR-base application config (app-config).
 
 # A chart can be either an 'application' or a 'library' chart.
 #
@@ -20,13 +20,16 @@ version: 0.1.1
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
-appVersion: 0.3.2
+appVersion: "0.3.2"
 sources: ["https://github.com/RADAR-base/radar-app-config"]
 home: "https://radar-base.org"
 maintainers:
   - email: keyvan@thehyve.nl
     name: Keyvan Hedayati
+    url: https://www.thehyve.nl
   - email: joris@thehyve.nl
     name: Joris Borgdorff
+    url: https://www.thehyve.nl/experts/joris-borgdorff
   - email: nivethika@thehyve.nl
     name: Nivethika Mahasivam
+    url: https://www.thehyve.nl/experts/nivethika-mahasivam

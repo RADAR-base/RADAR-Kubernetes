@@ -2,9 +2,9 @@
 
 # radar-fitbit-connector
 
-![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
+![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.3.3](https://img.shields.io/badge/AppVersion-0.3.3-informational?style=flat-square)
 
-A Helm chart for RADAR-base fitbit connector
+A Helm chart for RADAR-base fitbit connector. This application collects data from participants via the Fitbit Web API.
 
 **Homepage:** <https://radar-base.org>
 
@@ -12,9 +12,9 @@ A Helm chart for RADAR-base fitbit connector
 
 | Name | Email | Url |
 | ---- | ------ | --- |
-| Keyvan Hedayati | keyvan@thehyve.nl |  |
-| Joris Borgdorff | joris@thehyve.nl |  |
-| Nivethika Mahasivam | nivethika@thehyve.nl |  |
+| Keyvan Hedayati | keyvan@thehyve.nl | https://www.thehyve.nl |
+| Joris Borgdorff | joris@thehyve.nl | https://www.thehyve.nl/experts/joris-borgdorff |
+| Nivethika Mahasivam | nivethika@thehyve.nl | https://www.thehyve.nl/experts/nivethika-mahasivam |
 
 ## Source Code
 
@@ -34,14 +34,13 @@ A Helm chart for RADAR-base fitbit connector
 | image.repository | string | `"radarbase/kafka-connect-rest-fitbit-source"` | radar-fitbit-connector image repository |
 | image.tag | string | `"0.3.3"` | radar-fitbit-connector image tag (immutable tags are recommended) Overrides the image tag whose default is the chart appVersion. |
 | image.pullPolicy | string | `"IfNotPresent"` | radar-fitbit-connector image pull policy |
+| imagePullSecrets | list | `[]` | Docker registry secret names as an array |
 | nameOverride | string | `""` | String to partially override radar-fitbit-connector.fullname template with a string (will prepend the release name) |
 | fullnameOverride | string | `""` | String to fully override radar-fitbit-connector.fullname template with a string |
+| podSecurityContext | object | `{}` | Configure radar-fitbit-connector pods' Security Context |
+| securityContext | object | `{}` | Configure radar-fitbit-connector containers' Security Context |
 | service.type | string | `"ClusterIP"` | Kubernetes Service type |
 | service.port | int | `8083` | radar-fitbit-connector port |
-| ingress.enabled | bool | `false` | Enable ingress controller resource |
-| ingress.annotations | object | `{}` | Annotations to define default ingress class, certificate issuer |
-| ingress.hosts | list | check values.yaml | Hosts to listen to incoming requests |
-| ingress.tls | list | `[]` | TLS secrets for certificates |
 | resources.requests | object | `{"cpu":"100m","memory":"1Gi"}` | CPU/Memory resource requests |
 | persistence.enabled | bool | `true` | Enable persistence using PVC |
 | persistence.accessMode | string | `"ReadWriteOnce"` | PVC Access Mode for radar-fitbit-connector volume |

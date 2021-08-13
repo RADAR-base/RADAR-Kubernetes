@@ -2,7 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-# -- Number of radar-fitbit-connector replicas to deploy
+# -- Number of radar-rest-sources-authorizer replicas to deploy
 replicaCount: 2
 
 image:
@@ -14,10 +14,26 @@ image:
   # -- radar-rest-sources-authorizer image pull policy
   pullPolicy: IfNotPresent
 
+# -- Docker registry secret names as an array
+imagePullSecrets: []
+
 # -- String to partially override radar-rest-sources-authorizer.fullname template with a string (will prepend the release name)
 nameOverride: ""
 # -- String to fully override radar-rest-sources-authorizer.fullname template with a string
 fullnameOverride: ""
+
+# -- Configure radar-rest-sources-authorizer pods' Security Context
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# -- Configure radar-rest-sources-authorizer containers' Security Context
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
 
 service:
   # -- Kubernetes Service type
@@ -52,7 +68,7 @@ resources:
   # limits:
   #   cpu: 100m
   #   memory: 128Mi
-  
+
   # -- CPU/Memory resource requests
   requests:
     cpu: 100m

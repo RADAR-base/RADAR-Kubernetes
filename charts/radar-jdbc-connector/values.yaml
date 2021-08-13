@@ -14,36 +14,32 @@ image:
   # -- radar-jdbc-connector image pull policy
   pullPolicy: IfNotPresent
 
+# -- Docker registry secret names as an array
 imagePullSecrets: []
+
 # -- String to partially override radar-jdbc-connector.fullname template with a string (will prepend the release name)
 nameOverride: ""
 # -- String to fully override radar-jdbc-connector.fullname template with a string
 fullnameOverride: ""
+
+# -- Configure radar-jdbc-connector pods' Security Context
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# -- Configure radar-jdbc-connector containers' Security Context
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
 
 service:
   # -- Kubernetes Service type
   type: ClusterIP
   # -- radar-jdbc-connector port
   port: 8083
-
-ingress:
-  # -- Enable ingress controller resource
-  enabled: false
-  # -- Annotations to define default ingress class, certificate issuer
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  
-  # -- Hosts to listen to incoming requests
-  # @default -- check values.yaml
-  hosts:
-    - host: chart-example.local
-      paths: []
-  # -- TLS secrets for certificates
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
 
 resources:
   # We usually recommend not to specify default resources and to leave this as a conscious
