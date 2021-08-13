@@ -2,16 +2,16 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-# -- Number of Appconfig frontend replicas to deploy
+# -- Number of radar-output replicas to deploy
 replicaCount: 1
 
 image:
-  # -- Appconfig frontend image repository
+  # -- radar-output image repository
   repository: radarbase/radar-output-restructure
-  # -- Appconfig frontend image tag (immutable tags are recommended)
+  # -- radar-output image tag (immutable tags are recommended)
   # Overrides the image tag whose default is the chart appVersion.
   tag: 1.2.1
-  # -- Appconfig frontend image pull policy
+  # -- radar-output image pull policy
   pullPolicy: IfNotPresent
 
 # -- Docker registry secret names as an array
@@ -21,6 +21,19 @@ imagePullSecrets: []
 nameOverride: ""
 # -- String to fully override radar-output.fullname template with a string
 fullnameOverride: ""
+
+# -- Configure radar-output pods' Security Context
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# -- Configure radar-output containers' Security Context
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
 
 resources:
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -44,23 +57,6 @@ tolerations: []
 
 # -- Affinity labels for pod assignment
 affinity: {}
-
-persistence:
-   # -- Enable persistence using PVC
-  enabled: false
-  ## If defined, storageClassName: <storageClass>
-  ## If set to "-", storageClassName: "", which disables dynamic provisioning
-  ## If undefined (the default) or set to null, no storageClassName spec is
-  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
-  ##   GKE, AWS & OpenStack)
-  ##
-  # storageClass: "-"
-  ##
-  ## If you want to reuse an existing claim, you can pass the name of the PVC using
-  ## the existingClaim variable
-  # existingClaim: your-claim
-  # accessMode: ReadWriteOnce
-  # size: 30Gi
 
 source:
   # -- Type of the intermediate storage of the RADAR-base pipeline e.g. s3, hdfs

@@ -3,7 +3,6 @@ appVersion: "1.0"
 description: A Helm chart for Velero, this chart is an overlay for Velero and adds some default values and a deployment to mirror the local object storage to a remote location.
 name: velero
 version: 0.1.1
-kubeVersion: "<=1.17"
 engine: gotpl
 sources: ["https://github.com/vmware-tanzu/helm-charts/tree/main/charts/velero"]
 deprecated: false
@@ -12,5 +11,10 @@ home: "https://velero.io"
 maintainers:
   - email: keyvan@thehyve.nl
     name: Keyvan Hedayati
+    url: https://www.thehyve.nl
   - email: joris@thehyve.nl
     name: Joris Borgdorff
+    url: https://www.thehyve.nl/experts/joris-borgdorff
+  - email: nivethika@thehyve.nl
+    name: Nivethika Mahasivam
+    url: https://www.thehyve.nl/experts/nivethika-mahasivam

@@ -1,6 +1,6 @@
 apiVersion: v1
 appVersion: "1.2.1"
-description: A Helm chart for RADAR-base output restructure service. This application reads data from intermediate storage and restructure the data into project-> subject-id-> data topic -> data split per hour. This service offers few options to choose the source and target of the pipeline. For more details see "https://github.com/RADAR-base/radar-output-restructure".
+description: A Helm chart for RADAR-base output restructure service. This application reads data from intermediate storage and restructure the data into project-> subject-id-> data topic -> data split per hour. This service offers few options to choose the source and target of the pipeline.
 name: radar-output
 version: 0.1.1
 sources: ["https://github.com/RADAR-base/radar-output-restructure"]
@@ -9,7 +9,10 @@ home: "https://radar-base.org"
 maintainers:
   - email: keyvan@thehyve.nl
     name: Keyvan Hedayati
+    url: https://www.thehyve.nl
   - email: joris@thehyve.nl
     name: Joris Borgdorff
+    url: https://www.thehyve.nl/experts/joris-borgdorff
   - email: nivethika@thehyve.nl
     name: Nivethika Mahasivam
+    url: https://www.thehyve.nl/experts/nivethika-mahasivam

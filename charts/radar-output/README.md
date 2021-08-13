@@ -4,7 +4,7 @@
 
 ![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.2.1](https://img.shields.io/badge/AppVersion-1.2.1-informational?style=flat-square)
 
-A Helm chart for RADAR-base output restructure service. This application reads data from intermediate storage and restructure the data into project-> subject-id-> data topic -> data split per hour. This service offers few options to choose the source and target of the pipeline. For more details see "https://github.com/RADAR-base/radar-output-restructure".
+A Helm chart for RADAR-base output restructure service. This application reads data from intermediate storage and restructure the data into project-> subject-id-> data topic -> data split per hour. This service offers few options to choose the source and target of the pipeline.
 
 **Homepage:** <https://radar-base.org>
 
@@ -12,9 +12,9 @@ A Helm chart for RADAR-base output restructure service. This application reads d
 
 | Name | Email | Url |
 | ---- | ------ | --- |
-| Keyvan Hedayati | keyvan@thehyve.nl |  |
-| Joris Borgdorff | joris@thehyve.nl |  |
-| Nivethika Mahasivam | nivethika@thehyve.nl |  |
+| Keyvan Hedayati | keyvan@thehyve.nl | https://www.thehyve.nl |
+| Joris Borgdorff | joris@thehyve.nl | https://www.thehyve.nl/experts/joris-borgdorff |
+| Nivethika Mahasivam | nivethika@thehyve.nl | https://www.thehyve.nl/experts/nivethika-mahasivam |
 
 ## Source Code
 
@@ -29,19 +29,20 @@ A Helm chart for RADAR-base output restructure service. This application reads d
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| replicaCount | int | `1` | Number of Appconfig frontend replicas to deploy |
-| image.repository | string | `"radarbase/radar-output-restructure"` | Appconfig frontend image repository |
-| image.tag | string | `"1.2.1"` | Appconfig frontend image tag (immutable tags are recommended) Overrides the image tag whose default is the chart appVersion. |
-| image.pullPolicy | string | `"IfNotPresent"` | Appconfig frontend image pull policy |
+| replicaCount | int | `1` | Number of radar-output replicas to deploy |
+| image.repository | string | `"radarbase/radar-output-restructure"` | radar-output image repository |
+| image.tag | string | `"1.2.1"` | radar-output image tag (immutable tags are recommended) Overrides the image tag whose default is the chart appVersion. |
+| image.pullPolicy | string | `"IfNotPresent"` | radar-output image pull policy |
 | imagePullSecrets | list | `[]` | Docker registry secret names as an array |
 | nameOverride | string | `""` | String to partially override radar-output.fullname template with a string (will prepend the release name) |
 | fullnameOverride | string | `""` | String to fully override radar-output.fullname template with a string |
+| podSecurityContext | object | `{}` | Configure radar-output pods' Security Context |
+| securityContext | object | `{}` | Configure radar-output containers' Security Context |
 | resources.limits | object | `{"cpu":"1000m"}` | CPU/Memory resource limits |
 | resources.requests | object | `{"cpu":"100m","memory":"400Mi"}` | CPU/Memory resource requests |
 | nodeSelector | object | `{}` | Node labels for pod assignment |
 | tolerations | list | `[]` | Toleration labels for pod assignment |
 | affinity | object | `{}` | Affinity labels for pod assignment |
-| persistence.enabled | bool | `false` | Enable persistence using PVC |
 | source.type | string | `"s3"` | Type of the intermediate storage of the RADAR-base pipeline e.g. s3, hdfs |
 | source.s3.endpoint | string | `"http://minio:9000"` | s3 endpoint of the intermediate storage |
 | source.s3.accessToken | string | `"access_key"` | s3 access-key of the intermediate storage |

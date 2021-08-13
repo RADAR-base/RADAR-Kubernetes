@@ -13,6 +13,22 @@ mc_image:
   # -- Object storage backup pod image pull policy
   pullPolicy: IfNotPresent
 
+# -- Docker registry secret names as an array
+imagePullSecrets: []
+
+# -- Configure object storage backup pod pods' Security Context
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# -- Configure object storage backup pod containers' Security Context
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
 local:
   # -- Address of local object storage to backup data from
   address: minio.default:9000

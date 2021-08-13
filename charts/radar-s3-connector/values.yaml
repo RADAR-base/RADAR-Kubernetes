@@ -14,28 +14,32 @@ image:
   # -- radar-s3-connector image pull policy
   pullPolicy: IfNotPresent
 
+# -- Docker registry secret names as an array
+imagePullSecrets: []
+
 # -- String to partially override radar-s3-connector.fullname template with a string (will prepend the release name)
 nameOverride: ""
 # -- String to fully override radar-s3-connector.fullname template with a string
 fullnameOverride: ""
+
+# -- Configure radar-s3-connector pods' Security Context
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# -- Configure radar-s3-connector containers' Security Context
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
 
 service:
   # -- Kubernetes Service type
   type: ClusterIP
   # -- radar-s3-connector port
   port: 8083
-
-ingress:
-  # -- Enable ingress controller resource
-  enabled: false
-  # -- Annotations to define default ingress class, certificate issuer
-  annotations: {}
-  # -- Hosts to listen to incoming requests
-  hosts:
-    - host: chart-example.local
-      paths: []
-  # -- Utilize TLS backend in ingress
-  tls: []
 
 resources:
   # We usually recommend not to specify default resources and to leave this as a conscious

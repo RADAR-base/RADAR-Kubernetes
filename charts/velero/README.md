@@ -12,8 +12,9 @@ A Helm chart for Velero, this chart is an overlay for Velero and adds some defau
 
 | Name | Email | Url |
 | ---- | ------ | --- |
-| Keyvan Hedayati | keyvan@thehyve.nl |  |
-| Joris Borgdorff | joris@thehyve.nl |  |
+| Keyvan Hedayati | keyvan@thehyve.nl | https://www.thehyve.nl |
+| Joris Borgdorff | joris@thehyve.nl | https://www.thehyve.nl/experts/joris-borgdorff |
+| Nivethika Mahasivam | nivethika@thehyve.nl | https://www.thehyve.nl/experts/nivethika-mahasivam |
 
 ## Source Code
 
@@ -27,8 +28,6 @@ A Helm chart for Velero, this chart is an overlay for Velero and adds some defau
 
 ## Requirements
 
-Kubernetes: `<=1.17`
-
 | Repository | Name | Version |
 |------------|------|---------|
 | https://vmware-tanzu.github.io/helm-charts | velero | 2.12.0 |
@@ -41,6 +40,9 @@ Kubernetes: `<=1.17`
 | mc_image.repository | string | `"minio/mc"` | Object storage backup pod image repository |
 | mc_image.tag | string | `"RELEASE.2020-09-03T00-08-28Z"` | Object storage backup pod image tag (immutable tags are recommended) |
 | mc_image.pullPolicy | string | `"IfNotPresent"` | Object storage backup pod image pull policy |
+| imagePullSecrets | list | `[]` | Docker registry secret names as an array |
+| podSecurityContext | object | `{}` | Configure object storage backup pod pods' Security Context |
+| securityContext | object | `{}` | Configure object storage backup pod containers' Security Context |
 | local.address | string | `"minio.default:9000"` | Address of local object storage to backup data from |
 | local.accessKey | string | `"accessKey"` | Access key of local object storage |
 | local.secretKey | string | `"secretKey"` | Secret key of local object storage |
