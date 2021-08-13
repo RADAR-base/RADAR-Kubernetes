@@ -33,8 +33,11 @@ A Helm chart for RADAR-base upload connector frontend application
 | image.repository | string | `"radarbase/radar-upload-connect-frontend"` | radar-upload-connect-frontend image repository |
 | image.tag | string | `"0.5.9"` | radar-upload-connect-frontend image tag (immutable tags are recommended) Overrides the image tag whose default is the chart appVersion. |
 | image.pullPolicy | string | `"IfNotPresent"` | radar-upload-connect-frontend image pull policy |
+| imagePullSecrets | list | `[]` | Docker registry secret names as an array |
 | nameOverride | string | `""` | String to partially override radar-upload-connect-frontend.fullname template with a string (will prepend the release name) |
 | fullnameOverride | string | `""` | String to fully override radar-upload-connect-frontend.fullname template with a string |
+| podSecurityContext | object | `{}` | Configure radar-upload-connect-frontend pods' Security Context |
+| securityContext | object | `{}` | Configure radar-upload-connect-frontend containers' Security Context |
 | service.type | string | `"ClusterIP"` | Kubernetes Service type |
 | service.port | int | `80` | radar-upload-connect-frontend port |
 | ingress.enabled | bool | `true` | Enable ingress controller resource |

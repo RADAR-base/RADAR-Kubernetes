@@ -33,8 +33,11 @@ A Helm chart for RADAR-base gateway. For more details of the configurations, see
 | image.repository | string | `"radarbase/radar-gateway"` | radar-gateway image repository |
 | image.tag | string | `"0.5.6"` | radar-gateway image tag (immutable tags are recommended) Overrides the image tag whose default is the chart appVersion. |
 | image.pullPolicy | string | `"IfNotPresent"` | radar-gateway image pull policy |
+| imagePullSecrets | list | `[]` | Docker registry secret names as an array |
 | nameOverride | string | `""` | String to partially override radar-gateway.fullname template with a string (will prepend the release name) |
 | fullnameOverride | string | `""` | String to fully override radar-gateway.fullname template with a string |
+| podSecurityContext | object | `{}` | Configure radar-gateway pods' Security Context |
+| securityContext | object | `{}` | Configure radar-gateway containers' Security Context |
 | service.type | string | `"ClusterIP"` | Kubernetes Service type |
 | service.port | int | `8080` | radar-gateway port |
 | ingress.enabled | bool | `true` | Enable ingress controller resource |

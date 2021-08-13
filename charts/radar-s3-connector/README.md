@@ -34,8 +34,11 @@ A Helm chart for RADAR-base s3 connector. This connector uses Confluent s3 conne
 | image.repository | string | `"radarbase/kafka-connect-transform-s3"` | radar-s3-connector image repository |
 | image.tag | string | `"5.5.1"` | radar-s3-connector image tag (immutable tags are recommended) Overrides the image tag whose default is the chart appVersion. |
 | image.pullPolicy | string | `"IfNotPresent"` | radar-s3-connector image pull policy |
+| imagePullSecrets | list | `[]` | Docker registry secret names as an array |
 | nameOverride | string | `""` | String to partially override radar-s3-connector.fullname template with a string (will prepend the release name) |
 | fullnameOverride | string | `""` | String to fully override radar-s3-connector.fullname template with a string |
+| podSecurityContext | object | `{}` | Configure radar-s3-connector pods' Security Context |
+| securityContext | object | `{}` | Configure radar-s3-connector containers' Security Context |
 | service.type | string | `"ClusterIP"` | Kubernetes Service type |
 | service.port | int | `8083` | radar-s3-connector port |
 | resources.requests | object | `{"cpu":"100m","memory":"3Gi"}` | CPU/Memory resource requests |

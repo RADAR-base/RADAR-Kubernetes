@@ -9,8 +9,26 @@ image:
   tag: latest
   pullPolicy: IfNotPresent
 
+# -- Docker registry secret names as an array
+imagePullSecrets: []
+
+# -- String to partially override smtp.fullname template with a string (will prepend the release name)
 nameOverride: ""
+# -- String to fully override smtp.fullname template with a string
 fullnameOverride: ""
+
+# -- Configure smtp pods' Security Context
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# -- Configure smtp containers' Security Context
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
 
 service:
   type: ClusterIP

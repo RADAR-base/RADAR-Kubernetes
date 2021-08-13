@@ -33,7 +33,11 @@ A Helm chart for S3 Proxy. It uses https://hub.docker.com/r/andrewgaul/s3proxy t
 | image.repository | string | `"andrewgaul/s3proxy"` | s3-proxy image repository |
 | image.tag | string | `"travis-1430"` | s3-proxy image tag (immutable tags are recommended) Overrides the image tag whose default is the chart appVersion. |
 | image.pullPolicy | string | `"IfNotPresent"` | s3-proxy image pull policy |
+| imagePullSecrets | list | `[]` | Docker registry secret names as an array |
 | nameOverride | string | `""` | String to partially override s3-proxy.fullname template with a string (will prepend the release name) |
+| fullnameOverride | string | `""` | String to fully override s3-proxy.fullname template with a string |
+| podSecurityContext | object | `{}` | Configure s3-proxy pods' Security Context |
+| securityContext | object | `{}` | Configure s3-proxy containers' Security Context |
 | service.type | string | `"ClusterIP"` | Kubernetes Service type |
 | service.port | int | `80` | s3-proxy port |
 | resources.requests | object | `{"cpu":"100m","memory":"128Mi"}` | CPU/Memory resource requests |

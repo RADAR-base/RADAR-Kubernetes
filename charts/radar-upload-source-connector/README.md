@@ -32,8 +32,11 @@ A Helm chart for RADAR-base upload kafka connector.
 | replicaCount | int | `2` | Number of radar-upload-source-connector replicas to deploy |
 | image.repository | string | `"radarbase/radar-connect-upload-source"` | radar-upload-source-connector image repository |
 | image.tag | string | `"0.5.9"` | radar-upload-source-connector image tag (immutable tags are recommended) Overrides the image tag whose default is the chart appVersion. |
+| imagePullSecrets | list | `[]` | Docker registry secret names as an array |
 | nameOverride | string | `""` | String to partially override radar-upload-source-connector.fullname template with a string (will prepend the release name) |
 | fullnameOverride | string | `""` | String to fully override radar-upload-source-connector.fullname template with a string |
+| podSecurityContext | object | `{}` | Configure radar-upload-source-connector pods' Security Context |
+| securityContext | object | `{}` | Configure radar-upload-source-connector containers' Security Context |
 | service.type | string | `"ClusterIP"` | Kubernetes Service type |
 | service.port | int | `80` | radar-upload-source-connector port |
 | resources.requests | object | `{"cpu":"100m","memory":"800Mi"}` | CPU/Memory resource requests |

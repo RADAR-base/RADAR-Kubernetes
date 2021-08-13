@@ -24,6 +24,12 @@ spec:
         app.kubernetes.io/name: {{ include "radar-backend.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -42,6 +48,8 @@ spec:
               topologyKey: "kubernetes.io/hostname"
       containers:
         - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:

@@ -21,6 +21,12 @@ spec:
         app.kubernetes.io/name: {{ include "radar-gateway.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -39,6 +45,8 @@ spec:
               topologyKey: "kubernetes.io/hostname"
       containers:
         - image: sscaling/jmx-prometheus-exporter
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
           imagePullPolicy: IfNotPresent
           name: prometheus-jmx-exporter
           env:

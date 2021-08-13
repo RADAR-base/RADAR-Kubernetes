@@ -13,10 +13,26 @@ image:
   tag: 0.5.9
   # -- radar-upload-source-connector image pull policy
 
+# -- Docker registry secret names as an array
+imagePullSecrets: []
+
 # -- String to partially override radar-upload-source-connector.fullname template with a string (will prepend the release name)
 nameOverride: ""
 # -- String to fully override radar-upload-source-connector.fullname template with a string
 fullnameOverride: ""
+
+# -- Configure radar-upload-source-connector pods' Security Context
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# -- Configure radar-upload-source-connector containers' Security Context
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
 
 service:
   # -- Kubernetes Service type

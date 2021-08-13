@@ -14,10 +14,26 @@ image:
   # -- radar-fitbit-connector image pull policy
   pullPolicy: IfNotPresent
 
+# -- Docker registry secret names as an array
+imagePullSecrets: []
+
 # -- String to partially override radar-fitbit-connector.fullname template with a string (will prepend the release name)
 nameOverride: ""
 # -- String to fully override radar-fitbit-connector.fullname template with a string
 fullnameOverride: ""
+
+# -- Configure radar-fitbit-connector pods' Security Context
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# -- Configure radar-fitbit-connector containers' Security Context
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
 
 service:
   # -- Kubernetes Service type
