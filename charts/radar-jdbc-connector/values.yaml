@@ -2,19 +2,28 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# -- Number of radar-fitbit-connector replicas to deploy
 replicaCount: 1
 
 image:
+  # -- radar-jdbc-connector image repository
   repository: radarbase/radar-jdbc-connector
+  # -- radar-jdbc-connector image tag (immutable tags are recommended)
+  # Overrides the image tag whose default is the chart appVersion.
   tag: latest
+  # -- radar-jdbc-connector image pull policy
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
+# -- String to partially override radar-jdbc-connector.fullname template with a string (will prepend the release name)
 nameOverride: ""
+# -- String to fully override radar-jdbc-connector.fullname template with a string
 fullnameOverride: ""
 
 service:
+  # -- Kubernetes Service type
   type: ClusterIP
+  # -- radar-jdbc-connector port
   port: 8083
 
 resources:
@@ -25,24 +34,38 @@ resources:
   # limits:
   #   cpu: 100m
   #   memory: 128Mi
+
+  # -- CPU/Memory resource requests
   requests:
     cpu: 100m
     memory: 1Gi
 
+# -- Node labels for pod assignment
 nodeSelector: {}
 
+# -- Toleration labels for pod assignment
 tolerations: []
 
+# -- Affinity labels for pod assignment
 affinity: {}
 
+# -- URI of Zookeeper instances of the cluster
 zookeeper: cp-zookeeper-headless:2181
+# -- URI of Kafka brokers of the cluster
 kafka: PLAINTEXT://cp-kafka-headless:9092
+# -- Number of Kafka brokers. This is used to validate the cluster availability at connector init.
 kafka_num_brokers: "3"
+# -- URL of the Kafka schema registry
 schema_registry: http://cp-schema-registry:8081
+# -- Comma-separated list of topics the connector will read from and ingest into the database
 topics: android_phone_relative_location, android_phone_battery_level, connect_upload_altoida_summary, connect_fitbit_intraday_heart_rate, connect_fitbit_intraday_steps
 
 timescaledb:
+  # -- Host of the TimescaleDB database
   host: timescaledb-postgresql-headless
+  # -- TimescaleDB database username
   username: grafana
+  # -- TimescaleDB database password
   password: password
+  # -- TimescaleDB database name
   database_name: grafana-metrics
