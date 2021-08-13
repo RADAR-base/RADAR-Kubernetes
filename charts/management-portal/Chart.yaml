@@ -3,7 +3,6 @@ appVersion: "0.7.0"
 description: A Helm chart for RADAR-Base Management Portal to manage projects and participants throughout RADAR-base.
 name: management-portal
 version: 0.1.1
-kubeVersion: "<=1.17"
 engine: gotpl
 sources: ["https://github.com/RADAR-base/ManagementPortal"]
 deprecated: false

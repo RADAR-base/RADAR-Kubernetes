@@ -27,15 +27,6 @@ A Helm chart for cert-manager. This chart is an overly just to make sure `cluste
 
 ## Requirements
 
-Kubernetes: `<=1.17`
-
-| Repository | Name | Version |
-|------------|------|---------|
-| https://charts.jetstack.io | cert-manager | v1.1.0 |
-## Requirements
-
-Kubernetes: `<=1.17`
-
 | Repository | Name | Version |
 |------------|------|---------|
 | https://charts.jetstack.io | cert-manager | v1.1.0 |

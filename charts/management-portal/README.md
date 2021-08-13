@@ -76,10 +76,6 @@ A Helm chart for RADAR-Base Management Portal to manage projects and participant
 | smtp.auth | bool | `true` | set to true, if the account should be authenticated before sending emails |
 | oauth_clients | object | check values.yaml | OAuth2 Client configuration |
 
-## Requirements
-
-Kubernetes: `<=1.17`
-
 ## OAuth Client Configuration
 List of OAuth client configurations supported by RADAR-base. Each client should be enabled separately, if relevant and used in the installation.
 Each client configuration has the following setup:

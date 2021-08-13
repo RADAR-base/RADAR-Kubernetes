@@ -28,8 +28,6 @@ A Helm chart for Velero, this chart is an overlay for Velero and adds some defau
 
 ## Requirements
 
-Kubernetes: `<=1.17`
-
 | Repository | Name | Version |
 |------------|------|---------|
 | https://vmware-tanzu.github.io/helm-charts | velero | 2.12.0 |
