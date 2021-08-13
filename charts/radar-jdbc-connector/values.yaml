@@ -14,11 +14,26 @@ image:
   # -- radar-jdbc-connector image pull policy
   pullPolicy: IfNotPresent
 
+# -- Docker registry secret names as an array
 imagePullSecrets: []
+
 # -- String to partially override radar-jdbc-connector.fullname template with a string (will prepend the release name)
 nameOverride: ""
 # -- String to fully override radar-jdbc-connector.fullname template with a string
 fullnameOverride: ""
+
+# -- Configure radar-jdbc-connector pods' Security Context
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# -- Configure radar-jdbc-connector containers' Security Context
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
 
 service:
   # -- Kubernetes Service type
