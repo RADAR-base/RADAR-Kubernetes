@@ -50,6 +50,7 @@ A Helm chart for RADAR-Base Management Portal to manage projects and participant
 | nodeSelector | object | `{}` | Node labels for pod assignment |
 | tolerations | list | `[]` | Toleration labels for pod assignment |
 | affinity | object | `{}` | Affinity labels for pod assignment |
+| keystore | string | `""` | base 64 encoded binary p12 keystore containing a ECDSA certificate with alias `radarbase-managementportal-ec` and a RSA certificate with alias `selfsigned`. |
 | postgres.host | string | `"postgresql"` | host name of the postgres db |
 | postgres.port | int | `5432` | post of the postgres db |
 | postgres.database | string | `"managementportal"` | database name |
@@ -79,7 +80,8 @@ A Helm chart for RADAR-Base Management Portal to manage projects and participant
 ## OAuth Client Configuration
 List of OAuth client configurations supported by RADAR-base. Each client should be enabled separately, if relevant and used in the installation.
 Each client configuration has the following setup:
-```
+
+```yaml
 <client_id>: # client id
   enabled: false # set to true, if it should be enabled. Default is false.
   resource_ids: # list of resources that can be accessed by this client.
@@ -91,4 +93,20 @@ Each client configuration has the following setup:
   additional_information: # A JSON string containing additional meta-data of this client. e.g. {"dynamic_registration": true} should be set for clients which can automatically register a data source for a subject
   redirect_uri: # Redirect URL for clients which have authorization_code grant-type enabled.
   autoapprove: # List of permissions that can auto-approved when authorization-code flow succeeds.
+```
+
+## OAuth 2.0 key store
+
+ManagementPortal needs a certificate and private key to sign OAuth 2.0 Json Web Tokens (JWT's). The keystore needs to be a P12 file including an ECDSA certificate with alias `radarbase-managementportal-ec` and an RSA certificate with alias `selfsigned`. The script `bin/keystore-init` is included to generate this for you. It requires Java to be installed.
+
+Once a valid keystore file is available, its contents should be passed as a base 64 encoded value in the `keystore` value. When using helmfile, this can be achieved by setting
+
+```yaml
+management_portal:
+  keystore: {{ readFile "etc/keystore.p12" | b64enc | quote }}
+```
+in `production.yaml.gotmpl`. If SOPS is used for secrets management, write the following instead:
+```yaml
+management_portal:
+  keystore: {{ exec "sops" (list "-d" "etc/keystore.p12.enc") | b64enc | quote }}
 ```

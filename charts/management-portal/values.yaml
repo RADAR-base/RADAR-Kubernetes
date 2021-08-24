@@ -90,7 +90,8 @@ tolerations: []
 # -- Affinity labels for pod assignment
 affinity: {}
 
-# B64 encoded Binary keystore file
+# -- base 64 encoded binary p12 keystore containing a ECDSA certificate with alias `radarbase-managementportal-ec` and a RSA certificate with alias `selfsigned`.
+keystore: ""
 # With helmfile, this can be set in a production.yaml.gotmpl
 # file by setting
 #   keystore: {{ readFile "keystore.p12" | b64enc | quote }}
