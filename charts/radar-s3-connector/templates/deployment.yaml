@@ -231,7 +231,9 @@ spec:
         - name: init-topics
           image: alpine:latest
           args:
-            - /etc/kafka-connect/sink-s3/init/init-topics.sh /etc/kafka-connect/sink-s3/original/sink-s3.properties /etc/kafka-connect/sink-s3/sink-s3.properties
+            - /etc/kafka-connect/sink-s3/init/init-topics.sh
+            - /etc/kafka-connect/sink-s3/original/sink-s3.properties
+            - /etc/kafka-connect/sink-s3/sink-s3.properties
           volumeMounts:
             - name: config
               mountPath: /etc/kafka-connect/sink-s3/original
