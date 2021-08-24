@@ -46,3 +46,11 @@ data:
     elif [ $(echo "$STATUS" | grep RUNNING | wc -l) -le 1 ]; then
       exit 1
     fi
+  add-topics-to-config.sh: |
+    #!/bin/sh
+    SOURCE=$1
+    TARGET=$2
+    set -e
+    apk add --no-cache curl jq
+    TOPICS=$(curl -f {{ .Values.catalogServer.url }}/source-types | jq -r '[to_entries[] | select(.key|endswith("source-types")) | .value[].data[].topic] | unique | join(",")')
+    sed "s/^topics=.\+\$/\\0,$TOPICS/" "$SOURCE" | sed "s/^topics=\$/\\0$TOPICS/" > "$TARGET"
