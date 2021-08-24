@@ -204,7 +204,7 @@ spec:
             exec:
               command:
               - /bin/sh
-              - /etc/kafka-connect/sink-s3/healthcheck.sh
+              - /etc/kafka-connect/sink-s3/original/healthcheck.sh
             initialDelaySeconds: 40
             periodSeconds: 60
             timeoutSeconds: 10
@@ -214,7 +214,7 @@ spec:
             exec:
               command:
               - /bin/sh
-              - /etc/kafka-connect/sink-s3/healthcheck.sh
+              - /etc/kafka-connect/sink-s3/original/healthcheck.sh
             initialDelaySeconds: 40
             periodSeconds: 60
             timeoutSeconds: 10
@@ -223,12 +223,31 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
+            - name: config-updated
+              mountPath: /etc/kafka-connect/sink-s3
             - name: config
+              mountPath: /etc/kafka-connect/sink-s3/original
+      initContainers:
+        - name: init-topics
+          image: alpine:latest
+          args:
+            - /etc/kafka-connect/sink-s3/init/init-topics.sh /etc/kafka-connect/sink-s3/original/sink-s3.properties /etc/kafka-connect/sink-s3/sink-s3.properties
+          volumeMounts:
+            - name: config
+              mountPath: /etc/kafka-connect/sink-s3/original
+            - name: config-init
+              mountPath: /etc/kafka-connect/sink-s3/init
+            - name: config-updated
               mountPath: /etc/kafka-connect/sink-s3
       volumes:
         - name: config
           configMap:
             name: {{ include "radar-s3-connector.fullname" . }}
+        - name: config-init
+          configMap:
+            name: {{ include "radar-s3-connector.fullname" . }}-init
+        - name: config-updated
+          emptyDir: {}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
