@@ -18,6 +18,7 @@ You need to have a working Kubernetes installation and there are 3 ways to have 
 * Install it on your local machine with:
   * [Minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/)
   * [K3S](https://k3s.io/)
+  * [Docker Desktop](https://www.docker.com/products/docker-desktop)
 
 **Note 1:** This setup is currently only tested on AWS EKS, OpenStack Magnum and Azure ASK however because of cloud agnostic approach of Kubernetes you should be able install this stack on any Kubernetes installation. Also the idea behind using `helm` and `helmfile` has been allowing more complex and customized setups without too much change in the original repository, so if current approach isn't working in your environment you can easily change components to your needs.
 
@@ -38,11 +39,9 @@ cd RADAR-Kubernetes
 cp environments.yaml.tmpl environments.yaml
 cp base.yaml production.yaml
 cp base.yaml.gotmpl production.yaml.gotmpl
-sops -e base.secrets.yaml > production.secrets.yaml
 vim environments.yaml # use the files you just created
 vim production.yaml  # Change setup parameters and configurations
 vim production.yaml.gotmpl  # Change setup parameters that require Go templating, such as reading input files
-sops production.secrets.yaml  # Change passwords and credentials
 ./bin/keystore-init
 helmfile sync --concurrency 1
 ```
