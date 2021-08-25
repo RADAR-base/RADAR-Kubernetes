@@ -244,9 +244,6 @@ spec:
         - name: config-original
           configMap:
             name: {{ include "radar-s3-connector.fullname" . }}
-        - name: config-init
-          configMap:
-            name: {{ include "radar-s3-connector.fullname" . }}-init
         - name: config-updated
           emptyDir: {}
       {{- with .Values.nodeSelector }}
