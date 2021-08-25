@@ -187,6 +187,7 @@ oauth_clients:
       - res_gateway
       - res_ManagementPortal
       - res_appconfig
+      - res_AppServer
     client_secret: ""
     scope:
       - MEASUREMENT.CREATE
