@@ -60,12 +60,6 @@ releases:
         values:
           - "https://dashboard.{{ .Values.server_name }}/login/generic_oauth"
 
-  - name: smtp
-    chart: ../charts/smtp
-    installed: {{ .Values.smtp._install }}
-    values:
-      - {{ .Values.smtp | toYaml | indent 8 | trim }}
-
   - name: app-config
     chart: ../charts/app-config
     installed: {{ .Values.app_config._install }}
