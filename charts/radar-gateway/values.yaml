@@ -10,7 +10,7 @@ image:
   repository: radarbase/radar-gateway
   # -- radar-gateway image tag (immutable tags are recommended)
   # Overrides the image tag whose default is the chart appVersion.
-  tag: 0.5.6
+  tag: 0.5.7
   # -- radar-gateway image pull policy
   pullPolicy: IfNotPresent
 
