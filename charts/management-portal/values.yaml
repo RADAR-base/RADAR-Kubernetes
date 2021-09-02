@@ -9,7 +9,7 @@ image:
   # -- Management Portal image repository
   repository: radarbase/management-portal
   # -- Management Portal image tag (immutable tags are recommended)
-  tag: 0.7.1
+  tag: 0.8.0
   # -- Management Portal image pull policy
   pullPolicy: IfNotPresent
 
@@ -315,6 +315,7 @@ oauth_clients:
       - SOURCETYPE.READ
       - SUBJECT.READ
       - SUBJECT.UPDATE
+      - SUBJECT.CREATE
     authorized_grant_types:
       - authorization_code
     access_token_validity: 900
