@@ -21,13 +21,19 @@ spec:
       labels:
         app.kubernetes.io/name: {{ include "catalog-server.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
-      annotations:      
+      annotations:
         backup.velero.io/backup-volumes: config
         checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         {{- if .Values.cc.enabled }}
         checksum/configmap-java-config: {{ include (print $.Template.BasePath "/configmap-java-config.yaml") . | sha256sum }}
         {{- end }}
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -46,6 +52,8 @@ spec:
               topologyKey: "kubernetes.io/hostname"
       initContainers:
       - name: kafka-init
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         args:
           - topic_init.sh
@@ -85,6 +93,8 @@ spec:
           {{- end }}
       containers:
         - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           args:
             - radar-catalog-server

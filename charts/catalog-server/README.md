@@ -4,7 +4,7 @@
 
 ![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.7.1](https://img.shields.io/badge/AppVersion-0.7.1-informational?style=flat-square)
 
-A Helm chart for RADAR-base catalogue server
+A Helm chart for RADAR-base catalogue server. This application creates RADAR-base topics in Kafka, registers schemas in Schema Registry and keeps a catalog of available source types.
 
 **Homepage:** <https://radar-base.org>
 
@@ -12,9 +12,9 @@ A Helm chart for RADAR-base catalogue server
 
 | Name | Email | Url |
 | ---- | ------ | --- |
-| Keyvan Hedayati | keyvan@thehyve.nl |  |
-| Joris Borgdorff | joris@thehyve.nl |  |
-| Nivethika Mahasivam | nivethika@thehyve.nl |  |
+| Keyvan Hedayati | keyvan@thehyve.nl | https://www.thehyve.nl |
+| Joris Borgdorff | joris@thehyve.nl | https://www.thehyve.nl/experts/joris-borgdorff |
+| Nivethika Mahasivam | nivethika@thehyve.nl | https://www.thehyve.nl/experts/nivethika-mahasivam |
 
 ## Source Code
 
@@ -34,15 +34,13 @@ A Helm chart for RADAR-base catalogue server
 | image.repository | string | `"radarbase/radar-schemas-tools"` | catalog-server image repository |
 | image.tag | string | `"0.7.1"` | catalog-server image tag (immutable tags are recommended) Overrides the image tag whose default is the chart appVersion. |
 | image.pullPolicy | string | `"IfNotPresent"` | catalog-server image pull policy |
-| nameOverride | string | `""` | String to partially override management-portal.fullname template with a string (will prepend the release name) |
-| fullnameOverride | string | `""` | String to fully override management-portal.fullname template with a string |
+| imagePullSecrets | list | `[]` | Docker registry secret names as an array |
+| nameOverride | string | `""` | String to partially override catalog-server.fullname template with a string (will prepend the release name) |
+| fullnameOverride | string | `""` | String to fully override catalog-server.fullname template with a string |
+| podSecurityContext | object | `{}` | Configure catalog-server pods' Security Context |
+| securityContext | object | `{}` | Configure Appconfig containers' Security Context |
 | service.type | string | `"ClusterIP"` | Kubernetes Service type |
 | service.port | int | `9010` | catalog-server port |
-| ingress.enabled | bool | `false` | Enable ingress controller resource |
-| ingress.annotations | object | `{}` | Annotations to define default ingress class, certificate issuer |
-| ingress.hosts[0].host | string | `"chart-example.local"` |  |
-| ingress.hosts[0].paths | list | `[]` |  |
-| ingress.tls | list | `[]` |  |
 | resources.requests.cpu | string | `"100m"` |  |
 | resources.requests.memory | string | `"256Mi"` |  |
 | persistence.enabled | bool | `true` | Enable persistence using PVC |

@@ -21,11 +21,17 @@ spec:
       annotations:
         checksum/configmap-properties: {{ include (print $.Template.BasePath "/configmap-properties.yaml") . | sha256sum }}
         checksum/configmap-users: {{ include (print $.Template.BasePath "/configmap-users.yaml") . | sha256sum }}
-        backup.velero.io/backup-volumes: logs        
+        backup.velero.io/backup-volumes: logs
       labels:
         app.kubernetes.io/name: {{ include "radar-fitbit-connector.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -44,6 +50,8 @@ spec:
               topologyKey: "kubernetes.io/hostname"
       containers:
         - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:

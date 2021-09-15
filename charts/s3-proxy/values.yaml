@@ -14,23 +14,32 @@ image:
   # -- s3-proxy image pull policy
   pullPolicy: IfNotPresent
 
+# -- Docker registry secret names as an array
+imagePullSecrets: []
+
 # -- String to partially override s3-proxy.fullname template with a string (will prepend the release name)
 nameOverride: ""
 # -- String to fully override s3-proxy.fullname template with a string
+fullnameOverride: ""
+
+# -- Configure s3-proxy pods' Security Context
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# -- Configure s3-proxy containers' Security Context
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
 
 service:
   # -- Kubernetes Service type
   type: ClusterIP
   # -- s3-proxy port
   port: 80
-
-ingress:
-  # -- Enable ingress controller resource
-  enabled: false
-  # -- Annotations to define default ingress class, certificate issuer
-  annotations: {}
-  # -- Utilize TLS backend in ingress
-  tls: []
 
 resources:
   # We usually recommend not to specify default resources and to leave this as a conscious

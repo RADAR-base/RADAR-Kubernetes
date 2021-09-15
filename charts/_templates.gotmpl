@@ -6,9 +6,6 @@
 {{- end }}
 
 {{ define "common.prerequisiteswithpv" -}}
-## Prerequisites
-* Kubernetes 1.17+
-* Kubectl 1.17+
-* Helm 3.1.0+
+{{ template "common.prerequisites" . }}
 * PV provisioner support in the underlying infrastructure
 {{- end }}
