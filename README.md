@@ -34,7 +34,7 @@ The following tools should be installed in your local machine to install the RAD
 | [helm](https://github.com/helm/helm#install)| Helm Charts are used to package Kubernetes resources for each component|
 | [helmfile](https://github.com/roboll/helmfile#installation)| RADAR-Kubernetes uses helmfiles to deploy Helm charts.|
 | [helm-diff](https://github.com/databus23/helm-diff#install)| A dependency for Helmfile| 
-| [helm-secrets](https://github.com/zendesk/helm-secrets)| |
+| [helm-secrets](https://github.com/zendesk/helm-secrets)| A dependency of Helmfile for securely managing secrets|
 
 **Once you have a working installation of a Kubernetes cluster, please [configure Kubectl with the appropriate Kubeconfig](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#verify-kubectl-configuration) to enable Kubectl to find and access your cluster. Then proceed to the installation section.** 
 
@@ -47,6 +47,7 @@ It will download the dependent helm charts from Confluent platform for component
     ```shell
     git clone --recurse-submodules https://github.com/RADAR-base/RADAR-Kubernetes.git
     ```
+ 
 2. Create basic config files using template files.
     ```shell script
     cd RADAR-Kubernetes
@@ -54,6 +55,10 @@ It will download the dependent helm charts from Confluent platform for component
     cp base.yaml production.yaml
     cp base.yaml.gotmpl production.yaml.gotmpl
     ```
+   
+     It is recommended make a private clone of this repository, if you want to version control your configurations and/or share with other people. 
+      
+     The best practise to share your platform configurations is by **sharing the encrypted version of `production.yaml`**.  
 
 ### Configure
 
@@ -89,17 +94,27 @@ It will download the dependent helm charts from Confluent platform for component
     ./bin/keystore-init
     ```
 ### Install
-Finally you can start installing the RADAR-Base stack. Having `--concurrency 1` will make installation slower but it is necessary because some components such as `kube-prometheus-stack` and `kafka-init` (aka `catalog-server`) should be installed in their specified order. If you've forgotten to use this flag the installation might not be successful and you should follow [Uninstallation](#uninstall) steps to clean up the Kubernetes cluster before you can try again.
+Once you are done with all configurations, the RADAR-Kubernetes can be deployed on a Kubernetes cluster. 
+
+#### Install RADAR-Kubernetes on your cluster. 
+
 ```shell
 helmfile sync --concurrency 1
 ```
-Depending on you cluster this will take a few minutes to run. During the installation you can monitor the process more closely by running `kubectl get pods` and checking if new pods successfully enter Running status and are fully Ready or not.
 
-If an application doesn't become fully ready installation will fail and you need to figure out the issue. In order to do this you can use `kubectl describe pods <podname>` and `kubcetl logs <podname>` to even more closely inspect pods status and health during the installation, fore some components such as aforementioned `kube-prometheus-stack` and `kafka-init` you might need to remove everything before trying again but for most other components you can just run installation command again.
+The `helmfile sync` will synchronize all the Kubernetes resources defined in the helmfiles with your Kubernetes cluster. Having `--concurrency 1` will make sure components are installed in required order. Depending on your cluster specification, this may take a few minutes when installed for the first time. 
 
-#### Verify
-After installation you can check cluster status with `kubectl get pods` command and if it has been successful you should see an output similar to this:
+| :exclamation:  Note|
+|:----------------------------------------|
+| Installing the stack with `--concurrency 1` may make the installation slower. However, it is necessary because some components such as `kube-prometheus-stack` and `kafka-init` (aka `catalog-server`) should be installed in their specified order. If you've forgotten to use this flag, then the installation may not be successful. To continue, follow [Uninstallation](#uninstall) steps to clean up the Kubernetes cluster before you can try again.
+
+#### Monitor and verify the installation process.
+Once the installation is done or in progress, you can check the status using `kubectl get pods`.
+
+If the installation has been successful, you should see an output similar to the list below.
+
 ```
+➜ kubectl get pods
 NAME                                             READY   STATUS    RESTARTS   AGE
 catalog-server-5c6767cbd8-dc6wc                  1/1     Running   0          8m21s
 cp-kafka-0                                       2/2     Running   0          8m21s
@@ -188,19 +203,47 @@ cert-manager-cainjector-75b6bc7b8b-dv2js   1/1     Running   0          8m21s
 cert-manager-webhook-8444c4bc77-jhzgb      1/1     Running   0          8m21s
 ```
 
+Other ways to ensure that installation have been successful is to check application logs for errors and exceptions. 
 
-If you have enabled monitoring you should also check Prometheus to see if there are any alerts firing. In next section there is a guide on how to connect to Prometheus.
-
-Other ways to ensure that installation have been successful is to check application logs for errors and exceptions. Also to check Kafka and make sure it's functional and RADAR-Base topics are loaded in:
+#### Ensure Kafka cluster is functional and RADAR-base topics are loaded
 
 ```bash
 ➜  kubectl exec -it cp-kafka-0 -c cp-kafka-broker -- kafka-topics --zookeeper cp-zookeeper-headless:2181 --list | wc -l
 273
 ```
-Number of topics can be more or less than this number depending on components that you have activated.
+This output means there are 273 topics loaded in the Kafka cluster.
+In your setup, the number of topics can be more or less, depending on components that you have activated.
 
-## Usage
-### Accessing the applications
+#### Troubleshoot
+If an application doesn't become fully ready installation will not be successful. In this case, you should investigate the root cause by investigating the relevant component. 
+
+Some useful commands for troubleshooting a component is mentioned below.
+
+1. Describe a pod to understand current status
+```shell script
+kubectl describe pods <podname>
+```
+2. Investigate the logs of the pod
+```shell script
+kubcetl logs <podname>
+```
+To check last few lines
+```shell script
+kubcetl logs --tail 100 <podname>
+```
+To continue monitoring the logs
+```shell script
+kubcetl logs -f <podname>
+```
+For more information on how `kubectl` can be used to manage a Kubernetes application, please visit [Kubectl documentation](https://kubernetes.io/docs/reference/kubectl/cheatsheet/). 
+| :exclamation: Note |
+|--------------------|
+| For most of the components, you can reinstall them without additional actions. However, for some components such as `kube-prometheus-stack` and `kafka-init`, you may need to remove everything before trying again.|
+ 
+If you have enabled monitoring you should also check **Prometheus** to see if there are any alerts. In next section there is a guide on how to connect to Prometheus.
+
+### Usage
+#### Accessing the applications
 In order to access to the applications first you need to find the IP address that Nginx service is listening to and then point the domain that you've specified in `server_name` variable to this IP address via a DNS server (e.g. [Route53](https://aws.amazon.com/route53/), [Cloudflare](https://www.cloudflare.com/dns/), [Bind](https://www.isc.org/bind/)) or [`hosts` file](https://en.wikipedia.org/wiki/Hosts_(file)) in your local machine.
 > For this guide we assume that you've set `server_name` to "k8s.radar-base.org" and SSL is enabled.
 
@@ -214,7 +257,7 @@ nginx-ingress-controller   LoadBalancer   10.100.237.75   XXXX.eu-central-1.elb.
 * If you're not using a cloud provider you need to use a load balancer to expose `31046` and `30932` ports (will be different in your setup) to a IP address and then point `k8s.radar-base.org` domain to that IP address.
 * For development and testing purposes you can run `sudo kubectl port-forward svc/nginx-ingress-controller 80:80 443:443` which will forward Nginx service ports to your local machine and you can have access to applications after adding `127.0.0.1       k8s.radar-base.org` to your `hosts` file.
 
-**Note:** If you've enabled monitoring or loggingyou should point `*.server_name` domain to the same address as `server_name`.
+**Note:** If you've enabled monitoring or logging, you should point `*.server_name` domain to the same address as `server_name`.
 
 Now depending on your setup you should have access to following URLs:
 ```
@@ -231,7 +274,7 @@ https://grafana.k8s.radar-base.org
 
 **Note:** If you have enabled the SSL you might see invalid certificate error when you try to access to the websites, in this case wait a couple of minutes until `cert-manager` issues those certificates.
 
-## Volume expansion
+### Volume expansion
 
 If want to resize a volumes after its initialization you need to make sure that it's supported by its underlying volume plugin:
 https://kubernetes.io/docs/concepts/storage/persistent-volumes/#expanding-persistent-volumes-claims
@@ -239,12 +282,12 @@ https://kubernetes.io/docs/concepts/storage/persistent-volumes/#expanding-persis
 If it's supported then it should be an easy process like this:
 https://www.jeffgeerling.com/blog/2019/expanding-k8s-pvs-eks-on-aws
 
-## Uninstall
+### Uninstall
 If you want to remove the Radar-base from your cluster you and use following command to delete the applications from cluster:
 ```
 helmfile destroy
 ```
-After there might still be some configuration lingering inside the cluster, you can use following commands to purge them as well.
+Some configurations can still linger inside the cluster. Try using following commands to purge them as well.
 ```
 kubectl delete crd prometheuses.monitoring.coreos.com prometheusrules.monitoring.coreos.com servicemonitors.monitoring.coreos.com alertmanagers.monitoring.coreos.com podmonitors.monitoring.coreos.com alertmanagerconfigs.monitoring.coreos.com probes.monitoring.coreos.com thanosrulers.monitoring.coreos.com
 kubectl delete psp kube-prometheus-stack-alertmanager kube-prometheus-stack-grafana kube-prometheus-stack-grafana-test kube-prometheus-stack-kube-state-metrics kube-prometheus-stack-operator kube-prometheus-stack-prometheus kube-prometheus-stack-prometheus-node-exporter
@@ -260,3 +303,7 @@ kubectl -n monitoring delete secrets radar-base-tls
 kubectl delete crd cephblockpools.ceph.rook.io  cephclients.ceph.rook.io cephclusters.ceph.rook.io cephfilesystems.ceph.rook.io cephnfses.ceph.rook.io cephobjectstores.ceph.rook.io cephobjectstoreusers.ceph.rook.io volumes.rook.io
 kubectl delete psp 00-rook-ceph-operator
 ```
+
+## Feedback and Contributions
+Enabling RADAR-base community to use RADAR-Kubernetes is important for us. If you have troubles setting up the platform using provided instructions, you can create an issue with exact details to reproduce and the expected behaviour.
+You can also reach out to the RADAR-base community via [RADAR-base Slack](https://join.slack.com/t/radardevelopment/shared_invite/zt-8ati1ag6-GZgSKFaZmr9DjKxHpqOshA) on **radar-kubernetes channel**. The RADAR-base developers support the community on a voluntary basis and will pick up your requests as time permits. 
