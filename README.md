@@ -242,8 +242,8 @@ For more information on how `kubectl` can be used to manage a Kubernetes applica
  
 If you have enabled monitoring you should also check **Prometheus** to see if there are any alerts. In next section there is a guide on how to connect to Prometheus.
 
-### Usage
-#### Accessing the applications
+## Usage
+### Accessing the applications
 In order to access to the applications first you need to find the IP address that Nginx service is listening to and then point the domain that you've specified in `server_name` variable to this IP address via a DNS server (e.g. [Route53](https://aws.amazon.com/route53/), [Cloudflare](https://www.cloudflare.com/dns/), [Bind](https://www.isc.org/bind/)) or [`hosts` file](https://en.wikipedia.org/wiki/Hosts_(file)) in your local machine.
 > For this guide we assume that you've set `server_name` to "k8s.radar-base.org" and SSL is enabled.
 
@@ -274,7 +274,7 @@ https://grafana.k8s.radar-base.org
 
 **Note:** If you have enabled the SSL you might see invalid certificate error when you try to access to the websites, in this case wait a couple of minutes until `cert-manager` issues those certificates.
 
-### Volume expansion
+## Volume expansion
 
 If want to resize a volumes after its initialization you need to make sure that it's supported by its underlying volume plugin:
 https://kubernetes.io/docs/concepts/storage/persistent-volumes/#expanding-persistent-volumes-claims
@@ -282,7 +282,7 @@ https://kubernetes.io/docs/concepts/storage/persistent-volumes/#expanding-persis
 If it's supported then it should be an easy process like this:
 https://www.jeffgeerling.com/blog/2019/expanding-k8s-pvs-eks-on-aws
 
-### Uninstall
+## Uninstall
 If you want to remove the Radar-base from your cluster you and use following command to delete the applications from cluster:
 ```
 helmfile destroy
