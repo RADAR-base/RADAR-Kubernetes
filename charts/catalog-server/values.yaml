@@ -14,33 +14,32 @@ image:
   # -- catalog-server image pull policy
   pullPolicy: IfNotPresent
 
-# -- String to partially override management-portal.fullname template with a string (will prepend the release name)
+# -- Docker registry secret names as an array
+imagePullSecrets: []
+
+# -- String to partially override catalog-server.fullname template with a string (will prepend the release name)
 nameOverride: ""
-# -- String to fully override management-portal.fullname template with a string
+# -- String to fully override catalog-server.fullname template with a string
 fullnameOverride: ""
+
+# -- Configure catalog-server pods' Security Context
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# -- Configure Appconfig containers' Security Context
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
 
 service:
   # -- Kubernetes Service type
   type: ClusterIP
   # -- catalog-server port
   port: 9010
-
-ingress:
-  # -- Enable ingress controller resource
-  enabled: false
-  # -- Annotations to define default ingress class, certificate issuer
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  # -- Hosts to listen to incoming requests
-  hosts:
-    - host: chart-example.local
-      paths: []
-
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
 
 resources:
   # We usually recommend not to specify default resources and to leave this as a conscious

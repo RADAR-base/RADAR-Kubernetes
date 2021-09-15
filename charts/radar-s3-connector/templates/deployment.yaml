@@ -22,6 +22,12 @@ spec:
         app.kubernetes.io/name: {{ include "radar-s3-connector.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -40,6 +46,8 @@ spec:
               topologyKey: "kubernetes.io/hostname"
       containers:
         - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
@@ -196,7 +204,7 @@ spec:
             exec:
               command:
               - /bin/sh
-              - /etc/kafka-connect/sink-s3/healthcheck.sh
+              - /etc/kafka-connect/sink-s3/original/healthcheck.sh
             initialDelaySeconds: 40
             periodSeconds: 60
             timeoutSeconds: 10
@@ -206,7 +214,7 @@ spec:
             exec:
               command:
               - /bin/sh
-              - /etc/kafka-connect/sink-s3/healthcheck.sh
+              - /etc/kafka-connect/sink-s3/original/healthcheck.sh
             initialDelaySeconds: 40
             periodSeconds: 60
             timeoutSeconds: 10
@@ -215,12 +223,29 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-            - name: config
+            - name: config-original
+              mountPath: /etc/kafka-connect/sink-s3/original
+            - name: config-updated
+              mountPath: /etc/kafka-connect/sink-s3
+      initContainers:
+        - name: init-topics
+          image: alpine:latest
+          args:
+            - /bin/sh
+            - /etc/kafka-connect/sink-s3/original/add-topics-to-config.sh
+            - /etc/kafka-connect/sink-s3/original/sink-s3.properties
+            - /etc/kafka-connect/sink-s3/sink-s3.properties
+          volumeMounts:
+            - name: config-original
+              mountPath: /etc/kafka-connect/sink-s3/original
+            - name: config-updated
               mountPath: /etc/kafka-connect/sink-s3
       volumes:
-        - name: config
+        - name: config-original
           configMap:
             name: {{ include "radar-s3-connector.fullname" . }}
+        - name: config-updated
+          emptyDir: {}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

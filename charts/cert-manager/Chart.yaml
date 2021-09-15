@@ -1,5 +1,20 @@
 apiVersion: v1
 appVersion: "1.0"
-description: A Helm chart for Kubernetes
+description: A Helm chart for cert-manager. This chart is an overly just to make sure `clusterissuer.yaml` is installed with the cluster and some default values. For more info refer to the cert-manager docs.
 name: cert-manager
 version: 0.1.0
+engine: gotpl
+sources: ["https://github.com/jetstack/cert-manager"]
+deprecated: false
+type: application
+home: "https://cert-manager.io"
+maintainers:
+  - email: keyvan@thehyve.nl
+    name: Keyvan Hedayati
+    url: https://www.thehyve.nl
+  - email: joris@thehyve.nl
+    name: Joris Borgdorff
+    url: https://www.thehyve.nl/experts/joris-borgdorff
+  - email: nivethika@thehyve.nl
+    name: Nivethika Mahasivam
+    url: https://www.thehyve.nl/experts/nivethika-mahasivam

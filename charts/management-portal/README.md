@@ -2,9 +2,9 @@
 
 # management-portal
 
-![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.6.4](https://img.shields.io/badge/AppVersion-0.6.4-informational?style=flat-square)
+![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.7.0](https://img.shields.io/badge/AppVersion-0.7.0-informational?style=flat-square)
 
-A Helm chart for RADAR-Base Management Portal
+A Helm chart for RADAR-Base Management Portal to manage projects and participants throughout RADAR-base.
 
 **Homepage:** <https://radar-base.org>
 
@@ -12,9 +12,9 @@ A Helm chart for RADAR-Base Management Portal
 
 | Name | Email | Url |
 | ---- | ------ | --- |
-| Keyvan Hedayati | keyvan@thehyve.nl |  |
-| Joris Borgdorff | joris@thehyve.nl |  |
-| Nivethika Mahasivam | nivethika@thehyve.nl |  |
+| Keyvan Hedayati | keyvan@thehyve.nl | https://www.thehyve.nl |
+| Joris Borgdorff | joris@thehyve.nl | https://www.thehyve.nl/experts/joris-borgdorff |
+| Nivethika Mahasivam | nivethika@thehyve.nl | https://www.thehyve.nl/experts/nivethika-mahasivam |
 
 ## Source Code
 
@@ -33,8 +33,11 @@ A Helm chart for RADAR-Base Management Portal
 | image.repository | string | `"radarbase/management-portal"` | Management Portal image repository |
 | image.tag | string | `"0.7.0"` | Management Portal image tag (immutable tags are recommended) |
 | image.pullPolicy | string | `"IfNotPresent"` | Management Portal image pull policy |
+| imagePullSecrets | list | `[]` | Docker registry secret names as an array |
 | nameOverride | string | `""` | String to partially override management-portal.fullname template with a string (will prepend the release name) |
 | fullnameOverride | string | `""` | String to fully override management-portal.fullname template with a string |
+| podSecurityContext | object | `{}` | Configure management-portal pods' Security Context |
+| securityContext | object | `{}` | Configure management-portal containers' Security Context |
 | service.type | string | `"ClusterIP"` | Kubernetes Service type |
 | service.port | int | `8080` | Management Portal port |
 | ingress.enabled | bool | `true` | Enable ingress controller resource |
@@ -47,6 +50,7 @@ A Helm chart for RADAR-Base Management Portal
 | nodeSelector | object | `{}` | Node labels for pod assignment |
 | tolerations | list | `[]` | Toleration labels for pod assignment |
 | affinity | object | `{}` | Affinity labels for pod assignment |
+| keystore | string | `""` | base 64 encoded binary p12 keystore containing a ECDSA certificate with alias `radarbase-managementportal-ec` and a RSA certificate with alias `selfsigned`. |
 | postgres.host | string | `"postgresql"` | host name of the postgres db |
 | postgres.port | int | `5432` | post of the postgres db |
 | postgres.database | string | `"managementportal"` | database name |
@@ -61,7 +65,7 @@ A Helm chart for RADAR-Base Management Portal
 | managementportal.common_privacy_policy_url | string | `"http://info.thehyve.nl/radar-cns-privacy-policy"` | Override with a publicly resolvable url of the privacy-policy url for your set-up. This can be overridden on a project basis as well. |
 | managementportal.oauth_checking_key_aliases_0 | string | `"radarbase-managementportal-ec"` | Keystore alias to sign JWT tokens from Management Portal |
 | managementportal.oauth_checking_key_aliases_1 | string | `"selfsigned"` | Keystore alias to sign JWT tokens from Management Portal |
-| managementportal.frontend_client_secret | string | `"xxx"` | OAuth Client secret of the Management Portal frontend application |
+| managementportal.frontend_client_secret | string | `"xxx"` | OAuth2 Client secret of the Management Portal frontend application |
 | managementportal.common_admin_password | string | `"xxx"` | Admin password of the default admin user created by the system |
 | smtp.enabled | bool | `false` | set to true, if SMTP server should be enabled. Required to be true for production setup |
 | smtp.host | string | `"smtp"` | Hostname of the SMTP server |
@@ -71,12 +75,13 @@ A Helm chart for RADAR-Base Management Portal
 | smtp.from | string | `"noreply@example.com"` | Email address which should be used to send activation emails |
 | smtp.starttls | bool | `false` | set to true,if ttls should be enabled |
 | smtp.auth | bool | `true` | set to true, if the account should be authenticated before sending emails |
-| oauth_clients | object | check values.yaml | Oauth Client configuration |
+| oauth_clients | object | check values.yaml | OAuth2 Client configuration |
 
 ## OAuth Client Configuration
 List of OAuth client configurations supported by RADAR-base. Each client should be enabled separately, if relevant and used in the installation.
 Each client configuration has the following setup:
-```
+
+```yaml
 <client_id>: # client id
   enabled: false # set to true, if it should be enabled. Default is false.
   resource_ids: # list of resources that can be accessed by this client.
@@ -88,4 +93,20 @@ Each client configuration has the following setup:
   additional_information: # A JSON string containing additional meta-data of this client. e.g. {"dynamic_registration": true} should be set for clients which can automatically register a data source for a subject
   redirect_uri: # Redirect URL for clients which have authorization_code grant-type enabled.
   autoapprove: # List of permissions that can auto-approved when authorization-code flow succeeds.
+```
+
+## OAuth 2.0 key store
+
+ManagementPortal needs a certificate and private key to sign OAuth 2.0 Json Web Tokens (JWT's). The keystore needs to be a P12 file including an ECDSA certificate with alias `radarbase-managementportal-ec` and an RSA certificate with alias `selfsigned`. The script `bin/keystore-init` is included to generate this for you. It requires Java to be installed.
+
+Once a valid keystore file is available, its contents should be passed as a base 64 encoded value in the `keystore` value. When using helmfile, this can be achieved by setting
+
+```yaml
+management_portal:
+  keystore: {{ readFile "etc/keystore.p12" | b64enc | quote }}
+```
+in `production.yaml.gotmpl`. If SOPS is used for secrets management, write the following instead:
+```yaml
+management_portal:
+  keystore: {{ exec "sops" (list "-d" "etc/keystore.p12.enc") | b64enc | quote }}
 ```

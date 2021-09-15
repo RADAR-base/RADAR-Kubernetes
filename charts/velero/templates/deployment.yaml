@@ -16,8 +16,16 @@ spec:
         app.kubernetes.io/name: {{ include "velero.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: intermediate
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.mc_image.repository }}:{{ .Values.mc_image.tag }}"
           env:
           - name: MC_HOST_local
@@ -33,6 +41,8 @@ spec:
             - local/{{ .Values.local.intermediateBucketName }}
             - backup/{{ .Values.backup.intermediateBucketName }}
         - name: output
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.mc_image.repository }}:{{ .Values.mc_image.tag }}"
           env:
           - name: MC_HOST_local

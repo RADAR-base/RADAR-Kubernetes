@@ -18,6 +18,12 @@ spec:
         app.kubernetes.io/name: {{ include "radar-jdbc-connector.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -36,6 +42,8 @@ spec:
               topologyKey: "kubernetes.io/hostname"
       containers:
         - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
@@ -88,7 +96,7 @@ spec:
           - name: CONNECTOR_PROPERTY_FILE_PREFIX
             value: "sink-timescale/sink-timescale"
           - name: KAFKA_HEAP_OPTS
-            value: "-Xms1500m"            
+            value: "-Xms1500m"
           ports:
             - name: http
               containerPort: 8083
