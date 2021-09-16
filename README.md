@@ -306,4 +306,4 @@ kubectl delete psp 00-rook-ceph-operator
 
 ## Feedback and Contributions
 Enabling RADAR-base community to use RADAR-Kubernetes is important for us. If you have troubles setting up the platform using provided instructions, you can create an issue with exact details to reproduce and the expected behaviour.
-You can also reach out to the RADAR-base community via [RADAR-base Slack](https://join.slack.com/t/radardevelopment/shared_invite/zt-8ati1ag6-GZgSKFaZmr9DjKxHpqOshA) on **radar-kubernetes channel**. The RADAR-base developers support the community on a voluntary basis and will pick up your requests as time permits. 
+You can also reach out to the RADAR-base community via RADAR-base Slack on **[radar-kubernetes channel](https://radardevelopment.slack.com/archives/C021AGGESC9)**. The RADAR-base developers support the community on a voluntary basis and will pick up your requests as time permits. 
