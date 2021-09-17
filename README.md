@@ -225,15 +225,15 @@ kubectl describe pods <podname>
 ```
 2. Investigate the logs of the pod
 ```shell script
-kubcetl logs <podname>
+kubectl logs <podname>
 ```
 To check last few lines
 ```shell script
-kubcetl logs --tail 100 <podname>
+kubectl logs --tail 100 <podname>
 ```
 To continue monitoring the logs
 ```shell script
-kubcetl logs -f <podname>
+kubectl logs -f <podname>
 ```
 For more information on how `kubectl` can be used to manage a Kubernetes application, please visit [Kubectl documentation](https://kubernetes.io/docs/reference/kubectl/cheatsheet/). 
 | :exclamation: Note |
