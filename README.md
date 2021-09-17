@@ -1,4 +1,4 @@
-# RADAR-Kubernetes [![Build Status](https://travis-ci.org/RADAR-base/RADAR-Kubernetes.svg?branch=master](https://travis-ci.org/RADAR-base/RADAR-Kubernetes)
+# RADAR-Kubernetes [![Build Status](https://travis-ci.org/RADAR-base/RADAR-Kubernetes.svg?branch=master)](https://travis-ci.org/RADAR-base/RADAR-Kubernetes)
 The Kubernetes stack of RADAR-base platform
 
 ## About
@@ -225,15 +225,15 @@ kubectl describe pods <podname>
 ```
 2. Investigate the logs of the pod
 ```shell script
-kubcetl logs <podname>
+kubectl logs <podname>
 ```
 To check last few lines
 ```shell script
-kubcetl logs --tail 100 <podname>
+kubectl logs --tail 100 <podname>
 ```
 To continue monitoring the logs
 ```shell script
-kubcetl logs -f <podname>
+kubectl logs -f <podname>
 ```
 For more information on how `kubectl` can be used to manage a Kubernetes application, please visit [Kubectl documentation](https://kubernetes.io/docs/reference/kubectl/cheatsheet/). 
 | :exclamation: Note |
@@ -283,7 +283,7 @@ If it's supported then it should be an easy process like this:
 https://www.jeffgeerling.com/blog/2019/expanding-k8s-pvs-eks-on-aws
 
 ## Uninstall
-If you want to remove the Radar-base from your cluster you and use following command to delete the applications from cluster:
+If you want to remove the RADAR-base from your cluster you and use following command to delete the applications from cluster:
 ```
 helmfile destroy
 ```
