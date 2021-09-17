@@ -1,4 +1,4 @@
-# RADAR-Kubernetes [![Build Status](https://travis-ci.org/RADAR-base/RADAR-Kubernetes.svg?branch=master](https://travis-ci.org/RADAR-base/RADAR-Kubernetes)
+# RADAR-Kubernetes [![Build Status](https://travis-ci.org/RADAR-base/RADAR-Kubernetes.svg?branch=master)](https://travis-ci.org/RADAR-base/RADAR-Kubernetes)
 The Kubernetes stack of RADAR-base platform
 
 ## About
