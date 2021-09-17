@@ -283,7 +283,7 @@ If it's supported then it should be an easy process like this:
 https://www.jeffgeerling.com/blog/2019/expanding-k8s-pvs-eks-on-aws
 
 ## Uninstall
-If you want to remove the Radar-base from your cluster you and use following command to delete the applications from cluster:
+If you want to remove the RADAR-base from your cluster you and use following command to delete the applications from cluster:
 ```
 helmfile destroy
 ```
