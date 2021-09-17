@@ -2,33 +2,44 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-replicaCount: 2
+# -- Number of radar-fitbit-connector replicas to deploy
+replicaCount: 1
 
 image:
+  # -- radar-fitbit-connector image repository
   repository: radarbase/kafka-connect-rest-fitbit-source
-  tag: 0.3.1
+  # -- radar-fitbit-connector image tag (immutable tags are recommended)
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: 0.3.3
+  # -- radar-fitbit-connector image pull policy
   pullPolicy: IfNotPresent
 
+# -- Docker registry secret names as an array
+imagePullSecrets: []
+
+# -- String to partially override radar-fitbit-connector.fullname template with a string (will prepend the release name)
 nameOverride: ""
+# -- String to fully override radar-fitbit-connector.fullname template with a string
 fullnameOverride: ""
 
+# -- Configure radar-fitbit-connector pods' Security Context
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# -- Configure radar-fitbit-connector containers' Security Context
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
 service:
+  # -- Kubernetes Service type
   type: ClusterIP
+  # -- radar-fitbit-connector port
   port: 8083
-
-ingress:
-  enabled: false
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: chart-example.local
-      paths: []
-
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
 
 resources:
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -38,11 +49,14 @@ resources:
   # limits:
   #   cpu: 100m
   #   memory: 128Mi
+
+  # -- CPU/Memory resource requests
   requests:
     cpu: 100m
     memory: 1Gi
 
 persistence:
+  # -- Enable persistence using PVC
   enabled: true
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -55,25 +69,44 @@ persistence:
   ## If you want to reuse an existing claim, you can pass the name of the PVC using
   ## the existingClaim variable
   # existingClaim: your-claim
+
+  # -- PVC Access Mode for radar-fitbit-connector volume
   accessMode: ReadWriteOnce
+  # -- PVC Storage Request for radar-fitbit-connector volume
   size: 5Gi
 
+# -- Node labels for pod assignment
 nodeSelector: {}
 
+# -- Toleration labels for pod assignment
 tolerations: []
 
+# -- Affinity labels for pod assignment
 affinity: {}
 
+# -- URI of Zookeeper instances of the cluster
 zookeeper: cp-zookeeper-headless:2181
+# -- URI of Kafka brokers of the cluster
 kafka: PLAINTEXT://cp-kafka-headless:9092
+# -- Number of Kafka brokers. This is used to validate the cluster availability at connector init.
 kafka_num_brokers: "3"
+# -- URL of the Kafka schema registry
 schema_registry: http://cp-schema-registry:8081
 
-radar_rest_sources_backend: radar-rest-sources-backend
+# -- Base URL of the rest-sources-authorizer-backend service
+radar_rest_sources_backend_url: http://radar-rest-sources-backend:8080/rest-sources/backend/
+# -- Number of connector tasks to be used in connector.properties
+connector_num_tasks: "5"
+# -- Fitbit API client id.
 fitbit_api_client: ""
+# -- Fitbit API client secret.
 fitbit_api_secret: ""
 
+# -- OAuth2 client id from Management Portal
 oauthClientId: radar_fitbit_connector
+# -- OAuth2 client secret from Management Portal
 oauthClientSecret: secret
+# -- Hostname of Management Portal. This will be used to create URLs to access Management Portal
 managementportal_host: management-portal
+# -- Set to true, if intraday access data should be collected by the connector. This will be set in connector.properties.
 includeIntradayData: true

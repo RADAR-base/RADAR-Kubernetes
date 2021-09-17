@@ -4,27 +4,29 @@ bases:
 ---
 
 repositories:
-- name: stable
-  url: https://charts.helm.sh/stable
 - name: elastic
   url: https://helm.elastic.co
 - name: jetstack
   url: https://charts.jetstack.io
 - name: prometheus-community
   url: https://prometheus-community.github.io/helm-charts
-
+- name: bitnami
+  url: https://charts.bitnami.com/bitnami
+- name: kongz
+  url: https://charts.kong-z.com
+- name: fluent
+  url: https://fluent.github.io/helm-charts
+- name: ingress-nginx
+  url: https://kubernetes.github.io/ingress-nginx
 
 helmDefaults:
-  atomic: true
-  # force: true
-  timeout: 600
   kubeContext: {{ .Values.kubeContext }}
 
 releases:
   - name: mongodb
     namespace: graylog
-    chart: stable/mongodb-replicaset
-    version: 3.11.5
+    chart: bitnami/mongodb
+    version: 10.11.1
     installed: {{ .Values.mongodb._install }}
     values:
       - "../etc/mongodb/values.yaml"
@@ -33,18 +35,16 @@ releases:
   - name: elasticsearch
     namespace: graylog
     chart: elastic/elasticsearch
-    version: 7.6.0
+    version: 7.12.0
     installed: {{ .Values.elasticsearch._install }}
-    set:
-      - name: imageTag
-        value: "6.8.6"
-      - name: resources.requests.memory
-        value: "1.5Gi"
+    values:
+      - "../etc/elasticsearch/values.yaml"
+      - {{ .Values.elasticsearch | toYaml | indent 8 | trim }}
 
   - name: graylog
     namespace: graylog
-    chart: stable/graylog
-    version: 1.5.6
+    chart: kongz/graylog
+    version: 1.7.9
     installed: {{ .Values.graylog._install }}
     values:
       - "../etc/graylog/values.yaml"
@@ -59,12 +59,14 @@ releases:
       - name: graylog.ingress.tls[0].hosts
         values: ["graylog.{{ .Values.server_name }}"]
 
-  - name: fluentd
+  - name: fluent-bit
     namespace: graylog
-    chart: ../charts/fluentd
-    installed: {{ .Values.fluentd._install }}
+    chart: fluent/fluent-bit
+    version: 0.15.4
+    installed: {{ .Values.fluent_bit._install }}
     values:
-      - {{ .Values.fluentd | toYaml | indent 8 | trim }}
+      - "../etc/fluent-bit/values.yaml"
+      - {{ .Values.fluent_bit | toYaml | indent 8 | trim }}
 
   - name: cert-manager
     namespace: cert-manager
@@ -116,10 +118,11 @@ releases:
         values: ["grafana.{{ .Values.server_name }}"]
 
   - name: nginx-ingress
-    chart: stable/nginx-ingress
-    version: 1.40.2
+    chart: ingress-nginx/ingress-nginx
+    version: 3.25.0
     force: false
     installed: {{ .Values.nginx_ingress._install }}
+    disableValidation: true
     values:
       - "../etc/nginx-ingress/values.yaml"
       - {{ .Values.nginx_ingress | toYaml | indent 8 | trim }}

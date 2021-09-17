@@ -2,94 +2,138 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# -- Number of radar-output replicas to deploy
 replicaCount: 1
 
-image_output:
+image:
+  # -- radar-output image repository
   repository: radarbase/radar-output-restructure
-  tag: 1.1.6.1
+  # -- radar-output image tag (immutable tags are recommended)
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: 1.2.1
+  # -- radar-output image pull policy
   pullPolicy: IfNotPresent
 
+# -- Docker registry secret names as an array
 imagePullSecrets: []
+
+# -- String to partially override radar-output.fullname template with a string (will prepend the release name)
 nameOverride: ""
+# -- String to fully override radar-output.fullname template with a string
 fullnameOverride: ""
+
+# -- Configure radar-output pods' Security Context
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# -- Configure radar-output containers' Security Context
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
 
 resources:
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+
+  # -- CPU/Memory resource limits
   limits:
     cpu: 1000m
+  # -- CPU/Memory resource requests
   requests:
     cpu: 100m
     memory: 400Mi
 
+# -- Node labels for pod assignment
 nodeSelector: {}
 
+# -- Toleration labels for pod assignment
 tolerations: []
 
+# -- Affinity labels for pod assignment
 affinity: {}
 
-persistence:
-  enabled: false
-  ## If defined, storageClassName: <storageClass>
-  ## If set to "-", storageClassName: "", which disables dynamic provisioning
-  ## If undefined (the default) or set to null, no storageClassName spec is
-  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
-  ##   GKE, AWS & OpenStack)
-  ##
-  # storageClass: "-"
-  ##
-  ## If you want to reuse an existing claim, you can pass the name of the PVC using
-  ## the existingClaim variable
-  # existingClaim: your-claim
-  # accessMode: ReadWriteOnce
-  # size: 30Gi
-
 source:
+  # -- Type of the intermediate storage of the RADAR-base pipeline e.g. s3, hdfs
   type: s3
   s3:
+    # -- s3 endpoint of the intermediate storage
     endpoint: "http://minio:9000"
+    # -- s3 access-key of the intermediate storage
     accessToken: access_key
+    # -- s3 secret-key of the intermediate storage
     secretKey: secret
+    # -- s3 bucket name of the intermediate storage
     bucket: radar-intermediate-storage
   azure:
+    # -- Azure endpoint of the intermediate storage
     endpoint: ""
+    # -- Azure username to access the s3 endpoint when using personal login
     username: ""
+    # -- Azure password when using personal login
     password: ""
+    # -- Azure account name when using shared access tokens
     accountName: ""
+    # -- Azure account key when using shared access tokens
     accountKey: ""
+    # -- Azure SAS(shared access signature) token when using shared access tokens
     sasToken: ""
+    # -- Azure blob container name
     container: ""
 
 target:
+  # -- Type of the output storage of the RADAR-base pipeline e.g. s3, local
   type: s3
   s3:
+    # -- s3 endpoint of the output storage
     endpoint: "http://minio:9000"
+    # -- s3 access-key of the output storage
     accessToken: access_key
+    # -- s3 secret-key of the output storage
     secretKey: secret
+    # -- s3 bucket name of the output storage
     bucket: radar-output-storage
   azure:
+    # -- Azure endpoint of the output storage
     endpoint: ""
+    # -- Azure username to access the s3 endpoint when using personal login
     username: ""
+    # -- Azure password when using personal login
     password: ""
+    # -- Azure account name when using shared access tokens
     accountName: ""
+    # -- Azure account key when using shared access tokens
     accountKey: ""
+    # -- Azure SAS(shared access signature) token when using shared access tokens
     sasToken: ""
+    # -- Azure blob container name
     container: ""
 
 redis:
-  url: redis://redis-master:6379
+  # -- URL of the redis database
+  uri: redis://redis-master:6379
 
 worker:
+  # -- Minimum amount of time in seconds since a file was last modified for it to be considered for processing.
   minimumFileAge: 900
+  # -- Number of threads to do processing on
   numThreads: 2
 
 cleaner:
+  # -- Number of days after which a source file is considered old
   age: 7
 
 paths:
+  # -- Relative path to intermediate storage root to browse for data
   input: topics
+  # -- Relative path to output storage to write data
   output: output
+  # -- # Output path construction factory
   factory: org.radarbase.output.path.ObservationKeyPathFactory
+  # -- Additional properties. For details see https://github.com/RADAR-base/radar-output-restructure/blob/master/restructure.yml
   properties: {}

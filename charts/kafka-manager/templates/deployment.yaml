@@ -16,6 +16,10 @@ spec:
         app: {{ template "kafka-manager.name" . }}
         release: {{ .Release.Name }}
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ template "kafka-manager.serviceAccountName" . }}
       containers:
         - name: {{ .Chart.Name }}

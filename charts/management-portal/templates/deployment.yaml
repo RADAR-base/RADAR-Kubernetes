@@ -18,11 +18,18 @@ spec:
       annotations:
         checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         checksum/secrets: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
+        checksum/secrets-config: {{ include (print $.Template.BasePath "/secrets-config.yaml") . | sha256sum }}
         checksum/secrets-keystore: {{ include (print $.Template.BasePath "/secrets-keystore.yaml") . | sha256sum }}
       labels:
         app.kubernetes.io/name: {{ include "management-portal.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -41,6 +48,8 @@ spec:
               topologyKey: "kubernetes.io/hostname"
       containers:
         - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
@@ -62,7 +71,7 @@ spec:
           - name: SPRING_DATASOURCE_HIKARI_LEAK_DETECTION_THRESHOLD
             value: "30000"
           - name: MANAGEMENTPORTAL_MAIL_FROM
-            value: {{ .Values.from_email }}
+            value: {{ .Values.smtp.from }}
           - name: MANAGEMENTPORTAL_COMMON_BASEURL
             value: https://{{ .Values.server_name }}
           - name: MANAGEMENTPORTAL_COMMON_MANAGEMENT_PORTAL_BASE_URL
@@ -73,7 +82,7 @@ spec:
                 name: {{ template "management-portal.secretName" . }}
                 key: managementportal_frontend_client_secret
           - name: MANAGEMENTPORTAL_OAUTH_CLIENTS_FILE
-            value: /config/oauth_client_details.csv
+            value: /secrets/oauth_client_details.csv
           - name: MANAGEMENTPORTAL_CATALOGUE_SERVER_ENABLE_AUTO_IMPORT
             value: "{{ .Values.managementportal.catalogue_server_enable_auto_import }}"
           - name: MANAGEMENTPORTAL_CATALOGUE_SERVER_SERVER_URL
@@ -144,6 +153,8 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /config/
+            - name: secrets-config
+              mountPath: /secrets/
             - name: keystore
               mountPath: /mp-includes/config/
             {{- if .Values.postgres.ssl.enabled }}
@@ -154,6 +165,9 @@ spec:
         - name: config
           configMap:
             name: {{ include "management-portal.fullname" . }}
+        - name: secrets-config
+          secret:
+            secretName: {{ include "management-portal.fullname" . }}-config
         - name: keystore
           secret:
             secretName: {{ include "management-portal.fullname" . }}-keystore
