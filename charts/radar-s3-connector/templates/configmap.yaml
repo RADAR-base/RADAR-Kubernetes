@@ -11,14 +11,19 @@ data:
   sink-s3.properties: |
     name=radar-s3-sink-connector
     connector.class=io.confluent.connect.s3.S3SinkConnector
-    tasks.max={{ .Values.maxTasks }}
+    tasks.max={{ .Values.maxTasks | int }}
     topics={{ .Values.topics }}
     flush.size={{ .Values.flushSize | int }}
     s3.bucket.name={{ .Values.bucketName }}
+    {{- if .Values.s3Region }}
+    s3.region={{ .Values.s3Region }}
+    {{- end }}
     s3.part.size={{ .Values.s3PartSize | int }}
     s3.object.tagging={{ .Values.s3Tagging }}
     connect.meta.data=false
+    {{- if not .Values.s3Region }}
     store.url={{ .Values.s3Endpoint }}
+    {{- end }}
     storage.class=io.confluent.connect.s3.storage.S3Storage
     format.class=io.confluent.connect.s3.format.avro.AvroFormat
     transforms=combineKeyValue
@@ -41,3 +46,11 @@ data:
     elif [ $(echo "$STATUS" | grep RUNNING | wc -l) -le 1 ]; then
       exit 1
     fi
+  add-topics-to-config.sh: |
+    #!/bin/sh
+    SOURCE=$1
+    TARGET=$2
+    set -e
+    apk add --no-cache curl jq
+    TOPICS=$(curl -f {{ .Values.catalogServer.url }}/source-types | jq -r '[to_entries[] | select(.key|endswith("source-types")) | .value[].data[].topic] | unique | join(",")')
+    sed "s/^topics=.\+\$/\\0,$TOPICS/" "$SOURCE" | sed "s/^topics=\$/\\0$TOPICS/" > "$TARGET"

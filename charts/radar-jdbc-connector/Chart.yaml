@@ -1,4 +1,22 @@
 apiVersion: v2
 name: radar-jdbc-connector
-description: A Helm chart for Kubernetes
-version: 0.1.0
+description: A Helm chart for RADAR-base JDBC Kafka connector. This is a fork of the Kafka JDBC connector which allows data from topics to be imported into JDBC databases (including TimescaleDB databases which is used in the dashboard pipeline).
+version: 0.1.1
+engine: gotpl
+sources: ["https://github.com/RADAR-base/RADAR-JDBC-Connector"]
+deprecated: false
+type: application
+home: "https://radar-base.org"
+maintainers:
+  - email: pauline.conde@kcl.ac.uk
+    name: Pauline Conde
+    url: https://www.kcl.ac.uk/people/pauline-conde
+  - email: keyvan@thehyve.nl
+    name: Keyvan Hedayati
+    url: https://www.thehyve.nl
+  - email: joris@thehyve.nl
+    name: Joris Borgdorff
+    url: https://www.thehyve.nl/experts/joris-borgdorff
+  - email: nivethika@thehyve.nl
+    name: Nivethika Mahasivam
+    url: https://www.thehyve.nl/experts/nivethika-mahasivam

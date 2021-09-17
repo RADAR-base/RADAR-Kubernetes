@@ -1,27 +1,21 @@
 controller:
-  # hostNetwork: "true"
-  # dnsPolicy: "ClusterFirstWithHostNet"
   config:
     ssl-redirect: "true"
     server-tokens: "false"
     http-snippet:
       limit_req_zone $binary_remote_addr zone=login_limit:10m rate=2r/s;
-  metrics:
-    enabled: "true"
-    serviceMonitor:
-      enabled: "true"
 
-  stats:
-    enabled: "true"
-
+  # Define requests resources to avoid probe issues due to CPU utilization in busy nodes
+  # ref: https://github.com/kubernetes/ingress-nginx/issues/4735#issuecomment-551204903
+  # Ideally, there should be no limits.
+  # https://engineering.indeedblog.com/blog/2019/12/cpu-throttling-regression-fix/
   resources:
-    # We usually recommend not to specify default resources and to leave this as a conscious
-    # choice for the user. This also increases chances charts run on environments with little
-    # resources, such as Minikube. If you do want to specify resources, uncomment the following
-    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-    # limits:
-    #   cpu: 100m
-    #   memory: 128Mi
     requests:
       cpu: 100m
-      memory: 300Mi
+      memory: 90Mi
+
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+

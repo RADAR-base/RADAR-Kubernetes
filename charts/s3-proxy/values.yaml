@@ -2,24 +2,44 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# -- Number of s3-proxy replicas to deploy
 replicaCount: 1
 
 image:
+  # -- s3-proxy image repository
   repository: andrewgaul/s3proxy
+  # -- s3-proxy image tag (immutable tags are recommended)
+  # Overrides the image tag whose default is the chart appVersion.
   tag: travis-1430
+  # -- s3-proxy image pull policy
   pullPolicy: IfNotPresent
 
+# -- Docker registry secret names as an array
+imagePullSecrets: []
+
+# -- String to partially override s3-proxy.fullname template with a string (will prepend the release name)
 nameOverride: ""
+# -- String to fully override s3-proxy.fullname template with a string
 fullnameOverride: ""
 
-service:
-  type: ClusterIP
-  port: 80
+# -- Configure s3-proxy pods' Security Context
+podSecurityContext: {}
+  # fsGroup: 2000
 
-ingress:
-  enabled: false
-  annotations: {}
-  tls: []
+# -- Configure s3-proxy containers' Security Context
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  # -- Kubernetes Service type
+  type: ClusterIP
+  # -- s3-proxy port
+  port: 80
 
 resources:
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -29,22 +49,35 @@ resources:
   # limits:
   #   cpu: 100m
   #   memory: 128Mi
+
+    # -- CPU/Memory resource requests
   requests:
     cpu: 100m
     memory: 128Mi
 
+# -- Node labels for pod assignment
 nodeSelector: {}
 
+# -- Toleration labels for pod assignment
 tolerations: []
 
+# -- Affinity labels for pod assignment
 affinity: {}
 
 s3:
+  # -- Credentials used to access this proxy
   identity: null
-  credential: null
+  # -- Credentials used to access this proxy
+  credential: ""
 
+# -- Where requests should be proxied to
+# @default -- Check below
 target:
+  # -- Target provider
   provider: null
+  # -- Target endpoint
   endpoint: null
+  # -- Target identity
   identity: null
-  credential: null
+  # -- Target credential
+  credential: ""

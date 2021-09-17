@@ -2,25 +2,53 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# -- 	Number of Management Portal replicas to deploy
 replicaCount: 2
 
 image:
+  # -- Management Portal image repository
   repository: radarbase/management-portal
-  tag: 0.6.4
+  # -- Management Portal image tag (immutable tags are recommended)
+  tag: 0.8.0
+  # -- Management Portal image pull policy
   pullPolicy: IfNotPresent
 
+# -- Docker registry secret names as an array
+imagePullSecrets: []
+
+# -- String to partially override management-portal.fullname template with a string (will prepend the release name)
 nameOverride: ""
+# -- String to fully override management-portal.fullname template with a string
 fullnameOverride: ""
 
+# -- Configure management-portal pods' Security Context
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# -- Configure management-portal containers' Security Context
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
 service:
+  # -- Kubernetes Service type
   type: ClusterIP
+  # -- Management Portal port
   port: 8080
 
 ingress:
+  # -- Enable ingress controller resource
   enabled: true
+  # -- Annotations that define default ingress class, certificate issuer and rate limiter
+  # @default -- check values.yaml
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/server-snippet: |
       location /managementportal/oauth/ {
         # Allow 20 fast-following requests, like when authorizing a user.
@@ -29,10 +57,13 @@ ingress:
       location /managementportal/api/meta-token/ {
         limit_req zone=login_limit;
       }
+  # -- Path within the url structure
   path: "/managementportal"
+  # -- Hosts to accept requests from
   hosts:
     - localhost
   tls:
+    # -- TLS Secret Name
     secretName: radar-base-tls
 
 resources:
@@ -40,48 +71,91 @@ resources:
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+
+  # -- CPU/Memory resource limits
   limits:
     cpu: 2
     memory: 1.7Gi
+  # -- CPU/Memory resource requests
   requests:
     cpu: 100m
     memory: 512Mi
 
+# -- Node labels for pod assignment
 nodeSelector: {}
 
+# -- Toleration labels for pod assignment
 tolerations: []
 
+# -- Affinity labels for pod assignment
 affinity: {}
 
-# B64 encoded Binary keystore file
+# -- base 64 encoded binary p12 keystore containing a ECDSA certificate with alias `radarbase-managementportal-ec` and a RSA certificate with alias `selfsigned`.
+keystore: ""
 # With helmfile, this can be set in a production.yaml.gotmpl
 # file by setting
-#keystore: {{ readFile "keystore.p12" | b64enc | quote }}
+#   keystore: {{ readFile "keystore.p12" | b64enc | quote }}
 # or with SOPS
-#keystore: {{ exec "sops" (list "-d" "keystore.p12") | b64enc | quote }}
+#   keystore: {{ exec "sops" (list "-d" "keystore.p12") | b64enc | quote }}
 
+# Configuration of the Postgres data base to store data from Management Portal
 postgres:
-  host: postgresql-postgresql
+  # -- host name of the postgres db
+  host: postgresql
+  # -- post of the postgres db
   port: 5432
+  # -- database name
   database: managementportal
+  # -- additional JDBC connection parameters e.g. sslmode=verify-full
   connection_parameters: ""
+  # -- postgres user
   user: postgres
+  # -- password of the postgres user
   password: password
   ssl:
+    # -- set to true of the connecting to postgres using SSL
     enabled: false
     keystorepassword: keystorepassword
 
-from_email: from-email
+# -- domain name of the server
 server_name: localhost
+# -- Hostname of the catalogue-server
 catalogue_server: catalog-server
 managementportal:
+  # -- set to true, if automatic source-type import from catalogue server should be enabled
   catalogue_server_enable_auto_import: "false"
+  # -- Override with a publicly resolvable url of the privacy-policy url for your set-up. This can be overridden on a project basis as well.
   common_privacy_policy_url: http://info.thehyve.nl/radar-cns-privacy-policy
+  # -- Keystore alias to sign JWT tokens from Management Portal
   oauth_checking_key_aliases_0: radarbase-managementportal-ec
+  # -- Keystore alias to sign JWT tokens from Management Portal
   oauth_checking_key_aliases_1: selfsigned
+  # -- OAuth2 Client secret of the Management Portal frontend application
   frontend_client_secret: xxx
+  # -- Admin password of the default admin user created by the system
   common_admin_password: xxx
 
+# Configurations of the SMTP server to send activation emails from Management Portal
+smtp:
+  # -- set to true, if SMTP server should be enabled. Required to be true for production setup
+  enabled: false
+  # -- Hostname of the SMTP server
+  host: smtp
+  # -- Port of the SMTP server
+  port: 25
+  # -- Username of the SMTP server
+  username: username
+  # -- Password of the SMTP server
+  password: secret
+  # -- Email address which should be used to send activation emails
+  from: noreply@example.com
+  # -- set to true,if ttls should be enabled
+  starttls: false
+  # -- set to true, if the account should be authenticated before sending emails
+  auth: true
+
+# -- OAuth2 Client configuration
+# @default -- check values.yaml
 oauth_clients:
   pRMT:
     enable: false
@@ -113,6 +187,7 @@ oauth_clients:
       - res_gateway
       - res_ManagementPortal
       - res_appconfig
+      - res_AppServer
     client_secret: ""
     scope:
       - MEASUREMENT.CREATE
@@ -240,6 +315,7 @@ oauth_clients:
       - SOURCETYPE.READ
       - SUBJECT.READ
       - SUBJECT.UPDATE
+      - SUBJECT.CREATE
     authorized_grant_types:
       - authorization_code
     access_token_validity: 900
@@ -253,6 +329,7 @@ oauth_clients:
     client_secret: ""
     scope:
       - SUBJECT.READ
+      - MEASUREMENT.CREATE
     authorized_grant_types:
       - client_credentials
     access_token_validity: 900
@@ -304,13 +381,19 @@ oauth_clients:
       - SUBJECT.READ
       - SUBJECT.UPDATE
 
-smtp:
-  enabled: false
-  host: smtp
-  port: 25
-  username: username
-  password: secret
-  from: noreply@example.com
-  starttls: false
-  auth: true
-
+  grafana_dashboard:
+    enable: false
+    resource_ids:
+      - res_ManagementPortal
+    client_secret: ""
+    scope:
+      - USER.READ
+    authorized_grant_types:
+      - authorization_code
+      - refresh_token
+    access_token_validity: 900
+    refresh_token_validity: 78000
+    redirect_uri:
+      - http://dashboard.localhost/login/generic_oauth
+    autoapprove:
+      - USER.READ

@@ -40,7 +40,7 @@ releases:
       - name: postgres.password
         value: {{ .Values.radar_upload_postgres_password }}
       - name: client_secret
-        value: {{ .Values.management_portal.oauth_clients.radar_upload_backend.client_secret }}
+        value: {{ if hasKey .Values.management_portal.oauth_clients "radar_upload_backend" -}}{{ .Values.management_portal.oauth_clients.radar_upload_backend.client_secret }}{{- end }}
 
   - name: radar-upload-connect-frontend
     chart: ../charts/radar-upload-connect-frontend
@@ -68,4 +68,4 @@ releases:
       - name: bucketSecretKey
         value: {{ .Values.minio.secretKey }}
       - name: client_secret
-        value: {{ .Values.management_portal.oauth_clients.radar_upload_connect.client_secret }}
+        value: {{ if hasKey .Values.management_portal.oauth_clients "radar_upload_connect" -}}{{ .Values.management_portal.oauth_clients.radar_upload_connect.client_secret }}{{- end }}

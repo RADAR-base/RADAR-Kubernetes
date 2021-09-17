@@ -2,15 +2,16 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# -- Domain name of the server
 server_name: localhost
+# -- Email address of cluster maintainer
 maintainer_email: me@example.com
+# -- Install CRDs that are needed by cert-manager
 installCRDs: true
 
 prometheus:
+  # -- Enable Prometheus monitoring
   enabled: true
   servicemonitor:
+    # -- Enable Prometheus Operator ServiceMonitor monitoring
     enabled: true
-webhook:
-  enabled: false
-cainjector:
-  enabled: false

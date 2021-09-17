@@ -115,7 +115,7 @@ rbac:
   create: false
 
 replication:
-  enabled: true
+  enabled: false
   user: repl_user
   password: repl_password
   slaveReplicas: 1
@@ -453,16 +453,16 @@ master:
   sidecars:
   - name: fsfreeze
     image: busybox
-      securityContext:
-        privileged: true
-      volumeMounts:
-        - mountPath: "/bitnami/postgresql"
-          name: data
-          readOnly: false
-      command:
-        - "/bin/sh"
-        - "-c"
-        - "sleep infinity"
+    securityContext:
+      privileged: true
+    volumeMounts:
+      - mountPath: "/bitnami/postgresql"
+        name: data
+        readOnly: false
+    command:
+      - "/bin/sh"
+      - "-c"
+      - "sleep infinity"
 
   ## Override the service configuration for master
   ##

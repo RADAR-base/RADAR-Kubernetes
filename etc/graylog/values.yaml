@@ -1,5 +1,35 @@
+tags:
+  # If true, this chart will install Elasticsearch from requirement dependencies
+  install-elasticsearch: false
+  # If true, this chart will install MongoDB replicaset from requirement dependencies
+  install-mongodb: false
+
 graylog:
-  rootTimezone: Europe/Amsterdam
+  ## Additional input ports for receiving logs from servers
+  ## Note: Name must be in IANA_SVC_NAME (at most 15 characters, matching regex [a-z0-9]([a-z0-9-]*[a-z0-9])* and it must contains at least one letter [a-z], hyphens cannot be adjacent to other hyphens)
+  ## Note: Array must be sorted by port order
+  ##
+  input:
+    tcp:
+      service:
+        name: graylog-tcp
+        type: ClusterIP
+      ports:
+        - name: gelf
+          port: 12222
+
+  ingress:
+    enabled: true
+    port: 80
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/enable-access-log: "false"
+
+
+  ## Configure resource requests and limits
+  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ##
   resources:
     # We usually recommend not to specify default resources and to leave this as a conscious
     # choice for the user. This also increases chances charts run on environments with little
@@ -13,27 +43,30 @@ graylog:
       memory: 2Gi
 
   metrics:
+    ## If true, prometheus annotations will be attached
+    ##
     enabled: true
   geoip:
+    ## If true, Maxmind GeoLite2 will be installed to ${GRAYLOG_HOME}/geoip location
+    ##
     enabled: true
-  ingress:
-    enabled: true
-    port: 80
-    annotations:
-      kubernetes.io/ingress.class: nginx
-      cert-manager.io/cluster-issuer: letsencrypt-prod
-      nginx.ingress.kubernetes.io/enable-access-log: "false"
+
+  ## Graylog root timezone
+  ##
+  rootTimezone: "UTC"
   elasticsearch:
-    hosts: http://elasticsearch-master:9200
-  input:
-    tcp:
-      service:
-        type: ClusterIP
-      ports:
-        - name: gelf
-          port: 12222
+    ## Major version of the Elasticsearch version used.
+    ## It is required by Graylog 4. See https://docs.graylog.org/en/4.0/pages/configuration/elasticsearch.html#available-elasticsearch-configuration-tunables
+    version: "7"
+    ## List of Elasticsearch hosts Graylog should connect to.
+    ## Need to be specified as a comma-separated list of valid URIs for the http ports of your elasticsearch nodes.
+    ## If one or more of your elasticsearch hosts require authentication, include the credentials in each node URI that
+    ## requires authentication.
+    ##
+    hosts: http://elasticsearch-master-headless:9200
   mongodb:
-    uri: mongodb://mongodb-mongodb-replicaset-0.mongodb-mongodb-replicaset:27017/graylog?replicaSet=rs0
+    uri: mongodb://mongodb-0.mongodb-headless.graylog.svc.cluster.local:27017/graylog?replicaSet=rs0
+
 tags:
   install-mongodb: false
   install-elasticsearch: false

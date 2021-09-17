@@ -2,29 +2,40 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# -- Number of Appconfig replicas to deploy
 replicaCount: 2
 
 image:
+  # -- Appconfig image repository
   repository: radarbase/radar-app-config
-  tag: 0.3.0.1
+  # -- Appconfig image tag (immutable tags are recommended)
+  tag: 0.3.2
+  # -- Appconfig image pull policy
   pullPolicy: IfNotPresent
 
+# -- Docker registry secret names as an array
 imagePullSecrets: []
+
+# -- String to partially override management-portal.fullname template with a string (will prepend the release name)
 nameOverride: ""
+# -- String to fully override management-portal.fullname template with a string
 fullnameOverride: ""
 
+# -- Kubernetes namespace that Appconfig is going to be deployed on
 namespace: default
 
 serviceAccount:
-  # Specifies whether a service account should be created
+  # -- Specifies whether a service account should be created
   create: true
-  # The name of the service account to use.
+  # -- The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name:
 
+# -- Configure Appconfig pods' Security Context
 podSecurityContext: {}
   # fsGroup: 2000
 
+# -- Configure Appconfig containers' Security Context
 securityContext: {}
   # capabilities:
   #   drop:
@@ -34,18 +45,26 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
+  # -- Kubernetes Service type
   type: ClusterIP
+  # -- Appconfig port
   port: 8090
 
 ingress:
+  # -- Enable ingress controller resource
   enabled: true
+  # -- Annotations that define default ingress class, certificate issuer
+  # @default -- check values.yaml
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
+  # -- Path within the url structure
   path: "/appconfig/api($|/)(.*)"
+  # -- Hosts to accept requests from
   hosts:
     - localhost
   tls:
+    # -- TLS Secret Name
     secretName: radar-base-tls
 
 resources:
@@ -53,25 +72,39 @@ resources:
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+
+  # -- CPU/Memory resource limits
   limits:
     cpu: 2
+  # -- CPU/Memory resource requests
   requests:
     cpu: 100m
     memory: 768Mi
 
+# -- Node labels for pod assignment
 nodeSelector: {}
 
+# -- Toleration labels for pod assignment
 tolerations: []
 
+# -- Affinity labels for pod assignment
 affinity: {}
 
+# -- Standard JAVA_OPTS that should be passed to this service
 javaOpts: "-Xmx550m"
+# -- OAuth2 client id
 clientId: radar_appconfig
+# -- OAuth2 client secret
 clientSecret: secret
 
 jdbc:
+  # -- JDBC Driver to connect to the database.
   driver: org.postgresql.Driver
-  url: jdbc:postgresql://postgresql-postgresql/appconfig
+  # -- JDBC Connection url of the database.
+  url: jdbc:postgresql://postgresql:5432/appconfig
+  # -- Username of the database
   user: postgres
+  # -- Password of the user
   password: password
+  # -- JDBC dialect to use for JDBC Connection
   dialect: org.hibernate.dialect.PostgreSQLDialect
