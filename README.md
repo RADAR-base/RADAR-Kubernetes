@@ -1,4 +1,4 @@
-# RADAR-Kubernetes [![Build Status](https://travis-ci.org/RADAR-base/RADAR-Kubernetes.svg?branch=dev)](https://travis-ci.org/RADAR-base/RADAR-Kubernetes)
+# RADAR-Kubernetes [![Build Status](https://travis-ci.org/RADAR-base/RADAR-Kubernetes.svg?branch=master](https://travis-ci.org/RADAR-base/RADAR-Kubernetes)
 The Kubernetes stack of RADAR-base platform
 
 ## About
@@ -7,7 +7,7 @@ RADAR-base is an open-source platform designed to support remote clinical trials
 RADAR-Kubernetes setup uses [Helm](https://github.com/helm/helm) charts to package necessary Kubernetes resources for each component and [helmfile](https://github.com/roboll/helmfile) to modularize and deploy Helm charts of the platform on a Kubernetes cluster. This setup is designed to be a lightweight way to install and configure the RADAR-base components. The original images or charts may provide more and granular configurations. Please visit the `README` of respective charts to understand the configurations and visit the main repository for in depth knowledge.
 
 ## Status
-RADAR-Kubernetes is one of the youngest project of RADAR-base and will be the **long term supported form of deploying the platform**. Even though, RADAR-Kubernetes is being used in few production environments, it is still in its early stage of development. We are working improving the set up and documentation to enable RADAR-base community to make use of the platform.
+RADAR-Kubernetes is one of the youngest project of RADAR-base and will be the **long term supported form of deploying the platform**. Even though, RADAR-Kubernetes is being used in few production environments, it is still in its early stage of development. We are working on improving the set up and documentation to enable RADAR-base community to make use of the platform.
 
 ### Disclaimer
 This documentation assumes familiarity with all referenced Kubernetes concepts, utilities, and procedures and familiarity with Helm charts and helmfile. While this documentation will provide guidance for installing and configuring RADAR-base platform on a Kubernetes cluster, it is not a replacement for the official detailed documentation or tutorial of Kubernetes, Helm or Helmfile. If you are not familiar with these tools, we strongly recommend you to get familiar with these tools. Here is a [list of useful links](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/2731638785/How+to+get+started+with+tools+around+RADAR-Kubernetes) to get started. 
