@@ -4,7 +4,7 @@ The Kubernetes stack of RADAR-base platform
 ## About
 RADAR-base is an open-source platform designed to support remote clinical trials by collecting continuous data from wearables and mobile applications. RADAR-Kubernetes enables installing the RADAR-base platform onto Kubernetes clusters. RADAR-base platform can be used for wide range of use-cases. Depending on the use-case, the selection of applications need to be installed can vary. Please read the [component overview and breakdown](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/2673967112/Component+overview+and+breakdown) to understand the role of each component and how components work together. 
 
-RADAR-Kubernetes setup uses [Helm](https://github.com/helm/helm) charts to package necessary Kubernetes resources for each component and [helmfile](https://github.com/roboll/helmfile) to modularize and deploy Helm charts of the platform on a Kubernetes cluster. This setup is designed to be a lightweight way to install and configure the RADAR-base components. The original images or charts may provide more and granular configurations. Please visit the `README` of respective charts to understand the configurations and visit the main repository for in depth knowledge.
+RADAR-Kubernetes setup uses [Helm 3](https://github.com/helm/helm) charts to package necessary Kubernetes resources for each component and [helmfile](https://github.com/roboll/helmfile) to modularize and deploy Helm charts of the platform on a Kubernetes cluster. This setup is designed to be a lightweight way to install and configure the RADAR-base components. The original images or charts may provide more and granular configurations. Please visit the `README` of respective charts to understand the configurations and visit the main repository for in depth knowledge.
 
 ## Status
 RADAR-Kubernetes is one of the youngest project of RADAR-base and will be the **long term supported form of deploying the platform**. Even though, RADAR-Kubernetes is being used in few production environments, it is still in its early stage of development. We are working on improving the set up and documentation to enable RADAR-base community to make use of the platform.
@@ -31,10 +31,10 @@ The following tools should be installed in your local machine to install the RAD
 | [Git](https://git-scm.com/downloads) | RADAR-Kubernetes uses Git-submodules to use some third party Helm charts. Thus Git is required to properly download and sync correct versions of this repository and its dependent repositories |
 | [Java](https://openjdk.java.net/install/)| The installation setup uses Java Keytools to create Keystore files necessary for signing access tokens.|
 | [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)| Kubernetes command-line tool, kubectl, allows you to run commands against Kubernetes clusters|
-| [helm](https://github.com/helm/helm#install)| Helm Charts are used to package Kubernetes resources for each component|
+| [helm 3](https://github.com/helm/helm#install)| Helm Charts are used to package Kubernetes resources for each component|
 | [helmfile](https://github.com/roboll/helmfile#installation)| RADAR-Kubernetes uses helmfiles to deploy Helm charts.|
 | [helm-diff](https://github.com/databus23/helm-diff#install)| A dependency for Helmfile| 
-| [helm-secrets](https://github.com/zendesk/helm-secrets)| A dependency of Helmfile for securely managing secrets|
+| [helm-secrets](https://github.com/jkroepke/helm-secrets)| A dependency of Helmfile for securely managing secrets|
 
 **Once you have a working installation of a Kubernetes cluster, please [configure Kubectl with the appropriate Kubeconfig](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#verify-kubectl-configuration) to enable Kubectl to find and access your cluster. Then proceed to the installation section.** 
 
