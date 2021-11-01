@@ -68,11 +68,11 @@ It will download the dependent helm charts from Confluent platform for component
 - [/cp-helm-charts](cp-helm-charts): Path where Helm charts from Confluent platform will be downloaded using git
 - [/etc](etc): Contains Helm charts for third party applications used in RADAR-base
 - [/helmfile.d](helmfile.d): Contains Helmfiles for modular deployment of the platform
-- [environment.yaml](environments.yaml): Defines current environment files in order to be used by helmfile. Read more about `bases` [here](https://github.com/roboll/helmfile).
-- [production.yaml](production.yaml): Production helmfile template to configure and install RADAR-base component. Inspect the file to enable, disable and configure components required for your usecase. The default helmfile enables all core components that are needed to run RADAR-base platform with pRMT and aRMT apps. If you're not sure which components you want to enable you can refer to wiki for [an overview and breakdown on RADAR-Base components and their roles](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/2673967112/Component+overview+and+breakdown). 
+- [environments.yaml](environments.yaml): Defines current environment files in order to be used by helmfile. Read more about `bases` [here](https://github.com/roboll/helmfile/blob/master/docs/writing-helmfile.md).
+- [production.yaml](production.yaml): Production helmfile template to configure and install RADAR-base components. Inspect the file to enable, disable and configure components required for your use case. The default helmfile enables all core components that are needed to run RADAR-base platform with pRMT and aRMT apps. If you're not sure which components you want to enable you can refer to wiki for [an overview and breakdown on RADAR-Base components and their roles](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/2673967112/Component+overview+and+breakdown). 
 - [production.yaml.gotmpl](production.yaml.gotmpl): Change setup parameters that require Go templating, such as reading input files
 
-1. Configure the [enviornments.yaml](environments.yaml) to use the files that you have created by copying the template files.
+1. Configure the [environments.yaml](environments.yaml) to use the files that you have created by copying the template files.
     ```shell script
     vim environments.yaml # use the files you just created
     ```
@@ -85,7 +85,7 @@ It will download the dependent helm charts from Confluent platform for component
     ```shell script
     vim production.yaml  # Change setup parameters and configurations
     ```
-3. In [production.yaml.gotmpl](production.yaml.gotmpl) file, change setup parameters that require Go templating, such as reading input files
+3. In [production.yaml.gotmpl](production.yaml.gotmpl) file, change setup parameters that require Go templating, such as reading input files and selecting an option for the `keystore.p12`
     ```shell script
     vim production.yaml.gotmpl 
     ```
@@ -217,7 +217,7 @@ In your setup, the number of topics can be more or less, depending on components
 #### Troubleshoot
 If an application doesn't become fully ready installation will not be successful. In this case, you should investigate the root cause by investigating the relevant component. 
 
-Some useful commands for troubleshooting a component is mentioned below.
+Some useful commands for troubleshooting a component are mentioned below.
 
 1. Describe a pod to understand current status
 ```shell script
