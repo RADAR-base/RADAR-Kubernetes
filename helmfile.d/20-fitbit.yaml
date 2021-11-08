@@ -8,9 +8,14 @@ helmDefaults:
   timeout: 600
   kubeContext: {{ .Values.kubeContext }}
 
+repositories:
+  - name: radar
+    url: https://radar-base.github.io/radar-helm-charts
+
 releases:
   - name: radar-fitbit-connector
-    chart: ../charts/radar-fitbit-connector
+    chart: radar/radar-fitbit-connector
+    version: 0.1.1
     installed: {{ .Values.radar_fitbit_connector._install }}
     values:
       - {{ .Values.radar_fitbit_connector | toYaml | indent 8 | trim }}
@@ -25,7 +30,8 @@ releases:
         value: {{ if hasKey .Values.management_portal.oauth_clients "radar_fitbit_connector" -}}{{ .Values.management_portal.oauth_clients.radar_fitbit_connector.client_secret }}{{- end }}
 
   - name: radar-rest-sources-authorizer
-    chart: ../charts/radar-rest-sources-authorizer
+    chart: radar/radar-rest-sources-authorizer
+    version: 0.2.0
     installed: {{ .Values.radar_rest_sources_authorizer._install }}
     values:
       - {{ .Values.radar_rest_sources_authorizer | toYaml | indent 8 | trim }}
@@ -36,7 +42,8 @@ releases:
         value: {{ .Values.server_name }}
 
   - name: radar-rest-sources-backend
-    chart: ../charts/radar-rest-sources-backend
+    chart: radar/radar-rest-sources-backend
+    version: 0.2.0
     installed: {{ .Values.radar_rest_sources_backend._install }}
     values:
       - {{ .Values.radar_rest_sources_backend | toYaml | indent 8 | trim }}

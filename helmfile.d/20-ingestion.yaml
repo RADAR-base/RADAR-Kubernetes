@@ -8,9 +8,16 @@ helmDefaults:
   timeout: 600
   kubeContext: {{ .Values.kubeContext }}
 
+repositories:
+  - name: radar
+    url: https://radar-base.github.io/radar-helm-charts
+  - name: cp-radar
+    url: https://radar-base.github.io/cp-helm-charts
+
 releases:
   - name: cp-kafka-rest
-    chart: ../cp-helm-charts/charts/cp-kafka-rest
+    chart: cp-radar/cp-kafka-rest
+    version: 0.1.1
     wait: false
     installed: {{ .Values.cp_kafka_rest._install }}
     values:
@@ -18,7 +25,8 @@ releases:
       - {{ .Values.cp_kafka_rest | toYaml | indent 8 | trim }}
 
   - name: radar-gateway
-    chart: ../charts/radar-gateway
+    chart: radar/radar-gateway
+    version: 0.1.4
     installed: {{ .Values.radar_gateway._install }}
     values:
       - {{ .Values.radar_gateway | toYaml | indent 8 | trim }}

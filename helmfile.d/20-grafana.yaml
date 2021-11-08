@@ -3,14 +3,16 @@ bases:
 
 ---
 
+helmDefaults:
+  kubeContext: {{ .Values.kubeContext }}
+
 repositories:
   - name: grafana
     url: https://grafana.github.io/helm-charts
   - name: bitnami
     url: https://charts.bitnami.com/bitnami
-
-helmDefaults:
-  kubeContext: {{ .Values.kubeContext }}
+  - name: radar
+    url: https://radar-base.github.io/radar-helm-charts
 
 releases:
   - name: timescaledb
@@ -60,7 +62,8 @@ releases:
         value: "https://{{ .Values.server_name }}/managementportal/oauth/token"
 
   - name: radar-jdbc-connector
-    chart: ../charts/radar-jdbc-connector
+    chart: radar/radar-jdbc-connector
+    version: 0.1.1
     installed: {{ .Values.radar_jdbc_connector._install }}
     values:
       - {{ .Values.radar_jdbc_connector | toYaml | indent 8 | trim }}
