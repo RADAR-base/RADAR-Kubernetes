@@ -4,7 +4,7 @@ The Kubernetes stack of RADAR-base platform
 ## About
 RADAR-base is an open-source platform designed to support remote clinical trials by collecting continuous data from wearables and mobile applications. RADAR-Kubernetes enables installing the RADAR-base platform onto Kubernetes clusters. RADAR-base platform can be used for wide range of use-cases. Depending on the use-case, the selection of applications need to be installed can vary. Please read the [component overview and breakdown](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/2673967112/Component+overview+and+breakdown) to understand the role of each component and how components work together. 
 
-RADAR-Kubernetes setup uses [Helm 3](https://github.com/helm/helm) charts to package necessary Kubernetes resources for each component and [helmfile](https://github.com/roboll/helmfile) to modularize and deploy Helm charts of the platform on a Kubernetes cluster. This setup is designed to be a lightweight way to install and configure the RADAR-base components. The original images or charts may provide more and granular configurations. Please visit the `README` of respective charts to understand the configurations and visit the main repository for in depth knowledge.
+RADAR-Kubernetes setup uses [Helm 3](https://github.com/helm/helm) charts to package necessary Kubernetes resources for each component and [helmfile](https://github.com/roboll/helmfile) to modularize and deploy Helm charts of the platform on a Kubernetes cluster. This setup is designed to be a lightweight way to install and configure the RADAR-base components. The original images or charts may provide more and granular configurations. Please visit the `README` of respective charts in [radar-helm-charts](https://github.com/RADAR-base/radar-helm-charts) to understand the configurations and visit the main repository for in depth knowledge.
 
 ## Status
 RADAR-Kubernetes is one of the youngest project of RADAR-base and will be the **long term supported form of deploying the platform**. Even though, RADAR-Kubernetes is being used in few production environments, it is still in its early stage of development. We are working on improving the set up and documentation to enable RADAR-base community to make use of the platform.
@@ -43,37 +43,39 @@ The following tools should be installed in your local machine to install the RAD
 
 ### Prepare
 1. Clone the repository to your local machine by using following command.
-It will download the dependent helm charts from Confluent platform for components such as Kafka and Zookeeper.
+    It will download the dependent helm charts from Confluent platform for components such as Kafka and Zookeeper.
+
     ```shell
     git clone --recurse-submodules https://github.com/RADAR-base/RADAR-Kubernetes.git
     ```
  
 2. Create basic config files using template files.
-    ```shell script
+
+    ```shell
     cd RADAR-Kubernetes
     cp environments.yaml.tmpl environments.yaml
-    cp base.yaml production.yaml
-    cp base.yaml.gotmpl production.yaml.gotmpl
+    cp etc/base.yaml etc/production.yaml
+    cp secrets/base.yaml secrets/production.yaml  # All variables in this file should be modified
+    cp etc/base.yaml.gotmpl etc/production.yaml.gotmpl
     ```
    
-     It is recommended make a private clone of this repository, if you want to version control your configurations and/or share with other people. 
+    It is recommended make a private clone of this repository, if you want to version control your configurations and/or share with other people.
       
-     The best practise to share your platform configurations is by **sharing the encrypted version of `production.yaml`**.  
+    The best practise to share your platform configurations is by **sharing the encrypted version of `production.yaml`**.
 
 ### Configure
 
 #### Project Structure
 - [/bin](bin): Contains initialization scripts
-- [/charts](charts): Contains Helm Charts for RADAR-base components
-- [/cp-helm-charts](cp-helm-charts): Path where Helm charts from Confluent platform will be downloaded using git
-- [/etc](etc): Contains Helm charts for third party applications used in RADAR-base
+- [/etc](etc): Contains configurations for some Helm charts.
+- [/secrets](secrets): Contains secrets configuration for helm charts.
 - [/helmfile.d](helmfile.d): Contains Helmfiles for modular deployment of the platform
 - [environments.yaml](environments.yaml): Defines current environment files in order to be used by helmfile. Read more about `bases` [here](https://github.com/roboll/helmfile/blob/master/docs/writing-helmfile.md).
 - [production.yaml](production.yaml): Production helmfile template to configure and install RADAR-base components. Inspect the file to enable, disable and configure components required for your use case. The default helmfile enables all core components that are needed to run RADAR-base platform with pRMT and aRMT apps. If you're not sure which components you want to enable you can refer to wiki for [an overview and breakdown on RADAR-Base components and their roles](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/2673967112/Component+overview+and+breakdown). 
 - [production.yaml.gotmpl](production.yaml.gotmpl): Change setup parameters that require Go templating, such as reading input files
 
 1. Configure the [environments.yaml](environments.yaml) to use the files that you have created by copying the template files.
-    ```shell script
+    ```shell
     vim environments.yaml # use the files you just created
     ```
 2. Configure the [production.yaml](production.yaml). In this file you are required to fill in secrets and passwords used by RADAR-base applications. It is strongly recommended to use random password generator to fill these secrets. **You must keep this file secure and confidential once you have started installing the platform.**
@@ -82,14 +84,14 @@ It will download the dependent helm charts from Confluent platform for component
     
     Optionally, you can also enable or disable other components that are configured otherwise by default.
   
-    ```shell script
+    ```shell
     vim production.yaml  # Change setup parameters and configurations
     ```
 3. In [production.yaml.gotmpl](production.yaml.gotmpl) file, change setup parameters that require Go templating, such as reading input files and selecting an option for the `keystore.p12`
-    ```shell script
+    ```shell
     vim production.yaml.gotmpl 
     ```
-4. Run `bin/keystore-init` to create the Keystore file which used to sign JWT access tokens by [Management Portal](charts/management-portal/README.md)
+4. Run `bin/keystore-init` to create the Keystore file which used to sign JWT access tokens by [Management Portal](https://github.com/RADAR-base/radar-helm-charts/blob/main/charts/management-portal/README.md)
     ```shell
     ./bin/keystore-init
     ```
@@ -220,19 +222,19 @@ If an application doesn't become fully ready installation will not be successful
 Some useful commands for troubleshooting a component are mentioned below.
 
 1. Describe a pod to understand current status
-```shell script
+```shell
 kubectl describe pods <podname>
 ```
 2. Investigate the logs of the pod
-```shell script
+```shell
 kubectl logs <podname>
 ```
 To check last few lines
-```shell script
+```shell
 kubectl logs --tail 100 <podname>
 ```
 To continue monitoring the logs
-```shell script
+```shell
 kubectl logs -f <podname>
 ```
 For more information on how `kubectl` can be used to manage a Kubernetes application, please visit [Kubectl documentation](https://kubernetes.io/docs/reference/kubectl/cheatsheet/). 
@@ -284,11 +286,11 @@ https://www.jeffgeerling.com/blog/2019/expanding-k8s-pvs-eks-on-aws
 
 ## Uninstall
 If you want to remove the RADAR-base from your cluster you and use following command to delete the applications from cluster:
-```
+```shell
 helmfile destroy
 ```
 Some configurations can still linger inside the cluster. Try using following commands to purge them as well.
-```
+```shell
 kubectl delete crd prometheuses.monitoring.coreos.com prometheusrules.monitoring.coreos.com servicemonitors.monitoring.coreos.com alertmanagers.monitoring.coreos.com podmonitors.monitoring.coreos.com alertmanagerconfigs.monitoring.coreos.com probes.monitoring.coreos.com thanosrulers.monitoring.coreos.com
 kubectl delete psp kube-prometheus-stack-alertmanager kube-prometheus-stack-grafana kube-prometheus-stack-grafana-test kube-prometheus-stack-kube-state-metrics kube-prometheus-stack-operator kube-prometheus-stack-prometheus kube-prometheus-stack-prometheus-node-exporter
 kubectl delete mutatingwebhookconfigurations prometheus-admission

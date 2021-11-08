@@ -3,16 +3,18 @@ bases:
 
 ---
 
-repositories:
-- name: minio
-  url: https://helm.min.io/
-- name: bitnami
-  url: https://charts.bitnami.com/bitnami
-
 helmDefaults:
   atomic: false
   timeout: 240
   kubeContext: {{ .Values.kubeContext }}
+
+repositories:
+  - name: minio
+    url: https://helm.min.io/
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
+  - name: radar
+    url: https://radar-base.github.io/radar-helm-charts
 
 releases:
   - name: redis
@@ -39,7 +41,8 @@ releases:
         values: ["s3.{{ .Values.server_name }}"]
 
   - name: radar-s3-connector
-    chart: ../charts/radar-s3-connector
+    chart: radar/radar-s3-connector
+    version: 0.1.1
     installed: {{ .Values.radar_s3_connector._install }}
     values:
       - {{ .Values.radar_s3_connector | toYaml | indent 8 | trim }}
@@ -49,13 +52,15 @@ releases:
         value: {{ .Values.confluent_cloud.enabled }}
 
   - name: s3-proxy
-    chart: ../charts/s3-proxy
+    chart: radar/s3-proxy
+    version: 0.1.1
     installed: {{ .Values.s3_proxy._install }}
     values:
       - {{ .Values.s3_proxy | toYaml | indent 8 | trim }}
 
   - name: radar-output
-    chart: ../charts/radar-output
+    chart: radar/radar-output
+    version: 0.1.1
     wait: true
     installed: {{ .Values.radar_output._install }}
     values:

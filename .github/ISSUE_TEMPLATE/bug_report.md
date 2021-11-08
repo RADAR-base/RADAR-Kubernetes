@@ -2,8 +2,10 @@
 name: Bug report
 about: Create a report to help us improve
 title: ''
-labels: ''
-assignees: ''
+labels:
+  - bug
+assignees:
+  - K1Hyve
 
 ---
 
@@ -12,9 +14,6 @@ assignees: ''
 
  - [Troubleshoot Bitnami Helm Chart Issues](https://docs.bitnami.com/general/how-to/troubleshoot-helm-chart-issues)
  -->
-
-**Which chart**:
-The name (and version) of the affected chart
 
 **Describe the bug**
 A clear and concise description of what the bug is.

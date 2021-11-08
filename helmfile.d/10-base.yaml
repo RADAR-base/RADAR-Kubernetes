@@ -8,9 +8,16 @@ helmDefaults:
   timeout: 600
   kubeContext: {{ .Values.kubeContext }}
 
+repositories:
+  - name: radar
+    url: https://radar-base.github.io/radar-helm-charts
+  - name: cp-radar
+    url: https://radar-base.github.io/cp-helm-charts
+
 releases:
   - name: cp-zookeeper
-    chart: ../cp-helm-charts/charts/cp-zookeeper
+    chart: ../../cp-helm-charts/charts/cp-zookeeper
+    version: 0.2.0
     wait: true
     installed: {{ .Values.cp_zookeeper._install }}
     values:
@@ -18,7 +25,8 @@ releases:
       - {{ .Values.cp_zookeeper | toYaml | indent 8 | trim }}
 
   - name: cp-kafka
-    chart: ../cp-helm-charts/charts/cp-kafka
+    chart: ../../cp-helm-charts/charts/cp-kafka
+    version: 0.2.0
     wait: true
     installed: {{ .Values.cp_kafka._install }}
     values:
@@ -29,7 +37,8 @@ releases:
         value: {{ .Values.kafka_num_brokers }}
 
   - name: cp-schema-registry
-    chart: ../cp-helm-charts/charts/cp-schema-registry
+    chart: ../../cp-helm-charts/charts/cp-schema-registry
+    version: 0.2.0
     wait: true
     installed: {{ .Values.cp_schema_registry._install }}
     values:
@@ -46,7 +55,8 @@ releases:
         values: ["{{ .Values.server_name }}"]
 
   - name: catalog-server
-    chart: ../charts/catalog-server
+    chart: radar/catalog-server
+    version: 0.2.1
     wait: true
     installed: {{ .Values.catalog_server._install }}
     values:
