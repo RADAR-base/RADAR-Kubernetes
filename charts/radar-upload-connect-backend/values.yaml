@@ -90,7 +90,7 @@ client_id: radar_upload_backend
 client_secret: secret
 postgres:
   # -- Host name of the database to store uploaded data and metadata
-  host: radar-upload-postgresql-postgresql
+  host: radar-upload-postgresql
   # -- Database username
   user: postgres
   # -- Database password
