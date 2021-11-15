@@ -2,6 +2,7 @@ kubeContext: default
 server_name: example.com
 maintainer_email: MAINTAINER_EMAIL@example.com
 kafka_num_brokers: 3
+postgres_password: password
 
 # --------------------------------------------------------- 00-init.yaml ---------------------------------------------------------
 
@@ -118,7 +119,19 @@ management_portal:
       client_secret: "saturday$SHARE$scale"
     aRMT:
       enable: true
-      client_secret: ""
+      client_secret: secret
+    radar_upload_backend:
+      client_secret: secret
+    radar_upload_connect:
+      client_secret: secret
+    radar_rest_sources_auth_backend:
+      client_secret: secret
+    radar_redcap_integrator:
+      client_secret: secret
+    radar_fitbit_connector:
+      client_secret: secret
+    radar_appconfig:
+      client_secret: secret
   smtp:
     enabled: false
     host: smtp
@@ -138,6 +151,9 @@ app_config_frontend:
   callbackUrl: https://example.com/appconfig/login
 
 # --------------------------------------------------------- 20-fitbit.yaml ---------------------------------------------------------
+fitbit_api_client: fitbit_api_client_id
+fitbit_api_secret: fitbit_api_client_secret
+
 radar_fitbit_connector:
   _install: false
   replicaCount: 1
@@ -233,6 +249,8 @@ minio:
   s3Endpoint: http://minio:9000/
   persistence:
     size: 20Gi
+  accessKey: AKIAIOSFODNN7EXAMPLE
+  secretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
 radar_s3_connector:
   # set to true if radar-s3-connector should be installed
@@ -272,6 +290,12 @@ ccSchemaRegistryProxy:
 # --------------------------------------------------------- 20-grafana.yaml ---------------------------------------------------------
 
 timescaledb_db_name: grafana-metrics
+timescaledb_password: password
+timescaledb_username: postgres
+
+grafana_password: password
+grafana_metrics_username: username
+grafana_metrics_password: password
 
 radar_grafana:
   _install: true

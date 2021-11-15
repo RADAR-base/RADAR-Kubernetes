@@ -1,7 +1,0 @@
-environments:
- default:
-   values:
-   - ../base.yaml
-   - ../base.yaml.gotmpl
-   - ../production-test.yaml
-   - ../production-test.yaml.gotmpl
