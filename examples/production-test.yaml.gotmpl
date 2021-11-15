@@ -1,0 +1,12 @@
+# Remove below Go comment te enable management_portal reading
+management_portal:
+  # read unencrypted keystore
+  keystore: {{ readFile "etc/management-portal/keystore.p12" | b64enc | quote }}
+  # read encrypted keystore
+  # {{/* keystore: {{ exec "sops" (list "-d" "etc/management-portal/keystore.p12") | b64enc | quote }}  */}}
+
+radar_grafana:
+  dashboards:
+    allprojects:
+      home:
+        json: {{ readFile "etc/radar-grafana/dashboards/allprojects/home.json" | quote }}

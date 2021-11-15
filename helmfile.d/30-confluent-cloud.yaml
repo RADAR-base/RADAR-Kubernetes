@@ -1,6 +1,7 @@
 bases:
-  - ../environments.yaml
+- ../environments.yaml
 
+---
 
 helmDefaults:
   atomic: true
