@@ -65,9 +65,9 @@ source:
     # -- s3 endpoint of the intermediate storage
     endpoint: "http://minio:9000"
     # -- s3 access-key of the intermediate storage
-    accessToken: AKIAIOSFODNN7EXAMPLE
+    accessToken: access_key
     # -- s3 secret-key of the intermediate storage
-    secretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+    secretKey: secret
     # -- s3 bucket name of the intermediate storage
     bucket: radar-intermediate-storage
   azure:
@@ -93,9 +93,9 @@ target:
     # -- s3 endpoint of the output storage
     endpoint: "http://minio:9000"
     # -- s3 access-key of the output storage
-    accessToken: AKIAIOSFODNN7EXAMPLE
+    accessToken: access_key
     # -- s3 secret-key of the output storage
-    secretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+    secretKey: secret
     # -- s3 bucket name of the output storage
     bucket: radar-output-storage
   azure:
