@@ -34,7 +34,6 @@ The following tools should be installed in your local machine to install the RAD
 | [helm 3](https://github.com/helm/helm#install)| Helm Charts are used to package Kubernetes resources for each component|
 | [helmfile](https://github.com/roboll/helmfile#installation)| RADAR-Kubernetes uses helmfiles to deploy Helm charts.|
 | [helm-diff](https://github.com/databus23/helm-diff#install)| A dependency for Helmfile| 
-| [helm-secrets](https://github.com/jkroepke/helm-secrets)| A dependency of Helmfile for securely managing secrets|
 
 **Once you have a working installation of a Kubernetes cluster, please [configure Kubectl with the appropriate Kubeconfig](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#verify-kubectl-configuration) to enable Kubectl to find and access your cluster. Then proceed to the installation section.** 
 
@@ -55,7 +54,6 @@ The following tools should be installed in your local machine to install the RAD
     cd RADAR-Kubernetes
     cp environments.yaml.tmpl environments.yaml
     cp etc/base.yaml etc/production.yaml
-    cp secrets/base.yaml secrets/production.yaml  # All variables in this file should be modified
     cp etc/base.yaml.gotmpl etc/production.yaml.gotmpl
     ```
    
