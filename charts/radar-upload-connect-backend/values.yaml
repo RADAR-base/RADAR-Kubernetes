@@ -75,6 +75,10 @@ resources:
     cpu: 100m
     memory: 2Gi
 
+persistence:
+  enabled: true
+
+
 # -- Node labels for pod assignment
 nodeSelector: {}
 
