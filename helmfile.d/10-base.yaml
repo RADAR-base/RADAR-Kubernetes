@@ -16,7 +16,7 @@ repositories:
 
 releases:
   - name: cp-zookeeper
-    chart: ../../cp-helm-charts/charts/cp-zookeeper
+    chart: cp-radar/cp-zookeeper
     version: 0.2.0
     wait: true
     installed: {{ .Values.cp_zookeeper._install }}
@@ -25,7 +25,7 @@ releases:
       - {{ .Values.cp_zookeeper | toYaml | indent 8 | trim }}
 
   - name: cp-kafka
-    chart: ../../cp-helm-charts/charts/cp-kafka
+    chart: cp-radar/cp-kafka
     version: 0.2.0
     wait: true
     installed: {{ .Values.cp_kafka._install }}
@@ -37,7 +37,7 @@ releases:
         value: {{ .Values.kafka_num_brokers }}
 
   - name: cp-schema-registry
-    chart: ../../cp-helm-charts/charts/cp-schema-registry
+    chart: cp-radar/cp-schema-registry
     version: 0.2.0
     wait: true
     installed: {{ .Values.cp_schema_registry._install }}

@@ -181,10 +181,6 @@ radar_rest_sources_backend:
 
 # --------------------------------------------------------- 20-ingestion.yaml ---------------------------------------------------------
 
-cp_kafka_rest:
-  _install: true
-  replicaCount: 1
-
 radar_gateway:
   _install: true
   replicaCount: 1

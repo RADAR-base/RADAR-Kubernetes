@@ -15,15 +15,6 @@ repositories:
     url: https://radar-base.github.io/cp-helm-charts
 
 releases:
-  - name: cp-kafka-rest
-    chart: cp-radar/cp-kafka-rest
-    version: 0.1.1
-    wait: false
-    installed: {{ .Values.cp_kafka_rest._install }}
-    values:
-      - "../etc/cp-kafka-rest/values.yaml"
-      - {{ .Values.cp_kafka_rest | toYaml | indent 8 | trim }}
-
   - name: radar-gateway
     chart: radar/radar-gateway
     version: 0.1.4
