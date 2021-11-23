@@ -260,6 +260,7 @@ nginx-ingress-controller   LoadBalancer   10.100.237.75   XXXX.eu-central-1.elb.
     ```
     Alternatively, create each DNS entry manually:
     ```
+    dashboard.k8s.radar-base.org    IN  CNAME  k8s.radar-base.org
     graylog.k8s.radar-base.org      IN  CNAME  k8s.radar-base.org
     alertmanager.k8s.radar-base.org IN  CNAME  k8s.radar-base.org
     s3.k8s.radar-base.org           IN  CNAME  k8s.radar-base.org
