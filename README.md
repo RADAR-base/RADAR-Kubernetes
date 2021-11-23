@@ -245,7 +245,7 @@ If you have enabled monitoring you should also check **Prometheus** to see if th
 ## Usage
 ### Accessing the applications
 In order to access to the applications first you need to find the IP address that Nginx service is listening to and then point the domain that you've specified in `server_name` variable to this IP address via a DNS server (e.g. [Route53](https://aws.amazon.com/route53/), [Cloudflare](https://www.cloudflare.com/dns/), [Bind](https://www.isc.org/bind/)) or [`hosts` file](https://en.wikipedia.org/wiki/Hosts_(file)) in your local machine.
-> For this guide we assume that you've set `server_name` to "k8s.radar-base.org" and SSL is enabled.
+> For this guide we assume that you've set `server_name` to "k8s.radar-base.org" and SSL is enabled. Please replace it with a DNS domain under your control.
 
 You can see details of Nginx service with following command:
 ```
@@ -254,10 +254,21 @@ NAME                       TYPE           CLUSTER-IP      EXTERNAL-IP           
 nginx-ingress-controller   LoadBalancer   10.100.237.75   XXXX.eu-central-1.elb.amazonaws.com   80:31046/TCP,443:30932/TCP   1h
 ```
 * If you're using a cloud provider you need to point the value in `EXTERNAL-IP` column (in this example `XXXX.eu-central-1.elb.amazonaws.com`) to `k8s.radar-base.org` domain in your DNS server.
+* RADAR-base uses a few subdomains, which need to be present in DNS for the certificate manager to get an SSL certificate. The easy way to do this is to create a wildcard CNAME record:
+     ```
+    *.k8s.radar-base.org            IN  CNAME  k8s.radar-base.org
+    ```
+    Alternatively, create each DNS entry manually:
+    ```
+    graylog.k8s.radar-base.org      IN  CNAME  k8s.radar-base.org
+    alertmanager.k8s.radar-base.org IN  CNAME  k8s.radar-base.org
+    s3.k8s.radar-base.org           IN  CNAME  k8s.radar-base.org
+    prometheus.k8s.radar-base.org   IN  CNAME  k8s.radar-base.org
+    grafana.k8s.radar-base.org      IN  CNAME  k8s.radar-base.org
+    ```
+    With the latter method, when a new subdomain is needed for a new service, also a new CNAME entry needs to be created.
 * If you're not using a cloud provider you need to use a load balancer to expose `31046` and `30932` ports (will be different in your setup) to a IP address and then point `k8s.radar-base.org` domain to that IP address.
 * For development and testing purposes you can run `sudo kubectl port-forward svc/nginx-ingress-controller 80:80 443:443` which will forward Nginx service ports to your local machine and you can have access to applications after adding `127.0.0.1       k8s.radar-base.org` to your `hosts` file.
-
-**Note:** If you've enabled monitoring or logging, you should point `*.server_name` domain to the same address as `server_name`.
 
 Now depending on your setup you should have access to following URLs:
 ```
