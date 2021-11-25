@@ -182,9 +182,6 @@ app_config_frontend:
   callbackUrl: https://example.com/appconfig/login
 
 # --------------------------------------------------------- 20-fitbit.yaml ---------------------------------------------------------
-fitbit_api_client: fitbit_api_client_id
-fitbit_api_secret: fitbit_api_client_secret
-
 radar_fitbit_connector:
   _install: false
   replicaCount: 1
@@ -203,14 +200,11 @@ radar_rest_sources_backend:
     password: password
     ssl:
       enabled: false
-  # Clients example
-  #restSourceClients:
-  #  - sourceType: FitBit
-  #    authorizationEndpoint: https://www.fitbit.com/oauth2/authorize
-  #    tokenEndpoint: https://api.fitbit.com/oauth2/token
-  #    clientId: clientId
-  #    clientSecret: clientSecret
-  #    scope: activity heartrate sleep profile
+  restSourceClients:
+    fitbit:
+      enable: false
+      clientId: clientId
+      clientSecret: clientSecret
 
 # --------------------------------------------------------- 20-ingestion.yaml ---------------------------------------------------------
 
