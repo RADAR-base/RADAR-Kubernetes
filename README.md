@@ -42,10 +42,9 @@ The following tools should be installed in your local machine to install the RAD
 
 ### Prepare
 1. Clone the repository to your local machine by using following command.
-    It will download the dependent helm charts from Confluent platform for components such as Kafka and Zookeeper.
 
     ```shell
-    git clone --recurse-submodules https://github.com/RADAR-base/RADAR-Kubernetes.git
+    git clone https://github.com/RADAR-base/RADAR-Kubernetes.git
     ```
  
 2. Create basic config files using template files.
