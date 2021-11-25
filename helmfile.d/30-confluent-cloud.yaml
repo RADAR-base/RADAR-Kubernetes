@@ -5,12 +5,17 @@ bases:
 
 helmDefaults:
   atomic: true
-  timeout: 600
+  timeout: 60
   kubeContext: {{ .Values.kubeContext }}
-  
+
+repositories:
+  - name: radar
+    url: https://radar-base.github.io/radar-helm-charts
+
 releases:
   - name: cc-schema-registry-proxy
-    chart: ../charts/cc-schema-registry-proxy
+    chart: radar/cc-schema-registry-proxy
+    version: 0.1.1
     installed: {{ .Values.ccSchemaRegistryProxy._install }}
     values:
       - {{ .Values.ccSchemaRegistryProxy | toYaml | indent 8 | trim }}

@@ -3,14 +3,16 @@ bases:
 
 ---
 
-repositories:
-- name: bitnami
-  url: https://charts.bitnami.com/bitnami
-
 helmDefaults:
   atomic: true
-  timeout: 600
+  timeout: 120
   kubeContext: {{ .Values.kubeContext }}
+
+repositories:
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
+  - name: radar
+    url: https://radar-base.github.io/radar-helm-charts
 
 releases:
   - name: radar-upload-postgresql
@@ -28,7 +30,8 @@ releases:
         value: {{ .Values.radar_upload_postgres_password }}
 
   - name: radar-upload-connect-backend
-    chart: ../charts/radar-upload-connect-backend
+    chart: radar/radar-upload-connect-backend
+    version: 0.1.1
     installed: {{ .Values.radar_upload_connect_backend._install }}
     values:
       - {{ .Values.radar_upload_connect_backend | toYaml | indent 8 | trim }}
@@ -45,7 +48,8 @@ releases:
       {{ end }}
 
   - name: radar-upload-connect-frontend
-    chart: ../charts/radar-upload-connect-frontend
+    chart: radar/radar-upload-connect-frontend
+    version: 0.1.1
     installed: {{ .Values.radar_upload_connect_frontend._install }}
     values:
       - {{ .Values.radar_upload_connect_frontend | toYaml | indent 8 | trim }}
@@ -56,7 +60,8 @@ releases:
         values: [{{ .Values.server_name }}]
 
   - name: radar-upload-source-connector
-    chart: ../charts/radar-upload-source-connector
+    chart: radar/radar-upload-source-connector
+    version: 0.1.1
     installed: {{ .Values.radar_upload_source_connector._install }}
     values:
       - {{ .Values.radar_upload_source_connector | toYaml | indent 8 | trim }}
