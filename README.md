@@ -68,25 +68,25 @@ The following tools should be installed in your local machine to install the RAD
 - [/secrets](secrets): Contains secrets configuration for helm charts.
 - [/helmfile.d](helmfile.d): Contains Helmfiles for modular deployment of the platform
 - [environments.yaml](environments.yaml): Defines current environment files in order to be used by helmfile. Read more about `bases` [here](https://github.com/roboll/helmfile/blob/master/docs/writing-helmfile.md).
-- [production.yaml](production.yaml): Production helmfile template to configure and install RADAR-base components. Inspect the file to enable, disable and configure components required for your use case. The default helmfile enables all core components that are needed to run RADAR-base platform with pRMT and aRMT apps. If you're not sure which components you want to enable you can refer to wiki for [an overview and breakdown on RADAR-Base components and their roles](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/2673967112/Component+overview+and+breakdown). 
-- [production.yaml.gotmpl](production.yaml.gotmpl): Change setup parameters that require Go templating, such as reading input files
+- `etc/production.yaml`: Production helmfile template to configure and install RADAR-base components. Inspect the file to enable, disable and configure components required for your use case. The default helmfile enables all core components that are needed to run RADAR-base platform with pRMT and aRMT apps. If you're not sure which components you want to enable you can refer to wiki for [an overview and breakdown on RADAR-Base components and their roles](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/2673967112/Component+overview+and+breakdown). 
+- `etc/production.yaml.gotmpl`: Change setup parameters that require Go templating, such as reading input files
 
 1. Configure the [environments.yaml](environments.yaml) to use the files that you have created by copying the template files.
     ```shell
     vim environments.yaml # use the files you just created
     ```
-2. Configure the [production.yaml](production.yaml). In this file you are required to fill in secrets and passwords used by RADAR-base applications. It is strongly recommended to use random password generator to fill these secrets. **You must keep this file secure and confidential once you have started installing the platform.**
+2. Configure the `etc/production.yaml`. In this file you are required to fill in secrets and passwords used by RADAR-base applications. It is strongly recommended to use random password generator to fill these secrets. **You must keep this file secure and confidential once you have started installing the platform.**
     
     To create an encrypted password string and put it inside `kube_prometheus_stack.nginx_auth` variable. Please make sure you are using MD5 encryption. It appears `bcrypt` encryption isn't supported in current ingress-nginx.
     
     Optionally, you can also enable or disable other components that are configured otherwise by default.
   
     ```shell
-    vim production.yaml  # Change setup parameters and configurations
+    vim etc/production.yaml  # Change setup parameters and configurations
     ```
-3. In [production.yaml.gotmpl](production.yaml.gotmpl) file, change setup parameters that require Go templating, such as reading input files and selecting an option for the `keystore.p12`
+3. In `etc/production.yaml.gotmpl` file, change setup parameters that require Go templating, such as reading input files and selecting an option for the `keystore.p12`
     ```shell
-    vim production.yaml.gotmpl 
+    vim etc/production.yaml.gotmpl 
     ```
 4. Run `bin/keystore-init` to create the Keystore file which used to sign JWT access tokens by [Management Portal](https://github.com/RADAR-base/radar-helm-charts/blob/main/charts/management-portal/README.md)
     ```shell
