@@ -8,9 +8,14 @@ helmDefaults:
   timeout: 600
   kubeContext: {{ .Values.kubeContext }}
 
+repositories:
+  - name: radar
+    url: https://radar-base.github.io/radar-helm-charts
+
 releases:
   - name: radar-backend-monitor
-    chart: ../charts/radar-backend
+    chart: radar/radar-backend
+    version: 0.1.1
     installed: {{ .Values.radar_backend_monitor._install }}
     values:
       - "../etc/radar-backend-monitor/values.yaml"
@@ -20,7 +25,8 @@ releases:
         value: {{ .Values.kafka_num_brokers }}
 
   - name: radar-backend-stream
-    chart: ../charts/radar-backend
+    chart: radar/radar-backend
+    version: 0.1.1
     installed: {{ .Values.radar_backend_stream._install }}
     values:
       - "../etc/radar-backend-stream/values.yaml"

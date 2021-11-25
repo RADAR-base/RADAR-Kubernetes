@@ -5,14 +5,18 @@ bases:
 
 helmDefaults:
   atomic: true
-  timeout: 600
+  timeout: 120
   kubeContext: {{ .Values.kubeContext }}
+
+repositories:
+  - name: radar
+    url: https://radar-base.github.io/radar-helm-charts
 
 releases:
   - name: velero
-    chart: ../charts/velero
+    chart: radar/velero
     namespace: velero
-    version: 2.12.0
+    version: 0.1.1
     installed: {{ .Values.velero._install }}
     values:
       - {{ .Values.velero | toYaml | indent 8 | trim }}

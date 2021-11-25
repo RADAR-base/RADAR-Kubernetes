@@ -1,3 +1,0 @@
-[submodule "cp-helm-charts"]
-	path = cp-helm-charts
-	url = https://github.com/RADAR-base/cp-helm-charts
