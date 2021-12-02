@@ -50,11 +50,11 @@ releases:
     set:
       - name: ingress.hosts
         values: [{{ .Values.server_name }}]
-      {{- if .Values.fitbit_api_client }}
+      {{- if hasKey .Values "fitbit_api_client" }}
       - name: restSourceClients.fitbit.clientId
         value: {{ .Values.fitbit_api_client }}
       {{- end }}
-      {{- if .Values.fitbit_api_secret }}
+      {{- if hasKey .Values "fitbit_api_secret" }}
       - name: restSourceClients.fitbit.clientSecret
         value: {{ .Values.fitbit_api_secret }}
       {{- end }}
