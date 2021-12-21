@@ -56,7 +56,7 @@ releases:
 
   - name: catalog-server
     chart: radar/catalog-server
-    version: 0.2.1
+    version: 0.2.2
     wait: true
     installed: {{ .Values.catalog_server._install }}
     values:
