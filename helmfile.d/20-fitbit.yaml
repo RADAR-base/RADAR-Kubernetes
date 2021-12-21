@@ -31,7 +31,7 @@ releases:
 
   - name: radar-rest-sources-authorizer
     chart: radar/radar-rest-sources-authorizer
-    version: 0.2.0
+    version: 0.2.2
     installed: {{ .Values.radar_rest_sources_authorizer._install }}
     values:
       - {{ .Values.radar_rest_sources_authorizer | toYaml | indent 8 | trim }}
