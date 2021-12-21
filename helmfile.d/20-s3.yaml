@@ -60,7 +60,7 @@ releases:
 
   - name: radar-output
     chart: radar/radar-output
-    version: 0.1.1
+    version: 0.1.2
     wait: true
     installed: {{ .Values.radar_output._install }}
     values:
