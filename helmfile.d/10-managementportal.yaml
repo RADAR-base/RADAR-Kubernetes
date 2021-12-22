@@ -65,7 +65,7 @@ releases:
 
   - name: app-config
     chart: radar/app-config
-    version: 0.1.1
+    version: 0.1.2
     installed: {{ .Values.app_config._install }}
     values:
       - {{ .Values.app_config | toYaml | indent 8 | trim }}
