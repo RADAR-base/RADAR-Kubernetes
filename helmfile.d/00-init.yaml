@@ -46,7 +46,7 @@ releases:
   - name: graylog
     namespace: graylog
     chart: kongz/graylog
-    version: 1.7.9
+    version: 1.9.2
     installed: {{ .Values.graylog._install }}
     values:
       - "../etc/graylog/values.yaml"
