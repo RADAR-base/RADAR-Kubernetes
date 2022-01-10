@@ -10,3 +10,8 @@ radar_grafana:
     allprojects:
       home:
         json: {{ readFile "radar-grafana/dashboards/allprojects/home.json" | quote }}
+
+radar_appserver:
+  google_application_credentials: {{ readFile "etc/radar-appserver/google-credentials.json" | quote }}
+
+  
