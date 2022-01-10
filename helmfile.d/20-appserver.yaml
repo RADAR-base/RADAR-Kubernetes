@@ -1,0 +1,21 @@
+bases:
+- ../environments.yaml
+  
+---
+
+helmDefaults:
+  atomic: true
+  timeout: 6000
+  kubeContext: {{ .Values.kubeContext }}
+
+releases:
+  - name: radar-appserver
+    chart: ../charts/radar-appserver
+    installed: {{ .Values.radar_appserver._install }}
+    values:
+      - {{ .Values.radar_appserver | toYaml | indent 8 | trim }}
+    set:
+      - name: ingress.hosts
+        values: [{{ .Values.server_name }}]
+      - name: serverName
+        value: {{ .Values.server_name }}
