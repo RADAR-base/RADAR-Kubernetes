@@ -22,10 +22,14 @@ releases:
     set:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
+      {{- if hasKey .Values "fitbit_api_client" }}
       - name: fitbit_api_client
         value: {{ .Values.fitbit_api_client }}
+      {{- end }}
+      {{- if hasKey .Values "fitbit_api_secret" }}
       - name: fitbit_api_secret
         value: {{ .Values.fitbit_api_secret }}
+      {{- end }}
       - name: oauthClientSecret
         value: {{ if hasKey .Values.management_portal.oauth_clients "radar_fitbit_connector" -}}{{ .Values.management_portal.oauth_clients.radar_fitbit_connector.client_secret }}{{- end }}
 
