@@ -162,6 +162,8 @@ management_portal:
       client_secret: secret
     radar_appconfig:
       client_secret: secret
+    radar_push_endpoint:
+      client_secret: secret
   smtp:
     enabled: false
     host: smtp
@@ -350,3 +352,18 @@ timescaledb:
 radar_jdbc_connector:
   _install: true
   replicaCount: 1
+
+
+
+# --------------------------------------------------------- 20-push-endpoint.yaml ---------------------------------------------------------
+
+radar_push_endpoint:
+  _install: true
+  replicaCount: 1
+  adminProperties: {}
+  garmin:
+    enabled: true
+    consumerKey: ""
+    consumerSecret: ""
+    userRepositoryClientId: "radar_pushendpoint"
+    userRepositoryTokenUrl: "http://management-portal:8080/oauth/token/"
