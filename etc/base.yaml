@@ -184,6 +184,9 @@ app_config_frontend:
   callbackUrl: https://example.com/appconfig/login
 
 # --------------------------------------------------------- 20-fitbit.yaml ---------------------------------------------------------
+fitbit_api_client: "client"
+fitbit_api_secret: "secret"
+
 radar_fitbit_connector:
   _install: false
   replicaCount: 1
@@ -204,9 +207,9 @@ radar_rest_sources_backend:
       enabled: false
   restSourceClients:
     fitbit:
-      enable: false
-      clientId: clientId
-      clientSecret: clientSecret
+      enable: "false"
+    garmin:
+      enable: "false"
 
 # --------------------------------------------------------- 20-ingestion.yaml ---------------------------------------------------------
 
