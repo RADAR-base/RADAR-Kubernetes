@@ -368,5 +368,3 @@ radar_push_endpoint:
     enabled: true
     consumerKey: ""
     consumerSecret: ""
-    userRepositoryClientId: "radar_pushendpoint"
-    userRepositoryTokenUrl: "http://management-portal:8080/oauth/token/"
