@@ -8,9 +8,14 @@ helmDefaults:
   timeout: 6000
   kubeContext: {{ .Values.kubeContext }}
 
+repositories:
+  - name: radar
+    url: https://radar-base.github.io/radar-helm-charts
+
 releases:
   - name: radar-appserver
-    chart: ../charts/radar-appserver
+    chart: radar/radar-appserver
+    version: 0.0.1
     installed: {{ .Values.radar_appserver._install }}
     values:
       - {{ .Values.radar_appserver | toYaml | indent 8 | trim }}
