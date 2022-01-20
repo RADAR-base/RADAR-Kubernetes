@@ -47,7 +47,7 @@ releases:
 
   - name: radar-rest-sources-backend
     chart: radar/radar-rest-sources-backend
-    version: 0.2.2
+    version: 0.2.3
     installed: {{ .Values.radar_rest_sources_backend._install }}
     values:
       - {{ .Values.radar_rest_sources_backend | toYaml | indent 8 | trim }}
@@ -66,5 +66,17 @@ releases:
       {{- end }}
       - name: restSourceClients.fitbit.enable
         value: {{ .Values.radar_fitbit_connector._install }}
+      - name: restSourceClients.garmin.enable
+        value: {{ .Values.radar_push_endpoint.garmin.enabled }}
+      {{- if hasKey .Values "radar_push_endpoint.garmin.consumerKey" }}
+      - name: restSourceClients.garmin.clientId
+        value: {{ .Values.radar_push_endpoint.garmin.consumerKey }}
+      {{- end }}
+      {{- if hasKey .Values "radar_push_endpoint.garmin.consumerSecret" }}
+      - name: restSourceClients.garmin.clientSecret
+        value: {{ .Values.radar_push_endpoint.garmin.consumerSecret }}
+      {{- end }}
+      {{ if hasKey .Values.management_portal.oauth_clients "radar_rest_sources_auth_backend" }}
       - name: client_secret
-        value: {{ if hasKey .Values.management_portal.oauth_clients "radar_rest_sources_auth_backend" -}}{{ .Values.management_portal.oauth_clients.radar_rest_sources_auth_backend.client_secret }}{{- end }}
+        value: {{ .Values.management_portal.oauth_clients.radar_rest_sources_auth_backend.client_secret }}
+      {{ end }}
