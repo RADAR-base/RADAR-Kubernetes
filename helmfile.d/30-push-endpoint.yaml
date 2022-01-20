@@ -1,0 +1,43 @@
+bases:
+- ../environments.yaml
+
+---
+
+helmDefaults:
+  atomic: true
+  timeout: 600
+  kubeContext: {{ .Values.kubeContext }}
+
+repositories:
+  - name: radar
+    url: https://radar-base.github.io/radar-helm-charts
+
+releases:
+  - name: radar-push-endpoint
+    chart: radar/radar-push-endpoint
+    version: 0.1.1
+    installed: {{ .Values.radar_push_endpoint._install }}
+    values:
+      - {{ .Values.radar_push_endpoint | toYaml | indent 8 | trim }}
+      - {{ .Values.confluent_cloud | toYaml | indent 8 | trim }}
+    set:
+      - name: ingress.hosts
+        values: [{{ .Values.server_name }}]
+      - name: cc.enabled
+        value: {{ .Values.confluent_cloud.enabled }}
+      - name: serviceMonitor.enabled
+        value: {{ .Values.kube_prometheus_stack._install }}
+      {{- if .Values.confluent_cloud.enabled }}
+      - name: schemaRegistry
+        value: {{ .Values.confluent_cloud.cc.schemaRegistryUrl }}
+      - name: bootstrapServers
+        value: {{ .Values.confluent_cloud.cc.bootstrapServerurl }}
+      {{ end }}
+      {{- if .Values.radar_push_endpoint.garmin.enabled }}
+      - name: redis.url
+        value: {{ .Values.radar_output.redis.uri }}
+      {{ end }}
+      {{ if hasKey .Values.management_portal.oauth_clients "radar_push_endpoint" }}
+      - name: garmin.userRepositoryClientSecret
+        value: {{ .Values.management_portal.oauth_clients.radar_push_endpoint.client_secret }}
+      {{ end }}
