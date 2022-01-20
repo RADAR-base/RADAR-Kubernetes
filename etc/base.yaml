@@ -372,7 +372,6 @@ radar_appserver:
   _install: true
   replicaCount: 1
   managementportal_resource_name: res_AppServer
-  public_key_endpoints:
-    # - https://localhost/managementportal/oauth/token_key
+  public_key_endpoints: []
   
   
