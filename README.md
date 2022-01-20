@@ -241,6 +241,9 @@ For more information on how `kubectl` can be used to manage a Kubernetes applica
  
 If you have enabled monitoring you should also check **Prometheus** to see if there are any alerts. In next section there is a guide on how to connect to Prometheus.
 
+#### Optional
+If you are installing `radar-appserver`, please add your Google Firebase credentials to `etc/radar-appserver/google-credentials.json`. Please see example file for the format. This file can be downloaded from your Firebase account.
+
 ## Usage
 ### Accessing the applications
 In order to access to the applications first you need to find the IP address that Nginx service is listening to and then point the domain that you've specified in `server_name` variable to this IP address via a DNS server (e.g. [Route53](https://aws.amazon.com/route53/), [Cloudflare](https://www.cloudflare.com/dns/), [Bind](https://www.isc.org/bind/)) or [`hosts` file](https://en.wikipedia.org/wiki/Hosts_(file)) in your local machine.
