@@ -374,4 +374,9 @@ radar_appserver:
   managementportal_resource_name: res_AppServer
   public_key_endpoints: []
   
-  
+radar_appserver_postgres_password: password
+
+radar_appserver_postgresql:
+  _install: true
+  persistence:
+    size: 8Gi  

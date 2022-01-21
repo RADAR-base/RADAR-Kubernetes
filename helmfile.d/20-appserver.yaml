@@ -24,3 +24,17 @@ releases:
         values: [{{ .Values.server_name }}]
       - name: serverName
         value: {{ .Values.server_name }}
+
+  - name: radar-appserver-postgresql
+    chart: bitnami/postgresql
+    version: 9.6.0
+    wait: false
+    installed: {{ .Values.radar_appserver_postgresql._install }}
+    values:
+      - "../etc/radar-appserver-postgresql/values.yaml"
+      - {{ .Values.radar_appserver_postgresql | toYaml | indent 8 | trim }}
+    set:
+      - name: postgresqlPassword
+        value: {{ .Values.radar_appserver_postgres_password }}
+      - name: replication.password
+        value: {{ .Values.radar_appserver_postgres_password }}
