@@ -17,9 +17,10 @@ repositories:
 releases:
   - name: radar-gateway
     chart: radar/radar-gateway
-    version: 0.1.5
+    version: 0.1.6
     installed: {{ .Values.radar_gateway._install }}
     values:
+      - "../etc/radar-gateway/values.yaml"
       - {{ .Values.radar_gateway | toYaml | indent 8 | trim }}
       - {{ .Values.confluent_cloud | toYaml | indent 8 | trim }}
     set:

@@ -356,8 +356,6 @@ radar_jdbc_connector:
   _install: true
   replicaCount: 1
 
-
-
 # --------------------------------------------------------- 20-push-endpoint.yaml ---------------------------------------------------------
 
 radar_push_endpoint:
@@ -368,3 +366,17 @@ radar_push_endpoint:
     enabled: true
     consumerKey: ""
     consumerSecret: ""
+# --------------------------------------------------------- 20-appserver.yaml ---------------------------------------------------------
+
+radar_appserver:
+  _install: true
+  replicaCount: 1
+  managementportal_resource_name: res_AppServer
+  public_key_endpoints: []
+  
+radar_appserver_postgres_password: password
+
+radar_appserver_postgresql:
+  _install: true
+  persistence:
+    size: 8Gi  
