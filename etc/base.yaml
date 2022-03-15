@@ -181,7 +181,7 @@ app_config_frontend:
   _install: true
   replicaCount: 1
   authUrl: https://example.com/managementportal/oauth
-  callbackUrl: https://example.com/appconfig/login
+  authCallbackUrl: https://example.com/appconfig/login
 
 # --------------------------------------------------------- 20-fitbit.yaml ---------------------------------------------------------
 fitbit_api_client: "client"
