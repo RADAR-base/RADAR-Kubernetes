@@ -13,18 +13,6 @@ repositories:
     url: https://radar-base.github.io/radar-helm-charts
 
 releases:
-  - name: radar-appserver
-    chart: radar/radar-appserver
-    version: 0.1.0
-    installed: {{ .Values.radar_appserver._install }}
-    values:
-      - {{ .Values.radar_appserver | toYaml | indent 8 | trim }}
-    set:
-      - name: ingress.hosts
-        values: [{{ .Values.server_name }}]
-      - name: serverName
-        value: {{ .Values.server_name }}
-
   - name: radar-appserver-postgresql
     chart: bitnami/postgresql
     version: 9.6.0
@@ -38,3 +26,15 @@ releases:
         value: {{ .Values.radar_appserver_postgres_password }}
       - name: replication.password
         value: {{ .Values.radar_appserver_postgres_password }}
+
+  - name: radar-appserver
+    chart: radar/radar-appserver
+    version: 0.1.0
+    installed: {{ .Values.radar_appserver._install }}
+    values:
+      - {{ .Values.radar_appserver | toYaml | indent 8 | trim }}
+    set:
+      - name: ingress.hosts
+        values: [{{ .Values.server_name }}]
+      - name: serverName
+        value: {{ .Values.server_name }}
