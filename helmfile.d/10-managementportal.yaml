@@ -30,7 +30,7 @@ releases:
 
   - name: management-portal
     chart: radar/management-portal
-    version: 0.1.4
+    version: 0.2.1
     installed: {{ .Values.management_portal._install }}
     values:
       - {{ .Values.management_portal | toYaml | indent 8 | trim }}
