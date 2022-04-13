@@ -15,7 +15,7 @@ repositories:
 releases:
   - name: radar-backend-monitor
     chart: radar/radar-backend
-    version: 0.1.1
+    version: 0.1.2
     installed: {{ .Values.radar_backend_monitor._install }}
     values:
       - "../etc/radar-backend-monitor/values.yaml"
@@ -26,7 +26,7 @@ releases:
 
   - name: radar-backend-stream
     chart: radar/radar-backend
-    version: 0.1.1
+    version: 0.1.2
     installed: {{ .Values.radar_backend_stream._install }}
     values:
       - "../etc/radar-backend-stream/values.yaml"
