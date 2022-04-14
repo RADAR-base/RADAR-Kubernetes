@@ -7,35 +7,33 @@ helm version
 helmfile --version
 jq --version
 
+# Add repository indexes
 helmfile repos
+index=$(helm search repo -o json | jq -cr 'map({(.name): .version}) | add')
 
-# Read versions from Helm
-declare -A index
-while read chart
-do
-	name=$(echo "$chart" | cut -d $'\t' -f 1)
-	version=$(echo "$chart" | cut -d $'\t' -f 2)
-	index[$name]=$version
-done < <(helm search repo -o json | jq -r ".[] | [.name, .version] | @tsv")
-
-# Read current versions in the repository
 upgrades=0
+ok=""
+warn=""
+err=""
 
 while read chart
 do
 	name=$(echo "$chart" | cut -d $'\t' -f 1)
 	version=$(echo "$chart" | cut -d $'\t' -f 2)
+	listed_version=$(echo "$index" | jq -r ".\"$name\"")
 
-	if [ "${index[$name]}" != "$version" ]; then
+	if [ "$listed_version" != "$version" ]; then
 		if [[ "$name" == *"radar/"* ]]; then
-			echo "ERROR:   upgrade needed for $name: version $version is listed and version ${index[$name]} is available in the repository"
+			err+="$name ERROR $version $listed_version\n"
 			upgrades=$((upgrades+1))
 		else
-			echo "WARNING: upgrade needed for $name: version $version is listed and version ${index[$name]} is available in the repository"
+			warn+="$name WARNING $version $listed_version\n"
 		fi
 	else
-		echo "OK:       no upgrade needed for $name: version $version is latest"
+		ok+="$name OK $version $listed_version\n"
 	fi
 done < <(helmfile list --output json | jq -r ".[] | [.chart, .version] | @tsv")
 
-exit $upgrades
+printf "NAME STATUS VERSION LATEST\n$ok$warn$err" | column -t
+
+exit $(echo $err | wc -l)
