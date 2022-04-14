@@ -34,7 +34,7 @@ do
 			echo "WARNING: upgrade needed for $name: version $version is listed and version ${index[$name]} is available in the repository"
 		fi
 	else
-		echo "OK:       no upgrade needed for $name: version $version is listed and version ${index[$name]} is available"
+		echo "OK:       no upgrade needed for $name: version $version is latest"
 	fi
 done < <(helmfile list --output json | jq -r ".[] | [.chart, .version] | @tsv")
 
