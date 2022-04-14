@@ -11,7 +11,6 @@ jq --version
 helmfile repos
 index=$(helm search repo -o json | jq -cr 'map({(.name): .version}) | add')
 
-upgrades=0
 ok=""
 warn=""
 err=""
@@ -25,7 +24,6 @@ do
 	if [ "$listed_version" != "$version" ]; then
 		if [[ "$name" == *"radar/"* ]]; then
 			err+="$name ERROR $version $listed_version\n"
-			upgrades=$((upgrades+1))
 		else
 			warn+="$name WARNING $version $listed_version\n"
 		fi
