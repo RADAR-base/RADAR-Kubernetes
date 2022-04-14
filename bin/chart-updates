@@ -34,4 +34,4 @@ done < <(helmfile list --output json | jq -r ".[] | [.chart, .version] | @tsv")
 
 printf "NAME STATUS VERSION LATEST\n$ok$warn$err" | column -t
 
-exit $(echo $err | wc -l)
+exit $(printf "$err" | wc -l)
