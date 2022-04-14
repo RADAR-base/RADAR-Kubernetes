@@ -1,13 +1,13 @@
 name: Check dependency updates
 
 on:
-  pull_request: {}
   workflow_dispatch: {}
   schedule:
+    # Weekly: Monday at 5:30
     - cron: '30 5 * * 1'
 
 jobs:
-  release:
+  dependency-updates:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -18,9 +18,9 @@ jobs:
         with:
           install-helm-plugins: no
           install-kubectl: no
-      - name: setup helmfile config
-        run: |
-          cp .github/environments.yaml environments.yaml
+
+      - name: Set up helmfile config
+        run: cp .github/environments.yaml environments.yaml
       
       - name: Check updates
         run: bin/dependency-updates
