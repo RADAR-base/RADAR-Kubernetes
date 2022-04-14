@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+set -vx
+
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+. bin/util.sh
+
+helm version
+helmfile --version
+jq --version
+
+helmfile repos
+
+# Read versions from Helm
+declare -A index
+while read chart
+do
+	name=$(echo "$chart" | cut -d $'\t' -f 1)
+	version=$(echo "$chart" | cut -d $'\t' -f 2)
+	index[$name]=$version
+done < <(helm search repo -o json | jq -r ".[] | [.name, .version] | @tsv")
+
+# Read current versions in the repository
+upgrades=0
+
+while read chart
+do
+	name=$(echo "$chart" | cut -d $'\t' -f 1)
+	version=$(echo "$chart" | cut -d $'\t' -f 2)
+
+	if [ "${index[$name]}" != "$version" ]; then
+		if [[ "$name" == *"radar/"* ]]; then
+			echo "ERROR:   upgrade needed for $name: version $version is listed and version ${index[$name]} is available in the repository"
+			upgrades=$((upgrades+1))
+		else
+			echo "WARNING: upgrade needed for $name: version $version is listed and version ${index[$name]} is available in the repository"
+		fi
+	else
+		echo "OK:       no upgrade needed for $name: version $version is listed and version ${index[$name]} is available"
+	fi
+done < <(helmfile list --output json | jq -r ".[] | [.chart, .version] | @tsv")
+
+exit $upgrades
