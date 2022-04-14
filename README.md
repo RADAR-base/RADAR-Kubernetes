@@ -317,6 +317,12 @@ kubectl -n monitoring delete secrets radar-base-tls
 kubectl delete crd cephblockpools.ceph.rook.io  cephclients.ceph.rook.io cephclusters.ceph.rook.io cephfilesystems.ceph.rook.io cephnfses.ceph.rook.io cephobjectstores.ceph.rook.io cephobjectstoreusers.ceph.rook.io volumes.rook.io
 kubectl delete psp 00-rook-ceph-operator
 ```
+## Update charts
+
+To find any updates to the Helm charts that are listed in the repository, run
+```
+bin/chart-updates
+```
 
 ## Feedback and Contributions
 Enabling RADAR-base community to use RADAR-Kubernetes is important for us. If you have troubles setting up the platform using provided instructions, you can create an issue with exact details to reproduce and the expected behaviour.

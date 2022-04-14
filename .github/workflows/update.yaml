@@ -1,4 +1,4 @@
-name: Check dependency updates
+name: Check chart updates
 
 on:
   workflow_dispatch: {}
@@ -7,7 +7,7 @@ on:
     - cron: '30 5 * * 1'
 
 jobs:
-  dependency-updates:
+  chart-updates:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -23,4 +23,4 @@ jobs:
         run: cp .github/environments.yaml environments.yaml
       
       - name: Check updates
-        run: bin/dependency-updates
+        run: bin/chart-updates
