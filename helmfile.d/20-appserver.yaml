@@ -1,6 +1,6 @@
 bases:
 - ../environments.yaml
-  
+
 ---
 
 helmDefaults:
@@ -15,7 +15,7 @@ repositories:
 releases:
   - name: radar-appserver-postgresql
     chart: bitnami/postgresql
-    version: 9.6.0
+    version: {{ .Values.radar_appserver_postgresql._chart_version }}
     wait: false
     installed: {{ .Values.radar_appserver_postgresql._install }}
     values:
@@ -29,7 +29,7 @@ releases:
 
   - name: radar-appserver
     chart: radar/radar-appserver
-    version: 0.1.0
+    version: {{ .Values.radar_appserver._chart_version }}
     installed: {{ .Values.radar_appserver._install }}
     values:
       - {{ .Values.radar_appserver | toYaml | indent 8 | trim }}

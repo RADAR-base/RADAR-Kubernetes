@@ -15,7 +15,7 @@ repositories:
 releases:
   - name: radar-push-endpoint
     chart: radar/radar-push-endpoint
-    version: 0.1.1
+    version: {{ .Values.radar_push_endpoint._chart_version }}
     installed: {{ .Values.radar_push_endpoint._install }}
     values:
       - {{ .Values.radar_push_endpoint | toYaml | indent 8 | trim }}
