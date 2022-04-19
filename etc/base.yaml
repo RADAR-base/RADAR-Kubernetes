@@ -6,11 +6,9 @@ postgres_password: password
 
 # --------------------------------------------------------- 00-init.yaml ---------------------------------------------------------
 
-graylog:
-  _install: true
-
 mongodb:
   _install: true
+  _chart_version: 10.11.1
   architecture: replicaset
   auth:
     replicaSetKey: secret
@@ -18,15 +16,23 @@ mongodb:
 
 elasticsearch:
   _install: true
+  _chart_version: 7.12.0
 
-cert_manager:
+graylog:
   _install: true
+  _chart_version: 1.9.2
 
 fluent_bit:
   _install: true
+  _chart_version: 0.15.4
+
+cert_manager:
+  _install: true
+  _chart_version: 0.1.1
 
 kube_prometheus_stack:
   _install: true
+  _chart_version: 0.2.0
   kube-prometheus-stack:
     prometheus:
       prometheusSpec:
@@ -55,6 +61,7 @@ kube_prometheus_stack:
 
 nginx_ingress:
   _install: true
+  _chart_version: 3.25.0
   controller:
     replicaCount: 1
   metrics:
@@ -64,34 +71,11 @@ nginx_ingress:
 
 kafka_manager:
   _install: false
+  _chart_version: 2.1.5
   basicAuth:
     enabled: true
     username: kafkamanager-user
     password: password
-
-velero:
-  _install: false
-  objectStorageBackupReplicaCount: 1
-  local:
-    accessKey: accessKey
-    secretKey: secretKey
-  backup:
-    address: s3.amazon.com  # protocol should not be specified
-    bucket: radar-base-backups
-    accessKey: accessKey
-    secretKey: secretKey
-  velero:
-    configuration:
-      backupStorageLocation:
-        bucket: radar-base-backups
-        config:
-          s3Url: https://s3.amazon.com # protocol should be specified
-    credentials:
-      secretContents:
-        cloud: |
-          [default]
-          aws_access_key_id=accessKey
-          aws_secret_access_key=secretKey
 
 # --------------------------------------------------------- 10-base.yaml ---------------------------------------------------------
 confluent_cloud:
@@ -106,24 +90,31 @@ confluent_cloud:
 
 cp_zookeeper:
   _install: true
+  _chart_version: 0.2.0
   servers: 3
 
 cp_kafka:
   _install: true
+  _chart_version: 0.2.0
   persistence:
     size: 10Gi
 
 cp_schema_registry:
   _install: true
+  _chart_version: 0.2.0
   replicaCount: 1
 
 catalog_server:
   _install: true
+  _chart_version: 0.3.0
   replicaCount: 1
   schema_registry: http://cp-schema-registry:8081
 
+# --------------------------------------------------------- 10-managementportal.yaml ---------------------------------------------------------
+
 postgresql:
   _install: true
+  _chart_version: 9.6.0
   replication:
     enabled: false
   persistence:
@@ -131,6 +122,7 @@ postgresql:
 
 management_portal:
   _install: true
+  _chart_version: 0.2.1
   replicaCount: 1  # should be 1
   postgres:
     host: postgresql
@@ -172,6 +164,7 @@ management_portal:
 
 app_config:
   _install: true
+  _chart_version: 0.2.0
   replicaCount: 1
   jdbc:
     url: jdbc:postgresql://postgresql:5432/appconfig
@@ -179,9 +172,27 @@ app_config:
 
 app_config_frontend:
   _install: true
+  _chart_version: 0.2.0
   replicaCount: 1
   authUrl: https://example.com/managementportal/oauth
   authCallbackUrl: https://example.com/appconfig/login
+
+# --------------------------------------------------------- 20-appserver.yaml ---------------------------------------------------------
+
+radar_appserver_postgres_password: password
+
+radar_appserver_postgresql:
+  _install: true
+  _chart_version: 9.6.0
+  persistence:
+    size: 8Gi
+
+radar_appserver:
+  _install: true
+  _chart_version: 0.1.0
+  replicaCount: 1
+  managementportal_resource_name: res_AppServer
+  public_key_endpoints: []
 
 # --------------------------------------------------------- 20-fitbit.yaml ---------------------------------------------------------
 fitbit_api_client: "client"
@@ -189,15 +200,18 @@ fitbit_api_secret: "secret"
 
 radar_fitbit_connector:
   _install: false
+  _chart_version: 0.2.0
   replicaCount: 1
   oauthClientId: radar_fitbit_connector
 
 radar_rest_sources_authorizer:
+  _chart_version: 0.3.0
   _install: false
   replicaCount: 1
 
 radar_rest_sources_backend:
   _install: false
+  _chart_version: 0.3.0
   replicaCount: 1
   postgres:
     host: postgresql
@@ -211,28 +225,63 @@ radar_rest_sources_backend:
     garmin:
       enable: "false"
 
+# --------------------------------------------------------- 20-grafana.yaml ---------------------------------------------------------
+
+timescaledb_db_name: grafana-metrics
+timescaledb_password: password
+timescaledb_username: postgres
+
+grafana_password: password
+grafana_metrics_username: username
+grafana_metrics_password: password
+
+timescaledb:
+  _install: true
+  _chart_version: 9.6.0
+  replicaCount: 1
+  replication:
+    enable: false
+  persistence:
+    size: 8Gi
+
+radar_grafana:
+  _install: true
+  _chart_version: 6.13.0
+  replicaCount: 1
+  env:
+    GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/allprojects/home.json
+
+radar_jdbc_connector:
+  _install: true
+  _chart_version: 0.1.4
+  replicaCount: 1
+
 # --------------------------------------------------------- 20-ingestion.yaml ---------------------------------------------------------
 
 radar_gateway:
   _install: true
+  _chart_version: 0.2.0
   replicaCount: 1
 
 # --------------------------------------------------------- 20-kafka-analysis.yaml ---------------------------------------------------------
 
 radar_backend_monitor:
   _install: false
+  _chart_version: 0.1.2
   replicaCount: 1
   persistence:
     size: 1Gi
 
 radar_backend_stream:
   _install: false
+  _chart_version: 0.1.2
   replicaCount: 1
 
 # --------------------------------------------------------- 20-redcap.yaml ---------------------------------------------------------
 
 radar_integration:
   _install: false
+  _chart_version: 0.2.0
   replicaCount: 1
   oauth_client_id: radar_redcap_integrator
   projects: []
@@ -245,37 +294,18 @@ radar_integration:
   #    token: xxx
   #    mp_info_project_name: RADAR-BASE
 
-# --------------------------------------------------------- 20-upload.yaml ---------------------------------------------------------
-
-radar_upload_postgres_password: password
-
-radar_upload_postgresql:
-  _install: true
-  persistence:
-    size: 8Gi
-
-radar_upload_connect_backend:
-  _install: true
-  replicaCount: 1
-
-radar_upload_connect_frontend:
-  _install: true
-  replicaCount: 1
-
-radar_upload_source_connector:
-  _install: true
-  replicaCount: 1
-
 # --------------------------------------------------------- 20-s3-connector.yaml ---------------------------------------------------------
 
 redis:
   _install: true
+  _chart_version: 10.6.15
 
 # The access keys and secret keys of the following services should match.
 # If S3 is used as a storage medium instead of minio, then fill in those.
 
 minio:
   _install: true
+  _chart_version: 8.0.10
   replicas: 4
   s3Endpoint: http://minio:9000/
   persistence:
@@ -286,6 +316,7 @@ minio:
 radar_s3_connector:
   # set to true if radar-s3-connector should be installed
   _install: true
+  _chart_version: 0.2.0
   replicaCount: 1
   # The bucket name where intermediate data for cold storage should be written to.
   bucketName: radar-intermediate-storage
@@ -296,6 +327,7 @@ radar_s3_connector:
 
 s3_proxy:
   _install: false
+  _chart_version: 0.1.2
   replicaCount: 1
   target:
     provider: azureblob
@@ -305,6 +337,7 @@ s3_proxy:
 
 radar_output:
   _install: true
+  _chart_version: 0.2.0
   replicaCount: 1
   source:
     s3:
@@ -322,61 +355,73 @@ radar_output:
   redis:
     uri: redis://redis-master:6379
 
+# --------------------------------------------------------- 20-upload.yaml ---------------------------------------------------------
+
+radar_upload_postgres_password: password
+
+radar_upload_postgresql:
+  _install: true
+  _chart_version: 9.6.0
+  persistence:
+    size: 8Gi
+
+radar_upload_connect_backend:
+  _install: true
+  _chart_version: 0.2.0
+  replicaCount: 1
+
+radar_upload_connect_frontend:
+  _install: true
+  _chart_version: 0.2.0
+  replicaCount: 1
+
+radar_upload_source_connector:
+  _install: true
+  _chart_version: 0.2.0
+  replicaCount: 1
+
 # --------------------------------------------------------- 30-confluent-cloud.yaml ---------------------------------------------------------
 
 ccSchemaRegistryProxy:
   _install: false
+  _chart_version: 0.2.0
   externalName: schema-registry-domain
-
-# --------------------------------------------------------- 20-grafana.yaml ---------------------------------------------------------
-
-timescaledb_db_name: grafana-metrics
-timescaledb_password: password
-timescaledb_username: postgres
-
-grafana_password: password
-grafana_metrics_username: username
-grafana_metrics_password: password
-
-radar_grafana:
-  _install: true
-  replicaCount: 1
-  env:
-    GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/allprojects/home.json
-
-timescaledb:
-  _install: true
-  replicaCount: 1
-  replication:
-    enable: false
-  persistence:
-    size: 8Gi
-
-radar_jdbc_connector:
-  _install: true
-  replicaCount: 1
 
 # --------------------------------------------------------- 20-push-endpoint.yaml ---------------------------------------------------------
 
 radar_push_endpoint:
   _install: true
+  _chart_version: 0.1.1
   replicaCount: 1
   adminProperties: {}
   garmin:
     enabled: true
     consumerKey: ""
     consumerSecret: ""
-# --------------------------------------------------------- 20-appserver.yaml ---------------------------------------------------------
 
-radar_appserver:
-  _install: true
-  replicaCount: 1
-  managementportal_resource_name: res_AppServer
-  public_key_endpoints: []
-  
-radar_appserver_postgres_password: password
+# --------------------------------------------------------- 99-velero.yaml ---------------------------------------------------------
 
-radar_appserver_postgresql:
-  _install: true
-  persistence:
-    size: 8Gi  
+velero:
+  _install: false
+  _chart_version: 0.1.2
+  objectStorageBackupReplicaCount: 1
+  local:
+    accessKey: accessKey
+    secretKey: secretKey
+  backup:
+    address: s3.amazon.com  # protocol should not be specified
+    bucket: radar-base-backups
+    accessKey: accessKey
+    secretKey: secretKey
+  velero:
+    configuration:
+      backupStorageLocation:
+        bucket: radar-base-backups
+        config:
+          s3Url: https://s3.amazon.com # protocol should be specified
+    credentials:
+      secretContents:
+        cloud: |
+          [default]
+          aws_access_key_id=accessKey
+          aws_secret_access_key=secretKey

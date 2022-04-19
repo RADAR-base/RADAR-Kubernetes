@@ -19,7 +19,7 @@ repositories:
 releases:
   - name: redis
     chart: bitnami/redis
-    version: 10.6.15
+    version: {{ .Values.redis._chart_version }}
     installed: {{ .Values.redis._install }}
     values:
       - "../etc/redis/values.yaml"
@@ -27,7 +27,7 @@ releases:
 
   - name: minio
     chart: minio/minio
-    version: 8.0.10
+    version: {{ .Values.minio._chart_version }}
     installed: {{ .Values.minio._install }}
     values:
       - "../etc/minio/values.yaml"
@@ -42,7 +42,7 @@ releases:
 
   - name: radar-s3-connector
     chart: radar/radar-s3-connector
-    version: 0.2.0
+    version: {{ .Values.radar_s3_connector._chart_version }}
     installed: {{ .Values.radar_s3_connector._install }}
     values:
       - {{ .Values.radar_s3_connector | toYaml | indent 8 | trim }}
@@ -53,14 +53,14 @@ releases:
 
   - name: s3-proxy
     chart: radar/s3-proxy
-    version: 0.1.2
+    version: {{ .Values.s3_proxy._chart_version }}
     installed: {{ .Values.s3_proxy._install }}
     values:
       - {{ .Values.s3_proxy | toYaml | indent 8 | trim }}
 
   - name: radar-output
     chart: radar/radar-output
-    version: 0.2.0
+    version: {{ .Values.radar_output._chart_version }}
     wait: true
     installed: {{ .Values.radar_output._install }}
     values:

@@ -15,7 +15,7 @@ repositories:
 releases:
   - name: cc-schema-registry-proxy
     chart: radar/cc-schema-registry-proxy
-    version: 0.2.0
+    version: {{ .Values.ccSchemaRegistryProxy._chart_version }}
     installed: {{ .Values.ccSchemaRegistryProxy._install }}
     values:
       - {{ .Values.ccSchemaRegistryProxy | toYaml | indent 8 | trim }}
