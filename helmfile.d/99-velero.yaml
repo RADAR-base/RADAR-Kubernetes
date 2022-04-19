@@ -16,7 +16,7 @@ releases:
   - name: velero
     chart: radar/velero
     namespace: velero
-    version: 0.1.1
+    version: 0.1.2
     installed: {{ .Values.velero._install }}
     values:
       - {{ .Values.velero | toYaml | indent 8 | trim }}
