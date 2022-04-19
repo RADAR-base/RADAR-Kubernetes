@@ -63,7 +63,7 @@ releases:
 
   - name: radar-jdbc-connector
     chart: radar/radar-jdbc-connector
-    version: 0.1.1
+    version: 0.1.4
     installed: {{ .Values.radar_jdbc_connector._install }}
     values:
       - {{ .Values.radar_jdbc_connector | toYaml | indent 8 | trim }}
