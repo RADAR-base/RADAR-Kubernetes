@@ -17,7 +17,7 @@ repositories:
 releases:
   - name: cp-zookeeper
     chart: cp-radar/cp-zookeeper
-    version: 0.2.0
+    version: {{ .Values.cp_zookeeper._chart_version }}
     wait: true
     installed: {{ .Values.cp_zookeeper._install }}
     values:
@@ -26,7 +26,7 @@ releases:
 
   - name: cp-kafka
     chart: cp-radar/cp-kafka
-    version: 0.2.0
+    version: {{ .Values.cp_kafka._chart_version }}
     wait: true
     installed: {{ .Values.cp_kafka._install }}
     values:
@@ -38,7 +38,7 @@ releases:
 
   - name: cp-schema-registry
     chart: cp-radar/cp-schema-registry
-    version: 0.2.0
+    version: {{ .Values.cp_schema_registry._chart_version }}
     wait: true
     installed: {{ .Values.cp_schema_registry._install }}
     values:
@@ -56,7 +56,7 @@ releases:
 
   - name: catalog-server
     chart: radar/catalog-server
-    version: 0.3.0
+    version: {{ .Values.catalog_server._chart_version }}
     wait: true
     installed: {{ .Values.catalog_server._install }}
     values:

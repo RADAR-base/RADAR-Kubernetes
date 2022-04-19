@@ -17,7 +17,7 @@ repositories:
 releases:
   - name: radar-gateway
     chart: radar/radar-gateway
-    version: 0.2.0
+    version: {{ .Values.radar_gateway._chart_version }}
     installed: {{ .Values.radar_gateway._install }}
     values:
       - {{ .Values.radar_gateway | toYaml | indent 8 | trim }}
