@@ -30,7 +30,7 @@ releases:
 
   - name: management-portal
     chart: radar/management-portal
-    version: 0.1.4
+    version: 0.2.1
     installed: {{ .Values.management_portal._install }}
     values:
       - {{ .Values.management_portal | toYaml | indent 8 | trim }}
@@ -67,7 +67,7 @@ releases:
 
   - name: app-config
     chart: radar/app-config
-    version: 0.1.2
+    version: 0.2.0
     installed: {{ .Values.app_config._install }}
     values:
       - {{ .Values.app_config | toYaml | indent 8 | trim }}
@@ -79,7 +79,7 @@ releases:
 
   - name: app-config-frontend
     chart: radar/app-config-frontend
-    version: 0.1.1
+    version: 0.2.0
     installed: {{ .Values.app_config_frontend._install }}
     values:
       - {{ .Values.app_config_frontend | toYaml | indent 8 | trim }}
