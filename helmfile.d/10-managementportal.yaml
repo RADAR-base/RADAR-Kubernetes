@@ -84,5 +84,5 @@ releases:
     values:
       - {{ .Values.app_config_frontend | toYaml | indent 8 | trim }}
     set:
-      - name: server_name
-        value: {{ .Values.server_name }}
+      - name: ingress.hosts
+        value: [{{ .Values.server_name }}]
