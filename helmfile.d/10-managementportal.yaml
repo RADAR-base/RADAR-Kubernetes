@@ -79,7 +79,7 @@ releases:
 
   - name: app-config-frontend
     chart: radar/app-config-frontend
-    version: {{ .Values.app_config._chart_version }}
+    version: {{ .Values.app_config_frontend._chart_version }}
     installed: {{ .Values.app_config_frontend._install }}
     values:
       - {{ .Values.app_config_frontend | toYaml | indent 8 | trim }}
