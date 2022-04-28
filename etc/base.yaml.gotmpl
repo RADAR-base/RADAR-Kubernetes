@@ -8,13 +8,12 @@
   # In case a certificate is needed to connect to PostgreSQL
   # postgres:
   #   ssl:
-  #    keystore: ""
   #    # With helmfile, this can be set in a production.yaml.gotmpl
   #    # file by setting
-  #    {{/*   keystore: {{ readFile "certificate.pem" | b64enc | quote }}  */}}
+  #    {{/* keystore: {{ readFile "certificate.pem" | b64enc | quote }}  */}}
   #    # or with SOPS
-  #    {{/*   keystore: {{ exec "sops" (list "-d" "certificate.pem") | b64enc | quote }} */}}
-  
+  #    {{/* keystore: {{ exec "sops" (list "-d" "certificate.pem") | b64enc | quote }} */}}
+
 radar_grafana:
   dashboards:
     allprojects:
@@ -23,5 +22,3 @@ radar_grafana:
 
 radar_appserver:
   google_application_credentials: {{ readFile "../etc/radar-appserver/google-credentials.json" | quote }}
-
-  
