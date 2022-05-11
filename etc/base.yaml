@@ -172,7 +172,7 @@ app_config:
 
 app_config_frontend:
   _install: true
-  _chart_version: 0.2.1
+  _chart_version: 0.2.2
   replicaCount: 1
   authUrl: https://example.com/managementportal/oauth
   authCallbackUrl: https://example.com/appconfig/login
@@ -211,7 +211,7 @@ radar_rest_sources_authorizer:
 
 radar_rest_sources_backend:
   _install: false
-  _chart_version: 0.3.3
+  _chart_version: 0.3.4
   replicaCount: 1
   postgres:
     host: postgresql
