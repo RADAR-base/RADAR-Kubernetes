@@ -15,3 +15,4 @@ secrets.yaml
 secrets/
 .sops.yaml
 google-services.json
+google-credentials.json
