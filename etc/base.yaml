@@ -8,7 +8,7 @@ postgres_password: password
 
 mongodb:
   _install: true
-  _chart_version: 10.11.1
+  _chart_version: 12.1.19
   architecture: replicaset
   auth:
     replicaSetKey: secret
@@ -114,7 +114,7 @@ catalog_server:
 
 postgresql:
   _install: true
-  _chart_version: 9.6.0
+  _chart_version: 11.6.5
   replication:
     enabled: false
   persistence:
@@ -183,7 +183,7 @@ radar_appserver_postgres_password: password
 
 radar_appserver_postgresql:
   _install: true
-  _chart_version: 9.6.0
+  _chart_version: 11.6.5
   persistence:
     size: 8Gi
 
@@ -237,7 +237,7 @@ grafana_metrics_password: password
 
 timescaledb:
   _install: true
-  _chart_version: 9.6.0
+  _chart_version: 11.6.5
   replicaCount: 1
   replication:
     enable: false
@@ -361,7 +361,7 @@ radar_upload_postgres_password: password
 
 radar_upload_postgresql:
   _install: true
-  _chart_version: 9.6.0
+  _chart_version: 11.6.5
   persistence:
     size: 8Gi
 
