@@ -54,8 +54,12 @@ graylog:
   ## Make sure you strict with the `x` version of Graylog where `x` is ${version}-${x}
   ##
   image:
-    repository: "graylog/graylog:4.0.2-1"
+    repository: "graylog/graylog"
+    tag: "4.2.3-1"
     pullPolicy: "IfNotPresent"
+
+  ## Graylog default Java option
+  javaOpts: "-Dlog4j2.formatMsgNoLookups=true -Djdk.tls.acknowledgeCloseNotify=true -XX:+UnlockExperimentalVMOptions -XX:NewRatio=1 -XX:MaxMetaspaceSize=256m -server -XX:+ResizeTLAB -XX:-OmitStackTraceInFastThrow"
 
   ## Number of Graylog instance
   ##
@@ -65,6 +69,10 @@ graylog:
   ##
   env: {}
 
+  ## Additional labels to be added to Graylog pods
+  ##
+  customLabels: {}
+
   ## Additional environment variables in raw yaml format
   ## - name: POD_IP
   ##   valueFrom:
@@ -73,10 +81,6 @@ graylog:
   ## - name: SERVICE_8000_NAME
   ##   value: servicename
   envRaw: {}
-
-  ## Run as privileged container
-  ##
-  privileged: false
 
   ## Pod affinity
   ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
@@ -100,6 +104,29 @@ graylog:
   ## Annotations to be added to Graylog pods
   ##
   podAnnotations: {}
+
+  ## If specified, indicates the pod's priority.
+  ##
+  # priorityClassName:
+
+  ## Set security context for defining privilege and accessing control settings entire Pod
+  ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  ##
+  podSecurityContext: {}
+    # runAsUser: 10001
+    # fsGroup: 65534
+
+  ## Set security context for defining privilege and accessing control settings for Graylog container
+  ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  ##
+  securityContext:
+    privileged: false
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
 
   persistence:
     ## If true, Graylog will create/use a Persistent Volume Claim
@@ -125,9 +152,16 @@ graylog:
 
   ## Additional plugins you need to install on Graylog.
   ##
-  plugins: []
-    # - name: graylog-plugin-slack-notification-4.0.1.jar
-    #   url: https://github.com/KongZ/graylog-plugin-slack-notification/releases/download/v4.0.1/graylog-plugin-slack-notification-4.0.1.jar
+  plugins:
+    ## If true, set proxy server to retrieve the plugins
+    ##
+    proxy:
+      enabled: false
+      host: http://your.proxy.host:8080
+
+    locations: []
+    # - name: graylog-plugin-slack-notification-4.1.1.jar
+    #   url: https://github.com/KongZ/graylog-plugin-slack-notification/releases/download/v4.1.1/graylog-plugin-slack-notification-4.1.1.jar
     # - name: graylog-plugin-function-check-diff-1.0.1.jar
     #   url: https://github.com/KongZ/graylog-plugin-function-check-diff/releases/download/v1.0.1/graylog-plugin-function-check-diff-1.0.1.jar
     # - name: graylog-plugin-google-cloud-pubsub-1.0.4.jar
@@ -175,6 +209,29 @@ graylog:
       ## Graylog master service port.
       ##
       port: 9000
+      ## Graylog master service type.
+      ##
+      type: ClusterIP
+
+  startupProbe:
+    periodSeconds: 60
+    failureThreshold: 3
+    successThreshold: 1
+    timeoutSeconds: 5
+
+  livenessProbe:
+    initialDelaySeconds: 0
+    periodSeconds: 30
+    failureThreshold: 3
+    successThreshold: 1
+    timeoutSeconds: 5
+
+  readinessProbe:
+    initialDelaySeconds: 0
+    periodSeconds: 10
+    failureThreshold: 3
+    successThreshold: 1
+    timeoutSeconds: 5
 
   ## Additional input ports for receiving logs from servers
   ## Note: Name must be in IANA_SVC_NAME (at most 15 characters, matching regex [a-z0-9]([a-z0-9-]*[a-z0-9])* and it must contains at least one letter [a-z], hyphens cannot be adjacent to other hyphens)
@@ -208,12 +265,9 @@ graylog:
     ##
     certFile: /etc/graylog/server/server.cert
 
-  ## External URL to access Graylog at
+  ## External URL to access Graylog at e.g. https://graylog.mycompany.com
   ##
   externalUri: ""
-
-  ## External URL is https ?
-  externalUriTLS: false
 
   ingress:
     ## If true, Graylog server Ingress will be created
@@ -228,12 +282,15 @@ graylog:
     # labels:
     #  traffic-type: public
 
+    ## Specify the Ingress class name
+    ingressClassName: ""
+
     ## Graylog server Ingress hostnames with optional path
     ## Must be provided if Ingress is enabled
     ## Note: Graylog does not support two URL. You can specify only single URL
     ##
     hosts: []
-    #   - graylog.yourdomain.com
+    #  - graylog.yourdomain.com
 
     ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
     extraPaths: []
@@ -250,6 +307,12 @@ graylog:
     #     hosts:
     #       - graylog.yourdomain.com
 
+    ## For Kubernetes 1.18 or later. Use Prefix or Exact path types.
+    ## See https://kubernetes.io/docs/concepts/services-networking/ingress/#path-types
+    pathType: Prefix
+
+    ## An URL path
+    path: /
 
   ## Configure resource requests and limits
   ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
@@ -270,6 +333,7 @@ graylog:
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
   ##
   updateStrategy: RollingUpdate
+
   ## Graylog server pod termination grace period
   ##
   terminationGracePeriodSeconds: 120
@@ -311,7 +375,7 @@ graylog:
   elasticsearch:
     ## Major version of the Elasticsearch version used.
     ## It is required by Graylog 4. See https://docs.graylog.org/en/4.0/pages/configuration/elasticsearch.html#available-elasticsearch-configuration-tunables
-    version: "6"
+    version: "7"
     ## List of Elasticsearch hosts Graylog should connect to.
     ## Need to be specified as a comma-separated list of valid URIs for the http ports of your elasticsearch nodes.
     ## If one or more of your elasticsearch hosts require authentication, include the credentials in each node URI that
@@ -372,6 +436,10 @@ graylog:
     ##
     deleteBeforeStart: false
 
+    ## Maximum size of the graylog journal.
+    ##
+    maxSize: 5gb
+
   init:
     ## Init Container image
     ##
@@ -424,28 +492,57 @@ graylog:
     #  }'
     #  curl -v -u "admin:$GRAYLOG_PASSWORD_SECRET" -X PUT --header 'Content-Type: application/json' --header 'X-Requested-By: localhost' --data-binary "${json}" http://graylog-master:9000/api/plugins/org.graylog.plugins.auth.sso/config
 
+    ## Additional environment variables to be added to Graylog provisioner job
+    ##
+    env: {}
+
+    ## Additional environment variables in raw yaml format
+    ## - name: POD_IP
+    ##   valueFrom:
+    ##     fieldRef:
+    ##       fieldPath: status.podIP
+    ## - name: SERVICE_8000_NAME
+    ##   value: servicename
+    envRaw: {}
+
   secret:
     ## Secret annotations
     ##
     annotations: {}
 
-## Specify Elasticsearch version from requirement dependencies. Ignore this seection if you install Elasticsearch manually.
-## Note: Graylog 2.4 requires Elasticsearch version <= 5.6
-elasticsearch:
-  image:
-    repository: "docker.elastic.co/elasticsearch/elasticsearch-oss"
-    tag: "6.8.13"
-  client:
-    replicas: 1
-  master:
-    replicas: 1
-  data:
-    replicas: 1
-  cluster:
-    env:
-      MINIMUM_MASTER_NODES: 1
-    xpackEnable: false
+  options:
+    ## Using search result highlighting will result in slightly higher resource consumption of searches.
+    allowHighlighting: false
 
+    ## Do you want to allow searches with leading wildcards?
+    ## This can be extremely resource hungry and should only be enabled with care.
+    allowLeadingWildcardSearches: false
+
+## Specify Elasticsearch version from requirement dependencies. Ignore this seection if you install Elasticsearch manually.
+##
+## Note: the official elasticsearch chart will install master, coordinate, data, and ingest in single node.
+## It is strongly recommend to install Elasticsearch manually without using the dependency.
+## To install Elasticsearch on production, please follow the official guide https://github.com/elastic/helm-charts/tree/main/elasticsearch#how-to-deploy-dedicated-nodes-types
+elasticsearch:
+  replicas: 1
+  minimumMasterNodes: 1
+  antiAffinity: "soft"
+  # Shrink default JVM heap.
+  esJavaOpts: "-Xmx128m -Xms128m"
+  # Allocate smaller chunks of memory per pod.
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "512M"
+    limits:
+      cpu: "1000m"
+      memory: "512M"
+  volumeClaimTemplate:
+    resources:
+      requests:
+        storage: 8Gi  # default 30Gi
+
+# Specify Mongodb settings. Ignore this section if you install MongoDB manually.
 mongodb:
   architecture: "replicaset"
   useStatefulSet: true

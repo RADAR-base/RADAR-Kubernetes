@@ -1,69 +1,15 @@
-# Default values for fluent-bit.
-
-# kind -- DaemonSet or Deployment
-kind: DaemonSet
-
-image:
-  repository: fluent/fluent-bit
-  pullPolicy: Always
-  # tag:
-imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
-
-serviceAccount:
-  create: true
-  annotations: {}
-  name:
-
-rbac:
-  create: true
-
-service:
-  type: ClusterIP
-  port: 2020
-  labels:
-    {}
-  annotations:
-    {}
-    # prometheus.io/path: "/api/v1/metrics/prometheus"
-    # prometheus.io/port: "2020"
-    # prometheus.io/scrape: "true"
-
-serviceMonitor:
-  enabled: false
-  # namespace: monitoring
-  # interval: 10s
-  # scrapeTimeout: 10s
-  # selector:
-  #  prometheus: my-prometheus
-
-prometheusRule:
-  enabled: false
-  # namespace: ""
-  # additionnalLabels: {}
-  # rules:
-  # - alert: NoOutputBytesProcessed
-  #   expr: rate(fluentbit_output_proc_bytes_total[5m]) == 0
-  #   annotations:
-  #     message: |
-  #       Fluent Bit instance {{ $labels.instance }}'s output plugin {{ $labels.name }} has not processed any
-  #       bytes for at least 15 minutes.
-  #     summary: No Output Bytes Processed
-  #   for: 15m
-  #   labels:
-  #     severity: critical
 
 ## https://docs.fluentbit.io/manual/administration/configuring-fluent-bit/configuration-file
 config:
   service: |
     [SERVICE]
-        Flush 1
         Daemon Off
-        Log_Level info
+        Flush {{ .Values.flush }}
+        Log_Level {{ .Values.logLevel }}
         Parsers_File parsers.conf
         Parsers_File custom_parsers.conf
         HTTP_Server Off
+        Health_Check On
 
   ## https://docs.fluentbit.io/manual/pipeline/outputs
   outputs: |

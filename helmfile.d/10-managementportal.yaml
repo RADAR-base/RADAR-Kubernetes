@@ -4,8 +4,6 @@ bases:
 ---
 
 repositories:
-  - name: bitnami
-    url: https://charts.bitnami.com/bitnami
   - name: radar
     url: https://radar-base.github.io/radar-helm-charts
 
@@ -15,7 +13,7 @@ helmDefaults:
 
 releases:
   - name: postgresql
-    chart: bitnami/postgresql
+    chart: radar/postgresql
     version: {{ .Values.postgresql._chart_version }}
     wait: false
     installed: {{ .Values.postgresql._install }}
@@ -23,9 +21,9 @@ releases:
       - "../etc/postgresql/values.yaml"
       - {{ .Values.postgresql | toYaml | indent 8 | trim }}
     set:
-      - name: postgresqlPassword
+      - name: auth.postgresPassword
         value: {{ .Values.postgres_password }}
-      - name: replication.password
+      - name: auth.replicationPassword
         value: {{ .Values.postgres_password }}
 
   - name: management-portal

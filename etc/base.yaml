@@ -8,7 +8,7 @@ postgres_password: password
 
 mongodb:
   _install: true
-  _chart_version: 10.11.1
+  _chart_version: 11.1.10
   architecture: replicaset
   auth:
     replicaSetKey: secret
@@ -16,15 +16,15 @@ mongodb:
 
 elasticsearch:
   _install: true
-  _chart_version: 7.12.0
+  _chart_version: 7.17.3
 
 graylog:
   _install: true
-  _chart_version: 1.9.2
+  _chart_version: 2.1.2
 
 fluent_bit:
   _install: true
-  _chart_version: 0.15.4
+  _chart_version: 0.19.24
 
 cert_manager:
   _install: true
@@ -61,7 +61,7 @@ kube_prometheus_stack:
 
 nginx_ingress:
   _install: true
-  _chart_version: 3.25.0
+  _chart_version: 4.1.0
   controller:
     replicaCount: 1
   metrics:
@@ -114,7 +114,7 @@ catalog_server:
 
 postgresql:
   _install: true
-  _chart_version: 9.6.0
+  _chart_version: 11.1.24
   replication:
     enabled: false
   persistence:
@@ -183,7 +183,7 @@ radar_appserver_postgres_password: password
 
 radar_appserver_postgresql:
   _install: true
-  _chart_version: 9.6.0
+  _chart_version: 11.1.24
   persistence:
     size: 8Gi
 
@@ -237,7 +237,7 @@ grafana_metrics_password: password
 
 timescaledb:
   _install: true
-  _chart_version: 9.6.0
+  _chart_version: 11.1.24
   replicaCount: 1
   replication:
     enable: false
@@ -246,7 +246,7 @@ timescaledb:
 
 radar_grafana:
   _install: true
-  _chart_version: 6.13.0
+  _chart_version: 6.26.8
   replicaCount: 1
   env:
     GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/allprojects/home.json
@@ -298,7 +298,7 @@ radar_integration:
 
 redis:
   _install: true
-  _chart_version: 10.6.15
+  _chart_version: 16.8.7
 
 # The access keys and secret keys of the following services should match.
 # If S3 is used as a storage medium instead of minio, then fill in those.
@@ -361,7 +361,7 @@ radar_upload_postgres_password: password
 
 radar_upload_postgresql:
   _install: true
-  _chart_version: 9.6.0
+  _chart_version: 11.1.24
   persistence:
     size: 8Gi
 
