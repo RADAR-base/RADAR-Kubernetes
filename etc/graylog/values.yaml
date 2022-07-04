@@ -19,8 +19,11 @@ graylog:
           port: 12222
 
   ingress:
+    ## If true, Graylog server Ingress will be created
+    ##
     enabled: true
-    port: 80
+    ## Graylog server Ingress annotations
+    ##
     annotations:
       kubernetes.io/ingress.class: nginx
       cert-manager.io/cluster-issuer: letsencrypt-prod
@@ -46,14 +49,6 @@ graylog:
     ## If true, prometheus annotations will be attached
     ##
     enabled: true
-  geoip:
-    ## If true, Maxmind GeoLite2 will be installed to ${GRAYLOG_HOME}/geoip location
-    ##
-    enabled: true
-
-  ## Graylog root timezone
-  ##
-  rootTimezone: "UTC"
   elasticsearch:
     ## Major version of the Elasticsearch version used.
     ## It is required by Graylog 4. See https://docs.graylog.org/en/4.0/pages/configuration/elasticsearch.html#available-elasticsearch-configuration-tunables
@@ -66,7 +61,3 @@ graylog:
     hosts: http://elasticsearch-master-headless:9200
   mongodb:
     uri: mongodb://mongodb-0.mongodb-headless.graylog.svc.cluster.local:27017/graylog?replicaSet=rs0
-
-tags:
-  install-mongodb: false
-  install-elasticsearch: false

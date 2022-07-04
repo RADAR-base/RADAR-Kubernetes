@@ -9,16 +9,12 @@ helmDefaults:
   kubeContext: {{ .Values.kubeContext }}
 
 repositories:
-  - name: minio
-    url: https://helm.min.io/
-  - name: bitnami
-    url: https://charts.bitnami.com/bitnami
   - name: radar
     url: https://radar-base.github.io/radar-helm-charts
 
 releases:
   - name: redis
-    chart: bitnami/redis
+    chart: radar/redis
     version: {{ .Values.redis._chart_version }}
     installed: {{ .Values.redis._install }}
     values:
@@ -26,7 +22,7 @@ releases:
       - {{ .Values.redis | toYaml | indent 8 | trim }}
 
   - name: minio
-    chart: minio/minio
+    chart: radar/minio
     version: {{ .Values.minio._chart_version }}
     installed: {{ .Values.minio._install }}
     values:

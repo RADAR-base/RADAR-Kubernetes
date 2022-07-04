@@ -14,7 +14,7 @@ repositories:
 
 releases:
   - name: radar-appserver-postgresql
-    chart: bitnami/postgresql
+    chart: radar/postgresql
     version: {{ .Values.radar_appserver_postgresql._chart_version }}
     wait: false
     installed: {{ .Values.radar_appserver_postgresql._install }}
@@ -22,9 +22,9 @@ releases:
       - "../etc/radar-appserver-postgresql/values.yaml"
       - {{ .Values.radar_appserver_postgresql | toYaml | indent 8 | trim }}
     set:
-      - name: postgresqlPassword
+      - name: auth.postgresPassword
         value: {{ .Values.radar_appserver_postgres_password }}
-      - name: replication.password
+      - name: auth.replicationPassword
         value: {{ .Values.radar_appserver_postgres_password }}
 
   - name: radar-appserver
