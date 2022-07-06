@@ -19,11 +19,9 @@ releases:
       - "../etc/timescaledb/values.yaml"
       - {{ .Values.timescaledb | toYaml | indent 8 | trim }}
     set:
-      - name: postgresqlPassword
+      - name: global.postgresql.auth.postgresPassword
         value: {{ .Values.timescaledb_password }}
-      - name: postgresqlUsername
-        value: {{ .Values.timescaledb_username }}
-      - name: postgresqlDatabase
+      - name: auth.database
         value: {{ .Values.timescaledb_db_name }}
 
   - name: radar-grafana
@@ -69,6 +67,6 @@ releases:
       - name: timescaledb.password
         value: {{ .Values.timescaledb_password }}
       - name: timescaledb.username
-        value: {{ .Values.timescaledb_username }}
+        value: postgres
       - name: timescaledb.database_name
         value: {{ .Values.timescaledb_db_name }}

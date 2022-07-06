@@ -22,7 +22,7 @@ releases:
       - "../etc/radar-upload-postgresql/values.yaml"
       - {{ .Values.radar_upload_postgresql | toYaml | indent 8 | trim }}
     set:
-      - name: auth.postgresPassword
+      - name: global.postgresql.auth.postgresPassword
         value: {{ .Values.radar_upload_postgres_password }}
       - name: auth.replicationPassword
         value: {{ .Values.radar_upload_postgres_password }}
