@@ -229,7 +229,6 @@ radar_rest_sources_backend:
 
 timescaledb_db_name: grafana-metrics
 timescaledb_password: password
-timescaledb_username: postgres
 
 grafana_password: password
 grafana_metrics_username: username
@@ -337,7 +336,7 @@ s3_proxy:
 
 radar_output:
   _install: true
-  _chart_version: 0.2.1
+  _chart_version: 0.3.0
   replicaCount: 1
   source:
     s3:
