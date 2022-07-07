@@ -28,7 +28,14 @@ fluent_bit:
 
 cert_manager:
   _install: true
-  _chart_version: 0.1.2
+  _chart_version: 1.8.2
+  prometheus:
+    servicemonitor:
+      enabled: true
+
+cert_manager_letsencrypt:
+  _install: true
+  _chart_version: 0.1.0
 
 kube_prometheus_stack:
   _install: true
