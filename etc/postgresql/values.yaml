@@ -80,18 +80,20 @@ primary:
          #!/bin/bash
          set -e
          set -u
+         export PGPASSWORD="$POSTGRESQL_PASSWORD"
 
          function create_user_and_database() {
+           export PGPASSWORD="$POSTGRESQL_PASSWORD"
            local database=$1
-           local database_exist=$(psql -U "$POSTGRES_USER" -tAc "SELECT 1 FROM pg_database WHERE datname='$database';")
+           local database_exist=$(psql -U postgres -tAc "SELECT 1 FROM pg_database WHERE datname='$database';")
            if [[ "$database_exist" == 1 ]]; then
              echo "Database $database already exists"
            else
              echo "Database $database does not exist"
-             echo "  Creating database '$database' for user '$POSTGRES_USER'"
-             psql -U "$POSTGRES_USER" -v ON_ERROR_STOP=1  <<-EOSQL
+             echo "  Creating database '$database' for user postgres"
+             psql -U postgres -v ON_ERROR_STOP=1  <<-EOSQL
              CREATE DATABASE "$database";
-             GRANT ALL PRIVILEGES ON DATABASE $database TO "$POSTGRES_USER";
+             GRANT ALL PRIVILEGES ON DATABASE $database TO postgres;
          EOSQL
            fi
          }
@@ -157,7 +159,6 @@ primary:
     ## @param primary.persistence.size PVC Storage Request for PostgreSQL volume
     ##
     size: 8Gi
-## Init containers parameters:
 ## volumePermissions: Change the owner and group of the persistent volume(s) mountpoint(s) to 'runAsUser:fsGroup' on each node
 ##
 volumePermissions:
