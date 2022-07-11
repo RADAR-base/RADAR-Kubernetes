@@ -1,7 +1,11 @@
 #podManagementPolicy: Parallel
 syncLimit: 2
 initLimit: 5
-imageTag: 5.3.1
+imageTag: 7.2.0
+
+initChownData:
+  enabled: true
+  uid: 1000
 
 resources:
   # We usually recommend not to specify default resources and to leave this as a conscious
