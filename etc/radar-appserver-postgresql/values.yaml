@@ -54,6 +54,9 @@ replication:
 ##
 postgresqlDataDir: /bitnami/postgresql/data
 
+## @section PostgreSQL Primary parameters
+##
+primary:
   ## @param primary.podAnnotations Map of annotations to add to the pods (postgresql primary)
   ##
   podAnnotations:

@@ -21,4 +21,4 @@ radar_grafana:
         json: {{ readFile "radar-grafana/dashboards/allprojects/home.json" | quote }}
 
 radar_appserver:
-  google_application_credentials: {{ readFile "../etc/radar-appserver/google-credentials.json" | quote }}
+  google_application_credentials: {{ readFile "../etc/radar-appserver/firebase-adminsdk.json" | b64enc | quote }}
