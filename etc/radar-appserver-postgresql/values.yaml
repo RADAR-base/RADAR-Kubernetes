@@ -101,16 +101,15 @@ primary:
     ## @param primary.persistence.size PVC Storage Request for PostgreSQL volume
     ##
     size: 8Gi
-## volumePermissions: Change the owner and group of the persistent volume(s) mountpoint(s) to 'runAsUser:fsGroup' on each node
-##
-volumePermissions:
-  ## @param volumePermissions.enabled Enable init container that changes the owner and group of the persistent volume
-  ##
-  enabled: true
-
 ## @section Metrics Parameters
 
 metrics:
   ## @param metrics.enabled Start a prometheus exporter
+  ##
+  enabled: true
+## volumePermissions: Change the owner and group of the persistent volume(s) mountpoint(s) to 'runAsUser:fsGroup' on each node
+##
+volumePermissions:
+  ## @param volumePermissions.enabled Enable init container that changes the owner and group of the persistent volume
   ##
   enabled: true

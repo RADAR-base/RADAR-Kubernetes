@@ -242,7 +242,7 @@ For more information on how `kubectl` can be used to manage a Kubernetes applica
 If you have enabled monitoring you should also check **Prometheus** to see if there are any alerts. In next section there is a guide on how to connect to Prometheus.
 
 #### Optional
-If you are installing `radar-appserver`, please add your Google Firebase credentials to `etc/radar-appserver/google-credentials.json`. Please see example file for the format. This file can be downloaded from your Firebase account.
+If you are installing `radar-appserver`, it needs to be authorized with the Google Firebase also used by the aRMT / Questionnaire app. In Firebase, go to _Project settings_ -> _Service accounts_ and download a Firebase Admin SDK private key. Store the generated key as `etc/radar-appserver/firebase-adminsdk.json`.
 
 ## Usage
 ### Accessing the applications
