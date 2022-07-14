@@ -1,3 +1,17 @@
+## @section Global parameters
+## Please, note that this will override the parameters, including dependencies, configured to use the global value
+##
+global:
+  postgresql:
+    ## @param global.postgresql.auth.postgresPassword Password for the "postgres" admin user (overrides `auth.postgresPassword`)
+    ## @param global.postgresql.auth.username Name for a custom user to create (overrides `auth.username`)
+    ## @param global.postgresql.auth.password Password for the custom user to create (overrides `auth.password`)
+    ## @param global.postgresql.auth.database Name for a custom database to create (overrides `auth.database`)
+    ## @param global.postgresql.auth.existingSecret Name of existing secret to use for PostgreSQL credentials (overrides `auth.existingSecret`)
+    ##
+    auth:
+      postgresPassword: ""
+
 ## Bitnami PostgreSQL image version
 ## ref: https://hub.docker.com/r/bitnami/postgresql/tags/
 ## @param image.registry PostgreSQL image registry
@@ -43,6 +57,15 @@ postgresqlDataDir: /bitnami/postgresql/data
 ## @section PostgreSQL Primary parameters
 ##
 primary:
+  ## @param primary.extraEnvVars Array with extra environment variables to add to PostgreSQL Primary nodes
+  ## e.g:
+  ## extraEnvVars:
+  ##   - name: FOO
+  ##     value: "bar"
+  ##
+  extraEnvVars:
+    - name: POSTGRESQL_USERNAME
+      value: postgres
   ## @param primary.podAnnotations Map of annotations to add to the pods (postgresql primary)
   ##
   podAnnotations:
@@ -51,8 +74,7 @@ primary:
     post.hook.backup.velero.io/container: fsfreeze
     pre.hook.backup.velero.io/command: '["/bin/fsfreeze", "--freeze", "/bitnami/postgresql"]'
     pre.hook.backup.velero.io/container: fsfreeze
-  ## Add sidecars to the pod
-  ##
+  ## @param primary.sidecars Add additional sidecar containers to the PostgreSQL Primary pod(s)
   ## For example:
   ## sidecars:
   ##   - name: your-image-name
@@ -94,7 +116,6 @@ metrics:
   ## @param metrics.enabled Start a prometheus exporter
   ##
   enabled: true
-## Init containers parameters:
 ## volumePermissions: Change the owner and group of the persistent volume(s) mountpoint(s) to 'runAsUser:fsGroup' on each node
 ##
 volumePermissions:
