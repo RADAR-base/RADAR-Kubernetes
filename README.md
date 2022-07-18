@@ -1,7 +1,9 @@
-# RADAR-Kubernetes [![Build Status](https://travis-ci.org/RADAR-base/RADAR-Kubernetes.svg?branch=master)](https://travis-ci.org/RADAR-base/RADAR-Kubernetes)
-The Kubernetes stack of RADAR-base platform
+# RADAR-Kubernetes [![GitHub release](https://img.shields.io/github/v/release/radar-base/radar-kubernetes)](https://github.com/RADAR-base/RADAR-Kubernetes/releases/latest)
+
+The Kubernetes stack of RADAR-base platform.
 
 ## About
+
 RADAR-base is an open-source platform designed to support remote clinical trials by collecting continuous data from wearables and mobile applications. RADAR-Kubernetes enables installing the RADAR-base platform onto Kubernetes clusters. RADAR-base platform can be used for wide range of use-cases. Depending on the use-case, the selection of applications need to be installed can vary. Please read the [component overview and breakdown](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/2673967112/Component+overview+and+breakdown) to understand the role of each component and how components work together. 
 
 RADAR-Kubernetes setup uses [Helm 3](https://github.com/helm/helm) charts to package necessary Kubernetes resources for each component and [helmfile](https://github.com/roboll/helmfile) to modularize and deploy Helm charts of the platform on a Kubernetes cluster. This setup is designed to be a lightweight way to install and configure the RADAR-base components. The original images or charts may provide more and granular configurations. Please visit the `README` of respective charts in [radar-helm-charts](https://github.com/RADAR-base/radar-helm-charts) to understand the configurations and visit the main repository for in depth knowledge.
@@ -108,6 +110,8 @@ The `helmfile sync` will synchronize all the Kubernetes resources defined in the
 | :exclamation:  Note|
 |:----------------------------------------|
 | Installing the stack with `--concurrency 1` may make the installation slower. However, it is necessary because some components such as `kube-prometheus-stack` and `kafka-init` (aka `catalog-server`) should be installed in their specified order. If you've forgotten to use this flag, then the installation may not be successful. To continue, follow [Uninstallation](#uninstall) steps to clean up the Kubernetes cluster before you can try again.
+
+Graylog and fluent-bit services in the `graylog` namespace will not immediately be operational, first it needs an input source defined. Log into  `graylog.<server name>` with the Graylog credentials. Then navigate to _System_ -> _Inputs_, click _Launch new input_ and create a new GELF TCP input on port 12222.
 
 #### Monitor and verify the installation process.
 Once the installation is done or in progress, you can check the status using `kubectl get pods`.
@@ -248,7 +252,7 @@ Run the following instructions to upgrade an existing RADAR-Kubernetes cluster.
 |--------------------|
 | Upgrading the major version of a PostgreSQL image is not supported. If necessary, we propose to use a `pg_dump` to dump the current data and a `pg_restore` to restore that data on a newer version. Please find instructions for this elsewhere. |
 
-### Upgrade to version RADAR-Kubernetes 1.0.0
+### Upgrade to RADAR-Kubernetes version 1.0.0
 
 To upgrade the initial services, run
 ```
