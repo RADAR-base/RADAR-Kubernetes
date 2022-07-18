@@ -133,6 +133,8 @@ catalog_server:
 postgresql:
   _install: true
   _chart_version: 11.1.24
+  image:
+    tag: 11.16.0
   replication:
     enabled: false
   primary:
@@ -205,6 +207,8 @@ radar_appserver_postgres_password: password
 radar_appserver_postgresql:
   _install: true
   _chart_version: 11.1.24
+  image:
+    tag: 11.16.0
   primary:
     persistence:
       size: 8Gi
@@ -262,6 +266,8 @@ timescaledb:
   _install: true
   _chart_version: 11.1.24
   image:
+    # use the bitnami tag suffix to match with the bitnami postgresql chart
+    tag: latest-pg12-bitnami
     pullPolicy: Always
   replicaCount: 1
   replication:
@@ -390,6 +396,8 @@ radar_upload_postgres_password: password
 radar_upload_postgresql:
   _install: true
   _chart_version: 11.1.24
+  image:
+    tag: 11.16.0
   primary:
     persistence:
       size: 10Gi

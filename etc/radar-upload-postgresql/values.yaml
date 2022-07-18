@@ -1,3 +1,17 @@
+## @section Global parameters
+## Please, note that this will override the parameters, including dependencies, configured to use the global value
+##
+global:
+  postgresql:
+    ## @param global.postgresql.auth.postgresPassword Password for the "postgres" admin user (overrides `auth.postgresPassword`)
+    ## @param global.postgresql.auth.username Name for a custom user to create (overrides `auth.username`)
+    ## @param global.postgresql.auth.password Password for the custom user to create (overrides `auth.password`)
+    ## @param global.postgresql.auth.database Name for a custom database to create (overrides `auth.database`)
+    ## @param global.postgresql.auth.existingSecret Name of existing secret to use for PostgreSQL credentials (overrides `auth.existingSecret`)
+    ##
+    auth:
+      postgresPassword: ""
+
 ## Bitnami PostgreSQL image version
 ## ref: https://hub.docker.com/r/bitnami/postgresql/tags/
 ## @param image.registry PostgreSQL image registry
@@ -80,6 +94,9 @@ primary:
     ## @param primary.persistence.enabled Enable PostgreSQL Primary data persistence using PVC
     ##
     enabled: true
+    ## @param primary.persistence.existingClaim Name of an existing PVC to use
+    ##
+    #existingClaim: "data-radar-upload-postgresql-postgresql-0"
     ## @param primary.persistence.mountPath The path the volume will be mounted at
     ## Note: useful when using custom PostgreSQL images
     ##
@@ -87,17 +104,15 @@ primary:
     ## @param primary.persistence.size PVC Storage Request for PostgreSQL volume
     ##
     size: 8Gi
-## Init containers parameters:
-## volumePermissions: Change the owner and group of the persistent volume(s) mountpoint(s) to 'runAsUser:fsGroup' on each node
-##
-volumePermissions:
-  ## @param volumePermissions.enabled Enable init container that changes the owner and group of the persistent volume
-  ##
-  enabled: true
-
 ## @section Metrics Parameters
 
 metrics:
   ## @param metrics.enabled Start a prometheus exporter
+  ##
+  enabled: true
+## volumePermissions: Change the owner and group of the persistent volume(s) mountpoint(s) to 'runAsUser:fsGroup' on each node
+##
+volumePermissions:
+  ## @param volumePermissions.enabled Enable init container that changes the owner and group of the persistent volume
   ##
   enabled: true

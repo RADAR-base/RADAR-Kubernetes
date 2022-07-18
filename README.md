@@ -84,6 +84,8 @@ The following tools should be installed in your local machine to install the RAD
     ```shell
     vim etc/production.yaml  # Change setup parameters and configurations
     ```
+
+    When doing a clean install, you are advised to change the `postgresql`, `radar_appserver_postgresql` `radar_upload_postgresql` image tags to the latest PostgreSQL version. Likewise, the timescaledb image tag should use the latest timescaledb version.
 3. In `etc/production.yaml.gotmpl` file, change setup parameters that require Go templating, such as reading input files and selecting an option for the `keystore.p12`
     ```shell
     vim etc/production.yaml.gotmpl 
@@ -133,8 +135,7 @@ minio-2                                          1/1     Running   0          8m
 minio-3                                          1/1     Running   0          8m21s
 nginx-ingress-controller-748f5b5b88-9j882        1/1     Running   0          8m21s
 nginx-ingress-default-backend-659bd647bd-kk922   1/1     Running   0          8m21s
-postgresql-postgresql-master-0                   3/3     Running   0          8m21s
-postgresql-postgresql-slave-0                    1/1     Running   0          8m21s
+postgresql-0                                     3/3     Running   0          8m21s
 radar-fitbit-connector-594d8b668c-h8m4d          2/2     Running   0          8m21s
 radar-gateway-5c4b8c8645-c8zrh                   2/2     Running   0          8m21s
 radar-grafana-75b698d68-8gq94                    1/1     Running   0          8m21s
@@ -146,15 +147,10 @@ radar-rest-sources-backend-f5895cfd5-d8cdm       1/1     Running   0          8m
 radar-s3-connector-864b69bd5d-68dvk              1/1     Running   0          8m21s
 radar-upload-connect-backend-6d446f885d-29jnc    1/1     Running   0          8m21s
 radar-upload-connect-frontend-547cb69595-9ld5s   1/1     Running   0          8m21s
-radar-upload-postgresql-postgresql-master-0      3/3     Running   0          8m21s
-radar-upload-postgresql-postgresql-slave-0       1/1     Running   0          8m21s
+radar-upload-postgresql-postgresql-0             3/3     Running   0          8m21s
 radar-upload-source-connector-c87ddc848-fxlg7    1/1     Running   0          8m21s
 redis-master-0                                   2/2     Running   0          8m21s
-redis-slave-0                                    2/2     Running   0          8m21s
-smtp-6646fc65cd-5h2f7                            1/1     Running   0          8m21s
-timescaledb-slave-0                              1/1     Running   0          8m21s
-timescaledb-slave-1                              1/1     Running   0          8m21s
-timescaledb-timescaledb-master-0                 3/3     Running   0          8m21s
+timescaledb-postgresql-0                         3/3     Running   0          8m21s
 ```
 
 If you have enabled monitoring, logging and HTTPS you should see these as well:
@@ -243,6 +239,64 @@ If you have enabled monitoring you should also check **Prometheus** to see if th
 
 #### Optional
 If you are installing `radar-appserver`, it needs to be authorized with the Google Firebase also used by the aRMT / Questionnaire app. In Firebase, go to _Project settings_ -> _Service accounts_ and download a Firebase Admin SDK private key. Store the generated key as `etc/radar-appserver/firebase-adminsdk.json`.
+
+## Upgrade instructions
+
+To upgrade the base services cert-manager, run
+```
+helmfile -f helmfile.d/00-init.yaml --selector name=cert-manager apply
+helmfile -f helmfile.d/00-init.yaml --selector name=cert-manager-letsencrypt apply
+```
+
+To upgrade prometheus,  change `kube_prometheus_stack.kube-prometheus-stack.kubeStateMetrics.enabled: false` in your values (e.g., `production.yaml`)
+```
+helmfile -f helmfile.d/00-init.yaml --selector name=kube-prometheus-stack apply
+```
+Then change  `kube_prometheus_stack.kube-prometheus-stack.kubeStateMetrics.enabled: true` and run again
+```
+helmfile -f helmfile.d/00-init.yaml --selector name=kube-prometheus-stack apply
+```
+
+This avoids a conflict when updating `kube-state-metrics`.
+
+To update the Kafka stack, run:
+```
+helmfile -f helmfile.d/10-base.yaml apply
+```
+After this has succeeded, edit your `production.yaml` and change the `cp_kafka.customEnv.KAFKA_INTER_BROKER_PROTOCOL_VERSION` to the corresponding version documented in the [Confluent upgrade instructions](https://docs.confluent.io/platform/current/installation/upgrade.html) of your Kafka installation. Your currently installed Kafka version with `kubectl exec cp-kafka-0 -c cp-kafka-broker -- kafka-topics --version`.
+
+To upgrade to the latest PostgreSQL chart, first run
+```
+kubectl edit secrets postgresql
+```
+and copy the line
+```
+  postgresql-password: <mysecret>
+```
+and in the duplicate line, change `postgresql-password` to `postgres-password`. Also, in `production.yaml`, uncomment the line `postgresql.primary.persistence.existingClaim: "data-postgresql-postgresql-0"` to use the same data storage as previously. Then run `helmfile -f helmfile.d/10-managementportal.yaml`.
+
+For `radar-appserver-postgresql` and `timescaledb`, the upgrade will not be automatic. For `radar-appserver-postgresql`, uncomment the `production.yaml` line `radar_appserver_postgresql.primary.existingClaim: "data-radar-appserver-postgresql-postgresql-0"`. Then run
+```
+kubectl delete secrets radar-appserver-postgresql
+kubectl delete statefulsets radar-appserver-postgresql-postgresql
+helmfile -f helmfile.d/20-appserver.yaml apply
+```
+
+To upgrade `timescaledb`, uncomment the `production.yaml` line `timescaledb.primary.existingClaim: "data-timescaledb-postgresql-0"`. Then run
+```
+kubectl delete secrets timescaledb
+kubectl delete statefulsets timescaledb-postgresql
+helmfile -f helmfile.d/20-grafana.yaml apply
+```
+
+To upgrade `timescaledb`, uncomment the `production.yaml` line `radar_upload_postgresql.primary.existingClaim: "data-radar-upload-postgresql-postgresql-0"`. Then run
+```
+kubectl delete secrets radar-upload-postgresql
+kubectl delete statefulsets radar-upload-postgresql-postgresql
+helmfile -f helmfile.d/20-upload.yaml apply
+```
+
+Upgrading the major version of PostgreSQL is not supported. If necessary, we propose to use a `pg_dump` to dump the current data and a `pg_restore` to restore that data on a newer version.
 
 ## Usage
 ### Accessing the applications
