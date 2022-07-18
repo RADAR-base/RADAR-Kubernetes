@@ -102,8 +102,6 @@ cp_zookeeper:
   _chart_version: 0.3.1
   imageTag: 7.2.0
   servers: 3
-  # Uncomment if Zookeeper keeps crashing when it can find the data logs but not the snapshots.
-  #zookeeperSnapshotTrustEmpty: true
 
 cp_kafka:
   _install: true
