@@ -266,31 +266,28 @@ helmfile -f helmfile.d/10-base.yaml apply
 ```
 After this has succeeded, edit your `production.yaml` and change the `cp_kafka.customEnv.KAFKA_INTER_BROKER_PROTOCOL_VERSION` to the corresponding version documented in the [Confluent upgrade instructions](https://docs.confluent.io/platform/current/installation/upgrade.html) of your Kafka installation. Find the currently installed version of Kafka with `kubectl exec cp-kafka-0 -c cp-kafka-broker -- kafka-topics --version`.
 
-To upgrade to the latest PostgreSQL helm chart, first run
+To upgrade to the latest PostgreSQL helm chart, in `production.yaml`, uncomment the line `postgresql.primary.persistence.existingClaim: "data-postgresql-postgresql-0"` to use the same data storage as previously. Then run
 ```
-kubectl edit secrets postgresql
+kubectl delete secrets postgresql
+kubectl delete statefulsets postgresql-postgresql
+helmfile -f helmfile.d/10-managementportal.yaml apply
 ```
-and copy the line
-```
-  postgresql-password: <mysecret>
-```
-and in the duplicate line, change `postgresql-password` to `postgres-password`. Also, in `production.yaml`, uncomment the line `postgresql.primary.persistence.existingClaim: "data-postgresql-postgresql-0"` to use the same data storage as previously. Then run `helmfile -f helmfile.d/10-managementportal.yaml`.
 
-For `radar-appserver-postgresql` and `timescaledb`, the upgrade will not be automatic. For `radar-appserver-postgresql`, uncomment the `production.yaml` line `radar_appserver_postgresql.primary.existingClaim: "data-radar-appserver-postgresql-postgresql-0"`. Then run
+If installed, `radar-appserver-postgresql`, uncomment the `production.yaml` line `radar_appserver_postgresql.primary.existingClaim: "data-radar-appserver-postgresql-postgresql-0"`. Then run
 ```
 kubectl delete secrets radar-appserver-postgresql
 kubectl delete statefulsets radar-appserver-postgresql-postgresql
 helmfile -f helmfile.d/20-appserver.yaml apply
 ```
 
-To upgrade `timescaledb`, uncomment the `production.yaml` line `timescaledb.primary.existingClaim: "data-timescaledb-postgresql-0"`. Then run
+If installed, to upgrade `timescaledb`, uncomment the `production.yaml` line `timescaledb.primary.existingClaim: "data-timescaledb-postgresql-0"`. Then run
 ```
 kubectl delete secrets timescaledb
 kubectl delete statefulsets timescaledb-postgresql
 helmfile -f helmfile.d/20-grafana.yaml apply
 ```
 
-To upgrade `timescaledb`, uncomment the `production.yaml` line `radar_upload_postgresql.primary.existingClaim: "data-radar-upload-postgresql-postgresql-0"`. Then run
+If installed, to upgrade `radar-upload-postgresql`, uncomment the `production.yaml` line `radar_upload_postgresql.primary.existingClaim: "data-radar-upload-postgresql-postgresql-0"`. Then run
 ```
 kubectl delete secrets radar-upload-postgresql
 kubectl delete statefulsets radar-upload-postgresql-postgresql
