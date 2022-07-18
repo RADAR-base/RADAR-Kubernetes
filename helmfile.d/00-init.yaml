@@ -116,6 +116,11 @@ releases:
         value: radar-base-tls-grafana
       - name: kube-prometheus-stack.grafana.ingress.tls[0].hosts
         values: ["grafana.{{ .Values.server_name }}"]
+    hooks:
+      - events: ["presync"]
+        showlogs: true
+        command: "kubectl"
+        args: ["--context", "{{ .Values.kubeContext }}", "apply", "--force-conflicts", "--server-side", "-f", "../etc/kube-prometheus-stack/files/crds.yaml"]
 
   - name: nginx-ingress
     chart: radar/ingress-nginx

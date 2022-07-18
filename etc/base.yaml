@@ -39,7 +39,7 @@ cert_manager_letsencrypt:
 
 kube_prometheus_stack:
   _install: true
-  _chart_version: 0.2.0
+  _chart_version: 0.3.0
   kube-prometheus-stack:
     prometheus:
       prometheusSpec:
@@ -65,6 +65,8 @@ kube_prometheus_stack:
               resources:
                 requests:
                   storage: 1Gi
+    kubeStateMetrics:
+      enabled: true
 
 nginx_ingress:
   _install: true
@@ -97,18 +99,27 @@ confluent_cloud:
 
 cp_zookeeper:
   _install: true
-  _chart_version: 0.3.0
+  _chart_version: 0.3.1
+  imageTag: 7.2.0
   servers: 3
+  # Uncomment if Zookeeper keeps crashing when it can find the data logs but not the snapshots.
+  #zookeeperSnapshotTrustEmpty: true
 
 cp_kafka:
   _install: true
   _chart_version: 0.3.0
+  imageTag: 7.2.0
+  customEnv:
+    # Set this to 3.2 when upgraded to 7.2.0
+    KAFKA_INTER_BROKER_PROTOCOL_VERSION: "1.1"
+    KAFKA_LOG_MESSAGE_FORMAT_VERSION: "1.1"
   persistence:
     size: 10Gi
 
 cp_schema_registry:
   _install: true
   _chart_version: 0.3.0
+  imageTag: 7.2.0
   replicaCount: 1
 
 catalog_server:
@@ -124,8 +135,11 @@ postgresql:
   _chart_version: 11.1.24
   replication:
     enabled: false
-  persistence:
-    size: 8Gi
+  primary:
+    persistence:
+      size: 10Gi
+      # Uncomment when upgrading
+      #existingClaim: "data-postgresql-postgresql-0"
 
 management_portal:
   _install: true
@@ -191,8 +205,11 @@ radar_appserver_postgres_password: password
 radar_appserver_postgresql:
   _install: true
   _chart_version: 11.1.24
-  persistence:
-    size: 8Gi
+  primary:
+    persistence:
+      size: 8Gi
+      # Uncomment when upgrading
+      #existingClaim: "data-radar-appserver-postgresql-postgresql-0"
 
 radar_appserver:
   _install: true
@@ -244,11 +261,16 @@ grafana_metrics_password: password
 timescaledb:
   _install: true
   _chart_version: 11.1.24
+  image:
+    pullPolicy: Always
   replicaCount: 1
   replication:
     enable: false
-  persistence:
-    size: 8Gi
+  primary:
+    persistence:
+      size: 8Gi
+      # Uncomment when upgrading
+      #existingClaim: "data-timescaledb-postgresql-0"
 
 radar_grafana:
   _install: true
@@ -368,8 +390,11 @@ radar_upload_postgres_password: password
 radar_upload_postgresql:
   _install: true
   _chart_version: 11.1.24
-  persistence:
-    size: 8Gi
+  primary:
+    persistence:
+      size: 10Gi
+      # Uncomment when upgrading
+      #existingClaim: "data-radar-upload-postgresql-postgresql-0"
 
 radar_upload_connect_backend:
   _install: true
