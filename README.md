@@ -254,6 +254,8 @@ Run the following instructions to upgrade an existing RADAR-Kubernetes cluster.
 
 ### Upgrade to RADAR-Kubernetes version 1.0.0
 
+Before running the upgrade, compare `etc/base.yaml` and `etc/base.yaml.gotmpl` with their `production.yaml` counterparts. Please ensure that all properties in `etc/base.yaml` are overridden in your `production.yaml` or that the `base.yaml` default value is fine, in which case no value needs to be provided in `production.yaml`.
+
 To upgrade the initial services, run
 ```
 kubectl delete -n monitoring deployments kube-prometheus-stack-kube-state-metrics
