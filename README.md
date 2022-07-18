@@ -85,7 +85,7 @@ The following tools should be installed in your local machine to install the RAD
     vim etc/production.yaml  # Change setup parameters and configurations
     ```
 
-    When doing a clean install, you are advised to change the `postgresql`, `radar_appserver_postgresql` `radar_upload_postgresql` image tags to the latest PostgreSQL version. Likewise, the timescaledb image tag should use the latest timescaledb version.
+    When doing a clean install, you are advised to change the `postgresql`, `radar_appserver_postgresql` `radar_upload_postgresql` image tags to the latest PostgreSQL version. Likewise, the timescaledb image tag should use the latest timescaledb version. PostgreSQL major versions cannot easily be updated after installation.
 3. In `etc/production.yaml.gotmpl` file, change setup parameters that require Go templating, such as reading input files and selecting an option for the `keystore.p12`
     ```shell
     vim etc/production.yaml.gotmpl 
