@@ -262,9 +262,13 @@ helmfile -f helmfile.d/00-init.yaml apply --concurrency 1
 
 To update the Kafka stack, run:
 ```
-helmfile -f helmfile.d/10-base.yaml apply
+helmfile -f helmfile.d/10-base.yaml apply --concurrency 1
 ```
 After this has succeeded, edit your `production.yaml` and change the `cp_kafka.customEnv.KAFKA_INTER_BROKER_PROTOCOL_VERSION` to the corresponding version documented in the [Confluent upgrade instructions](https://docs.confluent.io/platform/current/installation/upgrade.html) of your Kafka installation. Find the currently installed version of Kafka with `kubectl exec cp-kafka-0 -c cp-kafka-broker -- kafka-topics --version`.
+When the `cp_kafka.customEnv.KAFKA_INTER_BROKER_PROTOCOL_VERSION` is updated, again run
+```
+helmfile -f helmfile.d/10-base.yaml apply
+```
 
 To upgrade to the latest PostgreSQL helm chart, in `production.yaml`, uncomment the line `postgresql.primary.persistence.existingClaim: "data-postgresql-postgresql-0"` to use the same data storage as previously. Then run
 ```
