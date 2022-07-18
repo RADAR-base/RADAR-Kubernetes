@@ -242,30 +242,31 @@ If you are installing `radar-appserver`, it needs to be authorized with the Goog
 
 ## Upgrade instructions
 
-To upgrade the base services cert-manager, run
+Run the following instructions to upgrade an existing RADAR-Kubernetes cluster.
+
+| :exclamation: Note |
+|--------------------|
+| Upgrading the major version of a PostgreSQL image is not supported. If necessary, we propose to use a `pg_dump` to dump the current data and a `pg_restore` to restore that data on a newer version. Please find instructions for this elsewhere. |
+
+### Upgrade to version RADAR-Kubernetes 1.0.0
+
+To upgrade the initial services, run
+```
+kubectl delete -n monitoring deployments kube-prometheus-stack-kube-state-metrics
+```
+and then run
 ```
 helmfile -f helmfile.d/00-init.yaml --selector name=cert-manager apply
-helmfile -f helmfile.d/00-init.yaml --selector name=cert-manager-letsencrypt apply
+helmfile -f helmfile.d/00-init.yaml apply --concurrency 1
 ```
-
-To upgrade prometheus,  change `kube_prometheus_stack.kube-prometheus-stack.kubeStateMetrics.enabled: false` in your values (e.g., `production.yaml`)
-```
-helmfile -f helmfile.d/00-init.yaml --selector name=kube-prometheus-stack apply
-```
-Then change  `kube_prometheus_stack.kube-prometheus-stack.kubeStateMetrics.enabled: true` and run again
-```
-helmfile -f helmfile.d/00-init.yaml --selector name=kube-prometheus-stack apply
-```
-
-This avoids a conflict when updating `kube-state-metrics`.
 
 To update the Kafka stack, run:
 ```
 helmfile -f helmfile.d/10-base.yaml apply
 ```
-After this has succeeded, edit your `production.yaml` and change the `cp_kafka.customEnv.KAFKA_INTER_BROKER_PROTOCOL_VERSION` to the corresponding version documented in the [Confluent upgrade instructions](https://docs.confluent.io/platform/current/installation/upgrade.html) of your Kafka installation. Your currently installed Kafka version with `kubectl exec cp-kafka-0 -c cp-kafka-broker -- kafka-topics --version`.
+After this has succeeded, edit your `production.yaml` and change the `cp_kafka.customEnv.KAFKA_INTER_BROKER_PROTOCOL_VERSION` to the corresponding version documented in the [Confluent upgrade instructions](https://docs.confluent.io/platform/current/installation/upgrade.html) of your Kafka installation. Find the currently installed version of Kafka with `kubectl exec cp-kafka-0 -c cp-kafka-broker -- kafka-topics --version`.
 
-To upgrade to the latest PostgreSQL chart, first run
+To upgrade to the latest PostgreSQL helm chart, first run
 ```
 kubectl edit secrets postgresql
 ```
@@ -295,8 +296,6 @@ kubectl delete secrets radar-upload-postgresql
 kubectl delete statefulsets radar-upload-postgresql-postgresql
 helmfile -f helmfile.d/20-upload.yaml apply
 ```
-
-Upgrading the major version of PostgreSQL is not supported. If necessary, we propose to use a `pg_dump` to dump the current data and a `pg_restore` to restore that data on a newer version.
 
 ## Usage
 ### Accessing the applications
