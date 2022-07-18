@@ -14,7 +14,7 @@ repositories:
 
 releases:
   - name: velero
-    chart: radar/velero
+    chart: radar/velero-s3-deployment
     namespace: velero
     version: {{ .Values.velero._chart_version }}
     installed: {{ .Values.velero._install }}
