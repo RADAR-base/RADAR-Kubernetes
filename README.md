@@ -111,7 +111,7 @@ The `helmfile sync` will synchronize all the Kubernetes resources defined in the
 |:----------------------------------------|
 | Installing the stack with `--concurrency 1` may make the installation slower. However, it is necessary because some components such as `kube-prometheus-stack` and `kafka-init` (aka `catalog-server`) should be installed in their specified order. If you've forgotten to use this flag, then the installation may not be successful. To continue, follow [Uninstallation](#uninstall) steps to clean up the Kubernetes cluster before you can try again.
 
-Graylog and fluent-bit services in the `graylog` namespace will not immediately be operational, first it needs an input source defined. Log into  `graylog.<server name>` with the Graylog credentials. Then navigate to _System_ -> _Inputs_, click _Launch new input_ and create a new GELF TCP input on port 12222.
+Graylog and fluent-bit services in the `graylog` namespace will not immediately be operational, first it needs an input source defined. Log into  `graylog.<server name>` with the Graylog credentials. Then navigate to _System_ -> _Inputs_, select GELF TCP in the dropdown and _Launch new input_. Set it as a global input on port 12222.
 
 #### Monitor and verify the installation process.
 Once the installation is done or in progress, you can check the status using `kubectl get pods`.
@@ -259,8 +259,12 @@ Before running the upgrade, compare `etc/base.yaml` and `etc/base.yaml.gotmpl` w
 To upgrade the initial services, run
 ```
 kubectl delete -n monitoring deployments kube-prometheus-stack-kube-state-metrics
+helm -n graylog uninstall mongodb
+kubectl delete -n graylog pvc datadir-mongodb-0 datadir-mongodb-1
 ```
-and then run
+Note that this will remove your graylog settings but not your actual logs. This step is unfortunately needed to enable credentials on the Graylog database hosted by the mongodb chart. You will need to recreate the GELF TCP input source as during install.
+
+Then run
 ```
 helmfile -f helmfile.d/00-init.yaml --selector name=cert-manager apply
 helmfile -f helmfile.d/00-init.yaml apply --concurrency 1
