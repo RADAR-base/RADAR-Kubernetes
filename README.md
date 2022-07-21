@@ -373,9 +373,6 @@ kubectl delete pvc --all
 kubectl -n cert-manager delete secrets letsencrypt-prod
 kubectl -n default delete secrets radar-base-tls
 kubectl -n monitoring delete secrets radar-base-tls
-
-kubectl delete crd cephblockpools.ceph.rook.io  cephclients.ceph.rook.io cephclusters.ceph.rook.io cephfilesystems.ceph.rook.io cephnfses.ceph.rook.io cephobjectstores.ceph.rook.io cephobjectstoreusers.ceph.rook.io volumes.rook.io
-kubectl delete psp 00-rook-ceph-operator
 ```
 ## Update charts
 
