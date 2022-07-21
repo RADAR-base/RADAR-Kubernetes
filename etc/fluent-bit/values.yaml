@@ -14,6 +14,23 @@ config:
         HTTP_Port {{ .Values.metricsPort }}
         Health_Check On
 
+  ## https://docs.fluentbit.io/manual/pipeline/filters
+  filters: |
+    [FILTER]
+        Name grep
+        match *
+        Exclude log Elasticsearch built-in security features are not enabled
+
+    [FILTER]
+        Name kubernetes
+        Match kube.*
+        Merge_Log On
+        Keep_Log On
+        Annotations On
+        Labels On
+        K8S-Logging.Parser On
+        K8S-Logging.Exclude On
+
   ## https://docs.fluentbit.io/manual/pipeline/outputs
   outputs: |
     [OUTPUT]
@@ -23,5 +40,5 @@ config:
         Port 12222
         Mode tcp
         gelf_short_message_key log
-        gelf_host_key {{ .Values.server_name }}
+        gelf_host_key stream
         Retry_Limit False

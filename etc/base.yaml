@@ -13,6 +13,7 @@ mongodb:
   auth:
     replicaSetKey: secret
     rootPassword: secret
+    passwords: [secret]
 
 elasticsearch:
   _install: true
