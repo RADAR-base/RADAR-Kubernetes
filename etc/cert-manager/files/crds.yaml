@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Source: cert-manager/templates/crd-templates.yaml
+# Source: cert-manager/templates/crds.yaml
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -23,6 +23,8 @@ metadata:
     app.kubernetes.io/instance: 'cert-manager'
     # Generated labels
     app.kubernetes.io/version: "v1.8.2"
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: cert-manager-v1.8.2
 spec:
   group: cert-manager.io
   names:
@@ -212,7 +214,7 @@ spec:
       served: true
       storage: true
 ---
-# Source: cert-manager/templates/crd-templates.yaml
+# Source: cert-manager/templates/crds.yaml
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -223,6 +225,8 @@ metadata:
     app.kubernetes.io/instance: 'cert-manager'
     # Generated labels
     app.kubernetes.io/version: "v1.8.2"
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: cert-manager-v1.8.2
 spec:
   group: cert-manager.io
   names:
@@ -582,7 +586,7 @@ spec:
       served: true
       storage: true
 ---
-# Source: cert-manager/templates/crd-templates.yaml
+# Source: cert-manager/templates/crds.yaml
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -593,6 +597,8 @@ metadata:
     app.kubernetes.io/instance: 'cert-manager'
     # Generated labels
     app.kubernetes.io/version: "v1.8.2"
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: cert-manager-v1.8.2
 spec:
   group: acme.cert-manager.io
   names:
@@ -1617,7 +1623,7 @@ spec:
       subresources:
         status: {}
 ---
-# Source: cert-manager/templates/crd-templates.yaml
+# Source: cert-manager/templates/crds.yaml
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -1628,6 +1634,8 @@ metadata:
     app.kubernetes.io/instance: 'cert-manager'
     # Generated labels
     app.kubernetes.io/version: "v1.8.2"
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: cert-manager-v1.8.2
 spec:
   group: cert-manager.io
   names:
@@ -2867,7 +2875,7 @@ spec:
       served: true
       storage: true
 ---
-# Source: cert-manager/templates/crd-templates.yaml
+# Source: cert-manager/templates/crds.yaml
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -2880,6 +2888,8 @@ metadata:
     app.kubernetes.io/instance: 'cert-manager'
     # Generated labels
     app.kubernetes.io/version: "v1.8.2"
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: cert-manager-v1.8.2
 spec:
   group: cert-manager.io
   names:
@@ -4119,7 +4129,7 @@ spec:
       served: true
       storage: true
 ---
-# Source: cert-manager/templates/crd-templates.yaml
+# Source: cert-manager/templates/crds.yaml
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -4132,6 +4142,8 @@ metadata:
     app.kubernetes.io/instance: 'cert-manager'
     # Generated labels
     app.kubernetes.io/version: "v1.8.2"
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: cert-manager-v1.8.2
 spec:
   group: acme.cert-manager.io
   names:
