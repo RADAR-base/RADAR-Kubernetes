@@ -1,8 +1,11 @@
+# Context that you use in kubectl to access the Kubernetes cluster. Will be translated to `helm --kube-context <context_name>`
 kubeContext: default
+# Domain name that RADAR-Base installation will be acessible from
 server_name: example.com
+# This email address will be used to notify for SSL certifcate expiration
 maintainer_email: MAINTAINER_EMAIL@example.com
+# Number of Kafka pods that will be installed
 kafka_num_brokers: 3
-postgres_password: password
 
 # --------------------------------------------------------- 00-init.yaml ---------------------------------------------------------
 
@@ -13,7 +16,8 @@ mongodb:
   auth:
     replicaSetKey: secret
     rootPassword: secret
-    passwords: [secret]
+    passwords:
+      - secret
 
 elasticsearch:
   _install: true
@@ -129,10 +133,17 @@ catalog_server:
 
 # --------------------------------------------------------- 10-managementportal.yaml ---------------------------------------------------------
 
+# This Postgresql is used for Management Portal and App config, postgres password should be same in them
 postgresql:
   _install: true
   _chart_version: 11.1.24
-  image:
+  global:
+    postgresql:
+      auth:
+        postgresPassword: password
+  auth:
+    replicationPassword: password
+  image: # Check https://hub.docker.com/r/bitnami/postgresql/tags
     tag: 11.16.0
   replication:
     enabled: false
@@ -183,6 +194,8 @@ management_portal:
     host: smtp
     port: 25
     from: noreply@example.com
+    username: username
+    password: secret
 
 app_config:
   _install: true
@@ -206,7 +219,7 @@ radar_appserver_postgres_password: password
 radar_appserver_postgresql:
   _install: true
   _chart_version: 11.1.24
-  image:
+  image: # Check https://hub.docker.com/r/bitnami/postgresql/tags
     tag: 11.16.0
   primary:
     persistence:
@@ -232,8 +245,8 @@ radar_fitbit_connector:
   oauthClientId: radar_fitbit_connector
 
 radar_rest_sources_authorizer:
-  _chart_version: 0.4.0
   _install: false
+  _chart_version: 0.4.0
   replicaCount: 1
 
 radar_rest_sources_backend:
@@ -395,7 +408,7 @@ radar_upload_postgres_password: password
 radar_upload_postgresql:
   _install: true
   _chart_version: 11.1.24
-  image:
+  image: # Check https://hub.docker.com/r/bitnami/postgresql/tags
     tag: 11.16.0
   primary:
     persistence:
