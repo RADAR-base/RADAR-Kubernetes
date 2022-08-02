@@ -79,7 +79,7 @@ The following tools should be installed in your local machine to install the RAD
     ```
 2. Configure the `etc/production.yaml`. In this file you are required to fill in secrets and passwords used by RADAR-base applications. It is strongly recommended to use random password generator to fill these secrets. **You must keep this file secure and confidential once you have started installing the platform.**
     
-    To create an encrypted password string and put it inside `kube_prometheus_stack.nginx_auth` variable. Please make sure you are using MD5 encryption. It appears `bcrypt` encryption isn't supported in current ingress-nginx.
+     To create an encrypted password string for monitoring system you need to use [this website](https://www.web2generators.com/apache-tools/htpasswd-generator) or `htpasswd` command to create an encrypted password string and put it inside `kube_prometheus_stack.nginx_auth` variable. It seems like bcrypt encryption isn't supported in current ingress-nginx so make sure that you're using MD5 encryption.
     
     Optionally, you can also enable or disable other components that are configured otherwise by default.
   

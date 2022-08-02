@@ -217,7 +217,7 @@ app_config_frontend:
 radar_appserver_postgres_password: password
 
 radar_appserver_postgresql:
-  _install: true
+  _install: false
   _chart_version: 11.1.24
   image: # Check https://hub.docker.com/r/bitnami/postgresql/tags
     tag: 11.16.0
@@ -228,7 +228,7 @@ radar_appserver_postgresql:
       #existingClaim: "data-radar-appserver-postgresql-postgresql-0"
 
 radar_appserver:
-  _install: true
+  _install: false
   _chart_version: 0.1.4
   replicaCount: 1
   managementportal_resource_name: res_AppServer
@@ -441,7 +441,7 @@ ccSchemaRegistryProxy:
 # --------------------------------------------------------- 20-push-endpoint.yaml ---------------------------------------------------------
 
 radar_push_endpoint:
-  _install: true
+  _install: false
   _chart_version: 0.1.4
   replicaCount: 1
   adminProperties: {}
