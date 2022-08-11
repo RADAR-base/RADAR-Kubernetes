@@ -209,8 +209,6 @@ app_config_frontend:
   _install: true
   _chart_version: 0.2.2
   replicaCount: 1
-  authUrl: https://example.com/managementportal/oauth
-  authCallbackUrl: https://example.com/appconfig/login
 
 # --------------------------------------------------------- 20-appserver.yaml ---------------------------------------------------------
 
