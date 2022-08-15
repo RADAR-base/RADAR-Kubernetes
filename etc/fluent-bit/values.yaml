@@ -35,10 +35,20 @@ config:
   outputs: |
     [OUTPUT]
         Name gelf
-        Match *
+        Match kube.*
         Host graylog-tcp
         Port 12222
         Mode tcp
         gelf_short_message_key log
+        gelf_host_key stream
+        Retry_Limit False
+        
+    [OUTPUT]
+        Name gelf
+        Match host.*
+        Host graylog-tcp
+        Port 12222
+        Mode tcp
+        Gelf_Short_Message_Key message
         gelf_host_key stream
         Retry_Limit False
