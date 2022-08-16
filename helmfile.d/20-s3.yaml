@@ -35,6 +35,10 @@ releases:
         value: radar-base-tls-s3
       - name: ingress.tls[0].hosts
         values: ["s3.{{ .Values.server_name }}"]
+      - name: accessKey
+        value: {{ .Values.s3_access_key }}
+      - name: secretKey
+        value: {{ .Values.s3_secret_key }}
 
   - name: radar-s3-connector
     chart: radar/radar-s3-connector
@@ -46,6 +50,10 @@ releases:
     set:
       - name: cc.enabled
         value: {{ .Values.confluent_cloud.enabled }}
+      - name: bucketAccessKey
+        value: {{ .Values.s3_access_key }}
+      - name: bucketSecretKey
+        value: {{ .Values.s3_secret_key }}
 
   - name: s3-proxy
     chart: radar/s3-proxy
@@ -53,6 +61,10 @@ releases:
     installed: {{ .Values.s3_proxy._install }}
     values:
       - {{ .Values.s3_proxy | toYaml | indent 8 | trim }}
+      - name: s3.identity
+        value: {{ .Values.s3_access_key }}
+      - name: s3.credential
+        value: {{ .Values.s3_secret_key }}
 
   - name: radar-output
     chart: radar/radar-output
@@ -61,3 +73,11 @@ releases:
     installed: {{ .Values.radar_output._install }}
     values:
       - {{ .Values.radar_output | toYaml | indent 8 | trim }}
+      - name: source.s3.accountName
+        value: {{ .Values.s3_access_key }}
+      - name: source.s3.accountKey
+        value: {{ .Values.s3_secret_key }}
+      - name: target.s3.accountName
+        value: {{ .Values.s3_access_key }}
+      - name: target.s3.accountKey
+        value: {{ .Values.s3_secret_key }}

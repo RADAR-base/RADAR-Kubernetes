@@ -347,6 +347,9 @@ redis:
 # The access keys and secret keys of the following services should match.
 # If S3 is used as a storage medium instead of minio, then fill in those.
 
+s3_access_key: accessKey
+s3_secret_key: accessKey
+
 minio:
   _install: true
   _chart_version: 8.0.11
@@ -354,8 +357,6 @@ minio:
   s3Endpoint: http://minio:9000/
   persistence:
     size: 20Gi
-  accessKey: AKIAIOSFODNN7EXAMPLE
-  secretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
 radar_s3_connector:
   # set to true if radar-s3-connector should be installed
@@ -366,8 +367,6 @@ radar_s3_connector:
   bucketName: radar-intermediate-storage
   s3Endpoint: http://minio:9000/
   topics: android_phone_usage_event_output,android_local_weather,android_phone_acceleration,android_phone_battery_level,android_phone_bluetooth_devices,android_phone_call,android_phone_contacts,android_phone_gyroscope,android_phone_light,android_phone_magnetic_field,android_phone_relative_location,android_phone_sms,android_phone_sms_unread,android_phone_step_count,android_phone_usage_event,android_phone_user_interaction,android_processed_audio,application_device_info,application_external_time,application_record_counts,application_server_status,application_time_zone,application_uptime,certh_banking_app_event,certh_banking_app_transaction,connect_fitbit_activity_log,connect_fitbit_intraday_calories,connect_fitbit_intraday_heart_rate,connect_fitbit_intraday_steps,connect_fitbit_sleep_classic,connect_fitbit_sleep_stages,connect_fitbit_time_zone,connect_upload_altoida_acceleration,connect_upload_altoida_action,connect_upload_altoida_attitude,connect_upload_altoida_bit_metrics,connect_upload_altoida_blink,connect_upload_altoida_diagnostics,connect_upload_altoida_domain_result,connect_upload_altoida_dot_metrics,connect_upload_altoida_eye_tracking,connect_upload_altoida_gravity,connect_upload_altoida_magnetic_field,connect_upload_altoida_metadata,connect_upload_altoida_object,connect_upload_altoida_path,connect_upload_altoida_rotation,connect_upload_altoida_summary,connect_upload_altoida_tap,connect_upload_altoida_touch,connect_upload_axivity_acceleration,connect_upload_axivity_battery_level,connect_upload_axivity_event,connect_upload_axivity_light,connect_upload_axivity_metadata,connect_upload_axivity_temperature,connect_upload_oxford_camera_data,connect_upload_oxford_camera_image,connect_upload_physilog_binary_data
-  bucketAccessKey: AKIAIOSFODNN7EXAMPLE
-  bucketSecretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
 s3_proxy:
   _install: false
@@ -375,9 +374,6 @@ s3_proxy:
   replicaCount: 1
   target:
     provider: azureblob
-  s3:
-    identity: AKIAIOSFODNN7EXAMPLE
-    credential: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
 radar_output:
   _install: true
@@ -387,14 +383,10 @@ radar_output:
     s3:
       endpoint: http://minio:9000/
       bucket: radar-intermediate-storage
-      accessToken: AKIAIOSFODNN7EXAMPLE
-      secretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
   target:
     s3:
       endpoint: http://minio:9000/
       bucket: radar-output-storage
-      accessToken: AKIAIOSFODNN7EXAMPLE
-      secretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
   redis:
     uri: redis://redis-master:6379
