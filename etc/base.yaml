@@ -34,6 +34,10 @@ fluent_bit:
 cert_manager:
   _install: true
   _chart_version: v1.8.2
+  global:
+    podSecurityPolicy:
+      enabled: true
+      useAppArmor: false
   prometheus:
     servicemonitor:
       enabled: true
