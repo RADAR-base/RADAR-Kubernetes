@@ -35,11 +35,15 @@ releases:
         value: radar-base-tls-s3
       - name: ingress.tls[0].hosts
         values: ["s3.{{ .Values.server_name }}"]
+      {{- if not .Values.minio.accessKey }}
       - name: accessKey
         value: {{ .Values.s3_access_key }}
+      {{- end }}
+      {{- if not .Values.minio.secretKey }}
       - name: secretKey
         value: {{ .Values.s3_secret_key }}
-
+      {{- end }}
+    
   - name: radar-s3-connector
     chart: radar/radar-s3-connector
     version: {{ .Values.radar_s3_connector._chart_version }}
@@ -50,10 +54,14 @@ releases:
     set:
       - name: cc.enabled
         value: {{ .Values.confluent_cloud.enabled }}
+      {{- if not .Values.radar-s3-connector.bucketAccessKey }}
       - name: bucketAccessKey
         value: {{ .Values.s3_access_key }}
+      {{- end }}
+      {{- if not .Values.radar-s3-connector.bucketSecretKey }}      
       - name: bucketSecretKey
         value: {{ .Values.s3_secret_key }}
+      {{- end }}
 
   - name: s3-proxy
     chart: radar/s3-proxy
@@ -61,10 +69,15 @@ releases:
     installed: {{ .Values.s3_proxy._install }}
     values:
       - {{ .Values.s3_proxy | toYaml | indent 8 | trim }}
+    set:
+      {{- if not .Values.s3-proxy.s3.identity }}      
       - name: s3.identity
         value: {{ .Values.s3_access_key }}
+      {{- end }}        
+      {{- if not .Values.s3-proxy.s3.credential }}          
       - name: s3.credential
         value: {{ .Values.s3_secret_key }}
+      {{- end }}
 
   - name: radar-output
     chart: radar/radar-output
@@ -73,11 +86,20 @@ releases:
     installed: {{ .Values.radar_output._install }}
     values:
       - {{ .Values.radar_output | toYaml | indent 8 | trim }}
-      - name: source.s3.accountName
+    set:      
+      {{- if not .Values.radar-output.source.s3.accessToken }}
+      - name: source.s3.accessToken
         value: {{ .Values.s3_access_key }}
-      - name: source.s3.accountKey
+      {{- end }}
+      {{- if not .Values.radar-output.source.s3.secretKey }}
+      - name: source.s3.secretKey
         value: {{ .Values.s3_secret_key }}
-      - name: target.s3.accountName
+      {{- end }}
+      {{- if not .Values.radar-output.target.s3.accessToken }}
+      - name: target.s3.accessToken
         value: {{ .Values.s3_access_key }}
-      - name: target.s3.accountKey
+      {{- end }}
+      {{- if not .Values.radar-output.target.s3.secretKey }}
+      - name: target.s3.secretKey
         value: {{ .Values.s3_secret_key }}
+      {{- end }}
