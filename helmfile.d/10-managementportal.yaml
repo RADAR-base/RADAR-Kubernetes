@@ -80,8 +80,6 @@ releases:
       - name: ingress.hosts
         values: [{{ .Values.server_name }}]
       - name: authUrl
-        values:
-          - https://{{ .Values.server_name }}/managementportal/oauth
+        value: https://{{ .Values.server_name }}/managementportal/oauth
       - name: authCallbackUrl
-        values:
-          - https://{{ .Values.server_name }}/appconfig/login
+        value: https://{{ .Values.server_name }}/appconfig/login
