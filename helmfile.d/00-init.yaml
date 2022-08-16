@@ -61,31 +61,6 @@ releases:
       - name: server_name
         value: {{ .Values.server_name }}
 
-  - name: cert-manager
-    namespace: cert-manager
-    wait: true
-    installed: {{ .Values.cert_manager._install }}
-    disableValidation: true
-    chart: radar/cert-manager
-    version: {{ .Values.cert_manager._chart_version }}
-    values:
-      - {{ .Values.cert_manager | toYaml | indent 8 | trim }}
-    hooks:
-      - events: ["presync"]
-        showlogs: true
-        command: "kubectl"
-        args: ["--context", "{{ .Values.kubeContext }}", "apply", "-f", "../etc/cert-manager/files/crds.yaml"]
-
-  - name: cert-manager-letsencrypt
-    namespace: cert-manager
-    wait: true
-    installed: {{ .Values.cert_manager_letsencrypt._install }}
-    chart: radar/cert-manager-letsencrypt
-    version: {{ .Values.cert_manager_letsencrypt._chart_version }}
-    set:
-      - name: maintainerEmail
-        value: {{ .Values.maintainer_email }}
-
   - name: kube-prometheus-stack
     chart: radar/kube-prometheus-stack
     version: {{ .Values.kube_prometheus_stack._chart_version }}
@@ -123,6 +98,31 @@ releases:
         showlogs: true
         command: "kubectl"
         args: ["--context", "{{ .Values.kubeContext }}", "apply", "--force-conflicts", "--server-side", "-f", "../etc/kube-prometheus-stack/files/crds.yaml"]
+
+  - name: cert-manager
+    namespace: cert-manager
+    wait: true
+    installed: {{ .Values.cert_manager._install }}
+    disableValidation: true
+    chart: radar/cert-manager
+    version: {{ .Values.cert_manager._chart_version }}
+    values:
+      - {{ .Values.cert_manager | toYaml | indent 8 | trim }}
+    hooks:
+      - events: ["presync"]
+        showlogs: true
+        command: "kubectl"
+        args: ["--context", "{{ .Values.kubeContext }}", "apply", "-f", "../etc/cert-manager/files/crds.yaml"]
+
+  - name: cert-manager-letsencrypt
+    namespace: cert-manager
+    wait: true
+    installed: {{ .Values.cert_manager_letsencrypt._install }}
+    chart: radar/cert-manager-letsencrypt
+    version: {{ .Values.cert_manager_letsencrypt._chart_version }}
+    set:
+      - name: maintainerEmail
+        value: {{ .Values.maintainer_email }}
 
   - name: nginx-ingress
     chart: radar/ingress-nginx
