@@ -446,9 +446,6 @@ velero:
   _install: false
   _chart_version: 0.1.0
   objectStorageBackupReplicaCount: 1
-  local:
-    accessKey: accessKey
-    secretKey: secretKey
   backup:
     address: s3.amazon.com  # protocol should not be specified
     bucket: radar-base-backups
