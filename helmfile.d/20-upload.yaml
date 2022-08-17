@@ -69,9 +69,9 @@ releases:
       - name: s3Endpoint
         value: {{ .Values.minio.s3Endpoint }}
       - name: bucketAccessKey
-        value: {{ .Values.minio.accessKey }}
+        value: {{ .Values.s3_access_key }}
       - name: bucketSecretKey
-        value: {{ .Values.minio.secretKey }}
+        value: {{ .Values.s3_secret_key }}
       {{ if hasKey .Values.management_portal.oauth_clients "radar_upload_connect" }}
       - name: client_secret
         value: {{ .Values.management_portal.oauth_clients.radar_upload_connect.client_secret }}
