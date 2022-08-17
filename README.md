@@ -93,9 +93,19 @@ The following tools should be installed in your local machine to install the RAD
     vim etc/production.yaml.gotmpl 
     ```
 4. Run `bin/keystore-init` to create the Keystore file which used to sign JWT access tokens by [Management Portal](https://github.com/RADAR-base/radar-helm-charts/blob/main/charts/management-portal/README.md)
+
     ```shell
-    ./bin/keystore-init
+    bin/keystore-init
     ```
+
+    To prevent the tool from querying variables interactively, please provide a DNAME in the following format, replacing each of the placeholders `<...>` with their proper value:
+
+    ```shell
+    DNAME="CN=<name>,O=<organization>,L=<city>,C=<2 letter country code>" bin/keystore-init
+    ```
+
+    Consult the full [X.500 Distinguished Name syntax](https://docs.oracle.com/javase/8/docs/technotes/tools/windows/keytool.html#CHDHBFGJ) for more information.
+
 ### Install
 Once you are done with all configurations, the RADAR-Kubernetes can be deployed on a Kubernetes cluster. 
 
