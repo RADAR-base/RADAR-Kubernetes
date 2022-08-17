@@ -21,11 +21,11 @@ releases:
     values:
       - {{ .Values.velero | toYaml | indent 8 | trim }}
     set:
-      {{- if not .Values.velero.local.accessKey }}
+      {{- if not (hasKey .Values.velero "local.accessKey") }}
       - name: local.accessKey
         value: {{ .Values.s3_access_key }}
       {{- end }}
-      {{- if not .Values.velero.local.secretKey }}
+      {{- if not (hasKey .Values.velero "local.secretKey") }}
       - name: local.secretKey
-        value: {{ .Values.s3_secretKey }}
+        value: {{ .Values.s3_secret_key }}
       {{- end }}
