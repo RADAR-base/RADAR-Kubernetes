@@ -48,7 +48,7 @@ cert_manager_letsencrypt:
 
 kube_prometheus_stack:
   _install: true
-  _chart_version: 0.3.0
+  _chart_version: 0.3.1
   kube-prometheus-stack:
     prometheus:
       prometheusSpec:
@@ -108,13 +108,13 @@ confluent_cloud:
 
 cp_zookeeper:
   _install: true
-  _chart_version: 0.3.1
+  _chart_version: 0.3.2
   imageTag: 7.2.0
   servers: 3
 
 cp_kafka:
   _install: true
-  _chart_version: 0.3.0
+  _chart_version: 0.3.1
   imageTag: 7.2.0
   customEnv:
     # Set this to 3.2 when upgraded to 7.2.0
