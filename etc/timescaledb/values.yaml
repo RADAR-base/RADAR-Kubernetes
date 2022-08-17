@@ -66,6 +66,8 @@ primary:
   extraEnvVars:
     - name: POSTGRES_USER
       value: postgres
+    - name: POSTGRES_USER
+      value: postgres
   ## @param primary.podAnnotations Map of annotations to add to the pods (postgresql primary)
   ##
   podAnnotations:
