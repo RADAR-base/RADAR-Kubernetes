@@ -363,7 +363,7 @@ adminPassword: password
 env:
   POSTGRES_USER: postgres
   POSTGRES_DB: postgres
-  POSTGRES_HOST: timescaledb-postgresql-headless
+  POSTGRES_HOST: timescaledb-postgresql-hl
   GF_USERS_DEFAULT_THEME: light
 
 ## "valueFrom" environment variable references that will be added to deployment pods
@@ -450,7 +450,8 @@ datasources:
         typeLogoUrl: public/app/plugins/datasource/postgres/img/postgresql_logo.svg
         access: proxy
         url: ${POSTGRES_HOST}
-        password: ${POSTGRES_PASSWORD}
+        secureJsonData:
+          password: ${POSTGRES_PASSWORD}
         user: ${POSTGRES_USER}
         database: ${POSTGRES_DB}
         basicAuth: false

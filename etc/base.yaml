@@ -303,6 +303,8 @@ radar_jdbc_connector:
   _install: true
   _chart_version: 0.1.6
   replicaCount: 1
+  timescaledb:
+    host: timescaledb-postgresql-hl
 
 # --------------------------------------------------------- 20-ingestion.yaml ---------------------------------------------------------
 

@@ -64,7 +64,7 @@ primary:
   ##     value: "bar"
   ##
   extraEnvVars:
-    - name: POSTGRES_USER
+    - name: POSTGRESQL_USERNAME
       value: postgres
     - name: POSTGRES_USER
       value: postgres
