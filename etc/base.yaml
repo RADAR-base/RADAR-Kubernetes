@@ -48,7 +48,7 @@ cert_manager_letsencrypt:
 
 kube_prometheus_stack:
   _install: true
-  _chart_version: 0.3.1
+  _chart_version: 0.3.2
   kube-prometheus-stack:
     prometheus:
       prometheusSpec:
