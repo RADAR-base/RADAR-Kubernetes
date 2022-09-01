@@ -141,10 +141,6 @@ catalog_server:
 postgresql:
   _install: true
   _chart_version: 11.1.24
-  global:
-    postgresql:
-      auth:
-        postgresPassword: password
   auth:
     replicationPassword: password
   image: # Check https://hub.docker.com/r/bitnami/postgresql/tags
