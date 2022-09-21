@@ -268,7 +268,7 @@ Before running the upgrade, compare `etc/base.yaml` and `etc/base.yaml.gotmpl` w
 
 To upgrade the initial services, run
 ```
-kubectl delete -n monitoring deployments kube-prometheus-stack-kube-state-metrics
+kubectl delete -n monitoring deployments kube-prometheus-stack-kube-state-metrics kafka-manager
 helm -n graylog uninstall mongodb
 kubectl delete -n graylog pvc datadir-mongodb-0 datadir-mongodb-1
 ```
@@ -306,7 +306,7 @@ helmfile -f helmfile.d/20-appserver.yaml apply
 
 If installed, to upgrade `timescaledb`, uncomment the `production.yaml` line `timescaledb.primary.existingClaim: "data-timescaledb-postgresql-0"`. Then run
 ```
-kubectl delete secrets timescaledb
+kubectl delete secrets timescaledb-postgresql
 kubectl delete statefulsets timescaledb-postgresql
 helmfile -f helmfile.d/20-grafana.yaml apply
 ```
@@ -317,6 +317,13 @@ kubectl delete secrets radar-upload-postgresql
 kubectl delete statefulsets radar-upload-postgresql-postgresql
 helmfile -f helmfile.d/20-upload.yaml apply
 ```
+
+Delete the redis stateful set (this will not delete the data on the volume) 
+```
+kubectl delete statefulset redis-master
+helmfile -f helmfile.d/20-s3.yaml sync --concurrency 1 
+```
+
 
 ## Usage
 ### Accessing the applications
