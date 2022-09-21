@@ -321,6 +321,7 @@ helmfile -f helmfile.d/20-upload.yaml apply
 Delete the redis stateful set (this will not delete the data on the volume) 
 ```
 kubectl delete statefulset redis-master
+helmfile -f helmfile.d/20-s3.yaml sync --concurrency 1 
 ```
 
 
