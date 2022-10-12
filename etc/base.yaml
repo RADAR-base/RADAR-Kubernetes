@@ -442,6 +442,37 @@ radar_push_endpoint:
     consumerKey: ""
     consumerSecret: ""
 
+# --------------------------------------------------------- 40-realtime-analyses.yaml ---------------------------------------------------------
+
+radar_jdbc_connector_agg:
+  _install: false
+  _chart_version: 0.1.6
+  replicaCount: 1
+  timescaledb:
+    host: timescaledb-postgresql-hl
+
+ksql_server:
+  _install: false
+  replicaCount: 1
+  servicePort: 8088
+  kafka:
+    bootstrapServers: PLAINTEXT://cp-kafka:9092
+  cp-schema-registry: 
+    url: http://cp-schema-registry:8081
+  ksql:
+    headless: false
+  configurationOverrides:
+    "ksql.server.url": "http://0.0.0.0:8088"
+    "ksql.advertised.listener": "http://ksql-server:8088"
+    "ksql.logging.processing.topic.auto.create": true
+    "ksql.logging.processing.stream.auto.create": true
+    "ksql.service.id": radar_default_
+    "ksql.persistence.default.format.key": AVRO
+    "ksql.persistence.default.format.value": AVRO
+    "ksql.sink.replicas": 3
+    "ksql.streams.replication.factor": 3
+    "ksql.internal.topic.replicas": 3
+
 # --------------------------------------------------------- 99-velero.yaml ---------------------------------------------------------
 
 velero:
