@@ -268,7 +268,7 @@ Before running the upgrade, compare `etc/base.yaml` and `etc/base.yaml.gotmpl` w
 
 To upgrade the initial services, run
 ```shell
-kubectl delete -n monitoring deployments kube-prometheus-stack-kube-state-metrics
+kubectl delete -n monitoring deployments kube-prometheus-stack-kube-state-metrics kafka-manager
 helm -n graylog uninstall mongodb
 kubectl delete -n graylog pvc datadir-mongodb-0 datadir-mongodb-1
 ```
@@ -306,7 +306,7 @@ helmfile -f helmfile.d/20-appserver.yaml apply
 
 If installed, to upgrade `timescaledb`, uncomment the `production.yaml` line `timescaledb.primary.existingClaim: "data-timescaledb-postgresql-0"`. Then run
 ```shell
-kubectl delete secrets timescaledb
+kubectl delete secrets timescaledb-postgresql
 kubectl delete statefulsets timescaledb-postgresql
 helmfile -f helmfile.d/20-grafana.yaml apply
 ```
@@ -330,11 +330,6 @@ kubectl get pv
 helm uninstall minio
 # Remove the old PVC. The PV will be retained.
 kubectl get pvc | grep export-minio- | cut -d ' ' -f 1 | xargs -n 1 kubectl delete pvc
-# Do the new helm install.
-helmfile -f helmfile.d/20-s3.yaml apply
-kubectl scale statefulset minio --replicas=0
-# Remove new pvc's
-for i in 0 1 2 3; do kubectl delete pvc data-minio-$i; done
 # Associate PV with the new PVC name
 while read -r pv pvc; do kubectl patch pv $pv -p '{"spec":{"claimRef":{"name": "'$(echo $pvc | sed 's/export-/data-/')'", "namespace": "default", "uid": null}}}'; done < minio-pv.list
 # Create the new PVCs to mount the volumes with
@@ -354,10 +349,15 @@ spec:
     requests:
       storage: 20Gi
 EOF
-# Start up minio again
-kubectl scale statefulset minio --replicas=4
+# Do the new helm install.
+helmfile -f helmfile.d/20-s3.yaml apply
 ```
 
+Delete the redis stateful set (this will not delete the data on the volume) 
+```
+kubectl delete statefulset redis-master
+helmfile -f helmfile.d/20-s3.yaml sync --concurrency 1 
+```
 ## Usage
 ### Accessing the applications
 In order to access to the applications first you need to find the IP address that Nginx service is listening to and then point the domain that you've specified in `server_name` variable to this IP address via a DNS server (e.g. [Route53](https://aws.amazon.com/route53/), [Cloudflare](https://www.cloudflare.com/dns/), [Bind](https://www.isc.org/bind/)) or [`hosts` file](https://en.wikipedia.org/wiki/Hosts_(file)) in your local machine.
