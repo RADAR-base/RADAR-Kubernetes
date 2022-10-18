@@ -20,6 +20,9 @@ releases:
     values:
       - "../etc/postgresql/values.yaml"
       - {{ .Values.postgresql | toYaml | indent 8 | trim }}
+    set:
+      - name: global.postgresql.auth.postgresPassword
+        value: {{ .Values.postgres_password }}
 
   - name: management-portal
     chart: radar/management-portal
