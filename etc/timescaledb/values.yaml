@@ -53,6 +53,9 @@ replication:
 ## @param postgresqlDataDir PostgreSQL data dir folder
 ##
 postgresqlDataDir: /bitnami/postgresql/data
+## @param postgresqlSharedPreloadLibraries Shared preload libraries (comma-separated list)
+##
+postgresqlSharedPreloadLibraries: "pgaudit,timescaledb"
 
 ## @section PostgreSQL Primary parameters
 ##
