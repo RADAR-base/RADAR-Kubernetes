@@ -359,34 +359,11 @@ s3_secret_key: accessKey
 minio:
   _install: true
   _chart_version: 11.9.1
-  mode: distributed
-  statefulset:
-    replicaCount: 4
+  image:
+    tag: 2022.10.15-debian-11-r0
   persistence:
     size: 20Gi
-  ingress:
-    enabled: true
-    tls: true
-  apiIngress:
-    enabled: true
-    tls: true
   provisioning:
-    enabled: true
-    buckets:
-      - name: radar-output-storage
-      - name: radar-intermediate-storage
-    policies:
-      - name: read-output
-        statements:
-          - resources:
-              - arn:aws:s3:::radar-output-storage
-            actions:
-              - s3:ListBucket
-          - resources:
-              - arn:aws:s3:::radar-output-storage/*
-            actions:
-              - s3:GetBucketLocation
-              - s3:GetObject
     ## @param provisioning.users MinIO&reg; users provisioning. Can be used in addition to provisioning.usersExistingSecrets.
     ## https://docs.min.io/docs/minio-admin-complete-guide.html#user
     ## e.g.
@@ -396,6 +373,7 @@ minio:
     ##     disabled: false
     ##     policies:
     ##       - read-output
+    users: []
 
 radar_s3_connector:
   # set to true if radar-s3-connector should be installed
