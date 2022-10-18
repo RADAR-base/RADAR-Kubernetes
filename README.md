@@ -322,18 +322,21 @@ If minio is installed, upgrade it with the following instructions:
 ```shell
 # get minio PV and PVC
 kubectl get pv | grep export-minio- | tr -s ' ' | cut -d ' ' -f 1,6 | tr '/' ' ' | cut -d ' ' -f 1,3 | tee minio-pv.list
-# don't delete when the PVC gets deleted
-while read -r pv pvc; do kubectl patch pv $pv -p '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}'; done < minio-pv.list
-# Check that the retain policy is applied to all minio PV's
-kubectl get pv
 # Uninstall the minio statefulset
 helm uninstall minio
-# Remove the old PVC. The PV will be retained.
-kubectl get pvc | grep export-minio- | cut -d ' ' -f 1 | xargs -n 1 kubectl delete pvc
 # Associate PV with the new PVC name
-while read -r pv pvc; do kubectl patch pv $pv -p '{"spec":{"claimRef":{"name": "'$(echo $pvc | sed 's/export-/data-/')'", "namespace": "default", "uid": null}}}'; done < minio-pv.list
-# Create the new PVCs to mount the volumes with
-for i in 0 1 2 3; do cat <<EOF | sed "s/data-minio-i/data-minio-$i/" | kubectl apply -f -; done
+while read -r pv pvc
+do
+  # Don not delete PV
+  kubectl patch pv $pv -p '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}'
+  # Delete PVC
+  kubectl delete pvc $pvc
+  # Name of the new PVC
+  newpvc=$(echo $pvc | sed 's/export-/data-/')
+  # Associate PV with the new PVC name
+  kubectl patch pv $pv -p '{"spec":{"claimRef":{"name": "'$newpvc'", "namespace": "default", "uid": null}}}'
+  # Create new PVC
+  cat <<EOF | sed "s/data-minio-i/$newpvc/" | kubectl apply -f -
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -349,6 +352,7 @@ spec:
     requests:
       storage: 20Gi
 EOF
+done < minio-pv.list
 # Do the new helm install.
 helmfile -f helmfile.d/20-s3.yaml apply
 ```
