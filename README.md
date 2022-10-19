@@ -317,7 +317,7 @@ Run the following instructions to upgrade an existing RADAR-Kubernetes cluster.
 Before running the upgrade, compare `etc/base.yaml` and `etc/base.yaml.gotmpl` with their `production.yaml` counterparts. Please ensure that all properties in `etc/base.yaml` are overridden in your `production.yaml` or that the `base.yaml` default value is fine, in which case no value needs to be provided in `production.yaml`.
 
 To upgrade the initial services, run
-```
+```shell
 kubectl delete -n monitoring deployments kube-prometheus-stack-kube-state-metrics kafka-manager
 helm -n graylog uninstall mongodb
 kubectl delete -n graylog pvc datadir-mongodb-0 datadir-mongodb-1
@@ -325,37 +325,37 @@ kubectl delete -n graylog pvc datadir-mongodb-0 datadir-mongodb-1
 Note that this will remove your graylog settings but not your actual logs. This step is unfortunately needed to enable credentials on the Graylog database hosted by the mongodb chart. You will need to recreate the GELF TCP input source as during install.
 
 Then run
-```
+```shell
 helmfile -f helmfile.d/00-init.yaml --selector name=cert-manager apply
 helmfile -f helmfile.d/00-init.yaml apply --concurrency 1
 ```
 
 To update the Kafka stack, run:
-```
+```shell
 helmfile -f helmfile.d/10-base.yaml apply --concurrency 1
 ```
 After this has succeeded, edit your `production.yaml` and change the `cp_kafka.customEnv.KAFKA_INTER_BROKER_PROTOCOL_VERSION` to the corresponding version documented in the [Confluent upgrade instructions](https://docs.confluent.io/platform/current/installation/upgrade.html) of your Kafka installation. Find the currently installed version of Kafka with `kubectl exec cp-kafka-0 -c cp-kafka-broker -- kafka-topics --version`.
 When the `cp_kafka.customEnv.KAFKA_INTER_BROKER_PROTOCOL_VERSION` is updated, again run
-```
+```shell
 helmfile -f helmfile.d/10-base.yaml apply
 ```
 
 To upgrade to the latest PostgreSQL helm chart, in `production.yaml`, uncomment the line `postgresql.primary.persistence.existingClaim: "data-postgresql-postgresql-0"` to use the same data storage as previously. Then run
-```
+```shell
 kubectl delete secrets postgresql
 kubectl delete statefulsets postgresql-postgresql
 helmfile -f helmfile.d/10-managementportal.yaml apply
 ```
 
 If installed, `radar-appserver-postgresql`, uncomment the `production.yaml` line `radar_appserver_postgresql.primary.existingClaim: "data-radar-appserver-postgresql-postgresql-0"`. Then run
-```
+```shell
 kubectl delete secrets radar-appserver-postgresql
 kubectl delete statefulsets radar-appserver-postgresql-postgresql
 helmfile -f helmfile.d/20-appserver.yaml apply
 ```
 
 If installed, to upgrade `timescaledb`, uncomment the `production.yaml` line `timescaledb.primary.existingClaim: "data-timescaledb-postgresql-0"`. Then run
-```
+```shell
 kubectl delete secrets timescaledb-postgresql
 kubectl delete statefulsets timescaledb-postgresql
 helmfile -f helmfile.d/20-grafana.yaml apply
@@ -368,13 +368,50 @@ kubectl delete statefulsets radar-upload-postgresql-postgresql
 helmfile -f helmfile.d/20-upload.yaml apply
 ```
 
+If minio is installed, upgrade it with the following instructions:
+```shell
+# get minio PV and PVC
+kubectl get pv | grep export-minio- | tr -s ' ' | cut -d ' ' -f 1,6 | tr '/' ' ' | cut -d ' ' -f 1,3 | tee minio-pv.list
+# Uninstall the minio statefulset
+helm uninstall minio
+# Associate PV with the new PVC name
+while read -r pv pvc
+do
+  # Don not delete PV
+  kubectl patch pv $pv -p '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}'
+  # Delete PVC
+  kubectl delete pvc $pvc
+  # Name of the new PVC
+  newpvc=$(echo $pvc | sed 's/export-/data-/')
+  # Associate PV with the new PVC name
+  kubectl patch pv $pv -p '{"spec":{"claimRef":{"name": "'$newpvc'", "namespace": "default", "uid": null}}}'
+  # Create new PVC
+  cat <<EOF | sed "s/data-minio-i/$newpvc/" | kubectl apply -f -
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app.kubernetes.io/instance: minio
+    app.kubernetes.io/name: minio
+  name: data-minio-i
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+EOF
+done < minio-pv.list
+# Do the new helm install.
+helmfile -f helmfile.d/20-s3.yaml apply
+```
+
 Delete the redis stateful set (this will not delete the data on the volume) 
 ```
 kubectl delete statefulset redis-master
 helmfile -f helmfile.d/20-s3.yaml sync --concurrency 1 
 ```
-
-
 ## Usage
 ### Accessing the applications
 In order to access to the applications first you need to find the IP address that Nginx service is listening to and then point the domain that you've specified in `server_name` variable to this IP address via a DNS server (e.g. [Route53](https://aws.amazon.com/route53/), [Cloudflare](https://www.cloudflare.com/dns/), [Bind](https://www.isc.org/bind/)) or [`hosts` file](https://en.wikipedia.org/wiki/Hosts_(file)) in your local machine.
