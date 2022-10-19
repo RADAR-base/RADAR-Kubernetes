@@ -114,16 +114,6 @@ releases:
         command: "kubectl"
         args: ["--context", "{{ .Values.kubeContext }}", "apply", "-f", "../etc/cert-manager/files/crds.yaml"]
 
-  - name: cert-manager-letsencrypt
-    namespace: cert-manager
-    wait: true
-    installed: {{ .Values.cert_manager_letsencrypt._install }}
-    chart: radar/cert-manager-letsencrypt
-    version: {{ .Values.cert_manager_letsencrypt._chart_version }}
-    set:
-      - name: maintainerEmail
-        value: {{ .Values.maintainer_email }}
-
   - name: nginx-ingress
     chart: radar/ingress-nginx
     version: {{ .Values.nginx_ingress._chart_version }}
