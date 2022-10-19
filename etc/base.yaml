@@ -36,7 +36,7 @@ cert_manager:
   _chart_version: v1.8.2
   global:
     podSecurityPolicy:
-      enabled: true
+      enabled: false
       useAppArmor: false
   prometheus:
     servicemonitor:
