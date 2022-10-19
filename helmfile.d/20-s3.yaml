@@ -42,7 +42,7 @@ releases:
       {{- end }}
       {{- if hasKey .Values.minio "secretKey" }}
       - name: auth.rootPassword
-        value: {{ .Values.s3_secret_key }}
+        value: {{ .Values.minio.secretKey }}
       {{- else if not (hasKey .Values.minio "auth.rootPassword") }}
       - name: auth.rootPassword
         value: {{ .Values.s3_secret_key }}
