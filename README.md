@@ -2,6 +2,38 @@
 
 The Kubernetes stack of RADAR-base platform.
 
+## Table of contents
+
+<!-- Generated with VIM plugin https://github.com/mzlogin/vim-markdown-toc -->
+<!-- vim-markdown-toc GFM -->
+
+* [About](#about)
+* [Status](#status)
+	* [Disclaimer](#disclaimer)
+* [Prerequisites](#prerequisites)
+	* [Hosting Infrastructure](#hosting-infrastructure)
+	* [Local machine](#local-machine)
+* [Installation](#installation)
+	* [Prepare](#prepare)
+	* [Configure](#configure)
+		* [Project Structure](#project-structure)
+	* [Install](#install)
+		* [Install RADAR-Kubernetes on your cluster.](#install-radar-kubernetes-on-your-cluster)
+		* [Monitor and verify the installation process.](#monitor-and-verify-the-installation-process)
+		* [Ensure Kafka cluster is functional and RADAR-base topics are loaded](#ensure-kafka-cluster-is-functional-and-radar-base-topics-are-loaded)
+		* [Troubleshoot](#troubleshoot)
+		* [Optional](#optional)
+* [Upgrade instructions](#upgrade-instructions)
+	* [Upgrade to RADAR-Kubernetes version 1.0.0](#upgrade-to-radar-kubernetes-version-100)
+* [Usage](#usage)
+	* [Accessing the applications](#accessing-the-applications)
+* [Volume expansion](#volume-expansion)
+* [Uninstall](#uninstall)
+* [Update charts](#update-charts)
+* [Feedback and Contributions](#feedback-and-contributions)
+
+<!-- vim-markdown-toc -->
+
 ## About
 
 RADAR-base is an open-source platform designed to support remote clinical trials by collecting continuous data from wearables and mobile applications. RADAR-Kubernetes enables installing the RADAR-base platform onto Kubernetes clusters. RADAR-base platform can be used for wide range of use-cases. Depending on the use-case, the selection of applications need to be installed can vary. Please read the [component overview and breakdown](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/2673967112/Component+overview+and+breakdown) to understand the role of each component and how components work together. 
