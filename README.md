@@ -326,8 +326,8 @@ Note that this will remove your graylog settings but not your actual logs. This 
 
 Then run
 ```shell
-helmfile -f helmfile.d/00-init.yaml --selector name=cert-manager apply
 helmfile -f helmfile.d/00-init.yaml apply --concurrency 1
+helmfile -f helmfile.d/10-base.yaml --selector name=cert-manager-letsencrypt apply
 ```
 
 To update the Kafka stack, run:
