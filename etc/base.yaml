@@ -131,7 +131,7 @@ cp_schema_registry:
 
 catalog_server:
   _install: true
-  _chart_version: 0.3.1
+  _chart_version: 0.4.0
   replicaCount: 1
   schema_registry: http://cp-schema-registry:8081
 
@@ -248,12 +248,12 @@ radar_fitbit_connector:
 
 radar_rest_sources_authorizer:
   _install: false
-  _chart_version: 0.4.0
+  _chart_version: 0.4.2
   replicaCount: 1
 
 radar_rest_sources_backend:
   _install: false
-  _chart_version: 0.4.0
+  _chart_version: 0.4.2
   replicaCount: 1
   postgres:
     host: postgresql
@@ -301,7 +301,7 @@ radar_grafana:
 
 radar_jdbc_connector:
   _install: true
-  _chart_version: 0.1.6
+  _chart_version: 0.3.0
   replicaCount: 1
   timescaledb:
     host: timescaledb-postgresql-hl
@@ -331,7 +331,7 @@ radar_backend_stream:
 
 radar_integration:
   _install: false
-  _chart_version: 0.2.1
+  _chart_version: 0.4.0
   replicaCount: 1
   oauth_client_id: radar_redcap_integrator
   projects: []
@@ -394,7 +394,7 @@ s3_proxy:
 
 radar_output:
   _install: true
-  _chart_version: 0.3.0
+  _chart_version: 0.3.1
   replicaCount: 1
   source:
     s3:
