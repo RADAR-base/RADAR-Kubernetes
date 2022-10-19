@@ -131,7 +131,7 @@ cp_schema_registry:
 
 catalog_server:
   _install: true
-  _chart_version: 0.4.0
+  _chart_version: 0.4.1
   replicaCount: 1
   schema_registry: http://cp-schema-registry:8081
 
@@ -147,7 +147,9 @@ postgresql:
         postgresPassword: password
   auth:
     replicationPassword: password
-  image: # Check https://hub.docker.com/r/bitnami/postgresql/tags
+  # Check https://hub.docker.com/r/bitnami/postgresql/tags
+  # On first install, choose the latest major version. This cannot be modified afterwards
+  image:
     tag: 11.16.0
   replication:
     enabled: false
@@ -221,7 +223,9 @@ radar_appserver_postgres_password: password
 radar_appserver_postgresql:
   _install: false
   _chart_version: 11.1.24
-  image: # Check https://hub.docker.com/r/bitnami/postgresql/tags
+  # Check https://hub.docker.com/r/bitnami/postgresql/tags
+  # On first install, choose the latest major version. This cannot be modified afterwards
+  image:
     tag: 11.16.0
   primary:
     persistence:
@@ -248,7 +252,7 @@ radar_fitbit_connector:
 
 radar_rest_sources_authorizer:
   _install: false
-  _chart_version: 0.4.2
+  _chart_version: 0.4.3
   replicaCount: 1
 
 radar_rest_sources_backend:
@@ -279,8 +283,10 @@ grafana_metrics_password: password
 timescaledb:
   _install: true
   _chart_version: 11.1.24
+  # Check https://hub.docker.com/r/timescale/timescaledb/tags
+  # The suffix MUST be bitnami.
+  # On first install, choose the latest major postgresql version. This cannot be modified afterwards.
   image:
-    # use the bitnami tag suffix to match with the bitnami postgresql chart
     tag: latest-pg12-bitnami
     pullPolicy: Always
   replicaCount: 1
@@ -303,8 +309,12 @@ radar_jdbc_connector:
   _install: true
   _chart_version: 0.3.0
   replicaCount: 1
-  timescaledb:
-    host: timescaledb-postgresql-hl
+  jdbc:
+  # -- Host of the TimescaleDB database
+    url: jdbc:postgresql://timescaledb-postgresql-hl:5432/grafana-metrics
+  sink:
+    topics: android_phone_relative_location, android_phone_battery_level, connect_fitbit_intraday_heart_rate, connect_fitbit_intraday_steps
+
 
 # --------------------------------------------------------- 20-ingestion.yaml ---------------------------------------------------------
 
@@ -337,12 +347,14 @@ radar_integration:
   projects: []
   # Example:
   #projects:
-  #  - url: "http://example.com"
-  #    project_id: "1"
-  #    enrolment_event: enrolment
-  #    integration_form: radar_integration
-  #    token: xxx
-  #    mp_info_project_name: RADAR-BASE
+  #  - redcap_info:
+  #      url: "http://example.com"
+  #      project_id: "1"
+  #      enrolment_event: enrolment
+  #      integration_form: radar_integration
+  #      token: xxx
+  #    mp_info:
+  #      project_name: RADAR-BASE
 
 # --------------------------------------------------------- 20-s3-connector.yaml ---------------------------------------------------------
 
