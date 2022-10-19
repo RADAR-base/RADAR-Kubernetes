@@ -31,4 +31,4 @@ jobs:
         kubectl version
         kubectl get pods --all-namespaces
 
-        helmfile sync
+        helmfile sync --concurrency 1
