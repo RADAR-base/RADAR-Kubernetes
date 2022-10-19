@@ -1,6 +1,6 @@
 # minio
 
-Minio object storage used for storing RADAR-Base intermediate and output data, based on the bitnami/minio chart. Some values have changed to adapt needs of RADAR-Base for complete list of values visit the original chart. The Minio console is accessed via `https://s3.<radar-base-hostname>`.
+Minio object storage used for storing RADAR-Base intermediate and output data, based on the bitnami/minio chart. Some values have changed to adapt needs of RADAR-Base. For a complete list of values visit [the original chart](https://github.com/RADAR-base/radar-helm-charts/tree/main/external/minio). The Minio console is accessed via `https://s3.<radar-base-hostname>`.
 
 The default root credentials should only be used for creating actual users and attaching policies to them. This can be done by adapting the `provisioning` values, specifically the `provisioning.users` and `provisioning.policies` lists.
 
