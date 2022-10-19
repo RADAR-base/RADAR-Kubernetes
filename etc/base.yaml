@@ -141,6 +141,10 @@ catalog_server:
 postgresql:
   _install: true
   _chart_version: 11.1.24
+  global:
+    postgresql:
+      auth:
+        postgresPassword: password
   auth:
     replicationPassword: password
   image: # Check https://hub.docker.com/r/bitnami/postgresql/tags
@@ -433,6 +437,7 @@ radar_upload_source_connector:
   _install: true
   _chart_version: 0.2.2
   replicaCount: 1
+  s3Endpoint: http://minio:9000/
 
 # --------------------------------------------------------- 30-confluent-cloud.yaml ---------------------------------------------------------
 
