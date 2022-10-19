@@ -115,7 +115,6 @@ provisioning:
     - name: radar-output-storage
     - name: radar-intermediate-storage
 
-
 ## Configure the ingress resource that allows you to access the
 ## MinIO&reg; Console. Set up the URL
 ## ref: https://kubernetes.io/docs/user-guide/ingress/
