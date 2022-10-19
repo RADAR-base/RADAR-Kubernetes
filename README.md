@@ -217,11 +217,29 @@ Other ways to ensure that installation have been successful is to check applicat
 #### Ensure Kafka cluster is functional and RADAR-base topics are loaded
 
 ```bash
-➜  kubectl exec -it cp-kafka-0 -c cp-kafka-broker -- kafka-topics --zookeeper cp-zookeeper-headless:2181 --list | wc -l
+➜  kubectl exec -it cp-kafka-0 -c cp-kafka-broker -- kafka-topics --bootstrap-server localhost:9092 --list | wc -l
 273
 ```
 This output means there are 273 topics loaded in the Kafka cluster.
 In your setup, the number of topics can be more or less, depending on components that you have activated.
+
+Other useful Kafka commands can be found by running
+
+```shell
+kubectl exec -it cp-kafka-0 -c cp-kafka-broker -- sh -c "ls /usr/bin/kafka*"
+```
+Use the `--help` flag with each tool to see its purpose.
+
+View the data in a kafka topic by running:
+
+```shell
+topic=... # kafka topic to read from
+# add any arguments to kafka-avro-console-consumer, e.g. --from-beginning or --max-messages 100
+args="--property print.key=true --bootstrap-server cp-kafka-headless:9092"
+command="unset JMX_PORT; kafka-avro-console-consumer"
+pod=$(kubectl get pods --selector=app=cp-schema-registry -o jsonpath="{.items[0].metadata.name}")
+kubectl exec -it $pod -c cp-schema-registry-server -- sh -c "$command --topic $topic $args"
+```
 
 #### Troubleshoot
 If an application doesn't become fully ready installation will not be successful. In this case, you should investigate the root cause by investigating the relevant component. 
@@ -404,4 +422,4 @@ bin/chart-updates
 
 ## Feedback and Contributions
 Enabling RADAR-base community to use RADAR-Kubernetes is important for us. If you have troubles setting up the platform using provided instructions, you can create an issue with exact details to reproduce and the expected behaviour.
-You can also reach out to the RADAR-base community via RADAR-base Slack on **[radar-kubernetes channel](https://radardevelopment.slack.com/archives/C021AGGESC9)**. The RADAR-base developers support the community on a voluntary basis and will pick up your requests as time permits. 
+You can also reach out to the RADAR-base community via RADAR-base Slack on **[radar-kubernetes channel](https://radardevelopment.slack.com/archives/C021AGGESC9)**. The RADAR-base developers support the community on a voluntary basis and will pick up your requests as time permits.
