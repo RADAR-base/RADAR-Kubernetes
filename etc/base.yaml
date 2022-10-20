@@ -42,10 +42,6 @@ cert_manager:
     servicemonitor:
       enabled: true
 
-cert_manager_letsencrypt:
-  _install: true
-  _chart_version: 0.1.0
-
 kube_prometheus_stack:
   _install: true
   _chart_version: 0.3.2
@@ -96,6 +92,10 @@ kafka_manager:
     password: password
 
 # --------------------------------------------------------- 10-base.yaml ---------------------------------------------------------
+cert_manager_letsencrypt:
+  _install: true
+  _chart_version: 0.1.0
+
 confluent_cloud:
   enabled: false
   cc:
