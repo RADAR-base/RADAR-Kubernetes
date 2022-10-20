@@ -208,6 +208,8 @@ management_portal:
 app_config:
   _install: true
   _chart_version: 0.2.3
+  image:
+    tag: 0.4.1
   replicaCount: 1
   jdbc:
     url: jdbc:postgresql://postgresql:5432/appconfig
@@ -216,6 +218,8 @@ app_config:
 app_config_frontend:
   _install: true
   _chart_version: 0.2.2
+  image:
+    tag: 0.4.1
   replicaCount: 1
 
 # --------------------------------------------------------- 20-appserver.yaml ---------------------------------------------------------
