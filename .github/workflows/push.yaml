@@ -12,23 +12,23 @@ jobs:
     - name: Set up helmfile config
       run: cp .github/environments.yaml environments.yaml
 
-    - name: Test
+    - name: Run helmfile template
       run: |
         helmfile template
 
-    - name: Start a local k8s cluster
-      uses: jupyterhub/action-k3s-helm@v3
-      with:
-        # See available:
-        # - k3s release channels at https://github.com/k3s-io/k3s/blob/HEAD/channel.yaml
-        # - k3s versions at https://github.com/k3s-io/k3s/tags
-        # - helm versions at https://github.com/helm/helm/tags
-        k3s-channel: latest
-
-    - name: Verify function of k8s, kubectl, and helm
-      run: |
-        echo "kubeconfig: $KUBECONFIG"
-        kubectl version
-        kubectl get pods --all-namespaces
-
-        helmfile sync --concurrency 1
+    # - name: Start a local k8s cluster
+    #   uses: jupyterhub/action-k3s-helm@v3
+    #   with:
+    #     # See available:
+    #     # - k3s release channels at https://github.com/k3s-io/k3s/blob/HEAD/channel.yaml
+    #     # - k3s versions at https://github.com/k3s-io/k3s/tags
+    #     # - helm versions at https://github.com/helm/helm/tags
+    #     k3s-channel: latest
+    #
+    # - name: Verify function of k8s, kubectl, and helm
+    #   run: |
+    #     echo "kubeconfig: $KUBECONFIG"
+    #     kubectl version
+    #     kubectl get pods --all-namespaces
+    #
+    #     helmfile sync --concurrency 1
