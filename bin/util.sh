@@ -127,6 +127,10 @@ check_config_present() {
   fi
 }
 
+generate_secret() {
+  echo $(tr -cd '[:alnum:]' < /dev/urandom | fold -w30 | head -n1)
+}
+
 query_password() {
   echo $2
   stty -echo
