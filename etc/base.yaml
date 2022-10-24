@@ -78,10 +78,10 @@ nginx_ingress:
   _chart_version: 4.1.0
   controller:
     replicaCount: 1
-  metrics:
-    enabled: "true"
-    serviceMonitor:
-      enabled: "true"
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
 
 kafka_manager:
   _install: false
