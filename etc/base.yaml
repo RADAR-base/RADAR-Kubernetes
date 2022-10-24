@@ -13,11 +13,6 @@ mongodb:
   _install: true
   _chart_version: 11.1.10
   architecture: replicaset
-  auth:
-    replicaSetKey: secret
-    rootPassword: secret
-    passwords:
-      - secret
 
 elasticsearch:
   _install: true
@@ -86,10 +81,6 @@ nginx_ingress:
 kafka_manager:
   _install: false
   _chart_version: 2.1.6
-  basicAuth:
-    enabled: true
-    username: kafkamanager-user
-    password: password
 
 # --------------------------------------------------------- 10-base.yaml ---------------------------------------------------------
 cert_manager_letsencrypt:
@@ -98,13 +89,6 @@ cert_manager_letsencrypt:
 
 confluent_cloud:
   enabled: false
-  cc:
-    bootstrapServerurl: confluentBootstrapServers
-    schemaRegistryUrl: confluentSchemaRegistryUrl
-    apiKey: ccApikey
-    apiSecret: ccApiSecret
-    schemaRegistryApiKey: srApiKey
-    schemaRegistryApiSecret: srApiSecret
 
 cp_zookeeper:
   _install: true
@@ -143,12 +127,6 @@ catalog_server:
 postgresql:
   _install: true
   _chart_version: 11.1.24
-  global:
-    postgresql:
-      auth:
-        postgresPassword: password
-  auth:
-    replicationPassword: password
   # Check https://hub.docker.com/r/bitnami/postgresql/tags
   # On first install, choose the latest major version. This cannot be modified afterwards
   image:
@@ -170,39 +148,11 @@ management_portal:
     ssl:
       enabled: false
   managementportal:
-    common_admin_password: password
-    frontend_client_secret: password
     catalogue_server_enable_auto_import: true
     common_privacy_policy_url: http://info.thehyve.nl/radar-cns-privacy-policy
     oauth_checking_key_aliases_0: radarbase-managementportal-ec
     oauth_checking_key_aliases_1: selfsigned
-  oauth_clients:
-    pRMT:
-      enable: true
-      client_secret: "saturday$SHARE$scale"
-    aRMT:
-      enable: true
-      client_secret: secret
-    radar_upload_backend:
-      client_secret: secret
-    radar_upload_connect:
-      client_secret: secret
-    radar_rest_sources_auth_backend:
-      client_secret: secret
-    radar_redcap_integrator:
-      client_secret: secret
-    radar_fitbit_connector:
-      client_secret: secret
-    radar_appconfig:
-      client_secret: secret
-    radar_push_endpoint:
-      client_secret: secret
   smtp:
-    enabled: false
-    host: smtp
-    port: 25
-    from: noreply@example.com
-    username: username
     password: secret
 
 app_config:
@@ -213,7 +163,6 @@ app_config:
   replicaCount: 1
   jdbc:
     url: jdbc:postgresql://postgresql:5432/appconfig
-    password: password
 
 app_config_frontend:
   _install: true
@@ -223,8 +172,6 @@ app_config_frontend:
   replicaCount: 1
 
 # --------------------------------------------------------- 20-appserver.yaml ---------------------------------------------------------
-
-radar_appserver_postgres_password: password
 
 radar_appserver_postgresql:
   _install: false
@@ -247,9 +194,6 @@ radar_appserver:
   public_key_endpoints: []
 
 # --------------------------------------------------------- 20-fitbit.yaml ---------------------------------------------------------
-fitbit_api_client: "client"
-fitbit_api_secret: "secret"
-
 radar_fitbit_connector:
   _install: false
   _chart_version: 0.2.1
@@ -268,7 +212,6 @@ radar_rest_sources_backend:
   postgres:
     host: postgresql
     user: postgres
-    password: password
     ssl:
       enabled: false
   restSourceClients:
@@ -280,11 +223,7 @@ radar_rest_sources_backend:
 # --------------------------------------------------------- 20-grafana.yaml ---------------------------------------------------------
 
 timescaledb_db_name: grafana-metrics
-timescaledb_password: password
-
-grafana_password: password
 grafana_metrics_username: username
-grafana_metrics_password: password
 
 timescaledb:
   _install: true
@@ -371,9 +310,6 @@ redis:
 # The access keys and secret keys of the following services should match.
 # If S3 is used as a storage medium instead of minio, then fill in those.
 
-s3_access_key: accessKey
-s3_secret_key: accessKey
-
 minio:
   _install: true
   _chart_version: 11.9.1
@@ -427,8 +363,6 @@ radar_output:
     uri: redis://redis-master:6379
 
 # --------------------------------------------------------- 20-upload.yaml ---------------------------------------------------------
-
-radar_upload_postgres_password: password
 
 radar_upload_postgresql:
   _install: true
