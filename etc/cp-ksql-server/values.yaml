@@ -101,5 +101,15 @@ cp-schema-registry:
 
 # KSQL configuration options
 ## ref: https://docs.confluent.io/current/ksql/docs/installation/server-config/config-reference.html
-configurationOverrides: {}
-  # "ksql.streams.producer.retries": "2147483647"
+configurationOverrides:
+    "ksql.logging.processing.topic.auto.create": true
+    "ksql.logging.processing.stream.auto.create": true
+    "ksql.service.id": radar_default_
+    "ksql.persistence.default.format.key": AVRO
+    "ksql.persistence.default.format.value": AVRO
+    "ksql.sink.replicas": 3
+    "ksql.streams.replication.factor": 3
+    "ksql.internal.topic.replicas": 3
+    "ssl.truststore.location": "/etc/kafka/secrets/kafka.client.truststore.jks"
+    "ssl.truststore.password": confluent
+    "log4j.logger.processing": false
