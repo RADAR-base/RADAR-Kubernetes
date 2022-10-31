@@ -367,6 +367,9 @@ radar_integration:
 redis:
   _install: true
   _chart_version: 16.8.7
+  metrics:
+    enabled: true
+  
 
 # The access keys and secret keys of the following services should match.
 # If S3 is used as a storage medium instead of minio, then fill in those.
@@ -381,6 +384,11 @@ minio:
     tag: 2022.10.15-debian-11-r0
   persistence:
     size: 20Gi
+  metrics:
+    serviceMonitor:
+      enabled: true
+    prometheusRule:
+      enabled: true    
   provisioning:
     ## @param provisioning.users MinIO&reg; users provisioning. Can be used in addition to provisioning.usersExistingSecrets.
     ## https://docs.min.io/docs/minio-admin-complete-guide.html#user
