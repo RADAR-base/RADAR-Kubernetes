@@ -9,6 +9,7 @@ The Kubernetes stack of RADAR-base platform.
 
 * [About](#about)
 * [Status](#status)
+  * [Compatibility](#compatibility)
 	* [Disclaimer](#disclaimer)
 * [Prerequisites](#prerequisites)
 	* [Hosting Infrastructure](#hosting-infrastructure)
@@ -36,15 +37,18 @@ The Kubernetes stack of RADAR-base platform.
 
 ## About
 
-RADAR-base is an open-source platform designed to support remote clinical trials by collecting continuous data from wearables and mobile applications. RADAR-Kubernetes enables installing the RADAR-base platform onto Kubernetes clusters. RADAR-base platform can be used for wide range of use-cases. Depending on the use-case, the selection of applications need to be installed can vary. Please read the [component overview and breakdown](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/2673967112/Component+overview+and+breakdown) to understand the role of each component and how components work together. 
+RADAR-base is an open-source platform designed to support remote clinical trials by collecting continuous data from wearables and mobile applications. RADAR-Kubernetes enables installing the RADAR-base platform onto Kubernetes clusters. RADAR-base platform can be used for wide range of use-cases. Depending on the use-case, the selection of applications need to be installed can vary. Please read the [component overview and breakdown](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/2673967112/Component+overview+and+breakdown) to understand the role of each component and how components work together.
 
 RADAR-Kubernetes setup uses [Helm 3](https://github.com/helm/helm) charts to package necessary Kubernetes resources for each component and [helmfile](https://github.com/roboll/helmfile) to modularize and deploy Helm charts of the platform on a Kubernetes cluster. This setup is designed to be a lightweight way to install and configure the RADAR-base components. The original images or charts may provide more and granular configurations. Please visit the `README` of respective charts in [radar-helm-charts](https://github.com/RADAR-base/radar-helm-charts) to understand the configurations and visit the main repository for in depth knowledge.
 
 ## Status
 RADAR-Kubernetes is one of the youngest project of RADAR-base and will be the **long term supported form of deploying the platform**. Even though, RADAR-Kubernetes is being used in few production environments, it is still in its early stage of development. We are working on improving the set up and documentation to enable RADAR-base community to make use of the platform.
 
+### Compatibility
+Currently RADAR-Kubernetes is supported on Kubernetes version 1.23 and 1.24, with experimental support on 1.25. You should be able to install the platform on other versions of Kubernetes as well but you might encounter compatibility issues.
+
 ### Disclaimer
-This documentation assumes familiarity with all referenced Kubernetes concepts, utilities, and procedures and familiarity with Helm charts and helmfile. While this documentation will provide guidance for installing and configuring RADAR-base platform on a Kubernetes cluster, it is not a replacement for the official detailed documentation or tutorial of Kubernetes, Helm or Helmfile. If you are not familiar with these tools, we strongly recommend you to get familiar with these tools. Here is a [list of useful links](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/2731638785/How+to+get+started+with+tools+around+RADAR-Kubernetes) to get started. 
+This documentation assumes familiarity with all referenced Kubernetes concepts, utilities, and procedures and familiarity with Helm charts and helmfile. While this documentation will provide guidance for installing and configuring RADAR-base platform on a Kubernetes cluster, it is not a replacement for the official detailed documentation or tutorial of Kubernetes, Helm or Helmfile. If you are not familiar with these tools, we strongly recommend you to get familiar with these tools. Here is a [list of useful links](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/2731638785/How+to+get+started+with+tools+around+RADAR-Kubernetes) to get started.
 
 ## Prerequisites
 ### Hosting Infrastructure
@@ -67,9 +71,9 @@ The following tools should be installed in your local machine to install the RAD
 | [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)| Kubernetes command-line tool, kubectl, allows you to run commands against Kubernetes clusters|
 | [helm 3](https://github.com/helm/helm#install)| Helm Charts are used to package Kubernetes resources for each component|
 | [helmfile](https://github.com/roboll/helmfile#installation)| RADAR-Kubernetes uses helmfiles to deploy Helm charts.|
-| [helm-diff](https://github.com/databus23/helm-diff#install)| A dependency for Helmfile| 
+| [helm-diff](https://github.com/databus23/helm-diff#install)| A dependency for Helmfile|
 
-**Once you have a working installation of a Kubernetes cluster, please [configure Kubectl with the appropriate Kubeconfig](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#verify-kubectl-configuration) to enable Kubectl to find and access your cluster. Then proceed to the installation section.** 
+**Once you have a working installation of a Kubernetes cluster, please [configure Kubectl with the appropriate Kubeconfig](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#verify-kubectl-configuration) to enable Kubectl to find and access your cluster. Then proceed to the installation section.**
 
 ## Installation
 > The following instructions on this guide are for local machines which runs on Linux operating systems. You can still use the same instructions with small to no changes on a MacOS device as well.
@@ -80,7 +84,7 @@ The following tools should be installed in your local machine to install the RAD
     ```shell
     git clone https://github.com/RADAR-base/RADAR-Kubernetes.git
     ```
- 
+
 2. Create basic config files using template files.
 
     ```shell
@@ -89,9 +93,9 @@ The following tools should be installed in your local machine to install the RAD
     cp etc/base.yaml etc/production.yaml
     cp etc/base.yaml.gotmpl etc/production.yaml.gotmpl
     ```
-   
+
     It is recommended make a private clone of this repository, if you want to version control your configurations and/or share with other people.
-      
+
     The best practise to share your platform configurations is by **sharing the encrypted version of `production.yaml`**.
 
 ### Configure
@@ -102,7 +106,7 @@ The following tools should be installed in your local machine to install the RAD
 - [/secrets](secrets): Contains secrets configuration for helm charts.
 - [/helmfile.d](helmfile.d): Contains Helmfiles for modular deployment of the platform
 - [environments.yaml](environments.yaml): Defines current environment files in order to be used by helmfile. Read more about `bases` [here](https://github.com/roboll/helmfile/blob/master/docs/writing-helmfile.md).
-- `etc/production.yaml`: Production helmfile template to configure and install RADAR-base components. Inspect the file to enable, disable and configure components required for your use case. The default helmfile enables all core components that are needed to run RADAR-base platform with pRMT and aRMT apps. If you're not sure which components you want to enable you can refer to wiki for [an overview and breakdown on RADAR-Base components and their roles](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/2673967112/Component+overview+and+breakdown). 
+- `etc/production.yaml`: Production helmfile template to configure and install RADAR-base components. Inspect the file to enable, disable and configure components required for your use case. The default helmfile enables all core components that are needed to run RADAR-base platform with pRMT and aRMT apps. If you're not sure which components you want to enable you can refer to wiki for [an overview and breakdown on RADAR-Base components and their roles](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/2673967112/Component+overview+and+breakdown).
 - `etc/production.yaml.gotmpl`: Change setup parameters that require Go templating, such as reading input files
 
 1. Configure the [environments.yaml](environments.yaml) to use the files that you have created by copying the template files.
@@ -110,11 +114,11 @@ The following tools should be installed in your local machine to install the RAD
     vim environments.yaml # use the files you just created
     ```
 2. Configure the `etc/production.yaml`. In this file you are required to fill in secrets and passwords used by RADAR-base applications. It is strongly recommended to use random password generator to fill these secrets. **You must keep this file secure and confidential once you have started installing the platform.**
-    
+
      To create an encrypted password string for monitoring system you need to use [this website](https://www.web2generators.com/apache-tools/htpasswd-generator) or `htpasswd` command to create an encrypted password string and put it inside `kube_prometheus_stack.nginx_auth` variable. It seems like bcrypt encryption isn't supported in current ingress-nginx so make sure that you're using MD5 encryption.
-    
+
     Optionally, you can also enable or disable other components that are configured otherwise by default.
-  
+
     ```shell
     vim etc/production.yaml  # Change setup parameters and configurations
     ```
@@ -122,7 +126,7 @@ The following tools should be installed in your local machine to install the RAD
     When doing a clean install, you are advised to change the `postgresql`, `radar_appserver_postgresql` `radar_upload_postgresql` image tags to the latest PostgreSQL version. Likewise, the timescaledb image tag should use the latest timescaledb version. PostgreSQL passwords and major versions cannot easily be updated after installation.
 3. In `etc/production.yaml.gotmpl` file, change setup parameters that require Go templating, such as reading input files and selecting an option for the `keystore.p12`
     ```shell
-    vim etc/production.yaml.gotmpl 
+    vim etc/production.yaml.gotmpl
     ```
 4. Run `bin/keystore-init` to create the Keystore file which used to sign JWT access tokens by [Management Portal](https://github.com/RADAR-base/radar-helm-charts/blob/main/charts/management-portal/README.md)
 
@@ -139,15 +143,15 @@ The following tools should be installed in your local machine to install the RAD
     Consult the full [X.500 Distinguished Name syntax](https://docs.oracle.com/javase/8/docs/technotes/tools/windows/keytool.html#CHDHBFGJ) for more information.
 
 ### Install
-Once you are done with all configurations, the RADAR-Kubernetes can be deployed on a Kubernetes cluster. 
+Once you are done with all configurations, the RADAR-Kubernetes can be deployed on a Kubernetes cluster.
 
-#### Install RADAR-Kubernetes on your cluster. 
+#### Install RADAR-Kubernetes on your cluster.
 
 ```shell
 helmfile sync --concurrency 1
 ```
 
-The `helmfile sync` will synchronize all the Kubernetes resources defined in the helmfiles with your Kubernetes cluster. Having `--concurrency 1` will make sure components are installed in required order. Depending on your cluster specification, this may take a few minutes when installed for the first time. 
+The `helmfile sync` will synchronize all the Kubernetes resources defined in the helmfiles with your Kubernetes cluster. Having `--concurrency 1` will make sure components are installed in required order. Depending on your cluster specification, this may take a few minutes when installed for the first time.
 
 | :exclamation:  Note|
 |:----------------------------------------|
@@ -244,7 +248,7 @@ cert-manager-cainjector-75b6bc7b8b-dv2js   1/1     Running   0          8m21s
 cert-manager-webhook-8444c4bc77-jhzgb      1/1     Running   0          8m21s
 ```
 
-Other ways to ensure that installation have been successful is to check application logs for errors and exceptions. 
+Other ways to ensure that installation have been successful is to check application logs for errors and exceptions.
 
 #### Ensure Kafka cluster is functional and RADAR-base topics are loaded
 
@@ -274,7 +278,7 @@ kubectl exec -it $pod -c cp-schema-registry-server -- sh -c "$command --topic $t
 ```
 
 #### Troubleshoot
-If an application doesn't become fully ready installation will not be successful. In this case, you should investigate the root cause by investigating the relevant component. 
+If an application doesn't become fully ready installation will not be successful. In this case, you should investigate the root cause by investigating the relevant component.
 
 Some useful commands for troubleshooting a component are mentioned below.
 
@@ -294,11 +298,11 @@ To continue monitoring the logs
 ```shell
 kubectl logs -f <podname>
 ```
-For more information on how `kubectl` can be used to manage a Kubernetes application, please visit [Kubectl documentation](https://kubernetes.io/docs/reference/kubectl/cheatsheet/). 
+For more information on how `kubectl` can be used to manage a Kubernetes application, please visit [Kubectl documentation](https://kubernetes.io/docs/reference/kubectl/cheatsheet/).
 | :exclamation: Note |
 |--------------------|
 | For most of the components, you can reinstall them without additional actions. However, for some components such as `kube-prometheus-stack` and `kafka-init`, you may need to remove everything before trying again.|
- 
+
 If you have enabled monitoring you should also check **Prometheus** to see if there are any alerts. In next section there is a guide on how to connect to Prometheus.
 
 #### Optional
@@ -407,10 +411,10 @@ done < minio-pv.list
 helmfile -f helmfile.d/20-s3.yaml apply
 ```
 
-Delete the redis stateful set (this will not delete the data on the volume) 
+Delete the redis stateful set (this will not delete the data on the volume)
 ```
 kubectl delete statefulset redis-master
-helmfile -f helmfile.d/20-s3.yaml sync --concurrency 1 
+helmfile -f helmfile.d/20-s3.yaml sync --concurrency 1
 ```
 ## Usage
 ### Accessing the applications
