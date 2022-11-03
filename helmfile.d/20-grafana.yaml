@@ -7,31 +7,25 @@ helmDefaults:
   kubeContext: {{ .Values.kubeContext }}
 
 repositories:
-  - name: grafana
-    url: https://grafana.github.io/helm-charts
-  - name: bitnami
-    url: https://charts.bitnami.com/bitnami
   - name: radar
     url: https://radar-base.github.io/radar-helm-charts
 
 releases:
   - name: timescaledb
-    chart: bitnami/postgresql
+    chart: radar/postgresql
     version: {{ .Values.timescaledb._chart_version }}
     installed: {{ .Values.timescaledb._install }}
     values:
       - "../etc/timescaledb/values.yaml"
       - {{ .Values.timescaledb | toYaml | indent 8 | trim }}
     set:
-      - name: postgresqlPassword
+      - name: global.postgresql.auth.postgresPassword
         value: {{ .Values.timescaledb_password }}
-      - name: postgresqlUsername
-        value: {{ .Values.timescaledb_username }}
-      - name: postgresqlDatabase
+      - name: auth.database
         value: {{ .Values.timescaledb_db_name }}
 
   - name: radar-grafana
-    chart: grafana/grafana
+    chart: radar/grafana
     version: {{ .Values.radar_grafana._chart_version }}
     installed: {{ .Values.radar_grafana._install }}
     values:
@@ -73,6 +67,6 @@ releases:
       - name: timescaledb.password
         value: {{ .Values.timescaledb_password }}
       - name: timescaledb.username
-        value: {{ .Values.timescaledb_username }}
+        value: postgres
       - name: timescaledb.database_name
         value: {{ .Values.timescaledb_db_name }}

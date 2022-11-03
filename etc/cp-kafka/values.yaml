@@ -1,5 +1,5 @@
 image: confluentinc/cp-kafka
-imageTag: 5.3.1
+imageTag: 7.2.0
 
 customEnv:
   KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
@@ -7,11 +7,10 @@ customEnv:
   KAFKA_MESSAGE_MAX_BYTES: "4000048"
   KAFKA_LOG4J_LOGGERS: kafka.producer.async.DefaultEventHandler=INFO,kafka.controller=INFO,state.change.logger=INFO
   KAFKA_COMPRESSION_TYPE: lz4
-  KAFKA_INTER_BROKER_PROTOCOL_VERSION: "1.1"
-  KAFKA_LOG_MESSAGE_FORMAT_VERSION: "1.1"
   KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
   KAFKA_OFFSETS_RETENTION_MINUTES: "10080"
   KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: "16000"
+  KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: "true"
 
 
 cp-zookeeper:
@@ -20,6 +19,10 @@ cp-zookeeper:
 
 persistence:
   size: 2Gi
+
+initChownData:
+  enabled: true
+  uid: 1000
 
 resources:
   # We usually recommend not to specify default resources and to leave this as a conscious

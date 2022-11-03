@@ -7,27 +7,13 @@ helmDefaults:
   kubeContext: {{ .Values.kubeContext }}
 
 repositories:
-  - name: elastic
-    url: https://helm.elastic.co
-  - name: jetstack
-    url: https://charts.jetstack.io
-  - name: prometheus-community
-    url: https://prometheus-community.github.io/helm-charts
-  - name: bitnami
-    url: https://charts.bitnami.com/bitnami
-  - name: kongz
-    url: https://charts.kong-z.com
-  - name: fluent
-    url: https://fluent.github.io/helm-charts
-  - name: ingress-nginx
-    url: https://kubernetes.github.io/ingress-nginx
   - name: radar
     url: https://radar-base.github.io/radar-helm-charts
 
 releases:
   - name: mongodb
     namespace: graylog
-    chart: bitnami/mongodb
+    chart: radar/mongodb
     version: {{ .Values.mongodb._chart_version }}
     installed: {{ .Values.mongodb._install }}
     values:
@@ -36,7 +22,7 @@ releases:
 
   - name: elasticsearch
     namespace: graylog
-    chart: elastic/elasticsearch
+    chart: radar/elasticsearch
     version: {{ .Values.elasticsearch._chart_version }}
     installed: {{ .Values.elasticsearch._install }}
     values:
@@ -45,13 +31,15 @@ releases:
 
   - name: graylog
     namespace: graylog
-    chart: kongz/graylog
+    chart: radar/graylog
     version: {{ .Values.graylog._chart_version }}
     installed: {{ .Values.graylog._install }}
     values:
       - "../etc/graylog/values.yaml"
       - {{ .Values.graylog | toYaml | indent 8 | trim }}
     set:
+      - name: graylog.mongodb.uri
+        value: mongodb://graylog:{{ index .Values.mongodb.auth.passwords 0 }}@mongodb-headless.graylog.svc.cluster.local:27017/graylog?replicaSet=rs0
       - name: graylog.rootEmail
         value: {{ .Values.maintainer_email }}
       - name: graylog.ingress.hosts
@@ -63,30 +51,15 @@ releases:
 
   - name: fluent-bit
     namespace: graylog
-    chart: fluent/fluent-bit
+    chart: radar/fluent-bit
     version: {{ .Values.fluent_bit._chart_version }}
     installed: {{ .Values.fluent_bit._install }}
     values:
       - "../etc/fluent-bit/values.yaml"
       - {{ .Values.fluent_bit | toYaml | indent 8 | trim }}
-
-  - name: cert-manager
-    namespace: cert-manager
-    wait: true
-    installed: {{ .Values.cert_manager._install }}
-    disableValidation: true
-    chart: radar/cert-manager
-    version: {{ .Values.cert_manager._chart_version }}
-    hooks:
-      - events: ["presync"]
-        showlogs: true
-        command: "kubectl"
-        args: ["--context", "{{ .Values.kubeContext }}", "apply", "-f", "../etc/cert-manager/files/crds.yaml"]
     set:
       - name: server_name
         value: {{ .Values.server_name }}
-      - name: maintainer_email
-        value: {{ .Values.maintainer_email }}
 
   - name: kube-prometheus-stack
     chart: radar/kube-prometheus-stack
@@ -120,9 +93,29 @@ releases:
         value: radar-base-tls-grafana
       - name: kube-prometheus-stack.grafana.ingress.tls[0].hosts
         values: ["grafana.{{ .Values.server_name }}"]
+    hooks:
+      - events: ["presync"]
+        showlogs: true
+        command: "kubectl"
+        args: ["--context", "{{ .Values.kubeContext }}", "apply", "--force-conflicts", "--server-side", "-f", "../etc/kube-prometheus-stack/files/crds.yaml"]
+
+  - name: cert-manager
+    namespace: cert-manager
+    wait: true
+    installed: {{ .Values.cert_manager._install }}
+    disableValidation: true
+    chart: radar/cert-manager
+    version: {{ .Values.cert_manager._chart_version }}
+    values:
+      - {{ .Values.cert_manager | toYaml | indent 8 | trim }}
+    hooks:
+      - events: ["presync"]
+        showlogs: true
+        command: "kubectl"
+        args: ["--context", "{{ .Values.kubeContext }}", "apply", "-f", "../etc/cert-manager/files/crds.yaml"]
 
   - name: nginx-ingress
-    chart: ingress-nginx/ingress-nginx
+    chart: radar/ingress-nginx
     version: {{ .Values.nginx_ingress._chart_version }}
     force: false
     installed: {{ .Values.nginx_ingress._install }}
@@ -142,8 +135,8 @@ releases:
       - name: ingress.hosts
         values:
           - {{ .Values.server_name }}
-      - name: ingress.tls[0].secretName
+      - name: ingress.tls.secretName
         value: radar-base-tls
-      - name: ingress.tls[0].hosts
+      - name: ingress.tls.hosts
         values:
           - {{ .Values.server_name }}

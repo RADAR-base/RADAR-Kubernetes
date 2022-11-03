@@ -1,6 +1,6 @@
 /.env
 kubernetes-HDFS/
-keystore.p12
+keystore.p12*
 radar-is.yml
 *.tgz
 production.yaml
@@ -13,6 +13,6 @@ charts/management-portal/files/root.crt
 charts/radar-rest-sources-backend/files/root.crt
 secrets.yaml
 secrets/
-.sops.yaml
+*.sops.*
 google-services.json
 google-credentials.json
