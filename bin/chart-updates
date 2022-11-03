@@ -3,13 +3,13 @@
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 . bin/util.sh
 
-helm version
-helmfile --version
-jq --version
+check_command_exists helm version
+check_command_exists helmfile
+check_command_exists yq
 
 # Add repository indexes
 helmfile repos
-index=$(helm search repo -o json | jq -cr 'map({(.name): .version}) | add')
+index=$(helm search repo -o yaml | yq -r '.[]  as $item ireduce ({}; . * {($item.name): $item.version})')
 
 ok=""
 warn=""
@@ -19,7 +19,7 @@ while read chart
 do
 	name=$(echo "$chart" | cut -d $'\t' -f 1)
 	version=$(echo "$chart" | cut -d $'\t' -f 2)
-	listed_version=$(echo "$index" | jq -r ".\"$name\"")
+	listed_version=$(echo "$index" | yq ".\"$name\"")
 
 	if [ "$listed_version" != "$version" ]; then
 		if [[ "$name" == *"radar/"* ]]; then
@@ -30,7 +30,7 @@ do
 	else
 		ok+="$name OK $version $listed_version\n"
 	fi
-done < <(helmfile list --output json | jq -r ".[] | [.chart, .version] | @tsv")
+done < <(helmfile list --output json | yq ".[] | [.chart, .version] | @tsv")
 
 printf "NAME STATUS VERSION LATEST\n$ok$warn$err" | column -t
 
