@@ -15,6 +15,16 @@ repositories:
     url: https://radar-base.github.io/cp-helm-charts
 
 releases:
+  - name: cert-manager-letsencrypt
+    namespace: cert-manager
+    wait: true
+    installed: {{ .Values.cert_manager_letsencrypt._install }}
+    chart: radar/cert-manager-letsencrypt
+    version: {{ .Values.cert_manager_letsencrypt._chart_version }}
+    set:
+      - name: maintainerEmail
+        value: {{ .Values.maintainer_email }}
+
   - name: cp-zookeeper
     chart: cp-radar/cp-zookeeper
     version: {{ .Values.cp_zookeeper._chart_version }}

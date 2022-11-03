@@ -2,6 +2,38 @@
 
 The Kubernetes stack of RADAR-base platform.
 
+## Table of contents
+
+<!-- Generated with VIM plugin https://github.com/mzlogin/vim-markdown-toc -->
+<!-- vim-markdown-toc GFM -->
+
+* [About](#about)
+* [Status](#status)
+	* [Disclaimer](#disclaimer)
+* [Prerequisites](#prerequisites)
+	* [Hosting Infrastructure](#hosting-infrastructure)
+	* [Local machine](#local-machine)
+* [Installation](#installation)
+	* [Prepare](#prepare)
+	* [Configure](#configure)
+		* [Project Structure](#project-structure)
+	* [Install](#install)
+		* [Install RADAR-Kubernetes on your cluster.](#install-radar-kubernetes-on-your-cluster)
+		* [Monitor and verify the installation process.](#monitor-and-verify-the-installation-process)
+		* [Ensure Kafka cluster is functional and RADAR-base topics are loaded](#ensure-kafka-cluster-is-functional-and-radar-base-topics-are-loaded)
+		* [Troubleshoot](#troubleshoot)
+		* [Optional](#optional)
+* [Upgrade instructions](#upgrade-instructions)
+	* [Upgrade to RADAR-Kubernetes version 1.0.0](#upgrade-to-radar-kubernetes-version-100)
+* [Usage](#usage)
+	* [Accessing the applications](#accessing-the-applications)
+* [Volume expansion](#volume-expansion)
+* [Uninstall](#uninstall)
+* [Update charts](#update-charts)
+* [Feedback and Contributions](#feedback-and-contributions)
+
+<!-- vim-markdown-toc -->
+
 ## About
 
 RADAR-base is an open-source platform designed to support remote clinical trials by collecting continuous data from wearables and mobile applications. RADAR-Kubernetes enables installing the RADAR-base platform onto Kubernetes clusters. RADAR-base platform can be used for wide range of use-cases. Depending on the use-case, the selection of applications need to be installed can vary. Please read the [component overview and breakdown](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/2673967112/Component+overview+and+breakdown) to understand the role of each component and how components work together. 
@@ -217,11 +249,29 @@ Other ways to ensure that installation have been successful is to check applicat
 #### Ensure Kafka cluster is functional and RADAR-base topics are loaded
 
 ```bash
-➜  kubectl exec -it cp-kafka-0 -c cp-kafka-broker -- kafka-topics --zookeeper cp-zookeeper-headless:2181 --list | wc -l
+➜  kubectl exec -it cp-kafka-0 -c cp-kafka-broker -- kafka-topics --bootstrap-server localhost:9092 --list | wc -l
 273
 ```
 This output means there are 273 topics loaded in the Kafka cluster.
 In your setup, the number of topics can be more or less, depending on components that you have activated.
+
+Other useful Kafka commands can be found by running
+
+```shell
+kubectl exec -it cp-kafka-0 -c cp-kafka-broker -- sh -c "ls /usr/bin/kafka*"
+```
+Use the `--help` flag with each tool to see its purpose.
+
+View the data in a kafka topic by running:
+
+```shell
+topic=... # kafka topic to read from
+# add any arguments to kafka-avro-console-consumer, e.g. --from-beginning or --max-messages 100
+args="--property print.key=true --bootstrap-server cp-kafka-headless:9092"
+command="unset JMX_PORT; kafka-avro-console-consumer"
+pod=$(kubectl get pods --selector=app=cp-schema-registry -o jsonpath="{.items[0].metadata.name}")
+kubectl exec -it $pod -c cp-schema-registry-server -- sh -c "$command --topic $topic $args"
+```
 
 #### Troubleshoot
 If an application doesn't become fully ready installation will not be successful. In this case, you should investigate the root cause by investigating the relevant component. 
@@ -267,7 +317,7 @@ Run the following instructions to upgrade an existing RADAR-Kubernetes cluster.
 Before running the upgrade, compare `etc/base.yaml` and `etc/base.yaml.gotmpl` with their `production.yaml` counterparts. Please ensure that all properties in `etc/base.yaml` are overridden in your `production.yaml` or that the `base.yaml` default value is fine, in which case no value needs to be provided in `production.yaml`.
 
 To upgrade the initial services, run
-```
+```shell
 kubectl delete -n monitoring deployments kube-prometheus-stack-kube-state-metrics kafka-manager
 helm -n graylog uninstall mongodb
 kubectl delete -n graylog pvc datadir-mongodb-0 datadir-mongodb-1
@@ -275,37 +325,37 @@ kubectl delete -n graylog pvc datadir-mongodb-0 datadir-mongodb-1
 Note that this will remove your graylog settings but not your actual logs. This step is unfortunately needed to enable credentials on the Graylog database hosted by the mongodb chart. You will need to recreate the GELF TCP input source as during install.
 
 Then run
-```
-helmfile -f helmfile.d/00-init.yaml --selector name=cert-manager apply
+```shell
 helmfile -f helmfile.d/00-init.yaml apply --concurrency 1
+helmfile -f helmfile.d/10-base.yaml --selector name=cert-manager-letsencrypt apply
 ```
 
 To update the Kafka stack, run:
-```
+```shell
 helmfile -f helmfile.d/10-base.yaml apply --concurrency 1
 ```
 After this has succeeded, edit your `production.yaml` and change the `cp_kafka.customEnv.KAFKA_INTER_BROKER_PROTOCOL_VERSION` to the corresponding version documented in the [Confluent upgrade instructions](https://docs.confluent.io/platform/current/installation/upgrade.html) of your Kafka installation. Find the currently installed version of Kafka with `kubectl exec cp-kafka-0 -c cp-kafka-broker -- kafka-topics --version`.
 When the `cp_kafka.customEnv.KAFKA_INTER_BROKER_PROTOCOL_VERSION` is updated, again run
-```
+```shell
 helmfile -f helmfile.d/10-base.yaml apply
 ```
 
 To upgrade to the latest PostgreSQL helm chart, in `production.yaml`, uncomment the line `postgresql.primary.persistence.existingClaim: "data-postgresql-postgresql-0"` to use the same data storage as previously. Then run
-```
+```shell
 kubectl delete secrets postgresql
 kubectl delete statefulsets postgresql-postgresql
 helmfile -f helmfile.d/10-managementportal.yaml apply
 ```
 
 If installed, `radar-appserver-postgresql`, uncomment the `production.yaml` line `radar_appserver_postgresql.primary.existingClaim: "data-radar-appserver-postgresql-postgresql-0"`. Then run
-```
+```shell
 kubectl delete secrets radar-appserver-postgresql
 kubectl delete statefulsets radar-appserver-postgresql-postgresql
 helmfile -f helmfile.d/20-appserver.yaml apply
 ```
 
 If installed, to upgrade `timescaledb`, uncomment the `production.yaml` line `timescaledb.primary.existingClaim: "data-timescaledb-postgresql-0"`. Then run
-```
+```shell
 kubectl delete secrets timescaledb-postgresql
 kubectl delete statefulsets timescaledb-postgresql
 helmfile -f helmfile.d/20-grafana.yaml apply
@@ -318,13 +368,50 @@ kubectl delete statefulsets radar-upload-postgresql-postgresql
 helmfile -f helmfile.d/20-upload.yaml apply
 ```
 
+If minio is installed, upgrade it with the following instructions:
+```shell
+# get minio PV and PVC
+kubectl get pv | grep export-minio- | tr -s ' ' | cut -d ' ' -f 1,6 | tr '/' ' ' | cut -d ' ' -f 1,3 | tee minio-pv.list
+# Uninstall the minio statefulset
+helm uninstall minio
+# Associate PV with the new PVC name
+while read -r pv pvc
+do
+  # Don not delete PV
+  kubectl patch pv $pv -p '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}'
+  # Delete PVC
+  kubectl delete pvc $pvc
+  # Name of the new PVC
+  newpvc=$(echo $pvc | sed 's/export-/data-/')
+  # Associate PV with the new PVC name
+  kubectl patch pv $pv -p '{"spec":{"claimRef":{"name": "'$newpvc'", "namespace": "default", "uid": null}}}'
+  # Create new PVC
+  cat <<EOF | sed "s/data-minio-i/$newpvc/" | kubectl apply -f -
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app.kubernetes.io/instance: minio
+    app.kubernetes.io/name: minio
+  name: data-minio-i
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+EOF
+done < minio-pv.list
+# Do the new helm install.
+helmfile -f helmfile.d/20-s3.yaml apply
+```
+
 Delete the redis stateful set (this will not delete the data on the volume) 
 ```
 kubectl delete statefulset redis-master
 helmfile -f helmfile.d/20-s3.yaml sync --concurrency 1 
 ```
-
-
 ## Usage
 ### Accessing the applications
 In order to access to the applications first you need to find the IP address that Nginx service is listening to and then point the domain that you've specified in `server_name` variable to this IP address via a DNS server (e.g. [Route53](https://aws.amazon.com/route53/), [Cloudflare](https://www.cloudflare.com/dns/), [Bind](https://www.isc.org/bind/)) or [`hosts` file](https://en.wikipedia.org/wiki/Hosts_(file)) in your local machine.
@@ -404,4 +491,4 @@ bin/chart-updates
 
 ## Feedback and Contributions
 Enabling RADAR-base community to use RADAR-Kubernetes is important for us. If you have troubles setting up the platform using provided instructions, you can create an issue with exact details to reproduce and the expected behaviour.
-You can also reach out to the RADAR-base community via RADAR-base Slack on **[radar-kubernetes channel](https://radardevelopment.slack.com/archives/C021AGGESC9)**. The RADAR-base developers support the community on a voluntary basis and will pick up your requests as time permits. 
+You can also reach out to the RADAR-base community via RADAR-base Slack on **[radar-kubernetes channel](https://radardevelopment.slack.com/archives/C021AGGESC9)**. The RADAR-base developers support the community on a voluntary basis and will pick up your requests as time permits.

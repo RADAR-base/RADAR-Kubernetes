@@ -21,6 +21,6 @@ jobs:
 
       - name: Set up helmfile config
         run: cp .github/environments.yaml environments.yaml
-      
+
       - name: Check updates
         run: bin/chart-updates

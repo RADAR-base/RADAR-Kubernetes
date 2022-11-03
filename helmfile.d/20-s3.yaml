@@ -29,18 +29,22 @@ releases:
       - "../etc/minio/values.yaml"
       - {{ .Values.minio | toYaml | indent 8 | trim }}
     set:
-      - name: ingress.hosts
-        values: ["s3.{{ .Values.server_name }}"]
-      - name: ingress.tls[0].secretName
-        value: radar-base-tls-s3
-      - name: ingress.tls[0].hosts
-        values: ["s3.{{ .Values.server_name }}"]
-      {{- if not (hasKey .Values.minio "accessKey") }}
-      - name: accessKey
+      - name: ingress.hostname
+        value: "s3.{{ .Values.server_name }}"
+      - name: apiIngress.hostname
+        value: "api.s3.{{ .Values.server_name }}"
+      {{- if hasKey .Values.minio "accessKey" }}
+      - name: auth.rootUser
+        value: {{ .Values.minio.accessKey }}
+      {{- else if not (hasKey .Values.minio "auth.rootUser") }}
+      - name: auth.rootUser
         value: {{ .Values.s3_access_key }}
       {{- end }}
-      {{- if not (hasKey .Values.minio "secretKey") }}
-      - name: secretKey
+      {{- if hasKey .Values.minio "secretKey" }}
+      - name: auth.rootPassword
+        value: {{ .Values.minio.secretKey }}
+      {{- else if not (hasKey .Values.minio "auth.rootPassword") }}
+      - name: auth.rootPassword
         value: {{ .Values.s3_secret_key }}
       {{- end }}
 
