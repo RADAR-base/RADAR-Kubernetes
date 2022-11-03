@@ -1,20 +1,51 @@
-persistentVolume:
-  size: 2Gi
-
-metrics:
+## MongoDB(&reg;) Authentication parameters
+##
+auth:
+  ## @param auth.enabled Enable authentication
+  ## ref: https://docs.mongodb.com/manual/tutorial/enable-authentication/
+  ##
   enabled: true
-
+  ## @param auth.rootPassword MongoDB(&reg;) root password
+  ## ref: https://github.com/bitnami/bitnami-docker-mongodb/blob/master/README.md#setting-the-root-password-on-first-run
+  ##
+  rootPassword: ""
+  ## MongoDB(&reg;) custom users and databases
+  ## ref: https://github.com/bitnami/bitnami-docker-mongodb/blob/master/README.md#creating-users-and-databases-on-first-run
+  ## @param auth.usernames List of custom users to be created during the initialization
+  ## @param auth.passwords List of passwords for the custom users set at `auth.usernames`
+  ## @param auth.databases List of custom databases to be created during the initialization
+  ##
+  usernames: [graylog]
+  passwords: []
+  databases: [graylog]
+## MongoDB(&reg;) containers' resource requests and limits.
+## ref: https://kubernetes.io/docs/user-guide/compute-resources/
+## We usually recommend not to specify default resources and to leave this as a conscious
+## choice for the user. This also increases chances charts run on environments with little
+## resources, such as Minikube. If you do want to specify resources, uncomment the following
+## lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+## @param resources.limits The resources limits for MongoDB(&reg;) containers
+## @param resources.requests The requested resources for MongoDB(&reg;) containers
+##
 resources:
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
   requests:
     cpu: 100m
     memory: 500Mi
+## @section Persistence parameters
+##
 
-auth:
-  enabled: false
+## Enable persistence using Persistent Volume Claims
+## ref: https://kubernetes.io/docs/user-guide/persistent-volumes/
+##
+persistence:
+  ## @param persistence.size PVC Storage Request for MongoDB(&reg;) data volume
+  ##
+  size: 2Gi
+
+## @section Metrics parameters
+##
+
+metrics:
+  ## @param metrics.enabled Enable using a sidecar Prometheus exporter
+  ##
+  enabled: true

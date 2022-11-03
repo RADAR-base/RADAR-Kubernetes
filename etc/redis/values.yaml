@@ -1,32 +1,57 @@
-usePassword: false
+## @section Redis&trade; common configuration parameters
+## https://github.com/bitnami/bitnami-docker-redis#configuration
+##
 
-cluster:
+## @param architecture Redis&trade; architecture. Allowed values: `standalone` or `replication`
+##
+architecture: standalone 
+## Redis&trade; Authentication parameters
+## ref: https://github.com/bitnami/bitnami-docker-redis#setting-the-server-password-on-first-run
+##
+auth:
+  ## @param auth.enabled Enable password authentication
+  ##
   enabled: false
-  slaveCount: 1
 
-networkPolicy:
-  enabled: false
-
-metrics:
-  enabled: true
-  serviceMonitor:
-    enabled: true
-
-sentinel:
-  enabled: false
+## @section Redis&trade; master configuration parameters
+##
 
 master:
+  ## @param master.podAnnotations Annotations for Redis&trade; master pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
   podAnnotations:
     backup.velero.io/backup-volumes: redis-data
     post.hook.backup.velero.io/command: '["/bin/fsfreeze", "--unfreeze", "/data"]'
     post.hook.backup.velero.io/container: fsfreeze
     pre.hook.backup.velero.io/command: '["/bin/fsfreeze", "--freeze", "/data"]'
     pre.hook.backup.velero.io/container: fsfreeze
-    
-# Redis may require some changes in the kernel of the host machine to work as expected, in particular increasing the somaxconn value and disabling transparent huge pages.
-sysctlImage:
+
+## @section Metrics Parameters
+##
+
+metrics:
+  ## @param metrics.enabled Start a sidecar prometheus exporter to expose Redis&trade; metrics
+  ##
   enabled: true
-  mountHostSys: true
+  ## Prometheus Service Monitor
+  ## ref: https://github.com/coreos/prometheus-operator
+  ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+  ##
+  serviceMonitor:
+    ## @param metrics.serviceMonitor.enabled Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
+    ##
+    enabled: true
+
+## init-sysctl container parameters
+## used to perform sysctl operation to modify Kernel settings (needed sometimes to avoid warnings)
+##
+sysctl:
+  ## @param sysctl.enabled Enable init container to modify Kernel settings
+  ##
+  enabled: true
+  ## @param sysctl.command override default init-sysctl container command (useful when using custom images)
+  ##
   command:
     - /bin/sh
     - -c
@@ -34,3 +59,7 @@ sysctlImage:
       install_packages procps
       sysctl -w net.core.somaxconn=10000
       echo never > /host-sys/kernel/mm/transparent_hugepage/enabled
+  ## @param sysctl.mountHostSys Mount the host `/sys` folder to `/host-sys`
+  ##
+  mountHostSys: true
+ 

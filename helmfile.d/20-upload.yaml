@@ -9,14 +9,12 @@ helmDefaults:
   kubeContext: {{ .Values.kubeContext }}
 
 repositories:
-  - name: bitnami
-    url: https://charts.bitnami.com/bitnami
   - name: radar
     url: https://radar-base.github.io/radar-helm-charts
 
 releases:
   - name: radar-upload-postgresql
-    chart: bitnami/postgresql
+    chart: radar/postgresql
     version: {{ .Values.radar_upload_postgresql._chart_version }}
     wait: false
     installed: {{ .Values.radar_upload_postgresql._install }}
@@ -24,9 +22,9 @@ releases:
       - "../etc/radar-upload-postgresql/values.yaml"
       - {{ .Values.radar_upload_postgresql | toYaml | indent 8 | trim }}
     set:
-      - name: postgresqlPassword
+      - name: global.postgresql.auth.postgresPassword
         value: {{ .Values.radar_upload_postgres_password }}
-      - name: replication.password
+      - name: auth.replicationPassword
         value: {{ .Values.radar_upload_postgres_password }}
 
   - name: radar-upload-connect-backend
@@ -68,12 +66,10 @@ releases:
     set:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
-      - name: s3Endpoint
-        value: {{ .Values.minio.s3Endpoint }}
       - name: bucketAccessKey
-        value: {{ .Values.minio.accessKey }}
+        value: {{ .Values.s3_access_key }}
       - name: bucketSecretKey
-        value: {{ .Values.minio.secretKey }}
+        value: {{ .Values.s3_secret_key }}
       {{ if hasKey .Values.management_portal.oauth_clients "radar_upload_connect" }}
       - name: client_secret
         value: {{ .Values.management_portal.oauth_clients.radar_upload_connect.client_secret }}
