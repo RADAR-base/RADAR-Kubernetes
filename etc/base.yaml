@@ -187,7 +187,7 @@ app_config_frontend:
   replicaCount: 1
 
 # --------------------------------------------------------- 20-appserver.yaml ---------------------------------------------------------
-
+# The charts in 20-appserver.yaml only need to be installed if you have a custom aRMT app.
 radar_appserver_postgresql:
   _install: false
   _chart_version: 11.1.24
@@ -209,6 +209,7 @@ radar_appserver:
   public_key_endpoints: []
 
 # --------------------------------------------------------- 20-fitbit.yaml ---------------------------------------------------------
+# The charts in 20-fitbit.yaml only need to be installed if you will use a Fitbit or Garmin API integration.
 radar_fitbit_connector:
   _install: false
   _chart_version: 0.2.1
@@ -306,17 +307,6 @@ radar_integration:
   _chart_version: 0.4.0
   replicaCount: 1
   oauth_client_id: radar_redcap_integrator
-  projects: []
-  # Example:
-  #projects:
-  #  - redcap_info:
-  #      url: "http://example.com/"
-  #      project_id: "1"
-  #      enrolment_event: enrolment
-  #      integration_form: radar_integration
-  #      token: xxx
-  #    mp_info:
-  #      project_name: RADAR-BASE
 
 # --------------------------------------------------------- 20-s3-connector.yaml ---------------------------------------------------------
 
@@ -325,10 +315,6 @@ redis:
   _chart_version: 16.8.7
   metrics:
     enabled: true
-
-
-# The access keys and secret keys of the following services should match.
-# If S3 is used as a storage medium instead of minio, then fill in those.
 
 minio:
   _install: true
@@ -432,8 +418,6 @@ radar_push_endpoint:
   adminProperties: {}
   garmin:
     enabled: true
-    consumerKey: ""
-    consumerSecret: ""
 
 # --------------------------------------------------------- 99-velero.yaml ---------------------------------------------------------
 
@@ -444,17 +428,9 @@ velero:
   backup:
     address: s3.amazon.com  # protocol should not be specified
     bucket: radar-base-backups
-    accessKey: accessKey
-    secretKey: secretKey
   velero:
     configuration:
       backupStorageLocation:
         bucket: radar-base-backups
         config:
           s3Url: https://s3.amazon.com # protocol should be specified
-    credentials:
-      secretContents:
-        cloud: |
-          [default]
-          aws_access_key_id=accessKey
-          aws_secret_access_key=secretKey

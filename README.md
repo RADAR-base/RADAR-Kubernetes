@@ -100,11 +100,12 @@ The following tools should be installed in your local machine to install the RAD
     ```shell
     bin/generate-secrets
     ```
-    You can change values in this file or leave them as they are. The script creates secrets for all of the components even if they're not going to be installed, you can remove the extra values if you want. After installation you'll need to look into this file to find login password to all of the services that are installed by RADAR-Kubernetes. 
+    You can change values in this file or leave them as they are. The script creates secrets for all of the components even if they're not going to be installed, you can remove the extra values if you want. After installation you'll need to look into this file to find login password to all of the services that are installed by RADAR-Kubernetes. Please be aware that you'll still need to manually enter some secrets for external services, notably for Confluent Cloud, REDCap, Fitbit, Garmin and external and backup S3 storage if you use them.
 
     Alternatively you can manually create this file and fill all of the values yourself, ideally with a random password generator:
     ```shell
     cp etc/base-secrets.yaml etc/secrets.yaml
+    vim etc/secrets.yaml
     ```
 
     **You must keep this file secure and confidential once you have started installing the platform** and the best practice to share your platform configurations is by **sharing the encrypted version of `secrets.yaml`**.
