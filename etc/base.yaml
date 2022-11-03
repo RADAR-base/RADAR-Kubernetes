@@ -9,9 +9,11 @@ kafka_num_brokers: 3
 
 # --------------------------------------------------------- 00-init.yaml ---------------------------------------------------------
 
+# Needed for graylog. If graylog is set not to install, this can be disabled as well.
 mongodb:
   _install: true
   _chart_version: 11.1.10
+  # Use standalone for a leaner installation, replicaset for a distributed one.
   architecture: replicaset
   auth:
     replicaSetKey: secret
@@ -19,6 +21,7 @@ mongodb:
     passwords:
       - secret
 
+# Needed for graylog. If graylog is set not to install, this can be disabled as well.
 elasticsearch:
   _install: true
   _chart_version: 7.17.3
@@ -27,6 +30,7 @@ graylog:
   _install: true
   _chart_version: 2.1.2
 
+# Needed for graylog. If graylog is set not to install, this can be disabled as well.
 fluent_bit:
   _install: true
   _chart_version: 0.19.24
@@ -35,17 +39,17 @@ cert_manager:
   _install: true
   _chart_version: v1.8.2
   global:
+    # Needed for compatibility with K8S 1.25+
     podSecurityPolicy:
-      enabled: true
+      enabled: false
       useAppArmor: false
   prometheus:
     servicemonitor:
       enabled: true
 
-cert_manager_letsencrypt:
-  _install: true
-  _chart_version: 0.1.0
-
+# Should be installed at least once to get the necessary resource definitions.
+# If disabled, you can still install those definitions with the command:
+# kubectl --context <my-context> apply --force-conflicts --server-side -f etc/kube-prometheus-stack/files/crds.yaml
 kube_prometheus_stack:
   _install: true
   _chart_version: 0.3.2
@@ -77,16 +81,19 @@ kube_prometheus_stack:
     kubeStateMetrics:
       enabled: true
 
+# Always needed
 nginx_ingress:
   _install: true
   _chart_version: 4.1.0
   controller:
     replicaCount: 1
-  metrics:
-    enabled: "true"
-    serviceMonitor:
-      enabled: "true"
+    # Prometheus metrics exporter
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
 
+# Kafka manager is outdated but can still be used. Otherwise, use Kafka command-line tools.
 kafka_manager:
   _install: false
   _chart_version: 2.1.6
@@ -96,6 +103,13 @@ kafka_manager:
     password: password
 
 # --------------------------------------------------------- 10-base.yaml ---------------------------------------------------------
+# Use letsencrypt to retrieve SSL certificates.
+cert_manager_letsencrypt:
+  _install: true
+  _chart_version: 0.1.0
+
+# Use confluent cloud instead of a local Kafka cluster.
+# If this is enabled, then cp_kafka and cp_zookeeper should be disabled.
 confluent_cloud:
   enabled: false
   cc:
@@ -108,30 +122,33 @@ confluent_cloud:
 
 cp_zookeeper:
   _install: true
-  _chart_version: 0.3.2
-  imageTag: 7.2.0
+  _chart_version: 0.3.3
+  imageTag: 7.2.2
   servers: 3
 
 cp_kafka:
   _install: true
-  _chart_version: 0.3.1
-  imageTag: 7.2.0
+  _chart_version: 0.3.2
+  imageTag: 7.2.2
   customEnv:
-    # Set this to 3.2 when upgraded to 7.2.0
-    KAFKA_INTER_BROKER_PROTOCOL_VERSION: "1.1"
-    KAFKA_LOG_MESSAGE_FORMAT_VERSION: "1.1"
+    # Set this to 1.1 when upgrading from Kafka 5.x
+    # and do a rolling upgrade as described in
+    # README
+    KAFKA_INTER_BROKER_PROTOCOL_VERSION: "3.2"
+    KAFKA_LOG_MESSAGE_FORMAT_VERSION: "3.2"
+  # Increase for larger installations.
   persistence:
     size: 10Gi
 
 cp_schema_registry:
   _install: true
   _chart_version: 0.3.0
-  imageTag: 7.2.0
+  imageTag: 7.2.2
   replicaCount: 1
 
 catalog_server:
   _install: true
-  _chart_version: 0.3.1
+  _chart_version: 0.4.2
   replicaCount: 1
   schema_registry: http://cp-schema-registry:8081
 
@@ -141,9 +158,15 @@ catalog_server:
 postgresql:
   _install: true
   _chart_version: 11.1.24
+  global:
+    postgresql:
+      auth:
+        postgresPassword: password
   auth:
     replicationPassword: password
-  image: # Check https://hub.docker.com/r/bitnami/postgresql/tags
+  # Check https://hub.docker.com/r/bitnami/postgresql/tags
+  # On first install, choose the latest major version. This cannot be modified afterwards
+  image:
     tag: 11.16.0
   replication:
     enabled: false
@@ -200,6 +223,8 @@ management_portal:
 app_config:
   _install: true
   _chart_version: 0.2.3
+  image:
+    tag: 0.4.1
   replicaCount: 1
   jdbc:
     url: jdbc:postgresql://postgresql:5432/appconfig
@@ -208,16 +233,22 @@ app_config:
 app_config_frontend:
   _install: true
   _chart_version: 0.2.2
+  image:
+    tag: 0.4.1
   replicaCount: 1
 
 # --------------------------------------------------------- 20-appserver.yaml ---------------------------------------------------------
+
+# The charts in 20-appserver.yaml only need to be installed if you have a custom aRMT app.
 
 radar_appserver_postgres_password: password
 
 radar_appserver_postgresql:
   _install: false
   _chart_version: 11.1.24
-  image: # Check https://hub.docker.com/r/bitnami/postgresql/tags
+  # Check https://hub.docker.com/r/bitnami/postgresql/tags
+  # On first install, choose the latest major version. This cannot be modified afterwards
+  image:
     tag: 11.16.0
   primary:
     persistence:
@@ -233,6 +264,9 @@ radar_appserver:
   public_key_endpoints: []
 
 # --------------------------------------------------------- 20-fitbit.yaml ---------------------------------------------------------
+
+# The charts in 20-fitbit.yaml only need to be installed if you will use a Fitbit or Garmin API integration.
+
 fitbit_api_client: "client"
 fitbit_api_secret: "secret"
 
@@ -244,12 +278,12 @@ radar_fitbit_connector:
 
 radar_rest_sources_authorizer:
   _install: false
-  _chart_version: 0.4.0
+  _chart_version: 0.4.3
   replicaCount: 1
 
 radar_rest_sources_backend:
   _install: false
-  _chart_version: 0.4.0
+  _chart_version: 0.4.2
   replicaCount: 1
   postgres:
     host: postgresql
@@ -275,8 +309,10 @@ grafana_metrics_password: password
 timescaledb:
   _install: true
   _chart_version: 11.1.24
+  # Check https://hub.docker.com/r/timescale/timescaledb/tags
+  # The suffix MUST be bitnami.
+  # On first install, choose the latest major postgresql version. This cannot be modified afterwards.
   image:
-    # use the bitnami tag suffix to match with the bitnami postgresql chart
     tag: latest-pg12-bitnami
     pullPolicy: Always
   replicaCount: 1
@@ -297,16 +333,21 @@ radar_grafana:
 
 radar_jdbc_connector:
   _install: true
-  _chart_version: 0.1.6
+  _chart_version: 0.3.0
   replicaCount: 1
-  timescaledb:
-    host: timescaledb-postgresql-hl
+  jdbc:
+  # -- Host of the TimescaleDB database
+    url: jdbc:postgresql://timescaledb-postgresql-hl:5432/grafana-metrics
+  sink:
+    # Change the list of topics if you have dashboards that read other data or if you don't have certain topics available on your cluster.
+    topics: android_phone_relative_location, android_phone_battery_level, connect_fitbit_intraday_heart_rate, connect_fitbit_intraday_steps
+
 
 # --------------------------------------------------------- 20-ingestion.yaml ---------------------------------------------------------
 
 radar_gateway:
   _install: true
-  _chart_version: 0.2.5
+  _chart_version: 0.2.6
   replicaCount: 1
 
 # --------------------------------------------------------- 20-kafka-analysis.yaml ---------------------------------------------------------
@@ -327,24 +368,29 @@ radar_backend_stream:
 
 radar_integration:
   _install: false
-  _chart_version: 0.2.1
+  _chart_version: 0.4.0
   replicaCount: 1
   oauth_client_id: radar_redcap_integrator
   projects: []
   # Example:
   #projects:
-  #  - url: "http://example.com"
-  #    project_id: "1"
-  #    enrolment_event: enrolment
-  #    integration_form: radar_integration
-  #    token: xxx
-  #    mp_info_project_name: RADAR-BASE
+  #  - redcap_info:
+  #      url: "http://example.com/"
+  #      project_id: "1"
+  #      enrolment_event: enrolment
+  #      integration_form: radar_integration
+  #      token: xxx
+  #    mp_info:
+  #      project_name: RADAR-BASE
 
 # --------------------------------------------------------- 20-s3-connector.yaml ---------------------------------------------------------
 
 redis:
   _install: true
   _chart_version: 16.8.7
+  metrics:
+    enabled: true
+  
 
 # The access keys and secret keys of the following services should match.
 # If S3 is used as a storage medium instead of minio, then fill in those.
@@ -354,11 +400,27 @@ s3_secret_key: accessKey
 
 minio:
   _install: true
-  _chart_version: 8.0.11
-  replicas: 4
-  s3Endpoint: http://minio:9000/
+  _chart_version: 11.9.1
+  image:
+    tag: 2022.10.15-debian-11-r0
   persistence:
     size: 20Gi
+  metrics:
+    serviceMonitor:
+      enabled: true
+    prometheusRule:
+      enabled: true    
+  provisioning:
+    ## @param provisioning.users MinIO&reg; users provisioning. Can be used in addition to provisioning.usersExistingSecrets.
+    ## https://docs.min.io/docs/minio-admin-complete-guide.html#user
+    ## e.g.
+    ## users:
+    ##   - username: test-username
+    ##     password: test-password
+    ##     disabled: false
+    ##     policies:
+    ##       - read-output
+    users: []
 
 radar_s3_connector:
   # set to true if radar-s3-connector should be installed
@@ -379,7 +441,7 @@ s3_proxy:
 
 radar_output:
   _install: true
-  _chart_version: 0.3.0
+  _chart_version: 0.3.1
   replicaCount: 1
   source:
     s3:
@@ -422,6 +484,7 @@ radar_upload_source_connector:
   _install: true
   _chart_version: 0.2.2
   replicaCount: 1
+  s3Endpoint: http://minio:9000/
 
 # --------------------------------------------------------- 30-confluent-cloud.yaml ---------------------------------------------------------
 
