@@ -9,11 +9,14 @@ kafka_num_brokers: 3
 
 # --------------------------------------------------------- 00-init.yaml ---------------------------------------------------------
 
+# Needed for graylog. If graylog is set not to install, this can be disabled as well.
 mongodb:
   _install: true
   _chart_version: 11.1.10
+  # Use standalone for a leaner installation, replicaset for a distributed one.
   architecture: replicaset
 
+# Needed for graylog. If graylog is set not to install, this can be disabled as well.
 elasticsearch:
   _install: true
   _chart_version: 7.17.3
@@ -22,6 +25,7 @@ graylog:
   _install: true
   _chart_version: 2.1.2
 
+# Needed for graylog. If graylog is set not to install, this can be disabled as well.
 fluent_bit:
   _install: true
   _chart_version: 0.19.24
@@ -30,6 +34,7 @@ cert_manager:
   _install: true
   _chart_version: v1.8.2
   global:
+    # Needed for compatibility with K8S 1.25+
     podSecurityPolicy:
       enabled: false
       useAppArmor: false
@@ -37,6 +42,9 @@ cert_manager:
     servicemonitor:
       enabled: true
 
+# Should be installed at least once to get the necessary resource definitions.
+# If disabled, you can still install those definitions with the command:
+# kubectl --context <my-context> apply --force-conflicts --server-side -f etc/kube-prometheus-stack/files/crds.yaml
 kube_prometheus_stack:
   _install: true
   _chart_version: 0.3.2
@@ -68,56 +76,63 @@ kube_prometheus_stack:
     kubeStateMetrics:
       enabled: true
 
+# Always needed
 nginx_ingress:
   _install: true
   _chart_version: 4.1.0
   controller:
     replicaCount: 1
-  metrics:
-    enabled: "true"
-    serviceMonitor:
-      enabled: "true"
+    # Prometheus metrics exporter
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
 
+# Kafka manager is outdated but can still be used. Otherwise, use Kafka command-line tools.
 kafka_manager:
   _install: false
   _chart_version: 2.1.6
 
 # --------------------------------------------------------- 10-base.yaml ---------------------------------------------------------
+# Use letsencrypt to retrieve SSL certificates.
 cert_manager_letsencrypt:
   _install: true
   _chart_version: 0.1.0
 
+# Use confluent cloud instead of a local Kafka cluster.
+# If this is enabled, then cp_kafka and cp_zookeeper should be disabled.
 confluent_cloud:
   enabled: false
 
 cp_zookeeper:
   _install: true
-  _chart_version: 0.3.2
-  imageTag: 7.2.1
+  _chart_version: 0.3.3
+  imageTag: 7.2.2
   servers: 3
 
 cp_kafka:
   _install: true
-  _chart_version: 0.3.1
-  imageTag: 7.2.1
+  _chart_version: 0.3.2
+  imageTag: 7.2.2
   customEnv:
     # Set this to 1.1 when upgrading from Kafka 5.x
     # and do a rolling upgrade as described in
     # README
     KAFKA_INTER_BROKER_PROTOCOL_VERSION: "3.2"
     KAFKA_LOG_MESSAGE_FORMAT_VERSION: "3.2"
+  # Increase for larger installations.
   persistence:
     size: 10Gi
 
 cp_schema_registry:
   _install: true
   _chart_version: 0.3.0
-  imageTag: 7.2.1
+  imageTag: 7.2.2
   replicaCount: 1
 
 catalog_server:
   _install: true
-  _chart_version: 0.4.1
+  _chart_version: 0.4.2
   replicaCount: 1
   schema_registry: http://cp-schema-registry:8081
 
@@ -259,6 +274,7 @@ radar_jdbc_connector:
     url: jdbc:postgresql://timescaledb-postgresql-hl:5432/grafana-metrics
     user: grafana
   sink:
+    # Change the list of topics if you have dashboards that read other data or if you don't have certain topics available on your cluster.
     topics: android_phone_relative_location, android_phone_battery_level, connect_fitbit_intraday_heart_rate, connect_fitbit_intraday_steps
 
 
@@ -266,7 +282,7 @@ radar_jdbc_connector:
 
 radar_gateway:
   _install: true
-  _chart_version: 0.2.5
+  _chart_version: 0.2.6
   replicaCount: 1
 
 # --------------------------------------------------------- 20-kafka-analysis.yaml ---------------------------------------------------------
@@ -294,7 +310,7 @@ radar_integration:
   # Example:
   #projects:
   #  - redcap_info:
-  #      url: "http://example.com"
+  #      url: "http://example.com/"
   #      project_id: "1"
   #      enrolment_event: enrolment
   #      integration_form: radar_integration
@@ -307,6 +323,9 @@ radar_integration:
 redis:
   _install: true
   _chart_version: 16.8.7
+  metrics:
+    enabled: true
+
 
 # The access keys and secret keys of the following services should match.
 # If S3 is used as a storage medium instead of minio, then fill in those.
@@ -318,6 +337,11 @@ minio:
     tag: 2022.10.15-debian-11-r0
   persistence:
     size: 20Gi
+  metrics:
+    serviceMonitor:
+      enabled: true
+    prometheusRule:
+      enabled: true
   provisioning:
     ## @param provisioning.users MinIO&reg; users provisioning. Can be used in addition to provisioning.usersExistingSecrets.
     ## https://docs.min.io/docs/minio-admin-complete-guide.html#user

@@ -54,10 +54,12 @@ provisioning:
       statements:
         - resources:
             - arn:aws:s3:::radar-output-storage
+          effect: "Allow"
           actions:
             - s3:ListBucket
         - resources:
             - arn:aws:s3:::radar-output-storage/*
+          effect: "Allow"
           actions:
             - s3:GetBucketLocation
             - s3:GetObject
