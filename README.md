@@ -68,9 +68,8 @@ The following tools should be installed in your local machine to install the RAD
 | [helm 3](https://github.com/helm/helm#install)| Helm Charts are used to package Kubernetes resources for each component|
 | [helmfile](https://github.com/roboll/helmfile#installation)| RADAR-Kubernetes uses helmfiles to deploy Helm charts.|
 | [helm-diff](https://github.com/databus23/helm-diff#install)| A dependency for Helmfile.|
-| [yq](https://github.com/mikefarah/yq#install)| (Optional) Used to run `generate-secrets` script.|
-| htpasswd| (Optional) Used to generate secret for Prometheus Nginx authentication. This binary is in `apache2-utils` package for Ubuntu, it's also easily available on other distributions as well. |
-| [jq](https://stedolan.github.io/jq/download/)| (Optional) Used to run `chart-updates` script.|
+| [yq](https://github.com/mikefarah/yq#install)| (Optional) Used to run `generate-secrets` and `chart-updates` script.|
+| openssl | (Optional) Used to generate secret for Prometheus Nginx authentication. This binary is in `openssl` package for Ubuntu, it's also easily available on other distributions as well. |
 
 **Once you have a working installation of a Kubernetes cluster, please [configure Kubectl with the appropriate Kubeconfig](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#verify-kubectl-configuration) to enable Kubectl to find and access your cluster. Then proceed to the installation section.**
 
