@@ -37,7 +37,7 @@ fluent_bit:
 
 cert_manager:
   _install: true
-  _chart_version: v1.8.2
+  _chart_version: v1.10.1
   global:
     # Needed for compatibility with K8S 1.25+
     podSecurityPolicy:
@@ -52,7 +52,7 @@ cert_manager:
 # kubectl --context <my-context> apply --force-conflicts --server-side -f etc/kube-prometheus-stack/files/crds.yaml
 kube_prometheus_stack:
   _install: true
-  _chart_version: 0.3.2
+  _chart_version: 0.4.0
   kube-prometheus-stack:
     prometheus:
       prometheusSpec:
