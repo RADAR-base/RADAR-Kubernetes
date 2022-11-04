@@ -12,6 +12,7 @@ environments.yaml
 charts/management-portal/files/root.crt
 charts/radar-rest-sources-backend/files/root.crt
 secrets.yaml
+secrets.*.yaml
 secrets/
 *.sops.*
 google-services.json
