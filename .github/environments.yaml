@@ -2,3 +2,4 @@ environments:
  default:
    values:
      - ../etc/base.yaml
+     - ../etc/base-secrets.yaml

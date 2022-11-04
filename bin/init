@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+. bin/util.sh
+
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+  echo "Usage: $0 [-h|--help]"
+  echo "Initialises configuration from templates and generates required secrets."
+  exit
+fi
+
+copy_template_if_absent environments.yaml.tmpl environments.yaml.tmpl
+copy_template_if_absent etc/production.yaml etc/base.yaml
+copy_template_if_absent etc/production.yaml.gotmpl etc/base.yaml.gotmpl
+
+DNAME="$DNAME" bin/keystore-init
+bin/generate-secrets
