@@ -2,4 +2,4 @@ environments:
  default:
    values:
      - ../etc/base.yaml
-     - ../.github/install-all.yaml
+     - ../etc/base-secrets.yaml

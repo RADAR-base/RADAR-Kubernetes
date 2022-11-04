@@ -64,9 +64,5 @@ releases:
     set:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
-      - name: timescaledb.password
+      - name: jdbc.password
         value: {{ .Values.timescaledb_password }}
-      - name: timescaledb.username
-        value: postgres
-      - name: timescaledb.database_name
-        value: {{ .Values.timescaledb_db_name }}
