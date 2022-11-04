@@ -3,3 +3,4 @@ environments:
    values:
      - ../etc/base.yaml
      - ../etc/base-secrets.yaml
+     - ../.github/install-all.yaml
