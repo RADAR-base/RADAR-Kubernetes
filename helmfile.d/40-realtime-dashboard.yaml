@@ -19,6 +19,7 @@ releases:
     version: {{ .Values.radar_jdbc_connector_agg._chart_version }}
     installed: {{ .Values.radar_jdbc_connector_agg._install }}
     values:
+      - "../etc/radar-jdbc-connector-agg/values.yaml"
       - {{ .Values.radar_jdbc_connector_agg | toYaml | indent 8 | trim }}
     set:
       - name: kafka_num_brokers
