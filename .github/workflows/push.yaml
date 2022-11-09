@@ -22,7 +22,7 @@ jobs:
     - uses: actions/checkout@v1.0.0
 
     - name: Setup helmfile
-      uses: mamezou-tech/setup-helmfile@v1.0.0
+      uses: mamezou-tech/setup-helmfile@v1.1.0
 
     - name: Set up helmfile config
       run: cp .github/environments.yaml environments.yaml
@@ -43,7 +43,7 @@ jobs:
         k3s-channel: latest
         traefik-enabled: false
 
-    - name: Verify function of k8s, kubectl, and helm
+    - name: Install RADAR-Kubernetes
       run: |
         echo "kubeconfig: $KUBECONFIG"
         kubectl version
