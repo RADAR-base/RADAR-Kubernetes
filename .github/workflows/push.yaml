@@ -12,6 +12,13 @@ jobs:
   build:
     runs-on: self-hosted
     steps:
+    - name: Cleanup repo folder
+      run: |
+        ls -la ./
+        rm -rf ./* || true
+        rm -rf ./.??* || true
+        ls -la ./
+
     - uses: actions/checkout@v1.0.0
 
     - name: Setup helmfile
@@ -22,6 +29,7 @@ jobs:
 
     - name: Run helmfile template
       run: |
+        DNAME='CN=CI,O=TheHyve,L=Utrecht,C=NL' ./bin/keystore-init
         helmfile template
 
     - name: Start a local k8s cluster
@@ -38,8 +46,6 @@ jobs:
         echo "kubeconfig: $KUBECONFIG"
         kubectl version
         kubectl get pods --all-namespaces
-
-        DNAME='CN=CI,O=TheHyve,L=Utrecht,C=NL' ./bin/keystore-init
 
         helmfile sync --concurrency 1
 
@@ -58,6 +64,7 @@ jobs:
         limit-access-to-actor: true
 
     - name: Clean up
+      if: always()
       run: |
         kubectl get pods --all-namespaces
         k3s-uninstall.sh
