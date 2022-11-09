@@ -4,9 +4,9 @@ bases:
 ---
 
 helmDefaults:
-  atomic: false
-  timeout: 240
+  atomic: {{ .Values.atomicInstall }}
   kubeContext: {{ .Values.kubeContext }}
+  timeout: 240
 
 repositories:
   - name: radar

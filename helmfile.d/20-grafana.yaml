@@ -4,6 +4,7 @@ bases:
 ---
 
 helmDefaults:
+  atomic: {{ .Values.atomicInstall }}
   kubeContext: {{ .Values.kubeContext }}
 
 repositories:

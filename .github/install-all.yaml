@@ -1,3 +1,5 @@
+atomicInstall: false
+
 mongodb:
   _install: true
 

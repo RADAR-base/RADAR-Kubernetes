@@ -1,3 +1,5 @@
+# Whether to upgrade process rolls back changes made in case of failed upgrade
+atomicInstall: true
 # Context that you use in kubectl to access the Kubernetes cluster. Will be translated to `helm --kube-context <context_name>`
 kubeContext: default
 # Domain name that RADAR-Base installation will be acessible from

@@ -3,13 +3,14 @@ bases:
 
 ---
 
+helmDefaults:
+  atomic: {{ .Values.atomicInstall }}
+  kubeContext: {{ .Values.kubeContext }}
+  timeout: 180
+
 repositories:
   - name: radar
     url: https://radar-base.github.io/radar-helm-charts
-
-helmDefaults:
-  timeout: 180
-  kubeContext: {{ .Values.kubeContext }}
 
 releases:
   - name: postgresql

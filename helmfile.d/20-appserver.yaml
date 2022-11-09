@@ -4,9 +4,9 @@ bases:
 ---
 
 helmDefaults:
-  atomic: true
-  timeout: 180
+  atomic: {{ .Values.atomicInstall }}
   kubeContext: {{ .Values.kubeContext }}
+  timeout: 180
 
 repositories:
   - name: radar
@@ -31,6 +31,8 @@ releases:
     chart: radar/radar-appserver
     version: {{ .Values.radar_appserver._chart_version }}
     installed: {{ .Values.radar_appserver._install }}
+    needs:
+    - radar-appserver-postgresql
     values:
       - {{ .Values.radar_appserver | toYaml | indent 8 | trim }}
     set:

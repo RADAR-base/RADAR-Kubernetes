@@ -4,7 +4,7 @@ bases:
 ---
 
 helmDefaults:
-  atomic: true
+  atomic: {{ .Values.atomicInstall }}
   timeout: 600
   kubeContext: {{ .Values.kubeContext }}
 
