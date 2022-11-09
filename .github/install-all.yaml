@@ -20,7 +20,7 @@ nginx_ingress:
   _install: true
 
 kafka_manager:
-  _install: true
+  _install: false
 
 cert_manager_letsencrypt:
   _install: true
