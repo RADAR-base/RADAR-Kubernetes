@@ -39,6 +39,8 @@ jobs:
         kubectl version
         kubectl get pods --all-namespaces
 
+        DNAME='CN=CI,O=TheHyve,L=Utrecht,C=NL' ./bin/keystore-init
+
         helmfile sync --concurrency 1
 
     # Enable tmate debugging of manually-triggered workflows if the input option was provided
@@ -54,3 +56,8 @@ jobs:
       timeout-minutes: 15
       with:
         limit-access-to-actor: true
+
+    - name: Clean up
+      run: |
+        kubectl get pods --all-namespaces
+        k3s-uninstall.sh

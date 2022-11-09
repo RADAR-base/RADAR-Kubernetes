@@ -4,3 +4,4 @@ environments:
      - ../etc/base.yaml
      - ../etc/base-secrets.yaml
      - ../.github/install-all.yaml
+     - ../.github/secrets.yaml.gotmpl
