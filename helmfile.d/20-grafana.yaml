@@ -28,6 +28,8 @@ releases:
     chart: radar/grafana
     version: {{ .Values.radar_grafana._chart_version }}
     installed: {{ .Values.radar_grafana._install }}
+    needs:
+    - timescaledb
     values:
       - "../etc/radar-grafana/values.yaml"
       - {{ .Values.radar_grafana | toYaml | indent 8 | trim }}

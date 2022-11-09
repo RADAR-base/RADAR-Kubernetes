@@ -52,6 +52,8 @@ releases:
     chart: radar/radar-s3-connector
     version: {{ .Values.radar_s3_connector._chart_version }}
     installed: {{ .Values.radar_s3_connector._install }}
+    needs:
+    - minio
     values:
       - {{ .Values.radar_s3_connector | toYaml | indent 8 | trim }}
       - {{ .Values.confluent_cloud | toYaml | indent 8 | trim }}
@@ -88,6 +90,9 @@ releases:
     version: {{ .Values.radar_output._chart_version }}
     wait: true
     installed: {{ .Values.radar_output._install }}
+    needs:
+    - redis
+    - minio
     values:
       - {{ .Values.radar_output | toYaml | indent 8 | trim }}
     set:

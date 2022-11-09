@@ -34,6 +34,9 @@ releases:
     chart: radar/graylog
     version: {{ .Values.graylog._chart_version }}
     installed: {{ .Values.graylog._install }}
+    needs:
+    - graylog/mongodb
+    - graylog/elasticsearch
     values:
       - "../etc/graylog/values.yaml"
       - {{ .Values.graylog | toYaml | indent 8 | trim }}
@@ -54,6 +57,8 @@ releases:
     chart: radar/fluent-bit
     version: {{ .Values.fluent_bit._chart_version }}
     installed: {{ .Values.fluent_bit._install }}
+    needs:
+    - graylog/graylog
     values:
       - "../etc/fluent-bit/values.yaml"
       - {{ .Values.fluent_bit | toYaml | indent 8 | trim }}
@@ -105,7 +110,7 @@ releases:
     installed: {{ .Values.cert_manager._install }}
     disableValidation: true
     chart: radar/cert-manager
-    version: {{ .Values.cert_manager._chart_version }}
+    version: {{ .Values.cert_manager._chart_version }}    
     values:
       - {{ .Values.cert_manager | toYaml | indent 8 | trim }}
     hooks:

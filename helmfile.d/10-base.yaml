@@ -39,6 +39,8 @@ releases:
     version: {{ .Values.cp_kafka._chart_version }}
     wait: true
     installed: {{ .Values.cp_kafka._install }}
+    needs:
+    - cp-zookeeper
     values:
       - "../etc/cp-kafka/values.yaml"
       - {{ .Values.cp_kafka | toYaml | indent 8 | trim }}
@@ -51,6 +53,8 @@ releases:
     version: {{ .Values.cp_schema_registry._chart_version }}
     wait: true
     installed: {{ .Values.cp_schema_registry._install }}
+    needs:
+    - cp-kafka
     values:
       - "../etc/cp-schema-registry/values.yaml"
       - {{ .Values.cp_schema_registry | toYaml | indent 8 | trim }}
@@ -69,6 +73,8 @@ releases:
     version: {{ .Values.catalog_server._chart_version }}
     wait: true
     installed: {{ .Values.catalog_server._install }}
+    needs:
+    - cp-schema-registry
     values:
       - {{ .Values.catalog_server | toYaml | indent 8 | trim }}
       - {{ .Values.confluent_cloud | toYaml | indent 8 | trim }}

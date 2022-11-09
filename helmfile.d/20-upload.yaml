@@ -31,6 +31,8 @@ releases:
     chart: radar/radar-upload-connect-backend
     version: {{ .Values.radar_upload_connect_backend._chart_version }}
     installed: {{ .Values.radar_upload_connect_backend._install }}
+    needs:
+    - radar-upload-postgresql
     values:
       - {{ .Values.radar_upload_connect_backend | toYaml | indent 8 | trim }}
     set:

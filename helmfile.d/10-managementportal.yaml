@@ -25,6 +25,8 @@ releases:
     chart: radar/management-portal
     version: {{ .Values.management_portal._chart_version }}
     installed: {{ .Values.management_portal._install }}
+    needs:
+    - postgresql
     values:
       - {{ .Values.management_portal | toYaml | indent 8 | trim }}
     set:
