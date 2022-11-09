@@ -2,7 +2,7 @@ name: CI
 on: [push]
 jobs:
   build:
-    runs-on: [self-hosted, linux, x64]
+    runs-on: self-hosted
     steps:
     - uses: actions/checkout@v1.0.0
 
