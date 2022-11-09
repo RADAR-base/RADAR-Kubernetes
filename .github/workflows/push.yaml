@@ -1,5 +1,13 @@
 name: CI
-on: [push]
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'
+        required: false
+        default: false
 jobs:
   build:
     runs-on: self-hosted
@@ -32,3 +40,17 @@ jobs:
         kubectl get pods --all-namespaces
 
         helmfile sync --concurrency 1
+
+    # Enable tmate debugging of manually-triggered workflows if the input option was provided
+    - name: Manually triggered tmate session
+      uses: mxschmitt/action-tmate@v3
+      if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+      with:
+        limit-access-to-actor: true
+
+    - name: Setup tmate session if jobs have failed
+      if: ${{ failure() }}
+      uses: mxschmitt/action-tmate@v3
+      timeout-minutes: 15
+      with:
+        limit-access-to-actor: true
