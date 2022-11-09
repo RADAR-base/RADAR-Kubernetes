@@ -7,6 +7,18 @@ sink:
   insertMode: upsert
   # -- Whether to merge the key fields into the inserted values.
   mergeKey: true
+
+  transforms:
+    # -- Whether to merge the key fields into the inserted values.
+    enabled: true
+    # -- Class to handle merging the key into the record
+    mergeKeyType: org.radarbase.kafka.connect.transforms.MergeKey
+    # -- Class to convert time-based fields into SQL timestamps
+    timestampType: org.radarbase.kafka.connect.transforms.TimestampConverter
+    # -- Field names to consider for converting to timestamp
+    timestampFields:
+      - TIME
+
   primaryKeys:
     # -- where to read the primary keys from when creating the table
     mode: record_value
