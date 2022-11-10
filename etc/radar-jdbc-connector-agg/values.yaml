@@ -5,8 +5,6 @@ sink:
   autoCreate: true
   # -- How to insert new values into the database
   insertMode: upsert
-  # -- Whether to merge the key fields into the inserted values.
-  mergeKey: true
 
   transforms:
     # -- Whether to merge the key fields into the inserted values.
