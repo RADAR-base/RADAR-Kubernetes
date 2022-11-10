@@ -3,14 +3,6 @@ bases:
 
 ---
 
-helmDefaults:
-  atomic: {{ .Values.atomicInstall }}
-  kubeContext: {{ .Values.kubeContext }}
-
-repositories:
-  - name: radar
-    url: https://radar-base.github.io/radar-helm-charts
-
 releases:
   - name: mongodb
     namespace: graylog

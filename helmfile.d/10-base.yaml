@@ -4,15 +4,7 @@ bases:
 ---
 
 helmDefaults:
-  atomic: {{ .Values.atomicInstall }}
   timeout: 600
-  kubeContext: {{ .Values.kubeContext }}
-
-repositories:
-  - name: radar
-    url: https://radar-base.github.io/radar-helm-charts
-  - name: cp-radar
-    url: https://radar-base.github.io/cp-helm-charts
 
 releases:
   - name: cert-manager-letsencrypt
