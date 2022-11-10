@@ -3,15 +3,15 @@ bases:
 
 ---
 
-helmDefaults:
-  timeout: 180
-  
+{{ readFile "../etc/helmfile-templates.yaml" }}
+
 releases:
   - name: radar-appserver-postgresql
     chart: radar/postgresql
     version: {{ .Values.radar_appserver_postgresql._chart_version }}
     wait: false
     installed: {{ .Values.radar_appserver_postgresql._install }}
+    <<: *logFailedRelease
     values:
       - "../etc/radar-appserver-postgresql/values.yaml"
       - {{ .Values.radar_appserver_postgresql | toYaml | indent 8 | trim }}
@@ -20,6 +20,7 @@ releases:
     chart: radar/radar-appserver
     version: {{ .Values.radar_appserver._chart_version }}
     installed: {{ .Values.radar_appserver._install }}
+    <<: *logFailedRelease    
     needs:
     - radar-appserver-postgresql
     values:

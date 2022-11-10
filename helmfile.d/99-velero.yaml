@@ -3,8 +3,7 @@ bases:
 
 ---
 
-helmDefaults:
-  timeout: 120
+{{ readFile "../etc/helmfile-templates.yaml" }}
 
 releases:
   - name: velero
@@ -12,6 +11,7 @@ releases:
     namespace: velero
     version: {{ .Values.velero._chart_version }}
     installed: {{ .Values.velero._install }}
+    <<: *logFailedRelease    
     values:
       - {{ .Values.velero | toYaml | indent 8 | trim }}
     set:

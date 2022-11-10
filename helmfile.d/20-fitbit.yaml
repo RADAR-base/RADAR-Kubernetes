@@ -3,14 +3,14 @@ bases:
 
 ---
 
-helmDefaults:
-  timeout: 600
+{{ readFile "../etc/helmfile-templates.yaml" }}
 
 releases:
   - name: radar-fitbit-connector
     chart: radar/radar-fitbit-connector
     version: {{ .Values.radar_fitbit_connector._chart_version }}
     installed: {{ .Values.radar_fitbit_connector._install }}
+    <<: *logFailedRelease
     values:
       - {{ .Values.radar_fitbit_connector | toYaml | indent 8 | trim }}
     set:
@@ -31,6 +31,7 @@ releases:
     chart: radar/radar-rest-sources-authorizer
     version: {{ .Values.radar_rest_sources_authorizer._chart_version }}
     installed: {{ .Values.radar_rest_sources_authorizer._install }}
+    <<: *logFailedRelease
     values:
       - {{ .Values.radar_rest_sources_authorizer | toYaml | indent 8 | trim }}
     set:
@@ -43,6 +44,7 @@ releases:
     chart: radar/radar-rest-sources-backend
     version: {{ .Values.radar_rest_sources_backend._chart_version }}
     installed: {{ .Values.radar_rest_sources_backend._install }}
+    <<: *logFailedRelease    
     values:
       - {{ .Values.radar_rest_sources_backend | toYaml | indent 8 | trim }}
     set:

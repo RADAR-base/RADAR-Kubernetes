@@ -3,14 +3,14 @@ bases:
 
 ---
 
-helmDefaults:
-  timeout: 600
+{{ readFile "../etc/helmfile-templates.yaml" }}
 
 releases:
   - name: radar-integration
     chart: radar/radar-integration
     version: {{ .Values.radar_integration._chart_version }}
     installed: {{ .Values.radar_integration._install }}
+    <<: *logFailedRelease    
     values:
       - {{ .Values.radar_integration | toYaml | indent 8 | trim }}
     set:

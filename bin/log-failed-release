@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+. bin/util.sh
+
+kubeContext="$1"
+releaseNamespace="$2"
+releaseName="$3"
+
+isReady=`kubectl --context $kubeContext --namespace $releaseNamespace get pods -l "app.kubernetes.io/instance=$releaseName" -o yaml | yq " .items[].status.containerStatuses[].ready" | grep false`
+
+if [ "$isReady" = "" ]; then
+  exit 0
+fi
+
+kubectl --context $kubeContext --namespace $releaseNamespace get pods -l "app.kubernetes.io/instance=$releaseName" -o yaml
+echo "------------------------ Previous logs ------------------------"
+kubectl --context $kubeContext --namespace $releaseNamespace logs --previous=true --ignore-errors=true --all-containers=true --prefix=true --timestamps=true --tail=100 -l "app.kubernetes.io/instance=$releaseName"
+echo "------------------------ Curent logs ------------------------"
+kubectl --context $kubeContext --namespace $releaseNamespace logs --ignore-errors=true --all-containers=true --prefix=true --timestamps=true --tail=100 -l "app.kubernetes.io/instance=$releaseName"

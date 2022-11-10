@@ -3,11 +3,14 @@ bases:
 
 ---
 
+{{ readFile "../etc/helmfile-templates.yaml" }}
+
 releases:
   - name: timescaledb
     chart: radar/postgresql
     version: {{ .Values.timescaledb._chart_version }}
     installed: {{ .Values.timescaledb._install }}
+    <<: *logFailedRelease
     values:
       - "../etc/timescaledb/values.yaml"
       - {{ .Values.timescaledb | toYaml | indent 8 | trim }}
@@ -21,6 +24,7 @@ releases:
     chart: radar/grafana
     version: {{ .Values.radar_grafana._chart_version }}
     installed: {{ .Values.radar_grafana._install }}
+    <<: *logFailedRelease
     values:
       - "../etc/radar-grafana/values.yaml"
       - {{ .Values.radar_grafana | toYaml | indent 8 | trim }}
@@ -52,6 +56,7 @@ releases:
     chart: radar/radar-jdbc-connector
     version: {{ .Values.radar_jdbc_connector._chart_version }}
     installed: {{ .Values.radar_jdbc_connector._install }}
+    <<: *logFailedRelease    
     values:
       - {{ .Values.radar_jdbc_connector | toYaml | indent 8 | trim }}
     set:

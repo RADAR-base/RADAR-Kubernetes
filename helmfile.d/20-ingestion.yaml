@@ -3,14 +3,14 @@ bases:
 
 ---
 
-helmDefaults:
-  timeout: 600
+{{ readFile "../etc/helmfile-templates.yaml" }}
 
 releases:
   - name: radar-gateway
     chart: radar/radar-gateway
     version: {{ .Values.radar_gateway._chart_version }}
     installed: {{ .Values.radar_gateway._install }}
+    <<: *logFailedRelease    
     values:
       - {{ .Values.radar_gateway | toYaml | indent 8 | trim }}
       - {{ .Values.confluent_cloud | toYaml | indent 8 | trim }}

@@ -3,12 +3,15 @@ bases:
 
 ---
 
+{{ readFile "../etc/helmfile-templates.yaml" }}
+
 releases:
   - name: mongodb
     namespace: graylog
     chart: radar/mongodb
     version: {{ .Values.mongodb._chart_version }}
     installed: {{ .Values.mongodb._install }}
+    <<: *logFailedRelease
     values:
       - "../etc/mongodb/values.yaml"
       - {{ .Values.mongodb | toYaml | indent 8 | trim }}
@@ -18,6 +21,7 @@ releases:
     chart: radar/elasticsearch
     version: {{ .Values.elasticsearch._chart_version }}
     installed: {{ .Values.elasticsearch._install }}
+    <<: *logFailedRelease
     values:
       - "../etc/elasticsearch/values.yaml"
       - {{ .Values.elasticsearch | toYaml | indent 8 | trim }}
@@ -27,6 +31,7 @@ releases:
     chart: radar/graylog
     version: {{ .Values.graylog._chart_version }}
     installed: {{ .Values.graylog._install }}
+    <<: *logFailedRelease
     values:
       - "../etc/graylog/values.yaml"
       - {{ .Values.graylog | toYaml | indent 8 | trim }}
@@ -47,6 +52,7 @@ releases:
     chart: radar/fluent-bit
     version: {{ .Values.fluent_bit._chart_version }}
     installed: {{ .Values.fluent_bit._install }}
+    <<: *logFailedRelease
     values:
       - "../etc/fluent-bit/values.yaml"
       - {{ .Values.fluent_bit | toYaml | indent 8 | trim }}
@@ -61,6 +67,7 @@ releases:
     namespace: monitoring
     installed: {{ .Values.kube_prometheus_stack._install }}
     disableValidation: true
+    <<: *logFailedRelease
     values:
       - {{ .Values.kube_prometheus_stack | toYaml | indent 8 | trim }}
     set:
@@ -99,6 +106,7 @@ releases:
     disableValidation: true
     chart: radar/cert-manager
     version: {{ .Values.cert_manager._chart_version }}
+    <<: *logFailedRelease
     values:
       - {{ .Values.cert_manager | toYaml | indent 8 | trim }}
     hooks:
@@ -113,6 +121,7 @@ releases:
     force: false
     installed: {{ .Values.nginx_ingress._install }}
     disableValidation: true
+    <<: *logFailedRelease
     values:
       - "../etc/nginx-ingress/values.yaml"
       - {{ .Values.nginx_ingress | toYaml | indent 8 | trim }}
@@ -122,6 +131,7 @@ releases:
     version: {{ .Values.kafka_manager._chart_version }}
     wait: false
     installed: {{ .Values.kafka_manager._install }}
+    <<: *logFailedRelease
     values:
       - {{ .Values.kafka_manager | toYaml | indent 8 | trim }}
     set:

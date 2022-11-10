@@ -3,14 +3,14 @@ bases:
 
 ---
 
-helmDefaults:
-  timeout: 600
+{{ readFile "../etc/helmfile-templates.yaml" }}
 
 releases:
   - name: radar-push-endpoint
     chart: radar/radar-push-endpoint
     version: {{ .Values.radar_push_endpoint._chart_version }}
     installed: {{ .Values.radar_push_endpoint._install }}
+    <<: *logFailedRelease    
     values:
       - {{ .Values.radar_push_endpoint | toYaml | indent 8 | trim }}
       - {{ .Values.confluent_cloud | toYaml | indent 8 | trim }}

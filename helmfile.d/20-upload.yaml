@@ -3,8 +3,7 @@ bases:
 
 ---
 
-helmDefaults:
-  timeout: 120
+{{ readFile "../etc/helmfile-templates.yaml" }}
 
 releases:
   - name: radar-upload-postgresql
@@ -12,6 +11,7 @@ releases:
     version: {{ .Values.radar_upload_postgresql._chart_version }}
     wait: false
     installed: {{ .Values.radar_upload_postgresql._install }}
+    <<: *logFailedRelease
     values:
       - "../etc/radar-upload-postgresql/values.yaml"
       - {{ .Values.radar_upload_postgresql | toYaml | indent 8 | trim }}
@@ -25,6 +25,7 @@ releases:
     chart: radar/radar-upload-connect-backend
     version: {{ .Values.radar_upload_connect_backend._chart_version }}
     installed: {{ .Values.radar_upload_connect_backend._install }}
+    <<: *logFailedRelease
     values:
       - {{ .Values.radar_upload_connect_backend | toYaml | indent 8 | trim }}
     set:
@@ -43,6 +44,7 @@ releases:
     chart: radar/radar-upload-connect-frontend
     version: {{ .Values.radar_upload_connect_frontend._chart_version }}
     installed: {{ .Values.radar_upload_connect_frontend._install }}
+    <<: *logFailedRelease
     values:
       - {{ .Values.radar_upload_connect_frontend | toYaml | indent 8 | trim }}
     set:
@@ -55,6 +57,7 @@ releases:
     chart: radar/radar-upload-source-connector
     version: {{ .Values.radar_upload_source_connector._chart_version }}
     installed: {{ .Values.radar_upload_source_connector._install }}
+    <<: *logFailedRelease    
     values:
       - {{ .Values.radar_upload_source_connector | toYaml | indent 8 | trim }}
     set:
