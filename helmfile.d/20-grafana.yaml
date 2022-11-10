@@ -29,7 +29,7 @@ releases:
     version: {{ .Values.radar_grafana._chart_version }}
     installed: {{ .Values.radar_grafana._install }}
     needs:
-    - timescaledb
+      - timescaledb
     values:
       - "../etc/radar-grafana/values.yaml"
       - {{ .Values.radar_grafana | toYaml | indent 8 | trim }}
@@ -61,6 +61,8 @@ releases:
     chart: radar/radar-jdbc-connector
     version: {{ .Values.radar_jdbc_connector._chart_version }}
     installed: {{ .Values.radar_jdbc_connector._install }}
+    needs:
+      - timescaledb
     values:
       - {{ .Values.radar_jdbc_connector | toYaml | indent 8 | trim }}
     set:
