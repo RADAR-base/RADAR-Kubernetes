@@ -419,6 +419,29 @@ radar_push_endpoint:
   garmin:
     enabled: true
 
+# --------------------------------------------------------- 40-realtime-analyses.yaml ---------------------------------------------------------
+
+radar_jdbc_connector_agg:
+  _install: false
+  _chart_version: 0.4.0
+  replicaCount: 1
+  timescaledb:
+    host: timescaledb-postgresql-hl
+
+ksql_server:
+  _install: false
+  replicaCount: 1
+  servicePort: 8088
+  kafka:
+    bootstrapServers: PLAINTEXT://cp-kafka:9092
+  cp-schema-registry: 
+    url: http://cp-schema-registry:8081
+  ksql:
+    headless: false
+  configurationOverrides:
+    "ksql.server.url": "http://0.0.0.0:8088"
+    "ksql.advertised.listener": "http://ksql-server:8088"
+
 # --------------------------------------------------------- 99-velero.yaml ---------------------------------------------------------
 
 velero:
