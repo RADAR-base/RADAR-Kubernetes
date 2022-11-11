@@ -35,6 +35,8 @@ cp_zookeeper:
 
 cp_kafka:
   _install: true
+  persistence:
+    size: 1Gi
 
 cp_schema_registry:
   _install: true
@@ -44,6 +46,9 @@ catalog_server:
 
 postgresql:
   _install: true
+  primary:
+    persistence:
+      size: 1Gi
 
 management_portal:
   _install: true
@@ -56,6 +61,9 @@ app_config_frontend:
 
 radar_appserver_postgresql:
   _install: true
+  primary:
+    persistence:
+      size: 1Gi
 
 radar_appserver:
   _install: true
@@ -71,6 +79,9 @@ radar_rest_sources_backend:
 
 timescaledb:
   _install: true
+  primary:
+    persistence:
+      size: 1Gi
 
 radar_grafana:
   _install: true
@@ -95,6 +106,8 @@ redis:
 
 minio:
   _install: true
+  persistence:
+    size: 1Gi
 
 radar_s3_connector:
   _install: true
@@ -107,6 +120,9 @@ radar_output:
 
 radar_upload_postgresql:
   _install: true
+  primary:
+    persistence:
+      size: 1Gi
 
 radar_upload_connect_backend:
   _install: true
