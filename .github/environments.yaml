@@ -12,6 +12,7 @@ helmDefaults:
   atomic: {{ .Values.atomicInstall }}
   kubeContext: {{ .Values.kubeContext }}
   cleanupOnFail: true
+  wait: true
   timeout: 600
 
 repositories:
