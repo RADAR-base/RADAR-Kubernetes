@@ -28,6 +28,8 @@ jobs:
       run: cp .github/environments.yaml environments.yaml
 
     - name: Run helmfile template
+      env:
+        FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
       run: |
         sudo apt install -y openjdk-11-jre-headless
         DNAME='CN=CI,O=TheHyve,L=Utrecht,C=NL' ./bin/keystore-init
@@ -44,6 +46,8 @@ jobs:
         traefik-enabled: false
 
     - name: Install RADAR-Kubernetes
+      env:
+        FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
       run: |
         echo "kubeconfig: $KUBECONFIG"
         kubectl version
