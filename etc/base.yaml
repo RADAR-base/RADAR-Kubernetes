@@ -226,6 +226,8 @@ radar_rest_sources_authorizer:
 radar_rest_sources_backend:
   _install: false
   _chart_version: 0.4.2
+  image:
+    tag: 4.1.3
   replicaCount: 1
   postgres:
     host: postgresql
