@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+mkdir /tmp/dependencies
+cd /tmp/dependencies
+
+sudo apt install -y openjdk-11-jre-headless curl coreutils
+
+KUBECTL_VERSION=$(curl -L -s https://dl.k8s.io/release/stable.txt)
+curl -LO "https://dl.k8s.io/release/$KUBECTL_VERSION/bin/linux/amd64/kubectl"
+curl -LO "https://dl.k8s.io/$KUBECTL_VERSION/bin/linux/amd64/kubectl.sha256"
+echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+kubectl version --client --output=yaml
+
+HELM_VERSION=$(curl -Ls "https://github.com/helm/helm/releases" | grep 'href="/helm/helm/releases/tag/v3.[0-9]*.[0-9]*\"' | sed -E 's/.*\/helm\/helm\/releases\/tag\/(v[0-9\.]+)".*/\1/g' | head -1)
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh --version $HELM_VERSION
+helm version
+
+helm plugin install https://github.com/databus23/helm-diff
+helm diff version
+
+HELMFILE_VERSION=$(curl -Ls "https://github.com/helmfile/helmfile/releases" | \grep 'href="/helmfile/helmfile/releases/tag/v[0-9]*.[0-9]*.[0-9]*\"' | sed -E 's/.*\/helmfile\/helmfile\/releases\/tag\/(v[0-9\.]+)".*/\1/g' | head -1)
+curl -fsSL -o helmfile.tar.gz "https://github.com/helmfile/helmfile/releases/download/$HELMFILE_VERSION/helmfile_$(echo -n $HELMFILE_VERSION | cut -c 2-)_linux_amd64.tar.gz"
+tar xzf helmfile.tar.gz
+sudo install -o root -g root -m 0755 helmfile /usr/local/bin/helmfile
+helmfile --version
+
+YQ_VERSION=$(curl -Ls "https://github.com/mikefarah/yq/releases" | \grep 'href="/mikefarah/yq/releases/tag/v[0-9]*.[0-9]*.[0-9]*\"' | sed -E 's/.*\/mikefarah\/yq\/releases\/tag\/(v[0-9\.]+)".*/\1/g' | head -1)
+curl -fsSL -o yq "https://github.com/mikefarah/yq/releases/download/$YQ_VERSION/yq_linux_amd64"
+sudo install -o root -g root -m 0755 yq /usr/local/bin/yq
+yq --version

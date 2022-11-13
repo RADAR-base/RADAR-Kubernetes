@@ -3,8 +3,8 @@ environments:
    values:
      - ../etc/base.yaml
      - ../etc/base-secrets.yaml
-     - ../.github/install-all.yaml
-     - ../.github/secrets.yaml.gotmpl
+     - ../.github/ci_config/install-all.yaml
+     - ../.github/ci_config/secrets.yaml.gotmpl
 
 ---
 
