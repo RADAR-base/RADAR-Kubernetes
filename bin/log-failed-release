@@ -12,10 +12,17 @@ else
   releaseNamespace="default"
 fi
 releaseName="$3"
+error="$4"
+
+if [ -z "$error" ]; then
+  exit 0
+fi
+
+echo $error
 
 isReady=`kubectl --context $kubeContext --namespace $releaseNamespace get pods -l "app.kubernetes.io/instance=$releaseName" -o yaml | yq " .items[].status.containerStatuses[].ready" | grep false`
 
-if [ "$isReady" = "" ]; then
+if [ -z "$isReady" ]; then
   exit 0
 fi
 

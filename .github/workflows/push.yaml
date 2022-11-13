@@ -33,15 +33,15 @@ jobs:
       run: |
         ./.github/ci_config/bin/install-dependencies
 
-    - name: Set up helmfile config
-      run: cp .github/ci_config/environments.yaml environments.yaml
+    - name: Prepare the environment
+      run: |
+        DNAME='CN=CI,O=TheHyve,L=Utrecht,C=NL' ./bin/init
+        yq -i -f process '.environments.default.values += ["../.github/ci_config/install-all.yaml", "../.github/ci_config/secrets.yaml.gotmpl"]' environments.yaml
 
     - name: Run helmfile template
       env:
         FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
       run: |
-        DNAME='CN=CI,O=TheHyve,L=Utrecht,C=NL' ./bin/keystore-init
-        ./bin/generate-secrets
         helmfile template
 
     - name: Start a local k8s cluster
@@ -51,7 +51,7 @@ jobs:
         # - k3s release channels at https://github.com/k3s-io/k3s/blob/HEAD/channel.yaml
         # - k3s versions at https://github.com/k3s-io/k3s/tags
         # - helm versions at https://github.com/helm/helm/tags
-        k3s-channel: latest
+        k3s-channel: v1.25.3+k3s1
         traefik-enabled: false
 
     - name: Install RADAR-Kubernetes
