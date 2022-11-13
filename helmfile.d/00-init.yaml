@@ -5,6 +5,9 @@ bases:
 
 {{ readFile "../etc/helmfile-templates.yaml" }}
 
+helmDefaults:
+  timeout: 300
+
 releases:
   - name: mongodb
     namespace: graylog

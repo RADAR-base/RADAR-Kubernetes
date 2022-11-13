@@ -5,6 +5,9 @@ bases:
 
 {{ readFile "../etc/helmfile-templates.yaml" }}
 
+helmDefaults:
+  timeout: 240
+
 releases:
   - name: redis
     chart: radar/redis
@@ -85,7 +88,7 @@ releases:
     version: {{ .Values.radar_output._chart_version }}
     wait: true
     installed: {{ .Values.radar_output._install }}
-    <<: *logFailedRelease    
+    <<: *logFailedRelease
     values:
       - {{ .Values.radar_output | toYaml | indent 8 | trim }}
     set:

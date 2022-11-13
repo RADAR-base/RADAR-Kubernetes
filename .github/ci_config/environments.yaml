@@ -11,9 +11,8 @@ environments:
 helmDefaults:
   atomic: {{ .Values.atomicInstall }}
   kubeContext: {{ .Values.kubeContext }}
-  cleanupOnFail: true
   wait: true
-  timeout: 600
+  timeout: {{ .Values.timeout }}
 
 repositories:
   - name: radar

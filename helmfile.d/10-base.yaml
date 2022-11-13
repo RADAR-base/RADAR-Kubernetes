@@ -5,6 +5,10 @@ bases:
 
 {{ readFile "../etc/helmfile-templates.yaml" }}
 
+helmDefaults:
+  atomic: true
+  timeout: 600
+
 releases:
   - name: cert-manager-letsencrypt
     namespace: cert-manager
