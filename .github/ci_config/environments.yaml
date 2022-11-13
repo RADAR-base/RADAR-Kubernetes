@@ -2,7 +2,7 @@ environments:
  default:
    values:
      - ../etc/base.yaml
-     - ../etc/base-secrets.yaml
+     - ../etc/secrets.yaml
      - ../.github/ci_config/install-all.yaml
      - ../.github/ci_config/secrets.yaml.gotmpl
 

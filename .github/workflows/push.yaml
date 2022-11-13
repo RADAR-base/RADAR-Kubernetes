@@ -41,6 +41,7 @@ jobs:
         FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
       run: |
         DNAME='CN=CI,O=TheHyve,L=Utrecht,C=NL' ./bin/keystore-init
+        ./bin/generate-secrets
         helmfile template
 
     - name: Start a local k8s cluster
