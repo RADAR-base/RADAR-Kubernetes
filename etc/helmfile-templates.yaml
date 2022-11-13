@@ -1,7 +1,7 @@
 templates:
   logFailedRelease: &logFailedRelease
     hooks:
-      - events: ["preuninstall"]
+      - events: ["postsync"]
         showlogs: true
         command: "../bin/log-failed-release"
         args: ["{{ .Values.kubeContext }}", "{{`{{ .Release.Namespace }}`}}", "{{`{{.Release.Name}}`}}",]

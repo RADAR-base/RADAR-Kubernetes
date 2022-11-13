@@ -12,12 +12,14 @@ jobs:
   build:
     runs-on: self-hosted
     steps:
-    - name: Cleanup repo folder
+    - name: Cleanup
+      continue-on-error: true
       run: |
         ls -la ./
         rm -rf ./* || true
         rm -rf ./.??* || true
         ls -la ./
+        k3s-uninstall.sh
 
     - uses: actions/checkout@v1.0.0
 
@@ -71,8 +73,7 @@ jobs:
       with:
         limit-access-to-actor: true
 
-    - name: Clean up
+    - name: Report cluster state
       if: always()
       run: |
         kubectl get pods --all-namespaces
-        k3s-uninstall.sh
