@@ -13,6 +13,9 @@ if [ "$isReady" = "" ]; then
   exit 0
 fi
 
+echo "------------------------ Namespace status ------------------------"
+kubectl --context $kubeContext --namespace $releaseNamespace get pods -o wide
+echo "------------------------ Pod status ------------------------"
 kubectl --context $kubeContext --namespace $releaseNamespace get pods -l "app.kubernetes.io/instance=$releaseName" -o yaml
 echo "------------------------ Previous logs ------------------------"
 kubectl --context $kubeContext --namespace $releaseNamespace logs --previous=true --ignore-errors=true --all-containers=true --prefix=true --timestamps=true --tail=100 -l "app.kubernetes.io/instance=$releaseName"
