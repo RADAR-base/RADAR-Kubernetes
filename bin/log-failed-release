@@ -1,28 +1,28 @@
 #!/usr/bin/env bash
 
-set -xv
-
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 . bin/util.sh
 
-kubeContext="$1"
-if [ -n "$2" ]; then
-  releaseNamespace="$2"
-else
-  releaseNamespace="default"
-fi
-releaseName="$3"
-error="$4"
+while getopts c:n:r:e: option
+do
+    case "${option}"
+        in
+        c)kubeContext=${OPTARG};;
+        n)releaseNamespace=${OPTARG};;
+        r)releaseName=${OPTARG};;
+        e)helmError=${OPTARG};;
+    esac
+done
 
-if [ -z "$error" ]; then
-  exit 0
-fi
+kubeContext=`echo $kubeContext | tr -d "'"`
+releaseNamespace=`echo $releaseNamespace | tr -d "'"`
+releaseName=`echo $releaseName | tr -d "'"`
 
-echo $error
+kubeContext=${kubeContext:-default}
+releaseNamespace=${releaseNamespace:-default}
 
-isReady=`kubectl --context $kubeContext --namespace $releaseNamespace get pods -l "app.kubernetes.io/instance=$releaseName" -o yaml | yq " .items[].status.containerStatuses[].ready" | grep false`
-
-if [ -z "$isReady" ]; then
+if kubectl --context $kubeContext --namespace $releaseNamespace get pods -l "app.kubernetes.io/instance=$releaseName" -o yaml | yq " .items[].status.containerStatuses[].ready" | grep true; then
+  echo "Applications seem to be healthly, installation successful."
   exit 0
 fi
 

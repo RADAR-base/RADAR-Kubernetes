@@ -1,4 +1,5 @@
 name: CI
+
 on:
   push:
   workflow_dispatch:
@@ -8,6 +9,7 @@ on:
         description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'
         required: false
         default: false
+
 jobs:
   build:
     runs-on: self-hosted
@@ -19,7 +21,7 @@ jobs:
         rm -rf ./* || true
         rm -rf ./.??* || true
         ls -la ./
-        k3s-uninstall.sh
+        /usr/local/bin/k3s-uninstall.sh
 
     - uses: actions/checkout@v1.0.0
 
@@ -44,15 +46,14 @@ jobs:
       run: |
         helmfile template
 
-    - name: Start a local k8s cluster
-      uses: jupyterhub/action-k3s-helm@v3
-      with:
-        # See available:
-        # - k3s release channels at https://github.com/k3s-io/k3s/blob/HEAD/channel.yaml
-        # - k3s versions at https://github.com/k3s-io/k3s/tags
-        # - helm versions at https://github.com/helm/helm/tags
-        k3s-channel: v1.25.3+k3s1
-        traefik-enabled: false
+    - name: Install K3S
+      env:
+        INSTALL_K3S_VERSION: "v1.25.2+k3s1"
+        INSTALL_K3S_SYMLINK: "skip"
+        K3S_KUBECONFIG_MODE: "644"
+      run: |
+        curl -sfL https://get.k3s.io | sh -s - --disable traefik --disable-helm-controller
+        cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
 
     - name: Install RADAR-Kubernetes
       env:

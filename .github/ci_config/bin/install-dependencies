@@ -3,6 +3,7 @@
 mkdir /tmp/dependencies
 cd /tmp/dependencies
 
+sudo apt update
 sudo apt install -y openjdk-11-jre-headless curl coreutils
 
 if [ -n "${KUBECTL_VERSION}" ]; then
