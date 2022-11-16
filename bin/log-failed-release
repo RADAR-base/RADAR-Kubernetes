@@ -3,35 +3,58 @@
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 . bin/util.sh
 
-while getopts c:n:r:e: option
+usage() {
+  echo "Usage: $0 -r RELEASE_NAME [-h] [-c KUBE_CONTEXT] [-n NAMESPACE] [-e ERROR_MESSAGE]"
+  echo "If any error message was given, this will check the status of the release."
+  echo "If the release is then not ready, diagnostics will be printed."
+}
+
+while getopts c:n:r:e:h option
 do
     case "${option}"
         in
-        c)kubeContext=${OPTARG};;
-        n)releaseNamespace=${OPTARG};;
-        r)releaseName=${OPTARG};;
-        e)helmError=${OPTARG};;
+        h)usage; exit 0;;
+        c)kubeContext="${OPTARG}";;
+        n)releaseNamespace="${OPTARG}";;
+        r)releaseName="${OPTARG}";;
+        e)helmError="${OPTARG}";;
+        *)usage >&2; exit 1;;
     esac
 done
 
-kubeContext=`echo $kubeContext | tr -d "'"`
-releaseNamespace=`echo $releaseNamespace | tr -d "'"`
-releaseName=`echo $releaseName | tr -d "'"`
-
-kubeContext=${kubeContext:-default}
-releaseNamespace=${releaseNamespace:-default}
-
-if kubectl --context $kubeContext --namespace $releaseNamespace get pods -l "app.kubernetes.io/instance=$releaseName" -o yaml | yq " .items[].status.containerStatuses[].ready" | grep true; then
-  echo "Applications seem to be healthly, installation successful."
+if [ -z "$releaseName" ]; then
+  echo "ERROR: release name missing" >&2
+  usage >&2
+  exit 1
+fi
+if [ -z "$helmError" ]; then
+  echo "No errors reported"
   exit 0
 fi
 
+kubeContext="${kubeContext:-$(kubectl config current-context)}"
+releaseNamespace="${releaseNamespace:-default}"
+
+if kubectl --context $kubeContext --namespace $releaseNamespace get pods -l "app.kubernetes.io/instance=$releaseName" -o yaml | yq " .items[].status.containerStatuses[].ready" | grep -vq false; then
+  echo "Application $releaseName ($releaseNamespace) is ready, installation successful."
+  exit 0
+fi
+
+echo "Application $releaseName ($releaseNamespace) not is ready, installation unsuccessful."
+echo "Error message: $helmError"
+echo
+echo "------------------------ Helm status ------------------------"
+helm --kube-context $kubeContext --namespace $releaseNamespace list
+echo
 echo "------------------------ Namespace status ------------------------"
 kubectl --context $kubeContext --namespace $releaseNamespace get pods -o wide
+echo
 echo "------------------------ Pod status ------------------------"
 kubectl --context $kubeContext --namespace $releaseNamespace get pods -l "app.kubernetes.io/instance=$releaseName" -o yaml
+echo
 echo "------------------------ Previous logs ------------------------"
 kubectl --context $kubeContext --namespace $releaseNamespace logs --previous=true --ignore-errors=true --all-containers=true --prefix=true --timestamps=true --tail=100 -l "app.kubernetes.io/instance=$releaseName"
+echo
 echo "------------------------ Curent logs ------------------------"
 kubectl --context $kubeContext --namespace $releaseNamespace logs --ignore-errors=true --all-containers=true --prefix=true --timestamps=true --tail=100 -l "app.kubernetes.io/instance=$releaseName"
 
