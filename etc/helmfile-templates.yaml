@@ -4,14 +4,4 @@ templates:
       - events: ["postsync"]
         showlogs: true
         command: "../bin/log-failed-release"
-        args:
-          - -c
-          - {{ .Values.kubeContext | quote }},
-          - -n
-          - {{ .Release.Namespace | quote }}
-          - -r
-          - {{ .Release.Name | quote }}
-          {{- if .Event.Error }}
-          - -e
-          - {{ .Event.Error | quote }}
-          {{- end }}
+        args: ["-c", "'{{ .Values.kubeContext }}'", "-n", "'{{ .Release.Namespace }}'", "-r", "'{{ .Release.Name }}'", "-e", "'{{ if .Event.Error }}{{ .Event.Error }}{{ end }}'"]

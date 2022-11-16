@@ -11,15 +11,16 @@ usage() {
 
 while getopts c:n:r:e:h option
 do
-    case "${option}"
-        in
-        h)usage; exit 0;;
-        c)kubeContext="${OPTARG}";;
-        n)releaseNamespace="${OPTARG}";;
-        r)releaseName="${OPTARG}";;
-        e)helmError="${OPTARG}";;
-        *)usage >&2; exit 1;;
-    esac
+  cleanedArg="$(echo "${OPTARG}" | tr -d "'")"
+  case "${option}"
+    in
+    h) usage; exit 0;;
+    c) kubeContext="$cleanedArg";;
+    n) releaseNamespace="$cleanedArg";;
+    r) releaseName="$cleanedArg";;
+    e) helmError="$cleanedArg";;
+    *) usage >&2; exit 1;;
+  esac
 done
 
 if [ -z "$releaseName" ]; then
