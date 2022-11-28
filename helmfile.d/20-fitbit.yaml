@@ -67,7 +67,7 @@ releases:
       - name: restSourceClients.fitbit.enable
         value: {{ .Values.radar_fitbit_connector._install }}
       - name: restSourceClients.garmin.enable
-        value: {{ .Values.radar_push_endpoint.garmin.enabled }}
+        value: {{ and .Values.radar_push_endpoint._install .Values.radar_push_endpoint.garmin.enabled }}
       {{- if hasKey .Values "radar_push_endpoint.garmin.consumerKey" }}
       - name: restSourceClients.garmin.clientId
         value: {{ .Values.radar_push_endpoint.garmin.consumerKey }}
