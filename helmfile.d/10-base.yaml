@@ -81,3 +81,53 @@ releases:
       - name: schema_registry
         value: {{ .Values.confluent_cloud.cc.schemaRegistryUrl }}
       {{ end }}
+
+  - name: radar-home
+    chart: radar/radar-home
+    version: {{ .Values.radar_home._chart_version }}
+    installed: {{ .Values.radar_home._install }}
+    values:
+      - {{ .Values.radar_home | toYaml | indent 8 | trim }}
+    set:
+      - name: ingress.hosts
+        values: [ {{ .Values.server_name }} ]
+      {{- if or (not (hasKey .Values.radar_home "s3")) (not (hasKey .Values.radar_home.s3 "enabled")) }}
+      - name: s3.enabled
+        value: {{ .Values.minio._install }}
+      {{- end }}
+      {{- if or (not (hasKey .Values.radar_home "s3")) (not (hasKey .Values.radar_home.s3 "url")) }}
+      - name: s3.url
+        value: https://s3.{{ .Values.server_name }}/login
+      {{- end }}
+      {{- if or (not (hasKey .Values.radar_home "dashboard")) (not (hasKey .Values.radar_home.dashboard "enabled")) }}
+      - name: dashboard.enabled
+        value: {{ .Values.radar_grafana._install }}
+      {{- end }}
+      {{- if or (not (hasKey .Values.radar_home "dashboard")) (not (hasKey .Values.radar_home.dashboard "url")) }}
+      - name: dashboard.url
+        value: https://dashboard.{{ .Values.server_name }}/
+      {{- end }}
+      {{- if or (not (hasKey .Values.radar_home "uploadPortal")) (not (hasKey .Values.radar_home.uploadPortal "enabled")) }}
+      - name: uploadPortal.enabled
+        value: {{ .Values.radar_upload_connect_frontend._install }}
+      {{- end }}
+      {{- if or (not (hasKey .Values.radar_home "restAuthorizer")) (not (hasKey .Values.radar_home.restAuthorizer "enabled")) }}
+      - name: restAuthorizer.enabled
+        value: {{ .Values.radar_rest_sources_authorizer._install }}
+      {{- end }}
+      {{- if or (not (hasKey .Values.radar_home "monitoring")) (not (hasKey .Values.radar_home.monitoring "enabled")) }}
+      - name: monitoring.enabled
+        value: {{ .Values.kube_prometheus_stack._install }}
+      {{- end }}
+      {{- if or (not (hasKey .Values.radar_home "monitoring")) (not (hasKey .Values.radar_home.monitoring "url")) }}
+      - name: monitoring.url
+        value: https://grafana.{{ .Values.server_name }}/login
+      {{- end }}
+      {{- if or (not (hasKey .Values.radar_home "logging")) (not (hasKey .Values.radar_home.logging "enabled")) }}
+      - name: logging.enabled
+        value: {{ .Values.graylog._install }}
+      {{- end }}
+      {{- if or (not (hasKey .Values.radar_home "logging")) (not (hasKey .Values.radar_home.logging "url")) }}
+      - name: logging.url
+        value: https://graylog.{{ .Values.server_name }}/
+      {{- end }}
