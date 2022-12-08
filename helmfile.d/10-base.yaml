@@ -115,3 +115,19 @@ releases:
       - name: restAuthorizer.enabled
         value: {{ .Values.radar_rest_sources_authorizer._install }}
       {{- end }}
+      {{- if or (not (hasKey .Values.radar_home "monitoring")) (not (hasKey .Values.radar_home.monitoring "enabled")) }}
+      - name: monitoring.enabled
+        value: {{ .Values.kube_prometheus_stack._install }}
+      {{- end }}
+      {{- if or (not (hasKey .Values.radar_home "monitoring")) (not (hasKey .Values.radar_home.monitoring "url")) }}
+      - name: monitoring.url
+        value: https://grafana.{{ .Values.server_name }}/login
+      {{- end }}
+      {{- if or (not (hasKey .Values.radar_home "logging")) (not (hasKey .Values.radar_home.logging "enabled")) }}
+      - name: logging.enabled
+        value: {{ .Values.graylog._install }}
+      {{- end }}
+      {{- if or (not (hasKey .Values.radar_home "logging")) (not (hasKey .Values.radar_home.logging "url")) }}
+      - name: logging.url
+        value: https://graylog.{{ .Values.server_name }}/
+      {{- end }}
