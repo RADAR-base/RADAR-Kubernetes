@@ -136,6 +136,10 @@ catalog_server:
   replicaCount: 1
   schema_registry: http://cp-schema-registry:8081
 
+radar_home:
+  _install: true
+  _chart_version: 0.1.0
+
 # --------------------------------------------------------- 10-managementportal.yaml ---------------------------------------------------------
 
 # This Postgresql is used for Management Portal and App config, postgres password should be same in them
