@@ -34,6 +34,7 @@ releases:
   - name: ksql-server
     chart: cp-radar/cp-ksql-server
     installed: {{ .Values.ksql_server._install }}
+    version: {{ .Values.ksql_server._chart_version }}
     values:
       - "../etc/cp-ksql-server/values.yaml"
       - {{ .Values.ksql_server | toYaml | indent 8 | trim }}
