@@ -28,7 +28,7 @@ releases:
         value: {{ .Values.timescaledb_password }}
       - name: jdbc.username
         value: {{ .Values.grafana_metrics_username }}
-      {{- if not (hasKey .Values.radar_jdbc_connector_agg.jdbc "url") }}
+      {{- if or (not (hasKey .Values.radar_jdbc_connector_agg "jdbc") (hasKey .Values.radar_jdbc_connector_agg.jdbc "url") }}
       - name: jdbc.url
         value: jdbc:postgresql://timescaledb-postgresql-hl:5432/{{ .Values.timescaledb_db_name }}
       {{- end }}

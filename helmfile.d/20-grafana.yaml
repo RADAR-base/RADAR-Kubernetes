@@ -73,7 +73,9 @@ releases:
         value: {{ .Values.kafka_num_brokers }}
       - name: jdbc.password
         value: {{ .Values.timescaledb_password }}
-      {{- if not (hasKey .Values.radar_jdbc_connector.jdbc "url") }}
+      - name: jdbc.username
+        value: {{ .Values.grafana_metrics_username }}
+      {{- if or (not (hasKey .Values.radar_jdbc_connector "jdbc") (hasKey .Values.radar_jdbc_connector.jdbc "url") }}
       - name: jdbc.url
         value: jdbc:postgresql://timescaledb-postgresql-hl:5432/{{ .Values.timescaledb_db_name }}
       {{- end }}
