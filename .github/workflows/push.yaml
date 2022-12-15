@@ -4,10 +4,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1.0.0
+    - uses: actions/checkout@v3
 
     - name: Setup helmfile
-      uses: mamezou-tech/setup-helmfile@v1.0.0
+      uses: mamezou-tech/setup-helmfile@v1.2.0
 
     - name: Set up helmfile config
       run: cp .github/environments.yaml environments.yaml
