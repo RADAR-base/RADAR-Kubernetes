@@ -218,12 +218,12 @@ radar_fitbit_connector:
 
 radar_rest_sources_authorizer:
   _install: false
-  _chart_version: 0.4.4
+  _chart_version: 0.4.5
   replicaCount: 1
 
 radar_rest_sources_backend:
   _install: false
-  _chart_version: 0.4.3
+  _chart_version: 0.4.4
   replicaCount: 1
   postgres:
     host: postgresql
