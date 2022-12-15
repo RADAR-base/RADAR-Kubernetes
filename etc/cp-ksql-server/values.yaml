@@ -110,6 +110,4 @@ configurationOverrides:
     "ksql.sink.replicas": 3
     "ksql.streams.replication.factor": 3
     "ksql.internal.topic.replicas": 3
-    "ssl.truststore.location": "/etc/kafka/secrets/kafka.client.truststore.jks"
-    "ssl.truststore.password": confluent
     "log4j.logger.processing": false

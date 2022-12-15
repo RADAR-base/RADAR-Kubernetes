@@ -19,8 +19,15 @@ releases:
       - "../etc/timescaledb/values.yaml"
       - {{ .Values.timescaledb | toYaml | indent 8 | trim }}
     set:
+      {{- if eq .Values.grafana_metrics_username "postgres" }}
       - name: global.postgresql.auth.postgresPassword
         value: {{ .Values.timescaledb_password }}
+      {{- else }}
+      - name: global.postgresql.auth.username
+        value: {{ .Values.grafana_metrics_username }}
+      - name: global.postgresql.auth.password
+        value: {{ .Values.timescaledb_password }}
+      {{- end }}
       - name: auth.database
         value: {{ .Values.timescaledb_db_name }}
 
@@ -66,3 +73,7 @@ releases:
         value: {{ .Values.kafka_num_brokers }}
       - name: jdbc.password
         value: {{ .Values.timescaledb_password }}
+      {{- if not (hasKey .Values.radar_jdbc_connector.jdbc "url") }}
+      - name: jdbc.url
+        value: jdbc:postgresql://timescaledb-postgresql-hl:5432/{{ .Values.timescaledb_db_name }}
+      {{- end }}

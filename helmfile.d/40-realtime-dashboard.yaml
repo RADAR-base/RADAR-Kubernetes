@@ -24,12 +24,14 @@ releases:
     set:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
-      - name: timescaledb.password
+      - name: jdbc.password
         value: {{ .Values.timescaledb_password }}
-      - name: timescaledb.username
-        value: postgres
-      - name: timescaledb.database_name
-        value: {{ .Values.timescaledb_db_name }}
+      - name: jdbc.username
+        value: {{ .Values.grafana_metrics_username }}
+      {{- if not (hasKey .Values.radar_jdbc_connector_agg.jdbc "url") }}
+      - name: jdbc.url
+        value: jdbc:postgresql://timescaledb-postgresql-hl:5432/{{ .Values.timescaledb_db_name }}
+      {{- end }}
 
   - name: ksql-server
     chart: cp-radar/cp-ksql-server
