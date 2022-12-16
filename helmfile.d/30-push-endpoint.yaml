@@ -37,7 +37,5 @@ releases:
       - name: redis.url
         value: {{ .Values.radar_output.redis.uri }}
       {{ end }}
-      {{ if hasKey .Values.management_portal.oauth_clients "radar_push_endpoint" }}
       - name: garmin.userRepositoryClientSecret
-        value: {{ .Values.management_portal.oauth_clients.radar_push_endpoint.client_secret }}
-      {{ end }}
+        value: {{ dig "garmin" "userRepositoryClientSecret" (dig "oauth_clients" "radar_push_endpoint" "client_secret" "" .Values.management_portal) .Values.radar_push_endpoint }}
