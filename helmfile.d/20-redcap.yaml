@@ -22,7 +22,5 @@ releases:
     set:
       - name: ingress.hosts
         values: [{{ .Values.server_name }}]
-      {{ if hasKey .Values.management_portal.oauth_clients "radar_redcap_integrator" }}
       - name: oauth_client_secret
-        value: {{ .Values.management_portal.oauth_clients.radar_redcap_integrator.client_secret }}
-      {{ end }}
+        value: {{ dig "oauth_client_secret" (dig "oauth_clients" "radar_redcap_integrator" "client_secret" "" .Values.management_portal) .Values.radar_integration }}

@@ -33,20 +33,10 @@ releases:
         value: "s3.{{ .Values.server_name }}"
       - name: apiIngress.hostname
         value: "api.s3.{{ .Values.server_name }}"
-      {{- if hasKey .Values.minio "accessKey" }}
       - name: auth.rootUser
-        value: {{ .Values.minio.accessKey }}
-      {{- else if not (hasKey .Values.minio "auth.rootUser") }}
-      - name: auth.rootUser
-        value: {{ .Values.s3_access_key }}
-      {{- end }}
-      {{- if hasKey .Values.minio "secretKey" }}
+        value: {{ dig "auth" "rootUser" (dig "accessKey" .Values.s3_access_key .Values.minio) .Values.minio }}
       - name: auth.rootPassword
-        value: {{ .Values.minio.secretKey }}
-      {{- else if not (hasKey .Values.minio "auth.rootPassword") }}
-      - name: auth.rootPassword
-        value: {{ .Values.s3_secret_key }}
-      {{- end }}
+        value: {{ dig "auth" "rootPassword" (dig "secretKey" .Values.s3_secret_key .Values.minio) .Values.minio }}
 
   - name: radar-s3-connector
     chart: radar/radar-s3-connector
@@ -58,14 +48,10 @@ releases:
     set:
       - name: cc.enabled
         value: {{ .Values.confluent_cloud.enabled }}
-      {{- if not (hasKey .Values.radar_s3_connector "bucketAccessKey") }}
       - name: bucketAccessKey
-        value: {{ .Values.s3_access_key }}
-      {{- end }}
-      {{- if not (hasKey .Values.radar_s3_connector "bucketSecretKey") }}
+        value: {{ dig "bucketAccessKey" .Values.s3_access_key .Values.radar_s3_connector }}
       - name: bucketSecretKey
-        value: {{ .Values.s3_secret_key }}
-      {{- end }}
+        value: {{ dig "bucketSecretKey" .Values.s3_secret_key .Values.radar_s3_connector }}
 
   - name: s3-proxy
     chart: radar/s3-proxy
@@ -74,14 +60,10 @@ releases:
     values:
       - {{ .Values.s3_proxy | toYaml | indent 8 | trim }}
     set:
-      {{- if not (hasKey .Values.s3_proxy "s3.identity") }}
       - name: s3.identity
-        value: {{ .Values.s3_access_key }}
-      {{- end }}
-      {{- if not (hasKey .Values.s3_proxy "s3.credential") }}
+        value: {{ dig "s3" "identity" .Values.s3_access_key .Values.s3_proxy }}
       - name: s3.credential
-        value: {{ .Values.s3_secret_key }}
-      {{- end }}
+        value: {{ dig "s3" "credential" .Values.s3_secret_key .Values.s3_proxy }}
 
   - name: radar-output
     chart: radar/radar-output
@@ -91,19 +73,11 @@ releases:
     values:
       - {{ .Values.radar_output | toYaml | indent 8 | trim }}
     set:
-      {{- if not (hasKey .Values.radar_output.source.s3 "accessToken") }}
       - name: source.s3.accessToken
-        value: {{ .Values.s3_access_key }}
-      {{- end }}
-      {{- if not (hasKey .Values.radar_output.source.s3 "secretKey") }}
+        value: {{ dig "source" "s3" "accessToken" .Values.s3_access_key .Values.radar_output }}
       - name: source.s3.secretKey
-        value: {{ .Values.s3_secret_key }}
-      {{- end }}
-      {{- if not (hasKey .Values.radar_output.target.s3 "accessToken") }}
+        value: {{ dig "source" "s3" "secretKey" .Values.s3_secret_key .Values.radar_output }}
       - name: target.s3.accessToken
-        value: {{ .Values.s3_access_key }}
-      {{- end }}
-      {{- if not (hasKey .Values.radar_output.target.s3 "secretKey") }}
+        value: {{ dig "target" "s3" "accessToken" .Values.s3_access_key .Values.radar_output }}
       - name: target.s3.secretKey
-        value: {{ .Values.s3_secret_key }}
-      {{- end }}
+        value: {{ dig "target" "s3" "secretKey" .Values.s3_secret_key .Values.radar_output }}
