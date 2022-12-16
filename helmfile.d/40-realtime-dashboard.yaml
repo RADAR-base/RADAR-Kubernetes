@@ -24,10 +24,10 @@ releases:
     set:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
+      - name: jdbc.username
+        value: {{ .Values.timescaledb_username }}
       - name: jdbc.password
         value: {{ .Values.timescaledb_password }}
-      - name: jdbc.username
-        value: {{ .Values.grafana_metrics_username }}
       - name: jdbc.url
         value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://timescaledb-postgresql-hl:5432/%s" .Values.timescaledb_db_name) .Values.radar_jdbc_connector_agg }}
 
