@@ -238,6 +238,7 @@ radar_rest_sources_backend:
 
 # --------------------------------------------------------- 20-grafana.yaml ---------------------------------------------------------
 
+timescaledb_username: postgres
 timescaledb_db_name: grafana-metrics
 grafana_metrics_username: postgres
 
