@@ -29,6 +29,9 @@ elasticsearch:
 graylog:
   _install: true
   _chart_version: 2.1.2
+  # See https://docs.mongodb.com/manual/reference/connection-string/ for details
+  # E.g, mongodb://graylog:password@mongodb-headless.graylog.svc.cluster.local:27017/graylog?replicaSet=rs0
+  mongodbConnectionString: secret
 
 # Needed for graylog. If graylog is set not to install, this can be disabled as well.
 fluent_bit:

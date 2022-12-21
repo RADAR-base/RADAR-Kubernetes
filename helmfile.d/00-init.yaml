@@ -39,7 +39,7 @@ releases:
       - {{ .Values.graylog | toYaml | indent 8 | trim }}
     set:
       - name: graylog.mongodb.uri
-        value: mongodb://graylog:{{ index .Values.mongodb.auth.passwords 0 }}@mongodb-headless.graylog.svc.cluster.local:27017/graylog?replicaSet=rs0
+        value: {{ .Values.graylog.mongodbConnectionString }}
       - name: graylog.rootEmail
         value: {{ .Values.maintainer_email }}
       - name: graylog.ingress.hosts
