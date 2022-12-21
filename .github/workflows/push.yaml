@@ -39,11 +39,13 @@ jobs:
 
     - name: Check gitignore
       run: |
-        IGNORED_FILES=$(find . -not -path './.git/*' -type f | git check-ignore --stdin --no-index)
-        if [ -n "$IGNORED_FILES" ]; then
-          echo "Remove the following ignored files from this branch:"
+        echo "Checking whether any files that should be ignored are uploaded"
+        echo
+        if find . -not -path './.git/*' -type f | git check-ignore --stdin --no-index; then
+          echo
+          echo "Remove the above files from this branch"
           echo "$IGNORED_FILES"
           exit 1
         else
-          exit 0
+          echo "No ignored files have been added"
         fi
