@@ -44,7 +44,6 @@ jobs:
         if find . -not -path './.git/*' -type f | git check-ignore --stdin --no-index; then
           echo
           echo "Remove the above files from this branch"
-          echo "$IGNORED_FILES"
           exit 1
         else
           echo "No ignored files have been added"
