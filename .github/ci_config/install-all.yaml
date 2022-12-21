@@ -52,6 +52,9 @@ postgresql:
 
 management_portal:
   _install: true
+  resources:
+    limits:
+      memory: 1700Mi
 
 app_config:
   _install: true
