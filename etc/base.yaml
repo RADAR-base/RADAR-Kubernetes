@@ -253,6 +253,7 @@ grafana_metrics_username: postgres
 timescaledb:
   _install: true
   _chart_version: 11.1.24
+  _timeout: 300
   # Check https://hub.docker.com/r/timescale/timescaledb/tags
   # The suffix MUST be bitnami.
   # On first install, choose the latest major postgresql version. This cannot be modified afterwards.

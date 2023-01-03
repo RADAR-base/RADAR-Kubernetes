@@ -10,6 +10,7 @@ releases:
     chart: radar/postgresql
     version: {{ .Values.timescaledb._chart_version }}
     installed: {{ .Values.timescaledb._install }}
+    timeout: {{ dig "_timeout" .Values.timeout .Values.timescaledb }}
     <<: *logFailedRelease
     values:
       - "../etc/timescaledb/values.yaml"
