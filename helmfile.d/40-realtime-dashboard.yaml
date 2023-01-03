@@ -1,0 +1,40 @@
+bases:
+- ../environments.yaml
+
+---
+repositories:
+  - name: radar
+    url: https://radar-base.github.io/radar-helm-charts
+  - name: cp-radar
+    url: https://radar-base.github.io/cp-helm-charts
+
+helmDefaults:
+  atomic: false
+  timeout: 240
+  kubeContext: {{ .Values.kubeContext }}
+
+releases:
+  - name: radar-jdbc-connector-agg
+    chart: radar/radar-jdbc-connector
+    version: {{ .Values.radar_jdbc_connector_agg._chart_version }}
+    installed: {{ .Values.radar_jdbc_connector_agg._install }}
+    values:
+      - "../etc/radar-jdbc-connector-agg/values.yaml"
+      - {{ .Values.radar_jdbc_connector_agg | toYaml | indent 8 | trim }}
+    set:
+      - name: kafka_num_brokers
+        value: {{ .Values.kafka_num_brokers }}
+      - name: jdbc.username
+        value: {{ .Values.timescaledb_username }}
+      - name: jdbc.password
+        value: {{ .Values.timescaledb_password }}
+      - name: jdbc.url
+        value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://timescaledb-postgresql-hl:5432/%s" .Values.timescaledb_db_name) .Values.radar_jdbc_connector_agg }}
+
+  - name: ksql-server
+    chart: cp-radar/cp-ksql-server
+    installed: {{ .Values.ksql_server._install }}
+    version: {{ .Values.ksql_server._chart_version }}
+    values:
+      - "../etc/cp-ksql-server/values.yaml"
+      - {{ .Values.ksql_server | toYaml | indent 8 | trim }}

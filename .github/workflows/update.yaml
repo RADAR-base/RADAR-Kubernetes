@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: setup-helmfile
-        uses: mamezou-tech/setup-helmfile@v0.9.0
+        uses: mamezou-tech/setup-helmfile@v1.2.0
         with:
           install-helm-plugins: no
           install-kubectl: no

@@ -25,7 +25,7 @@ releases:
         value: {{ .Values.fitbit_api_secret }}
       {{- end }}
       - name: oauthClientSecret
-        value: {{ if hasKey .Values.management_portal.oauth_clients "radar_fitbit_connector" -}}{{ .Values.management_portal.oauth_clients.radar_fitbit_connector.client_secret }}{{- end }}
+        value: {{ dig "radar_fitbit_connector" "client_secret" "" .Values.management_portal.oauth_clients }}
 
   - name: radar-rest-sources-authorizer
     chart: radar/radar-rest-sources-authorizer
@@ -63,16 +63,10 @@ releases:
       - name: restSourceClients.fitbit.enable
         value: {{ .Values.radar_fitbit_connector._install }}
       - name: restSourceClients.garmin.enable
-        value: {{ .Values.radar_push_endpoint.garmin.enabled }}
-      {{- if hasKey .Values "radar_push_endpoint.garmin.consumerKey" }}
+        value: {{ and .Values.radar_push_endpoint._install .Values.radar_push_endpoint.garmin.enabled }}
       - name: restSourceClients.garmin.clientId
-        value: {{ .Values.radar_push_endpoint.garmin.consumerKey }}
-      {{- end }}
-      {{- if hasKey .Values "radar_push_endpoint.garmin.consumerSecret" }}
+        value: {{ dig "restSourceClients" "garmin" "clientId" (dig "garmin" "consumerKey" "" .Values.radar_push_endpoint) .Values.radar_rest_sources_backend }}
       - name: restSourceClients.garmin.clientSecret
-        value: {{ .Values.radar_push_endpoint.garmin.consumerSecret }}
-      {{- end }}
-      {{ if hasKey .Values.management_portal.oauth_clients "radar_rest_sources_auth_backend" }}
+        value: {{ dig "restSourceClients" "garmin" "clientSecret" (dig "garmin" "consumerSecret" "" .Values.radar_push_endpoint) .Values.radar_rest_sources_backend }}
       - name: client_secret
-        value: {{ .Values.management_portal.oauth_clients.radar_rest_sources_auth_backend.client_secret }}
-      {{ end }}
+        value: {{ dig "client_secret" (dig "oauth_clients" "radar_rest_sources_auth_backend" "client_secret" "" .Values.management_portal) .Values.radar_rest_sources_backend }}

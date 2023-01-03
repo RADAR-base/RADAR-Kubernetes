@@ -136,9 +136,13 @@ cp_schema_registry:
 
 catalog_server:
   _install: true
-  _chart_version: 0.4.2
+  _chart_version: 0.4.3
   replicaCount: 1
   schema_registry: http://cp-schema-registry:8081
+
+radar_home:
+  _install: true
+  _chart_version: 0.1.1
 
 # --------------------------------------------------------- 10-managementportal.yaml ---------------------------------------------------------
 
@@ -176,18 +180,14 @@ management_portal:
 
 app_config:
   _install: true
-  _chart_version: 0.2.3
-  image:
-    tag: 0.4.1
+  _chart_version: 0.2.4
   replicaCount: 1
   jdbc:
     url: jdbc:postgresql://postgresql:5432/appconfig
 
 app_config_frontend:
   _install: true
-  _chart_version: 0.2.2
-  image:
-    tag: 0.4.1
+  _chart_version: 0.2.3
   replicaCount: 1
 
 # --------------------------------------------------------- 20-appserver.yaml ---------------------------------------------------------
@@ -222,14 +222,12 @@ radar_fitbit_connector:
 
 radar_rest_sources_authorizer:
   _install: false
-  _chart_version: 0.4.3
+  _chart_version: 0.4.5
   replicaCount: 1
 
 radar_rest_sources_backend:
   _install: false
-  _chart_version: 0.4.2
-  image:
-    tag: 4.1.3
+  _chart_version: 0.4.6
   replicaCount: 1
   postgres:
     host: postgresql
@@ -244,8 +242,9 @@ radar_rest_sources_backend:
 
 # --------------------------------------------------------- 20-grafana.yaml ---------------------------------------------------------
 
+timescaledb_username: postgres
 timescaledb_db_name: grafana-metrics
-grafana_metrics_username: username
+grafana_metrics_username: postgres
 
 timescaledb:
   _install: true
@@ -274,16 +273,11 @@ radar_grafana:
 
 radar_jdbc_connector:
   _install: true
-  _chart_version: 0.3.0
+  _chart_version: 0.4.0
   replicaCount: 1
-  jdbc:
-  # -- Host of the TimescaleDB database
-    url: jdbc:postgresql://timescaledb-postgresql-hl:5432/grafana-metrics
-    user: grafana
   sink:
     # Change the list of topics if you have dashboards that read other data or if you don't have certain topics available on your cluster.
     topics: android_phone_relative_location, android_phone_battery_level, connect_fitbit_intraday_heart_rate, connect_fitbit_intraday_steps
-
 
 # --------------------------------------------------------- 20-ingestion.yaml ---------------------------------------------------------
 
@@ -349,12 +343,11 @@ minio:
 radar_s3_connector:
   # set to true if radar-s3-connector should be installed
   _install: true
-  _chart_version: 0.2.3
+  _chart_version: 0.2.4
   replicaCount: 1
   # The bucket name where intermediate data for cold storage should be written to.
   bucketName: radar-intermediate-storage
   s3Endpoint: http://minio:9000/
-  topics: android_phone_usage_event_output,android_local_weather,android_phone_acceleration,android_phone_battery_level,android_phone_bluetooth_devices,android_phone_call,android_phone_contacts,android_phone_gyroscope,android_phone_light,android_phone_magnetic_field,android_phone_relative_location,android_phone_sms,android_phone_sms_unread,android_phone_step_count,android_phone_usage_event,android_phone_user_interaction,android_processed_audio,application_device_info,application_external_time,application_record_counts,application_server_status,application_time_zone,application_uptime,certh_banking_app_event,certh_banking_app_transaction,connect_fitbit_activity_log,connect_fitbit_intraday_calories,connect_fitbit_intraday_heart_rate,connect_fitbit_intraday_steps,connect_fitbit_sleep_classic,connect_fitbit_sleep_stages,connect_fitbit_time_zone,connect_upload_altoida_acceleration,connect_upload_altoida_action,connect_upload_altoida_attitude,connect_upload_altoida_bit_metrics,connect_upload_altoida_blink,connect_upload_altoida_diagnostics,connect_upload_altoida_domain_result,connect_upload_altoida_dot_metrics,connect_upload_altoida_eye_tracking,connect_upload_altoida_gravity,connect_upload_altoida_magnetic_field,connect_upload_altoida_metadata,connect_upload_altoida_object,connect_upload_altoida_path,connect_upload_altoida_rotation,connect_upload_altoida_summary,connect_upload_altoida_tap,connect_upload_altoida_touch,connect_upload_axivity_acceleration,connect_upload_axivity_battery_level,connect_upload_axivity_event,connect_upload_axivity_light,connect_upload_axivity_metadata,connect_upload_axivity_temperature,connect_upload_oxford_camera_data,connect_upload_oxford_camera_image,connect_upload_physilog_binary_data
 
 s3_proxy:
   _install: false
@@ -424,6 +417,28 @@ radar_push_endpoint:
   adminProperties: {}
   garmin:
     enabled: true
+
+# --------------------------------------------------------- 40-realtime-analyses.yaml ---------------------------------------------------------
+
+radar_jdbc_connector_agg:
+  _install: false
+  _chart_version: 0.4.0
+  replicaCount: 1
+
+ksql_server:
+  _install: false
+  _chart_version: 0.3.1
+  replicaCount: 1
+  servicePort: 8088
+  kafka:
+    bootstrapServers: PLAINTEXT://cp-kafka:9092
+  cp-schema-registry: 
+    url: http://cp-schema-registry:8081
+  ksql:
+    headless: false
+  configurationOverrides:
+    "ksql.server.url": "http://0.0.0.0:8088"
+    "ksql.advertised.listener": "http://ksql-server:8088"
 
 # --------------------------------------------------------- 99-velero.yaml ---------------------------------------------------------
 

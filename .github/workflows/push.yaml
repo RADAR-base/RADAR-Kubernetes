@@ -23,7 +23,7 @@ jobs:
         ls -la ./
         /usr/local/bin/k3s-uninstall.sh
 
-    - uses: actions/checkout@v1.0.0
+    - uses: actions/checkout@v3
 
     - name: Install dependencies
       env:
@@ -82,3 +82,20 @@ jobs:
       if: always()
       run: |
         kubectl get pods --all-namespaces
+
+  check-gitignore:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Check gitignore
+      run: |
+        echo "Checking whether any files that should be ignored are uploaded"
+        echo
+        if find . -not -path './.git/*' -type f | git check-ignore --stdin --no-index; then
+          echo
+          echo "Remove the above files from this branch"
+          exit 1
+        else
+          echo "No ignored files have been added"
+        fi

@@ -81,3 +81,33 @@ releases:
       - name: schema_registry
         value: {{ .Values.confluent_cloud.cc.schemaRegistryUrl }}
       {{ end }}
+
+  - name: radar-home
+    chart: radar/radar-home
+    version: {{ .Values.radar_home._chart_version }}
+    installed: {{ .Values.radar_home._install }}
+    values:
+      - {{ .Values.radar_home | toYaml | indent 8 | trim }}
+    set:
+      - name: ingress.hosts
+        values: [ {{ .Values.server_name }} ]
+      - name: s3.enabled
+        value: {{ dig "s3" "enabled" .Values.minio._install .Values.radar_home }}
+      - name: s3.url
+        value: {{ dig "s3" "url" (printf "https://s3.%s/login" .Values.server_name) .Values.radar_home }}
+      - name: dashboard.enabled
+        value: {{ dig "dashboard" "enabled" .Values.radar_grafana._install .Values.radar_home }}
+      - name: dashboard.url
+        value: {{ dig "dashboard" "url" (printf "https://dashboard.%s/" .Values.server_name) .Values.radar_home }}
+      - name: uploadPortal.enabled
+        value: {{ dig "uploadPortal" "enabled" .Values.radar_upload_connect_frontend._install .Values.radar_home }}
+      - name: restAuthorizer.enabled
+        value: {{ dig "restAuthorizer" "enabled" .Values.radar_rest_sources_authorizer._install .Values.radar_home }}
+      - name: monitoring.enabled
+        value: {{ dig "monitoring" "enabled" .Values.kube_prometheus_stack._install .Values.radar_home }}
+      - name: monitoring.url
+        value: {{ dig "monitoring" "url" (printf "https://grafana.%s/login" .Values.server_name) .Values.radar_home }}
+      - name: logging.enabled
+        value: {{ dig "logging" "enabled" .Values.graylog._install .Values.radar_home }}
+      - name: logging.url
+        value: {{ dig "logging" "url" (printf "https://graylog.%s/" .Values.server_name) .Values.radar_home }}
