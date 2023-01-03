@@ -165,7 +165,11 @@ postgresql:
 management_portal:
   _install: true
   _chart_version: 0.2.5
+  _timeout: 300
   replicaCount: 1  # should be 1
+  resources:
+    memory:
+      requests: 1700Mi
   postgres:
     host: postgresql
     ssl:
