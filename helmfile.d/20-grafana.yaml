@@ -70,7 +70,7 @@ releases:
     set:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
-      - name: jdbc.username
+      - name: jdbc.user
         value: {{ .Values.timescaledb_username }}
       - name: jdbc.password
         value: {{ .Values.timescaledb_password }}
