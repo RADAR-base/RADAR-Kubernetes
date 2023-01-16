@@ -7,13 +7,13 @@ on:
     - cron: '0 6 * * 1'
 
 env:
-  K8S_TARGET_VERSION: "v1.25.0"
+  K8S_TARGET_VERSION: "v1.26.0"
 
 jobs:
   check-compatibility:
     strategy:
       matrix:
-        kubeVersion: ["v1.23.0", "v1.24.0", "v1.25.0"]
+        kubeVersion: ["v1.23.0", "v1.24.0", "v1.25.0", "v1.26.0"]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
