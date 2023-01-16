@@ -298,7 +298,7 @@ radar_backend_monitor:
   _chart_version: 0.1.2
   replicaCount: 1
   smtp:
-    host: gmail.com
+    host: smtp.google.com
     port: 25
     user: user@gmail.com
   persistence:

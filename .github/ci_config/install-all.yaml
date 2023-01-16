@@ -5,6 +5,10 @@ mongodb:
 
 elasticsearch:
   _install: true
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "500Mi"
 
 graylog:
   _install: true
@@ -49,7 +53,7 @@ postgresql:
   primary:
     resources:
       requests:
-        cpu: 50Mi
+        cpu: 50m
     persistence:
       size: 1Gi
 
@@ -70,7 +74,7 @@ radar_appserver_postgresql:
   primary:
     resources:
       requests:
-        cpu: 50Mi  
+        cpu: 50m  
     persistence:
       size: 1Gi
 
@@ -91,7 +95,7 @@ timescaledb:
   primary:
     resources:
       requests:
-        cpu: 50Mi  
+        cpu: 50m
     persistence:
       size: 1Gi
 
@@ -135,7 +139,7 @@ radar_upload_postgresql:
   primary:
     resources:
       requests:
-        cpu: 50Mi  
+        cpu: 50m
     persistence:
       size: 1Gi
 
