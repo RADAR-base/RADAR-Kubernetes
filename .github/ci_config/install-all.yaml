@@ -46,10 +46,10 @@ catalog_server:
 
 postgresql:
   _install: true
-  resources:
-    requests:
-      cpu: 50Mi  
   primary:
+    resources:
+      requests:
+        cpu: 50Mi
     persistence:
       size: 1Gi
 
@@ -67,10 +67,10 @@ app_config_frontend:
 
 radar_appserver_postgresql:
   _install: true
-  resources:
-    requests:
-      cpu: 50Mi  
   primary:
+    resources:
+      requests:
+        cpu: 50Mi  
     persistence:
       size: 1Gi
 
@@ -88,10 +88,10 @@ radar_rest_sources_backend:
 
 timescaledb:
   _install: true
-  resources:
-    requests:
-      cpu: 50Mi  
   primary:
+    resources:
+      requests:
+        cpu: 50Mi  
     persistence:
       size: 1Gi
 
@@ -132,10 +132,10 @@ radar_output:
 
 radar_upload_postgresql:
   _install: true
-  resources:
-    requests:
-      cpu: 50Mi  
   primary:
+    resources:
+      requests:
+        cpu: 50Mi  
     persistence:
       size: 1Gi
 
