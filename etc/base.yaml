@@ -297,6 +297,10 @@ radar_backend_monitor:
   _install: false
   _chart_version: 0.1.2
   replicaCount: 1
+  smtp:
+    host: gmail.com
+    port: 25
+    user: user@gmail.com
   persistence:
     size: 1Gi
 
