@@ -58,10 +58,11 @@ jobs:
       run: |
         helmfile template
 
-    - run: kubectl krew install deprecations
-
-    - name: Check updates
-      run: helmfile template | kubepug --error-on-deprecated --error-on-deleted --input-file /dev/stdin' --k8s-version ${{ matrix.KUBECTL_VERSION }}
+    - name: Check deprecations
+      env:
+        FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
+      run: |
+        helmfile template | kubectl deprecations --error-on-deprecated --error-on-deleted --input-file /dev/stdin' --k8s-version ${{ matrix.KUBECTL_VERSION }}
 
     - name: Install K3S
       env:
