@@ -20,21 +20,19 @@ echo "$(cat kubectl.sha256) kubectl" | sha256sum --check
 sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 kubectl version --client --output=yaml
 
-if [ -n "${KREW_VERSION}" ]; then
-  KREW_VERSION=${KREW_VERSION}
-else
-  KREW_VERSION=$(curl -Ls "https://github.com/kubernetes-sigs/krew/releases" | grep 'href="/kubernetes-sigs/krew/releases/tag/v[0-9]*.[0-9]*.[0-9]\"' | sed -E 's/.*\/kubernetes-sigs\/krew\/releases\/tag\/(v[0-9\.]+)".*/\1/g' | head -1)
-fi
-KREW="krew-${OS}_${ARCH}"
-curl -LO "https://github.com/kubernetes-sigs/krew/releases/download/$KREW_VERSION/$KREW.tar.gz"
-curl -LO "https://github.com/kubernetes-sigs/krew/releases/download/$KREW_VERSION/$KREW.tar.gz.sha256"
-echo "$(cat $KREW.tar.gz.sha256) $KREW.tar.gz" | sha256sum --check
-tar zxvf "${KREW}.tar.gz"
-./"${KREW}" install krew
-export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
-kubectl krew version
-kubectl krew install deprecations
-kubectl deprecations version --json
+# if [ -n "${KREW_VERSION}" ]; then
+#   KREW_VERSION=${KREW_VERSION}
+# else
+#   KREW_VERSION=$(curl -Ls "https://github.com/kubernetes-sigs/krew/releases" | grep 'href="/kubernetes-sigs/krew/releases/tag/v[0-9]*.[0-9]*.[0-9]\"' | sed -E 's/.*\/kubernetes-sigs\/krew\/releases\/tag\/(v[0-9\.]+)".*/\1/g' | head -1)
+# fi
+# KREW="krew-${OS}_${ARCH}"
+# curl -LO "https://github.com/kubernetes-sigs/krew/releases/download/$KREW_VERSION/$KREW.tar.gz"
+# curl -LO "https://github.com/kubernetes-sigs/krew/releases/download/$KREW_VERSION/$KREW.tar.gz.sha256"
+# echo "$(cat $KREW.tar.gz.sha256) $KREW.tar.gz" | sha256sum --check
+# tar zxvf "${KREW}.tar.gz"
+# ./"${KREW}" install krew
+# export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+# kubectl krew version
 
 if [ -n "${HELM_VERSION}" ]; then
   HELM_VERSION=${HELM_VERSION}
