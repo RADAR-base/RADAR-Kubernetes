@@ -1,4 +1,4 @@
-name: CI
+name: Install applications on Kubernets
 
 on:
   push:
@@ -11,7 +11,19 @@ on:
         default: false
 
 jobs:
-  build:
+  install:
+    strategy:
+      matrix:
+        KUBECTL_VERSION: ["v1.23.0", "v1.24.0", "v1.25.0", "v1.26.0"]
+        include:
+          - KUBECTL_VERSION: "v1.23.0"
+            K3S_VERSION: "v1.23.15+k3s1"
+          - KUBECTL_VERSION: "v1.24.0"
+            K3S_VERSION: "v1.24.9+k3s2"
+          - KUBECTL_VERSION: "v1.25.0"
+            K3S_VERSION: "v1.25.5+k3s2"
+          - KUBECTL_VERSION: "v1.26.0"
+            K3S_VERSION: "v1.26.0+k3s2"
     runs-on: self-hosted
     steps:
     - name: Cleanup
@@ -27,7 +39,7 @@ jobs:
 
     - name: Install dependencies
       env:
-        KUBECTL_VERSION: "v1.26.0"
+        KUBECTL_VERSION: ${{ matrix.KUBECTL_VERSION }}
         HELM_VERSION: "v3.10.2"
         HELM_DIFF_VERSION: "3.4.2"
         HELMFILE_VERSION: "v0.148.1"
@@ -48,7 +60,7 @@ jobs:
 
     - name: Install K3S
       env:
-        INSTALL_K3S_VERSION: "v1.26.0+k3s2"
+        INSTALL_K3S_VERSION: ${{ matrix.K3S_VERSION }}
         INSTALL_K3S_SYMLINK: "skip"
         K3S_KUBECONFIG_MODE: "644"
       run: |
@@ -99,3 +111,26 @@ jobs:
         else
           echo "No ignored files have been added"
         fi
+
+  check-compatibility:
+    strategy:
+      matrix:
+        kubeVersion: ["v1.23.0", "v1.24.0", "v1.25.0", "v1.26.0"]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: setup-helmfile
+        uses: mamezou-tech/setup-helmfile@v1.2.0
+        with:
+          install-helm-plugins: yes
+          install-kubectl: yes
+
+      - name: Set up helmfile config
+        run: cp .github/environments.yaml environments.yaml
+
+      - run: kubectl krew install deprecations
+
+      - name: Check updates
+        run: helmfile template | kubepug --error-on-deprecated --error-on-deleted --input-file /dev/stdin' --k8s-version ${{ matrix.kubeVersion }}
