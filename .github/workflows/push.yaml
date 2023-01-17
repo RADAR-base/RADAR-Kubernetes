@@ -62,6 +62,7 @@ jobs:
       env:
         FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
       run: |
+        export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
         helmfile template | kubectl deprecations --error-on-deprecated --error-on-deleted --input-file /dev/stdin' --k8s-version ${{ matrix.KUBECTL_VERSION }}
 
     - name: Install K3S
