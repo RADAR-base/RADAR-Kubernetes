@@ -52,19 +52,6 @@ jobs:
         DNAME='CN=CI,O=TheHyve,L=Utrecht,C=NL' ./bin/init
         yq -i -f process '.environments.default.values += ["../.github/ci_config/install-all.yaml", "../.github/ci_config/secrets.yaml.gotmpl"]' environments.yaml
 
-    - name: Run helmfile template
-      env:
-        FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
-      run: |
-        helmfile template
-
-    - name: Check deprecations
-      env:
-        FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
-      run: |
-        export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
-        helmfile template | kubectl deprecations --error-on-deprecated --error-on-deleted --input-file /dev/stdin --k8s-version ${{ matrix.KUBECTL_VERSION }}
-
     - name: Install K3S
       env:
         INSTALL_K3S_VERSION: ${{ matrix.K3S_VERSION }}
@@ -73,6 +60,19 @@ jobs:
       run: |
         curl -sfL https://get.k3s.io | sh -s - --disable traefik --disable-helm-controller
         cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+
+    - name: Run helmfile template
+      env:
+        FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
+      run: |
+        helmfile template --validate
+
+    - name: Check deprecations
+      env:
+        FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
+      run: |
+        export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+        helmfile template --validate | kubectl deprecations --error-on-deprecated --error-on-deleted --input-file /dev/stdin --k8s-version ${{ matrix.KUBECTL_VERSION }}
 
     - name: Install RADAR-Kubernetes
       env:
