@@ -111,12 +111,14 @@ confluent_cloud:
 cp_zookeeper:
   _install: true
   _chart_version: 0.3.3
+  _timeout: 600
   imageTag: 7.2.2
   servers: 3
 
 cp_kafka:
   _install: true
   _chart_version: 0.3.2
+  _timeout: 600
   imageTag: 7.2.2
   customEnv:
     # Set this to 1.1 when upgrading from Kafka 5.x
@@ -167,9 +169,6 @@ management_portal:
   _chart_version: 0.2.5
   _timeout: 300
   replicaCount: 1  # should be 1
-  resources:
-    memory:
-      requests: 1700Mi
   postgres:
     host: postgresql
     ssl:
@@ -328,6 +327,7 @@ redis:
 minio:
   _install: true
   _chart_version: 11.9.1
+  _timeout: 300
   image:
     tag: 2022.10.15-debian-11-r0
   persistence:

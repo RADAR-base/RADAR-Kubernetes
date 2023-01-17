@@ -7,11 +7,12 @@ bases:
 
 releases:
   - name: velero
-    chart: radar/velero-s3-deployment
     namespace: velero
+    chart: radar/velero-s3-deployment
     version: {{ .Values.velero._chart_version }}
     installed: {{ .Values.velero._install }}
-    <<: *logFailedRelease    
+    timeout: {{ dig "_timeout" .Values.timeout .Values.velero }}
+    <<: *logFailedRelease
     values:
       - {{ .Values.velero | toYaml | indent 8 | trim }}
     set:

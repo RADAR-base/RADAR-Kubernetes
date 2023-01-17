@@ -59,6 +59,7 @@ releases:
     chart: radar/app-config
     version: {{ .Values.app_config._chart_version }}
     installed: {{ .Values.app_config._install }}
+    timeout: {{ dig "_timeout" .Values.timeout .Values.app_config }}
     <<: *logFailedRelease
     values:
       - {{ .Values.app_config | toYaml | indent 8 | trim }}
@@ -72,6 +73,7 @@ releases:
     chart: radar/app-config-frontend
     version: {{ .Values.app_config_frontend._chart_version }}
     installed: {{ .Values.app_config_frontend._install }}
+    timeout: {{ dig "_timeout" .Values.timeout .Values.app_config_frontend }}
     <<: *logFailedRelease
     values:
       - {{ .Values.app_config_frontend | toYaml | indent 8 | trim }}

@@ -10,6 +10,7 @@ releases:
     chart: radar/cc-schema-registry-proxy
     version: {{ .Values.ccSchemaRegistryProxy._chart_version }}
     installed: {{ .Values.ccSchemaRegistryProxy._install }}
+    timeout: {{ dig "_timeout" .Values.timeout .Values.ccSchemaRegistryProxy }}
     <<: *logFailedRelease    
     values:
       - {{ .Values.ccSchemaRegistryProxy | toYaml | indent 8 | trim }}

@@ -10,6 +10,7 @@ releases:
     chart: radar/radar-backend
     version: {{ .Values.radar_backend_monitor._chart_version }}
     installed: {{ .Values.radar_backend_monitor._install }}
+    timeout: {{ dig "_timeout" .Values.timeout .Values.radar_backend_monitor }}
     <<: *logFailedRelease
     values:
       - "../etc/radar-backend-monitor/values.yaml"
@@ -22,6 +23,7 @@ releases:
     chart: radar/radar-backend
     version: {{ .Values.radar_backend_monitor._chart_version }}
     installed: {{ .Values.radar_backend_stream._install }}
+    timeout: {{ dig "_timeout" .Values.timeout .Values.radar_backend_stream }}
     <<: *logFailedRelease    
     values:
       - "../etc/radar-backend-stream/values.yaml"

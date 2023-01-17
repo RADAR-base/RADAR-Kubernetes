@@ -32,6 +32,7 @@ releases:
     chart: radar/grafana
     version: {{ .Values.radar_grafana._chart_version }}
     installed: {{ .Values.radar_grafana._install }}
+    timeout: {{ dig "_timeout" .Values.timeout .Values.radar_grafana }}
     <<: *logFailedRelease
     values:
       - "../etc/radar-grafana/values.yaml"
@@ -64,6 +65,7 @@ releases:
     chart: radar/radar-jdbc-connector
     version: {{ .Values.radar_jdbc_connector._chart_version }}
     installed: {{ .Values.radar_jdbc_connector._install }}
+    timeout: {{ dig "_timeout" .Values.timeout .Values.radar_jdbc_connector }}
     <<: *logFailedRelease    
     values:
       - {{ .Values.radar_jdbc_connector | toYaml | indent 8 | trim }}

@@ -9,8 +9,8 @@ releases:
   - name: radar-upload-postgresql
     chart: radar/postgresql
     version: {{ .Values.radar_upload_postgresql._chart_version }}
-    wait: false
     installed: {{ .Values.radar_upload_postgresql._install }}
+    timeout: {{ dig "_timeout" .Values.timeout .Values.radar_upload_postgresql }}
     <<: *logFailedRelease
     values:
       - "../etc/radar-upload-postgresql/values.yaml"
@@ -25,6 +25,7 @@ releases:
     chart: radar/radar-upload-connect-backend
     version: {{ .Values.radar_upload_connect_backend._chart_version }}
     installed: {{ .Values.radar_upload_connect_backend._install }}
+    timeout: {{ dig "_timeout" .Values.timeout .Values.radar_upload_connect_backend }}
     <<: *logFailedRelease
     values:
       - {{ .Values.radar_upload_connect_backend | toYaml | indent 8 | trim }}
@@ -42,6 +43,7 @@ releases:
     chart: radar/radar-upload-connect-frontend
     version: {{ .Values.radar_upload_connect_frontend._chart_version }}
     installed: {{ .Values.radar_upload_connect_frontend._install }}
+    timeout: {{ dig "_timeout" .Values.timeout .Values.radar_upload_connect_frontend }}
     <<: *logFailedRelease
     values:
       - {{ .Values.radar_upload_connect_frontend | toYaml | indent 8 | trim }}
@@ -55,6 +57,7 @@ releases:
     chart: radar/radar-upload-source-connector
     version: {{ .Values.radar_upload_source_connector._chart_version }}
     installed: {{ .Values.radar_upload_source_connector._install }}
+    timeout: {{ dig "_timeout" .Values.timeout .Values.radar_upload_source_connector }}
     <<: *logFailedRelease    
     values:
       - {{ .Values.radar_upload_source_connector | toYaml | indent 8 | trim }}

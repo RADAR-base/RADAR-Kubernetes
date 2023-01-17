@@ -10,6 +10,7 @@ releases:
     chart: radar/radar-integration
     version: {{ .Values.radar_integration._chart_version }}
     installed: {{ .Values.radar_integration._install }}
+    timeout: {{ dig "_timeout" .Values.timeout .Values.radar_integration }}
     <<: *logFailedRelease    
     values:
       - {{ .Values.radar_integration | toYaml | indent 8 | trim }}
