@@ -59,7 +59,7 @@ if [ -n "${HELMFILE_VERSION}" ]; then
 else
   HELMFILE_VERSION=$(curl -Ls "https://github.com/helmfile/helmfile/releases" | \grep 'href="/helmfile/helmfile/releases/tag/v[0-9]*.[0-9]*.[0-9]*\"' | sed -E 's/.*\/helmfile\/helmfile\/releases\/tag\/(v[0-9\.]+)".*/\1/g' | head -1)
 fi
-curl -fsSL -o helmfile.tar.gz "https://github.com/helmfile/helmfile/releases/download/$HELMFILE_VERSION/helmfile_$(echo -n $HELMFILE_VERSION | cut -c 2-)_$OS_$ARCH.tar.gz"
+curl -fsSL -o helmfile.tar.gz "https://github.com/helmfile/helmfile/releases/download/$HELMFILE_VERSION/helmfile_$(echo -n $HELMFILE_VERSION | cut -c 2-)_${OS}_${ARCH}.tar.gz"
 tar xzf helmfile.tar.gz
 sudo install -o root -g root -m 0755 helmfile /usr/local/bin/helmfile
 helmfile --version
@@ -69,7 +69,7 @@ if [ -n "${YQ_VERSION}" ]; then
 else
   YQ_VERSION=$(curl -Ls "https://github.com/mikefarah/yq/releases" | \grep 'href="/mikefarah/yq/releases/tag/v[0-9]*.[0-9]*.[0-9]*\"' | sed -E 's/.*\/mikefarah\/yq\/releases\/tag\/(v[0-9\.]+)".*/\1/g' | head -1)
 fi
-curl -fsSL -o yq "https://github.com/mikefarah/yq/releases/download/$YQ_VERSION/yq_$OS_$ARCH"
+curl -fsSL -o yq "https://github.com/mikefarah/yq/releases/download/$YQ_VERSION/yq_${OS}_${ARCH}"
 sudo install -o root -g root -m 0755 yq /usr/local/bin/yq
 yq --version
 
