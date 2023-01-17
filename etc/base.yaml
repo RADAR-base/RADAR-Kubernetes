@@ -23,10 +23,12 @@ mongodb:
 # Needed for graylog. If graylog is set not to install, this can be disabled as well.
 elasticsearch:
   _install: true
+  _timeout: 240
   _chart_version: 7.17.3
 
 graylog:
   _install: true
+  _timeout: 240
   _chart_version: 2.1.2
 
 # Needed for graylog. If graylog is set not to install, this can be disabled as well.
