@@ -58,6 +58,11 @@ jobs:
       run: |
         helmfile template
 
+    - run: kubectl krew install deprecations
+
+    - name: Check updates
+      run: helmfile template | kubepug --error-on-deprecated --error-on-deleted --input-file /dev/stdin' --k8s-version ${{ matrix.KUBECTL_VERSION }}
+
     - name: Install K3S
       env:
         INSTALL_K3S_VERSION: ${{ matrix.K3S_VERSION }}
@@ -111,26 +116,3 @@ jobs:
         else
           echo "No ignored files have been added"
         fi
-
-  check-compatibility:
-    strategy:
-      matrix:
-        kubeVersion: ["v1.23.0", "v1.24.0", "v1.25.0", "v1.26.0"]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: setup-helmfile
-        uses: mamezou-tech/setup-helmfile@v1.2.0
-        with:
-          install-helm-plugins: yes
-          install-kubectl: yes
-
-      - name: Set up helmfile config
-        run: cp .github/environments.yaml environments.yaml
-
-      - run: kubectl krew install deprecations
-
-      - name: Check updates
-        run: helmfile template | kubepug --error-on-deprecated --error-on-deleted --input-file /dev/stdin' --k8s-version ${{ matrix.kubeVersion }}
