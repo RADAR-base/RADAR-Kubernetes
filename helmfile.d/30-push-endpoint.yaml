@@ -10,6 +10,7 @@ releases:
     chart: radar/radar-push-endpoint
     version: {{ .Values.radar_push_endpoint._chart_version }}
     installed: {{ .Values.radar_push_endpoint._install }}
+    timeout: {{ dig "_timeout" .Values.timeout .Values.radar_push_endpoint }}
     <<: *logFailedRelease    
     values:
       - {{ .Values.radar_push_endpoint | toYaml | indent 8 | trim }}

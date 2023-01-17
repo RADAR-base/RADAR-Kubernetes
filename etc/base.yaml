@@ -422,6 +422,7 @@ ccSchemaRegistryProxy:
 radar_push_endpoint:
   _install: false
   _chart_version: 0.1.4
+  _timeout: 240
   replicaCount: 1
   adminProperties: {}
   garmin:
