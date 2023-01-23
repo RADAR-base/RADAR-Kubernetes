@@ -10,7 +10,7 @@ releases:
     chart: radar/postgresql
     version: {{ .Values.radar_appserver_postgresql._chart_version }}
     installed: {{ .Values.radar_appserver_postgresql._install }}
-    timeout: {{ dig "_timeout" .Values.timeout .Values.radar_appserver_postgresql }}
+    timeout: {{ add .Values.base_timeout .Values.radar_appserver_postgresql._extra_timeout }}
     <<: *logFailedRelease
     values:
       - "../etc/radar-appserver-postgresql/values.yaml"
@@ -20,7 +20,7 @@ releases:
     chart: radar/radar-appserver
     version: {{ .Values.radar_appserver._chart_version }}
     installed: {{ .Values.radar_appserver._install }}
-    timeout: {{ dig "_timeout" .Values.timeout .Values.radar_appserver }}
+    timeout: {{ add .Values.base_timeout .Values.radar_appserver._extra_timeout }}
     <<: *logFailedRelease    
     needs:
     - radar-appserver-postgresql

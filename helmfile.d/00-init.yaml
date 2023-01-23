@@ -11,7 +11,7 @@ releases:
     chart: radar/mongodb
     version: {{ .Values.mongodb._chart_version }}
     installed: {{ .Values.mongodb._install }}
-    timeout: {{ dig "_timeout" .Values.timeout .Values.mongodb }}
+    timeout: {{ add .Values.base_timeout .Values.mongodb._extra_timeout }}
     <<: *logFailedRelease
     values:
       - "../etc/mongodb/values.yaml"
@@ -22,7 +22,7 @@ releases:
     chart: radar/elasticsearch
     version: {{ .Values.elasticsearch._chart_version }}
     installed: {{ .Values.elasticsearch._install }}
-    timeout: {{ dig "_timeout" .Values.timeout .Values.elasticsearch }}
+    timeout: {{ add .Values.base_timeout .Values.elasticsearch._extra_timeout }}
     <<: *logFailedRelease
     values:
       - "../etc/elasticsearch/values.yaml"
@@ -33,7 +33,7 @@ releases:
     chart: radar/graylog
     version: {{ .Values.graylog._chart_version }}
     installed: {{ .Values.graylog._install }}
-    timeout: {{ dig "_timeout" .Values.timeout .Values.graylog }}
+    timeout: {{ add .Values.base_timeout .Values.graylog._extra_timeout }}
     <<: *logFailedRelease
     values:
       - "../etc/graylog/values.yaml"
@@ -55,7 +55,7 @@ releases:
     chart: radar/fluent-bit
     version: {{ .Values.fluent_bit._chart_version }}
     installed: {{ .Values.fluent_bit._install }}
-    timeout: {{ dig "_timeout" .Values.timeout .Values.fluent_bit }}
+    timeout: {{ add .Values.base_timeout .Values.fluent_bit._extra_timeout }}
     <<: *logFailedRelease
     values:
       - "../etc/fluent-bit/values.yaml"
@@ -69,7 +69,7 @@ releases:
     chart: radar/kube-prometheus-stack
     version: {{ .Values.kube_prometheus_stack._chart_version }}
     installed: {{ .Values.kube_prometheus_stack._install }}
-    timeout: {{ dig "_timeout" .Values.timeout .Values.kube_prometheus_stack }}
+    timeout: {{ add .Values.base_timeout .Values.kube_prometheus_stack._extra_timeout }}
     disableValidation: true
     <<: *logFailedRelease
     values:
@@ -108,7 +108,7 @@ releases:
     chart: radar/cert-manager
     version: {{ .Values.cert_manager._chart_version }}
     installed: {{ .Values.cert_manager._install }}
-    timeout: {{ dig "_timeout" .Values.timeout .Values.cert_manager }}
+    timeout: {{ add .Values.base_timeout .Values.cert_manager._extra_timeout }}
     disableValidation: true
     <<: *logFailedRelease
     values:
@@ -123,7 +123,7 @@ releases:
     chart: radar/ingress-nginx
     version: {{ .Values.nginx_ingress._chart_version }}
     installed: {{ .Values.nginx_ingress._install }}
-    timeout: {{ dig "_timeout" .Values.timeout .Values.nginx_ingress }}
+    timeout: {{ add .Values.base_timeout .Values.nginx_ingress._extra_timeout }}
     disableValidation: true
     <<: *logFailedRelease
     values:
@@ -134,7 +134,7 @@ releases:
     chart: radar/kafka-manager
     version: {{ .Values.kafka_manager._chart_version }}
     installed: {{ .Values.kafka_manager._install }}
-    timeout: {{ dig "_timeout" .Values.timeout .Values.kafka_manager }}
+    timeout: {{ add .Values.base_timeout .Values.kafka_manager._extra_timeout }}
     <<: *logFailedRelease
     values:
       - {{ .Values.kafka_manager | toYaml | indent 8 | trim }}

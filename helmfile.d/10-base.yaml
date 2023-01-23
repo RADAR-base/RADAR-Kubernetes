@@ -11,7 +11,7 @@ releases:
     chart: radar/cert-manager-letsencrypt
     version: {{ .Values.cert_manager_letsencrypt._chart_version }}
     installed: {{ .Values.cert_manager_letsencrypt._install }}
-    timeout: {{ dig "_timeout" .Values.timeout .Values.cert_manager_letsencrypt }}
+    timeout: {{ add .Values.base_timeout .Values.cert_manager_letsencrypt._extra_timeout }}
     <<: *logFailedRelease
     set:
       - name: maintainerEmail
@@ -21,7 +21,7 @@ releases:
     chart: cp-radar/cp-zookeeper
     version: {{ .Values.cp_zookeeper._chart_version }}
     installed: {{ .Values.cp_zookeeper._install }}
-    timeout: {{ dig "_timeout" .Values.timeout .Values.cp_zookeeper }}
+    timeout: {{ add .Values.base_timeout .Values.cp_zookeeper._extra_timeout }}
     wait: true
     <<: *logFailedRelease
     values:
@@ -32,7 +32,7 @@ releases:
     chart: cp-radar/cp-kafka
     version: {{ .Values.cp_kafka._chart_version }}
     installed: {{ .Values.cp_kafka._install }}
-    timeout: {{ dig "_timeout" .Values.timeout .Values.cp_kafka }}
+    timeout: {{ add .Values.base_timeout .Values.cp_kafka._extra_timeout }}
     wait: true
     <<: *logFailedRelease
     values:
@@ -46,7 +46,7 @@ releases:
     chart: cp-radar/cp-schema-registry
     version: {{ .Values.cp_schema_registry._chart_version }}
     installed: {{ .Values.cp_schema_registry._install }}
-    timeout: {{ dig "_timeout" .Values.timeout .Values.cp_schema_registry }}
+    timeout: {{ add .Values.base_timeout .Values.cp_schema_registry._extra_timeout }}
     wait: true
     <<: *logFailedRelease
     values:
@@ -66,7 +66,7 @@ releases:
     chart: radar/catalog-server
     version: {{ .Values.catalog_server._chart_version }}
     installed: {{ .Values.catalog_server._install }}
-    timeout: {{ dig "_timeout" .Values.timeout .Values.catalog_server }}
+    timeout: {{ add .Values.base_timeout .Values.catalog_server._extra_timeout }}
     wait: true
     <<: *logFailedRelease
     values:
@@ -86,7 +86,7 @@ releases:
     chart: radar/radar-home
     version: {{ .Values.radar_home._chart_version }}
     installed: {{ .Values.radar_home._install }}
-    timeout: {{ dig "_timeout" .Values.timeout .Values.radar_home }}
+    timeout: {{ add .Values.base_timeout .Values.radar_home._extra_timeout }}
     <<: *logFailedRelease
     values:
       - {{ .Values.radar_home | toYaml | indent 8 | trim }}

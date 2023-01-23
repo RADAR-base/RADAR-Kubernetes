@@ -10,7 +10,7 @@ releases:
     chart: radar/postgresql
     version: {{ .Values.postgresql._chart_version }}
     installed: {{ .Values.postgresql._install }}
-    timeout: {{ dig "_timeout" .Values.timeout .Values.postgresql }}
+    timeout: {{ add .Values.base_timeout .Values.postgresql._extra_timeout }}
     <<: *logFailedRelease
     values:
       - "../etc/postgresql/values.yaml"
@@ -20,7 +20,7 @@ releases:
     chart: radar/management-portal
     version: {{ .Values.management_portal._chart_version }}
     installed: {{ .Values.management_portal._install }}
-    timeout: {{ dig "_timeout" .Values.timeout .Values.management_portal }}
+    timeout: {{ add .Values.base_timeout .Values.management_portal._extra_timeout }}
     <<: *logFailedRelease
     values:
       - {{ .Values.management_portal | toYaml | indent 8 | trim }}
@@ -59,7 +59,7 @@ releases:
     chart: radar/app-config
     version: {{ .Values.app_config._chart_version }}
     installed: {{ .Values.app_config._install }}
-    timeout: {{ dig "_timeout" .Values.timeout .Values.app_config }}
+    timeout: {{ add .Values.base_timeout .Values.app_config._extra_timeout }}
     <<: *logFailedRelease
     values:
       - {{ .Values.app_config | toYaml | indent 8 | trim }}
@@ -73,7 +73,7 @@ releases:
     chart: radar/app-config-frontend
     version: {{ .Values.app_config_frontend._chart_version }}
     installed: {{ .Values.app_config_frontend._install }}
-    timeout: {{ dig "_timeout" .Values.timeout .Values.app_config_frontend }}
+    timeout: {{ add .Values.base_timeout .Values.app_config_frontend._extra_timeout }}
     <<: *logFailedRelease
     values:
       - {{ .Values.app_config_frontend | toYaml | indent 8 | trim }}

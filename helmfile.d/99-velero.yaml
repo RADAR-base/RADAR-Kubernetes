@@ -11,7 +11,7 @@ releases:
     chart: radar/velero-s3-deployment
     version: {{ .Values.velero._chart_version }}
     installed: {{ .Values.velero._install }}
-    timeout: {{ dig "_timeout" .Values.timeout .Values.velero }}
+    timeout: {{ add .Values.base_timeout .Values.velero._extra_timeout }}
     <<: *logFailedRelease
     values:
       - {{ .Values.velero | toYaml | indent 8 | trim }}
