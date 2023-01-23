@@ -155,5 +155,11 @@ ccSchemaRegistryProxy:
 radar_push_endpoint:
   _install: true
 
+radar_jdbc_connector_agg:
+  _install: true
+
+ksql_server:
+  _install: true
+
 velero:
   _install: true
