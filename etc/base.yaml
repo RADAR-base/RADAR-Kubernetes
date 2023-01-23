@@ -135,12 +135,14 @@ cp_kafka:
 cp_schema_registry:
   _install: true
   _chart_version: 0.3.0
+  _timeout: 180
   imageTag: 7.2.2
   replicaCount: 1
 
 catalog_server:
   _install: true
   _chart_version: 0.4.3
+  _timeout: 180
   replicaCount: 1
   schema_registry: http://cp-schema-registry:8081
 
