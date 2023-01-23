@@ -2,7 +2,6 @@
 atomicInstall: true
 # time to wait for any individual Kubernetes operation
 base_timeout: 90
-timeout: 90
 # Context that you use in kubectl to access the Kubernetes cluster. Will be translated to `helm --kube-context <context_name>`
 kubeContext: default
 # Domain name that RADAR-Base installation will be acessible from
@@ -18,7 +17,7 @@ kafka_num_brokers: 3
 mongodb:
   _install: true
   _chart_version: 11.1.10
-  _extra_timeout: 0
+  _extra_timeout: 60
   # Use standalone for a leaner installation, replicaset for a distributed one.
   architecture: replicaset
 
