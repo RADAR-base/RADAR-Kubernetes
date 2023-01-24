@@ -3,20 +3,15 @@ bases:
 
 ---
 
-helmDefaults:
-  atomic: true
-  timeout: 600
-  kubeContext: {{ .Values.kubeContext }}
-
-repositories:
-  - name: radar
-    url: https://radar-base.github.io/radar-helm-charts
+{{ readFile "../etc/helmfile-templates.yaml" }}
 
 releases:
   - name: radar-fitbit-connector
     chart: radar/radar-fitbit-connector
     version: {{ .Values.radar_fitbit_connector._chart_version }}
     installed: {{ .Values.radar_fitbit_connector._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_fitbit_connector._extra_timeout }}
+    <<: *logFailedRelease
     values:
       - {{ .Values.radar_fitbit_connector | toYaml | indent 8 | trim }}
     set:
@@ -37,6 +32,8 @@ releases:
     chart: radar/radar-rest-sources-authorizer
     version: {{ .Values.radar_rest_sources_authorizer._chart_version }}
     installed: {{ .Values.radar_rest_sources_authorizer._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_rest_sources_authorizer._extra_timeout }}
+    <<: *logFailedRelease
     values:
       - {{ .Values.radar_rest_sources_authorizer | toYaml | indent 8 | trim }}
     set:
@@ -49,6 +46,8 @@ releases:
     chart: radar/radar-rest-sources-backend
     version: {{ .Values.radar_rest_sources_backend._chart_version }}
     installed: {{ .Values.radar_rest_sources_backend._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_rest_sources_backend._extra_timeout }}
+    <<: *logFailedRelease    
     values:
       - {{ .Values.radar_rest_sources_backend | toYaml | indent 8 | trim }}
     set:

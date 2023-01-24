@@ -3,22 +3,15 @@ bases:
 
 ---
 
-helmDefaults:
-  atomic: true
-  timeout: 600
-  kubeContext: {{ .Values.kubeContext }}
-
-repositories:
-  - name: radar
-    url: https://radar-base.github.io/radar-helm-charts
-  - name: cp-radar
-    url: https://radar-base.github.io/cp-helm-charts
+{{ readFile "../etc/helmfile-templates.yaml" }}
 
 releases:
   - name: radar-gateway
     chart: radar/radar-gateway
     version: {{ .Values.radar_gateway._chart_version }}
     installed: {{ .Values.radar_gateway._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_gateway._extra_timeout }}
+    <<: *logFailedRelease    
     values:
       - {{ .Values.radar_gateway | toYaml | indent 8 | trim }}
       - {{ .Values.confluent_cloud | toYaml | indent 8 | trim }}

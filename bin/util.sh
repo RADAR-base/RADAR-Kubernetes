@@ -59,7 +59,8 @@ copy_template() {
 
 generate_secret() {
   size=${1:-30}
-  base64 < /dev/urandom | head -c$size | tr '+/' '_.'
+  openssl rand -base64 $size | tr -d '+/'
+  #base64 < /dev/urandom | head -c$size | tr '+/' '_.'
 }
 
 query_password() {

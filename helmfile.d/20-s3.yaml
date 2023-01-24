@@ -3,20 +3,15 @@ bases:
 
 ---
 
-helmDefaults:
-  atomic: false
-  timeout: 240
-  kubeContext: {{ .Values.kubeContext }}
-
-repositories:
-  - name: radar
-    url: https://radar-base.github.io/radar-helm-charts
+{{ readFile "../etc/helmfile-templates.yaml" }}
 
 releases:
   - name: redis
     chart: radar/redis
     version: {{ .Values.redis._chart_version }}
     installed: {{ .Values.redis._install }}
+    timeout: {{ add .Values.base_timeout .Values.redis._extra_timeout }}
+    <<: *logFailedRelease
     values:
       - "../etc/redis/values.yaml"
       - {{ .Values.redis | toYaml | indent 8 | trim }}
@@ -25,6 +20,8 @@ releases:
     chart: radar/minio
     version: {{ .Values.minio._chart_version }}
     installed: {{ .Values.minio._install }}
+    timeout: {{ add .Values.base_timeout .Values.minio._extra_timeout }}
+    <<: *logFailedRelease
     values:
       - "../etc/minio/values.yaml"
       - {{ .Values.minio | toYaml | indent 8 | trim }}
@@ -42,6 +39,8 @@ releases:
     chart: radar/radar-s3-connector
     version: {{ .Values.radar_s3_connector._chart_version }}
     installed: {{ .Values.radar_s3_connector._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_s3_connector._extra_timeout }}
+    <<: *logFailedRelease
     values:
       - {{ .Values.radar_s3_connector | toYaml | indent 8 | trim }}
       - {{ .Values.confluent_cloud | toYaml | indent 8 | trim }}
@@ -57,6 +56,8 @@ releases:
     chart: radar/s3-proxy
     version: {{ .Values.s3_proxy._chart_version }}
     installed: {{ .Values.s3_proxy._install }}
+    timeout: {{ add .Values.base_timeout .Values.s3_proxy._extra_timeout }}
+    <<: *logFailedRelease
     values:
       - {{ .Values.s3_proxy | toYaml | indent 8 | trim }}
     set:
@@ -68,8 +69,9 @@ releases:
   - name: radar-output
     chart: radar/radar-output
     version: {{ .Values.radar_output._chart_version }}
-    wait: true
     installed: {{ .Values.radar_output._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_output._extra_timeout }}
+    <<: *logFailedRelease
     values:
       - {{ .Values.radar_output | toYaml | indent 8 | trim }}
     set:

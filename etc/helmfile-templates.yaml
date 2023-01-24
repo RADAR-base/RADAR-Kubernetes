@@ -1,0 +1,7 @@
+templates:
+  logFailedRelease: &logFailedRelease
+    hooks:
+      - events: ["postsync"]
+        showlogs: true
+        command: "../bin/log-failed-release"
+        args: ["-c", "'{{ .Values.kubeContext }}'", "-n", "'{{ .Release.Namespace }}'", "-r", "'{{ .Release.Name }}'", "-e", "'{{ if .Event.Error }}{{ .Event.Error }}{{ end }}'"]

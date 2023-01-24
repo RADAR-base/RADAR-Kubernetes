@@ -1,3 +1,7 @@
+# Whether to upgrade process rolls back changes made in case of failed upgrade
+atomicInstall: true
+# time to wait for any individual Kubernetes operation
+base_timeout: 90
 # Context that you use in kubectl to access the Kubernetes cluster. Will be translated to `helm --kube-context <context_name>`
 kubeContext: default
 # Domain name that RADAR-Base installation will be acessible from
@@ -13,6 +17,7 @@ kafka_num_brokers: 3
 mongodb:
   _install: true
   _chart_version: 11.1.10
+  _extra_timeout: 60
   # Use standalone for a leaner installation, replicaset for a distributed one.
   architecture: replicaset
 
@@ -20,19 +25,23 @@ mongodb:
 elasticsearch:
   _install: true
   _chart_version: 7.17.3
+  _extra_timeout: 180
 
 graylog:
   _install: true
   _chart_version: 2.1.2
+  _extra_timeout: 180
 
 # Needed for graylog. If graylog is set not to install, this can be disabled as well.
 fluent_bit:
   _install: true
   _chart_version: 0.19.24
+  _extra_timeout: 0
 
 cert_manager:
   _install: true
   _chart_version: v1.10.0
+  _extra_timeout: 0
   global:
     # Needed for compatibility with K8S 1.25+
     podSecurityPolicy:
@@ -48,6 +57,7 @@ cert_manager:
 kube_prometheus_stack:
   _install: true
   _chart_version: 0.4.0
+  _extra_timeout: 0
   kube-prometheus-stack:
     prometheus:
       prometheusSpec:
@@ -80,6 +90,7 @@ kube_prometheus_stack:
 nginx_ingress:
   _install: true
   _chart_version: 4.1.0
+  _extra_timeout: 0
   controller:
     replicaCount: 1
     # Prometheus metrics exporter
@@ -92,12 +103,14 @@ nginx_ingress:
 kafka_manager:
   _install: false
   _chart_version: 2.1.6
+  _extra_timeout: 0
 
 # --------------------------------------------------------- 10-base.yaml ---------------------------------------------------------
 # Use letsencrypt to retrieve SSL certificates.
 cert_manager_letsencrypt:
   _install: true
   _chart_version: 0.1.0
+  _extra_timeout: 0
 
 # Use confluent cloud instead of a local Kafka cluster.
 # If this is enabled, then cp_kafka and cp_zookeeper should be disabled.
@@ -107,12 +120,14 @@ confluent_cloud:
 cp_zookeeper:
   _install: true
   _chart_version: 0.3.3
+  _extra_timeout: 510
   imageTag: 7.2.2
   servers: 3
 
 cp_kafka:
   _install: true
   _chart_version: 0.3.2
+  _extra_timeout: 510
   imageTag: 7.2.2
   customEnv:
     # Set this to 1.1 when upgrading from Kafka 5.x
@@ -127,18 +142,21 @@ cp_kafka:
 cp_schema_registry:
   _install: true
   _chart_version: 0.3.0
+  _extra_timeout: 90
   imageTag: 7.2.2
   replicaCount: 1
 
 catalog_server:
   _install: true
   _chart_version: 0.4.3
+  _extra_timeout: 90
   replicaCount: 1
   schema_registry: http://cp-schema-registry:8081
 
 radar_home:
   _install: true
   _chart_version: 0.1.1
+  _extra_timeout: 0
 
 # --------------------------------------------------------- 10-managementportal.yaml ---------------------------------------------------------
 
@@ -146,6 +164,7 @@ radar_home:
 postgresql:
   _install: true
   _chart_version: 11.1.24
+  _extra_timeout: 0
   # Check https://hub.docker.com/r/bitnami/postgresql/tags
   # On first install, choose the latest major version. This cannot be modified afterwards
   image:
@@ -161,6 +180,7 @@ postgresql:
 management_portal:
   _install: true
   _chart_version: 0.2.5
+  _extra_timeout: 210
   replicaCount: 1  # should be 1
   postgres:
     host: postgresql
@@ -177,6 +197,7 @@ management_portal:
 app_config:
   _install: true
   _chart_version: 0.2.4
+  _extra_timeout: 0
   replicaCount: 1
   jdbc:
     url: jdbc:postgresql://postgresql:5432/appconfig
@@ -184,6 +205,7 @@ app_config:
 app_config_frontend:
   _install: true
   _chart_version: 0.2.3
+  _extra_timeout: 0
   replicaCount: 1
 
 # --------------------------------------------------------- 20-appserver.yaml ---------------------------------------------------------
@@ -191,6 +213,7 @@ app_config_frontend:
 radar_appserver_postgresql:
   _install: false
   _chart_version: 11.1.24
+  _extra_timeout: 0
   # Check https://hub.docker.com/r/bitnami/postgresql/tags
   # On first install, choose the latest major version. This cannot be modified afterwards
   image:
@@ -204,6 +227,7 @@ radar_appserver_postgresql:
 radar_appserver:
   _install: false
   _chart_version: 0.1.4
+  _extra_timeout: 0
   replicaCount: 1
   managementportal_resource_name: res_AppServer
   public_key_endpoints: []
@@ -213,17 +237,20 @@ radar_appserver:
 radar_fitbit_connector:
   _install: false
   _chart_version: 0.2.1
+  _extra_timeout: 0
   replicaCount: 1
   oauthClientId: radar_fitbit_connector
 
 radar_rest_sources_authorizer:
   _install: false
   _chart_version: 0.4.5
+  _extra_timeout: 0
   replicaCount: 1
 
 radar_rest_sources_backend:
   _install: false
   _chart_version: 0.4.6
+  _extra_timeout: 0
   replicaCount: 1
   postgres:
     host: postgresql
@@ -244,12 +271,13 @@ grafana_metrics_username: postgres
 
 timescaledb:
   _install: true
-  _chart_version: 11.1.24
+  _chart_version: 12.1.9
+  _extra_timeout: 210
   # Check https://hub.docker.com/r/timescale/timescaledb/tags
   # The suffix MUST be bitnami.
   # On first install, choose the latest major postgresql version. This cannot be modified afterwards.
   image:
-    tag: latest-pg12-bitnami
+    tag: 2.8.1-pg12-bitnami
     pullPolicy: Always
   replicaCount: 1
   replication:
@@ -263,6 +291,7 @@ timescaledb:
 radar_grafana:
   _install: true
   _chart_version: 6.26.8
+  _extra_timeout: 0
   replicaCount: 1
   env:
     GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/allprojects/home.json
@@ -270,6 +299,7 @@ radar_grafana:
 radar_jdbc_connector:
   _install: true
   _chart_version: 0.4.0
+  _extra_timeout: 0
   replicaCount: 1
   sink:
     # Change the list of topics if you have dashboards that read other data or if you don't have certain topics available on your cluster.
@@ -280,6 +310,7 @@ radar_jdbc_connector:
 radar_gateway:
   _install: true
   _chart_version: 0.2.6
+  _extra_timeout: 0
   replicaCount: 1
 
 # --------------------------------------------------------- 20-kafka-analysis.yaml ---------------------------------------------------------
@@ -287,13 +318,19 @@ radar_gateway:
 radar_backend_monitor:
   _install: false
   _chart_version: 0.1.2
+  _extra_timeout: 0
   replicaCount: 1
+  smtp:
+    host: smtp.google.com
+    port: 25
+    user: user@gmail.com
   persistence:
     size: 1Gi
 
 radar_backend_stream:
   _install: false
   _chart_version: 0.1.2
+  _extra_timeout: 0
   replicaCount: 1
 
 # --------------------------------------------------------- 20-redcap.yaml ---------------------------------------------------------
@@ -301,6 +338,7 @@ radar_backend_stream:
 radar_integration:
   _install: false
   _chart_version: 0.4.0
+  _extra_timeout: 0
   replicaCount: 1
   oauth_client_id: radar_redcap_integrator
 
@@ -309,12 +347,14 @@ radar_integration:
 redis:
   _install: true
   _chart_version: 16.8.7
+  _extra_timeout: 0
   metrics:
     enabled: true
 
 minio:
   _install: true
   _chart_version: 11.9.1
+  _extra_timeout: 210
   image:
     tag: 2022.10.15-debian-11-r0
   persistence:
@@ -340,6 +380,7 @@ radar_s3_connector:
   # set to true if radar-s3-connector should be installed
   _install: true
   _chart_version: 0.2.4
+  _extra_timeout: 90
   replicaCount: 1
   # The bucket name where intermediate data for cold storage should be written to.
   bucketName: radar-intermediate-storage
@@ -348,6 +389,7 @@ radar_s3_connector:
 s3_proxy:
   _install: false
   _chart_version: 0.1.3
+  _extra_timeout: 0
   replicaCount: 1
   target:
     provider: azureblob
@@ -355,6 +397,7 @@ s3_proxy:
 radar_output:
   _install: true
   _chart_version: 0.3.1
+  _extra_timeout: 0
   replicaCount: 1
   source:
     s3:
@@ -373,6 +416,7 @@ radar_output:
 radar_upload_postgresql:
   _install: true
   _chart_version: 11.1.24
+  _extra_timeout: 0
   image: # Check https://hub.docker.com/r/bitnami/postgresql/tags
     tag: 11.16.0
   primary:
@@ -384,16 +428,19 @@ radar_upload_postgresql:
 radar_upload_connect_backend:
   _install: true
   _chart_version: 0.2.3
+  _extra_timeout: 0
   replicaCount: 1
 
 radar_upload_connect_frontend:
   _install: true
   _chart_version: 0.2.3
+  _extra_timeout: 0
   replicaCount: 1
 
 radar_upload_source_connector:
   _install: true
   _chart_version: 0.2.2
+  _extra_timeout: 0
   replicaCount: 1
   s3Endpoint: http://minio:9000/
 
@@ -402,6 +449,7 @@ radar_upload_source_connector:
 ccSchemaRegistryProxy:
   _install: false
   _chart_version: 0.2.3
+  _extra_timeout: 0
   externalName: schema-registry-domain
 
 # --------------------------------------------------------- 20-push-endpoint.yaml ---------------------------------------------------------
@@ -409,6 +457,7 @@ ccSchemaRegistryProxy:
 radar_push_endpoint:
   _install: false
   _chart_version: 0.1.4
+  _extra_timeout: 180
   replicaCount: 1
   adminProperties: {}
   garmin:
@@ -419,11 +468,13 @@ radar_push_endpoint:
 radar_jdbc_connector_agg:
   _install: false
   _chart_version: 0.4.0
+  _extra_timeout: 0
   replicaCount: 1
 
 ksql_server:
   _install: false
   _chart_version: 0.3.1
+  _extra_timeout: 0
   replicaCount: 1
   servicePort: 8088
   kafka:
@@ -441,6 +492,7 @@ ksql_server:
 velero:
   _install: false
   _chart_version: 0.1.0
+  _extra_timeout: 0
   objectStorageBackupReplicaCount: 1
   backup:
     address: s3.amazon.com  # protocol should not be specified

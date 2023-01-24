@@ -3,20 +3,15 @@ bases:
 
 ---
 
-helmDefaults:
-  atomic: true
-  timeout: 600
-  kubeContext: {{ .Values.kubeContext }}
-
-repositories:
-  - name: radar
-    url: https://radar-base.github.io/radar-helm-charts
+{{ readFile "../etc/helmfile-templates.yaml" }}
 
 releases:
   - name: radar-backend-monitor
     chart: radar/radar-backend
     version: {{ .Values.radar_backend_monitor._chart_version }}
     installed: {{ .Values.radar_backend_monitor._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_backend_monitor._extra_timeout }}
+    <<: *logFailedRelease
     values:
       - "../etc/radar-backend-monitor/values.yaml"
       - {{ .Values.radar_backend_monitor | toYaml | indent 8 | trim }}
@@ -28,6 +23,8 @@ releases:
     chart: radar/radar-backend
     version: {{ .Values.radar_backend_monitor._chart_version }}
     installed: {{ .Values.radar_backend_stream._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_backend_stream._extra_timeout }}
+    <<: *logFailedRelease    
     values:
       - "../etc/radar-backend-stream/values.yaml"
       - {{ .Values.radar_backend_stream | toYaml | indent 8 | trim }}

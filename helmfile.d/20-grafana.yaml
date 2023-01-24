@@ -3,18 +3,15 @@ bases:
 
 ---
 
-helmDefaults:
-  kubeContext: {{ .Values.kubeContext }}
-
-repositories:
-  - name: radar
-    url: https://radar-base.github.io/radar-helm-charts
+{{ readFile "../etc/helmfile-templates.yaml" }}
 
 releases:
   - name: timescaledb
     chart: radar/postgresql
     version: {{ .Values.timescaledb._chart_version }}
     installed: {{ .Values.timescaledb._install }}
+    timeout: {{ add .Values.base_timeout .Values.timescaledb._extra_timeout }}
+    <<: *logFailedRelease
     values:
       - "../etc/timescaledb/values.yaml"
       - {{ .Values.timescaledb | toYaml | indent 8 | trim }}
@@ -35,6 +32,8 @@ releases:
     chart: radar/grafana
     version: {{ .Values.radar_grafana._chart_version }}
     installed: {{ .Values.radar_grafana._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_grafana._extra_timeout }}
+    <<: *logFailedRelease
     values:
       - "../etc/radar-grafana/values.yaml"
       - {{ .Values.radar_grafana | toYaml | indent 8 | trim }}
@@ -66,12 +65,14 @@ releases:
     chart: radar/radar-jdbc-connector
     version: {{ .Values.radar_jdbc_connector._chart_version }}
     installed: {{ .Values.radar_jdbc_connector._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_jdbc_connector._extra_timeout }}
+    <<: *logFailedRelease    
     values:
       - {{ .Values.radar_jdbc_connector | toYaml | indent 8 | trim }}
     set:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
-      - name: jdbc.username
+      - name: jdbc.user
         value: {{ .Values.timescaledb_username }}
       - name: jdbc.password
         value: {{ .Values.timescaledb_password }}
