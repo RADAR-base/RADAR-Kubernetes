@@ -440,7 +440,7 @@ radar_upload_connect_frontend:
 radar_upload_source_connector:
   _install: true
   _chart_version: 0.2.2
-  _extra_timeout: 0
+  _extra_timeout: 60
   replicaCount: 1
   s3Endpoint: http://minio:9000/
 
