@@ -26,3 +26,9 @@ radar_grafana:
 #radar_appserver:
 #  google_application_credentials: {{ readFile "../etc/radar-appserver/firebase-adminsdk.json" | quote }}
 #*/}}
+
+
+ksql_server:
+  ksql:
+    queries: |
+      {{- readFile "cp-ksql-server/queries.sql" | nindent 8 }}

@@ -467,7 +467,7 @@ radar_push_endpoint:
 
 radar_jdbc_connector_agg:
   _install: false
-  _chart_version: 0.4.0
+  _chart_version: 0.4.1
   _extra_timeout: 0
   replicaCount: 1
 
@@ -479,7 +479,7 @@ ksql_server:
   servicePort: 8088
   kafka:
     bootstrapServers: PLAINTEXT://cp-kafka:9092
-  cp-schema-registry: 
+  cp-schema-registry:
     url: http://cp-schema-registry:8081
   ksql:
     headless: false
