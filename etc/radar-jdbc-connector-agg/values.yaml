@@ -26,6 +26,6 @@ sink:
       - USERID
       - PROJECTID
   # -- Comma-separated list of topics the connector will read from and ingest into the database
-  topics:
+  topics: PUSH_GARMIN_HEART_RATE_SAMPLE_TIMESTAMP_LONG_WINDOWED_1H_TABLE
   # -- How to format a table name based on the inserted topic
   tableNameFormat: "${topic}"
