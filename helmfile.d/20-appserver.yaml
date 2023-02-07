@@ -23,7 +23,7 @@ releases:
     timeout: {{ add .Values.base_timeout .Values.radar_appserver._extra_timeout }}
     <<: *logFailedRelease    
     needs:
-    - radar-appserver-postgresql
+      - radar-appserver-postgresql
     values:
       - {{ .Values.radar_appserver | toYaml | indent 8 | trim }}
     set:

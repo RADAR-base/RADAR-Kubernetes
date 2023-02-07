@@ -36,7 +36,7 @@ releases:
     wait: true
     <<: *logFailedRelease
     needs:
-    - cp-zookeeper
+      - cp-zookeeper
     values:
       - "../etc/cp-kafka/values.yaml"
       - {{ .Values.cp_kafka | toYaml | indent 8 | trim }}
@@ -52,7 +52,7 @@ releases:
     wait: true
     <<: *logFailedRelease
     needs:
-    - cp-kafka
+      - cp-kafka
     values:
       - "../etc/cp-schema-registry/values.yaml"
       - {{ .Values.cp_schema_registry | toYaml | indent 8 | trim }}
@@ -74,7 +74,7 @@ releases:
     wait: true
     <<: *logFailedRelease
     needs:
-    - cp-schema-registry
+      - cp-schema-registry
     values:
       - {{ .Values.catalog_server | toYaml | indent 8 | trim }}
       - {{ .Values.confluent_cloud | toYaml | indent 8 | trim }}

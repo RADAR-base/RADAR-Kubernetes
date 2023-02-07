@@ -42,7 +42,7 @@ releases:
     timeout: {{ add .Values.base_timeout .Values.radar_s3_connector._extra_timeout }}
     <<: *logFailedRelease
     needs:
-    - minio
+      - minio
     values:
       - {{ .Values.radar_s3_connector | toYaml | indent 8 | trim }}
       - {{ .Values.confluent_cloud | toYaml | indent 8 | trim }}
@@ -75,8 +75,8 @@ releases:
     timeout: {{ add .Values.base_timeout .Values.radar_output._extra_timeout }}
     <<: *logFailedRelease
     needs:
-    - redis
-    - minio
+      - redis
+      - minio
     values:
       - {{ .Values.radar_output | toYaml | indent 8 | trim }}
     set:

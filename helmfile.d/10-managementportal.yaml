@@ -23,7 +23,7 @@ releases:
     timeout: {{ add .Values.base_timeout .Values.management_portal._extra_timeout }}
     <<: *logFailedRelease
     needs:
-    - postgresql
+      - postgresql
     values:
       - {{ .Values.management_portal | toYaml | indent 8 | trim }}
     set:

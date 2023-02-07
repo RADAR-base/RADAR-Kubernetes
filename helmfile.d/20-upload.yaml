@@ -28,7 +28,7 @@ releases:
     timeout: {{ add .Values.base_timeout .Values.radar_upload_connect_backend._extra_timeout }}
     <<: *logFailedRelease
     needs:
-    - radar-upload-postgresql
+      - radar-upload-postgresql
     values:
       - {{ .Values.radar_upload_connect_backend | toYaml | indent 8 | trim }}
     set:
