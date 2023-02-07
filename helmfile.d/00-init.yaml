@@ -35,6 +35,9 @@ releases:
     installed: {{ .Values.graylog._install }}
     timeout: {{ add .Values.base_timeout .Values.graylog._extra_timeout }}
     <<: *logFailedRelease
+    needs:
+    - graylog/mongodb
+    - graylog/elasticsearch
     values:
       - "../etc/graylog/values.yaml"
       - {{ .Values.graylog | toYaml | indent 8 | trim }}
@@ -57,6 +60,8 @@ releases:
     installed: {{ .Values.fluent_bit._install }}
     timeout: {{ add .Values.base_timeout .Values.fluent_bit._extra_timeout }}
     <<: *logFailedRelease
+    needs:
+    - graylog/graylog
     values:
       - "../etc/fluent-bit/values.yaml"
       - {{ .Values.fluent_bit | toYaml | indent 8 | trim }}

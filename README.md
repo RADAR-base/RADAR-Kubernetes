@@ -155,7 +155,7 @@ Once all configuration files are ready, the RADAR-Kubernetes can be deployed on 
 #### Install RADAR-Kubernetes on your cluster.
 
 ```shell
-helmfile sync --concurrency 1
+helmfile sync
 ```
 
 The `helmfile sync` will synchronize all the Kubernetes resources defined in the helmfiles with your Kubernetes cluster. Having `--concurrency 1` will make sure components are installed in required order. Depending on your cluster specification, this may take a few minutes when installed for the first time.

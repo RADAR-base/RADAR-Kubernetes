@@ -34,6 +34,8 @@ releases:
     installed: {{ .Values.radar_grafana._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_grafana._extra_timeout }}
     <<: *logFailedRelease
+    needs:
+    - timescaledb
     values:
       - "../etc/radar-grafana/values.yaml"
       - {{ .Values.radar_grafana | toYaml | indent 8 | trim }}

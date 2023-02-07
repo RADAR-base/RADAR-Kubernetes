@@ -22,6 +22,8 @@ releases:
     installed: {{ .Values.management_portal._install }}
     timeout: {{ add .Values.base_timeout .Values.management_portal._extra_timeout }}
     <<: *logFailedRelease
+    needs:
+    - postgresql
     values:
       - {{ .Values.management_portal | toYaml | indent 8 | trim }}
     set:
