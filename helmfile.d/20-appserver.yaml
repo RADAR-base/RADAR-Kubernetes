@@ -21,9 +21,8 @@ releases:
     version: {{ .Values.radar_appserver._chart_version }}
     installed: {{ .Values.radar_appserver._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_appserver._extra_timeout }}
-    <<: *logFailedRelease    
-    needs:
-      - radar-appserver-postgresql
+    {{ if .Values.radar_appserver_postgresql._install }}needs: [radar-appserver-postgresql]{{ end }}
+    <<: *logFailedRelease
     values:
       - {{ .Values.radar_appserver | toYaml | indent 8 | trim }}
     set:

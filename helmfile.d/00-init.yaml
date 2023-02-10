@@ -34,10 +34,10 @@ releases:
     version: {{ .Values.graylog._chart_version }}
     installed: {{ .Values.graylog._install }}
     timeout: {{ add .Values.base_timeout .Values.graylog._extra_timeout }}
-    <<: *logFailedRelease
     needs:
-      - graylog/mongodb
-      - graylog/elasticsearch
+      {{ if .Values.mongodb._install }}- graylog/mongodb{{ end }}
+      {{ if .Values.elasticsearch._install }}- graylog/elasticsearch{{ end }}
+    <<: *logFailedRelease
     values:
       - "../etc/graylog/values.yaml"
       - {{ .Values.graylog | toYaml | indent 8 | trim }}
@@ -59,9 +59,8 @@ releases:
     version: {{ .Values.fluent_bit._chart_version }}
     installed: {{ .Values.fluent_bit._install }}
     timeout: {{ add .Values.base_timeout .Values.fluent_bit._extra_timeout }}
+    {{ if .Values.graylog._install }}needs: [graylog/graylog]{{ end }}
     <<: *logFailedRelease
-    needs:
-      - graylog/graylog
     values:
       - "../etc/fluent-bit/values.yaml"
       - {{ .Values.fluent_bit | toYaml | indent 8 | trim }}
