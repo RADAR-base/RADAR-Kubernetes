@@ -47,9 +47,6 @@ cert_manager:
     podSecurityPolicy:
       enabled: false
       useAppArmor: false
-  prometheus:
-    servicemonitor:
-      enabled: true
 
 # Should be installed at least once to get the necessary resource definitions.
 # If disabled, you can still install those definitions with the command:
@@ -96,8 +93,6 @@ nginx_ingress:
     # Prometheus metrics exporter
     metrics:
       enabled: true
-      serviceMonitor:
-        enabled: true
 
 # Kafka manager is outdated but can still be used. Otherwise, use Kafka command-line tools.
 kafka_manager:
@@ -359,11 +354,6 @@ minio:
     tag: 2022.10.15-debian-11-r0
   persistence:
     size: 20Gi
-  metrics:
-    serviceMonitor:
-      enabled: true
-    prometheusRule:
-      enabled: true
   provisioning:
     ## @param provisioning.users MinIO&reg; users provisioning. Can be used in addition to provisioning.usersExistingSecrets.
     ## https://docs.min.io/docs/minio-admin-complete-guide.html#user

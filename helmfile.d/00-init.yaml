@@ -114,9 +114,13 @@ releases:
     installed: {{ .Values.cert_manager._install }}
     timeout: {{ add .Values.base_timeout .Values.cert_manager._extra_timeout }}
     disableValidation: true
+    {{ if .Values.kube_prometheus_stack._install }}needs: [monitoring/kube-prometheus-stack]{{ end }}
     <<: *logFailedRelease
     values:
       - {{ .Values.cert_manager | toYaml | indent 8 | trim }}
+    set:
+      - name: global.prometheus.servicemonitor.enabled
+        value: {{ .Values.kube_prometheus_stack._install }}
     hooks:
       - events: ["presync"]
         showlogs: true
@@ -129,10 +133,14 @@ releases:
     installed: {{ .Values.nginx_ingress._install }}
     timeout: {{ add .Values.base_timeout .Values.nginx_ingress._extra_timeout }}
     disableValidation: true
+    {{ if .Values.kube_prometheus_stack._install }}needs: [monitoring/kube-prometheus-stack]{{ end }}
     <<: *logFailedRelease
     values:
       - "../etc/nginx-ingress/values.yaml"
       - {{ .Values.nginx_ingress | toYaml | indent 8 | trim }}
+    set:
+      - name: controller.metrics.serviceMonitor.enabled
+        value: {{ .Values.kube_prometheus_stack._install }}
 
   - name: kafka-manager
     chart: radar/kafka-manager

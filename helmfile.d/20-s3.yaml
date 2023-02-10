@@ -34,6 +34,10 @@ releases:
         value: {{ dig "auth" "rootUser" (dig "accessKey" .Values.s3_access_key .Values.minio) .Values.minio }}
       - name: auth.rootPassword
         value: {{ dig "auth" "rootPassword" (dig "secretKey" .Values.s3_secret_key .Values.minio) .Values.minio }}
+      - name: metrics.serviceMonitor.enabled
+        value: {{ .Values.kube_prometheus_stack._install }}
+      - name: metrics.prometheusRule.enabled
+        value: {{ .Values.kube_prometheus_stack._install }}
 
   - name: radar-s3-connector
     chart: radar/radar-s3-connector
