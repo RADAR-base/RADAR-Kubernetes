@@ -26,3 +26,10 @@ radar_grafana:
 #radar_appserver:
 #  google_application_credentials: {{ readFile "../etc/radar-appserver/firebase-adminsdk.json" | quote }}
 #*/}}
+
+# Remove below Go comment to read the queries.sql and set the queries
+# in the ksql_server
+#ksql_server:
+#  ksql:
+#    queries: |
+#      {{/*- readFile "cp-ksql-server/queries.sql" | nindent 8 */}}
