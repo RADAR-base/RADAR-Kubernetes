@@ -1,5 +1,5 @@
 atomicInstall: false
-base_timeout: 180
+base_timeout: 300
 
 mongodb:
   _install: true
