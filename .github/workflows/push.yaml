@@ -95,11 +95,16 @@ jobs:
       run: |
         kubectl get pods --all-namespaces
 
+    - name: Prepare the logs for upload
+      if: always()
+      run: |
+        sudo chmod -R 777 /var/log/pods
+
     - name: Upload logs as artifacts
       uses: actions/upload-artifact@v3
       if: always()
       with:
-        name: kubenretes-logs
+        name: kubenretes-logs-${{ matrix.K3S_VERSION }}
         path: /var/log/pods
         if-no-files-found: ignore
 
