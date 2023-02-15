@@ -95,6 +95,13 @@ jobs:
       run: |
         kubectl get pods --all-namespaces
 
+    - name: Upload logs as artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: kubenretes-logs
+        path: /var/log/pods
+        if-no-files-found: ignore
+
   check-gitignore:
     runs-on: ubuntu-latest
     steps:
