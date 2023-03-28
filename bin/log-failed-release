@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+. bin/util.sh
+
+usage() {
+  echo "Usage: $0 -r RELEASE_NAME [-h] [-c KUBE_CONTEXT] [-n NAMESPACE] [-e ERROR_MESSAGE]"
+  echo "If any error message was given, this will check the status of the release."
+  echo "If the release is then not ready, diagnostics will be printed."
+}
+
+while getopts c:n:r:e:h option
+do
+  cleanedArg="$(echo "${OPTARG}" | tr -d "'")"
+  case "${option}"
+    in
+    h) usage; exit 0;;
+    c) kubeContext="$cleanedArg";;
+    n) releaseNamespace="$cleanedArg";;
+    r) releaseName="$cleanedArg";;
+    e) helmError="$cleanedArg";;
+    *) usage >&2; exit 1;;
+  esac
+done
+
+if [ -z "$releaseName" ]; then
+  echo "ERROR: release name missing" >&2
+  usage >&2
+  exit 1
+fi
+if [ -z "$helmError" ]; then
+  echo "No errors reported"
+  exit 0
+fi
+
+kubeContext="${kubeContext:-$(kubectl config current-context)}"
+releaseNamespace="${releaseNamespace:-default}"
+
+if kubectl --context $kubeContext --namespace $releaseNamespace get pods -l "app.kubernetes.io/instance=$releaseName" -o yaml | yq " .items[].status.containerStatuses[].ready" | grep -vq false; then
+  echo "Application $releaseName ($releaseNamespace) is ready, installation successful."
+  exit 0
+fi
+
+echo "Application $releaseName ($releaseNamespace) not is ready, installation unsuccessful."
+echo "Error message: $helmError"
+echo
+echo "------------------------ Helm status ------------------------"
+helm --kube-context $kubeContext --namespace $releaseNamespace list
+echo
+echo "------------------------ Namespace status ------------------------"
+kubectl --context $kubeContext --namespace $releaseNamespace get pods -o wide
+echo
+echo "------------------------ Pod status ------------------------"
+kubectl --context $kubeContext --namespace $releaseNamespace get pods -l "app.kubernetes.io/instance=$releaseName" -o yaml
+echo
+echo "------------------------ Previous logs ------------------------"
+kubectl --context $kubeContext --namespace $releaseNamespace logs --previous=true --ignore-errors=true --all-containers=true --prefix=true --timestamps=true --tail=100 -l "app.kubernetes.io/instance=$releaseName"
+echo
+echo "------------------------ Curent logs ------------------------"
+kubectl --context $kubeContext --namespace $releaseNamespace logs --ignore-errors=true --all-containers=true --prefix=true --timestamps=true --tail=100 -l "app.kubernetes.io/instance=$releaseName"
+
+exit 0

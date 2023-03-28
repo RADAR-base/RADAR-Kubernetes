@@ -3,24 +3,16 @@ bases:
 
 ---
 
-helmDefaults:
-  atomic: true
-  timeout: 600
-  kubeContext: {{ .Values.kubeContext }}
-
-repositories:
-  - name: radar
-    url: https://radar-base.github.io/radar-helm-charts
-  - name: cp-radar
-    url: https://radar-base.github.io/cp-helm-charts
+{{ readFile "../etc/helmfile-templates.yaml" }}
 
 releases:
   - name: cert-manager-letsencrypt
     namespace: cert-manager
-    wait: true
-    installed: {{ .Values.cert_manager_letsencrypt._install }}
     chart: radar/cert-manager-letsencrypt
     version: {{ .Values.cert_manager_letsencrypt._chart_version }}
+    installed: {{ .Values.cert_manager_letsencrypt._install }}
+    timeout: {{ add .Values.base_timeout .Values.cert_manager_letsencrypt._extra_timeout }}
+    <<: *logFailedRelease
     set:
       - name: maintainerEmail
         value: {{ .Values.maintainer_email }}
@@ -28,8 +20,10 @@ releases:
   - name: cp-zookeeper
     chart: cp-radar/cp-zookeeper
     version: {{ .Values.cp_zookeeper._chart_version }}
-    wait: true
     installed: {{ .Values.cp_zookeeper._install }}
+    timeout: {{ add .Values.base_timeout .Values.cp_zookeeper._extra_timeout }}
+    wait: true
+    <<: *logFailedRelease
     values:
       - "../etc/cp-zookeeper/values.yaml"
       - {{ .Values.cp_zookeeper | toYaml | indent 8 | trim }}
@@ -37,8 +31,10 @@ releases:
   - name: cp-kafka
     chart: cp-radar/cp-kafka
     version: {{ .Values.cp_kafka._chart_version }}
-    wait: true
     installed: {{ .Values.cp_kafka._install }}
+    timeout: {{ add .Values.base_timeout .Values.cp_kafka._extra_timeout }}
+    wait: true
+    <<: *logFailedRelease
     values:
       - "../etc/cp-kafka/values.yaml"
       - {{ .Values.cp_kafka | toYaml | indent 8 | trim }}
@@ -49,8 +45,10 @@ releases:
   - name: cp-schema-registry
     chart: cp-radar/cp-schema-registry
     version: {{ .Values.cp_schema_registry._chart_version }}
-    wait: true
     installed: {{ .Values.cp_schema_registry._install }}
+    timeout: {{ add .Values.base_timeout .Values.cp_schema_registry._extra_timeout }}
+    wait: true
+    <<: *logFailedRelease
     values:
       - "../etc/cp-schema-registry/values.yaml"
       - {{ .Values.cp_schema_registry | toYaml | indent 8 | trim }}
@@ -67,8 +65,10 @@ releases:
   - name: catalog-server
     chart: radar/catalog-server
     version: {{ .Values.catalog_server._chart_version }}
-    wait: true
     installed: {{ .Values.catalog_server._install }}
+    timeout: {{ add .Values.base_timeout .Values.catalog_server._extra_timeout }}
+    wait: true
+    <<: *logFailedRelease
     values:
       - {{ .Values.catalog_server | toYaml | indent 8 | trim }}
       - {{ .Values.confluent_cloud | toYaml | indent 8 | trim }}
@@ -81,3 +81,35 @@ releases:
       - name: schema_registry
         value: {{ .Values.confluent_cloud.cc.schemaRegistryUrl }}
       {{ end }}
+
+  - name: radar-home
+    chart: radar/radar-home
+    version: {{ .Values.radar_home._chart_version }}
+    installed: {{ .Values.radar_home._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_home._extra_timeout }}
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.radar_home | toYaml | indent 8 | trim }}
+    set:
+      - name: ingress.hosts
+        values: [ {{ .Values.server_name }} ]
+      - name: s3.enabled
+        value: {{ dig "s3" "enabled" .Values.minio._install .Values.radar_home }}
+      - name: s3.url
+        value: {{ dig "s3" "url" (printf "https://s3.%s/login" .Values.server_name) .Values.radar_home }}
+      - name: dashboard.enabled
+        value: {{ dig "dashboard" "enabled" .Values.radar_grafana._install .Values.radar_home }}
+      - name: dashboard.url
+        value: {{ dig "dashboard" "url" (printf "https://dashboard.%s/" .Values.server_name) .Values.radar_home }}
+      - name: uploadPortal.enabled
+        value: {{ dig "uploadPortal" "enabled" .Values.radar_upload_connect_frontend._install .Values.radar_home }}
+      - name: restAuthorizer.enabled
+        value: {{ dig "restAuthorizer" "enabled" .Values.radar_rest_sources_authorizer._install .Values.radar_home }}
+      - name: monitoring.enabled
+        value: {{ dig "monitoring" "enabled" .Values.kube_prometheus_stack._install .Values.radar_home }}
+      - name: monitoring.url
+        value: {{ dig "monitoring" "url" (printf "https://grafana.%s/login" .Values.server_name) .Values.radar_home }}
+      - name: logging.enabled
+        value: {{ dig "logging" "enabled" .Values.graylog._install .Values.radar_home }}
+      - name: logging.url
+        value: {{ dig "logging" "url" (printf "https://graylog.%s/" .Values.server_name) .Values.radar_home }}

@@ -2,7 +2,7 @@ rbac:
   create: true
   ## Use an existing ClusterRole/Role (depending on rbac.namespaced false/true)
   # useExistingRole: name-of-some-(cluster)role
-  pspEnabled: true
+  pspEnabled: false
   pspUseAppArmor: true
   namespaced: false
   extraRoleRules: []
@@ -47,7 +47,7 @@ podDisruptionBudget: {}
 ## See `kubectl explain deployment.spec.strategy` for more
 ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
 deploymentStrategy:
-  type: RollingUpdate
+  type: Recreate
 
 readinessProbe:
   httpGet:

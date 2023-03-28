@@ -3,20 +3,15 @@ bases:
 
 ---
 
-repositories:
-  - name: radar
-    url: https://radar-base.github.io/radar-helm-charts
-
-helmDefaults:
-  timeout: 180
-  kubeContext: {{ .Values.kubeContext }}
+{{ readFile "../etc/helmfile-templates.yaml" }}
 
 releases:
   - name: postgresql
     chart: radar/postgresql
     version: {{ .Values.postgresql._chart_version }}
-    wait: false
     installed: {{ .Values.postgresql._install }}
+    timeout: {{ add .Values.base_timeout .Values.postgresql._extra_timeout }}
+    <<: *logFailedRelease
     values:
       - "../etc/postgresql/values.yaml"
       - {{ .Values.postgresql | toYaml | indent 8 | trim }}
@@ -25,6 +20,8 @@ releases:
     chart: radar/management-portal
     version: {{ .Values.management_portal._chart_version }}
     installed: {{ .Values.management_portal._install }}
+    timeout: {{ add .Values.base_timeout .Values.management_portal._extra_timeout }}
+    <<: *logFailedRelease
     values:
       - {{ .Values.management_portal | toYaml | indent 8 | trim }}
     set:
@@ -62,6 +59,8 @@ releases:
     chart: radar/app-config
     version: {{ .Values.app_config._chart_version }}
     installed: {{ .Values.app_config._install }}
+    timeout: {{ add .Values.base_timeout .Values.app_config._extra_timeout }}
+    <<: *logFailedRelease
     values:
       - {{ .Values.app_config | toYaml | indent 8 | trim }}
     set:
@@ -74,6 +73,8 @@ releases:
     chart: radar/app-config-frontend
     version: {{ .Values.app_config_frontend._chart_version }}
     installed: {{ .Values.app_config_frontend._install }}
+    timeout: {{ add .Values.base_timeout .Values.app_config_frontend._extra_timeout }}
+    <<: *logFailedRelease
     values:
       - {{ .Values.app_config_frontend | toYaml | indent 8 | trim }}
     set:

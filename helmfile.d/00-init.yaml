@@ -3,12 +3,7 @@ bases:
 
 ---
 
-helmDefaults:
-  kubeContext: {{ .Values.kubeContext }}
-
-repositories:
-  - name: radar
-    url: https://radar-base.github.io/radar-helm-charts
+{{ readFile "../etc/helmfile-templates.yaml" }}
 
 releases:
   - name: mongodb
@@ -16,6 +11,8 @@ releases:
     chart: radar/mongodb
     version: {{ .Values.mongodb._chart_version }}
     installed: {{ .Values.mongodb._install }}
+    timeout: {{ add .Values.base_timeout .Values.mongodb._extra_timeout }}
+    <<: *logFailedRelease
     values:
       - "../etc/mongodb/values.yaml"
       - {{ .Values.mongodb | toYaml | indent 8 | trim }}
@@ -25,6 +22,8 @@ releases:
     chart: radar/elasticsearch
     version: {{ .Values.elasticsearch._chart_version }}
     installed: {{ .Values.elasticsearch._install }}
+    timeout: {{ add .Values.base_timeout .Values.elasticsearch._extra_timeout }}
+    <<: *logFailedRelease
     values:
       - "../etc/elasticsearch/values.yaml"
       - {{ .Values.elasticsearch | toYaml | indent 8 | trim }}
@@ -34,12 +33,14 @@ releases:
     chart: radar/graylog
     version: {{ .Values.graylog._chart_version }}
     installed: {{ .Values.graylog._install }}
+    timeout: {{ add .Values.base_timeout .Values.graylog._extra_timeout }}
+    <<: *logFailedRelease
     values:
       - "../etc/graylog/values.yaml"
       - {{ .Values.graylog | toYaml | indent 8 | trim }}
     set:
       - name: graylog.mongodb.uri
-        value: mongodb://graylog:{{ index .Values.mongodb.auth.passwords 0 }}@mongodb-headless.graylog.svc.cluster.local:27017/graylog?replicaSet=rs0
+        value: mongodb://graylog:{{ index (dig "auth" "passwords" (list "") .Values.mongodb) 0 }}@mongodb-headless.graylog.svc.cluster.local:27017/graylog?replicaSet=rs0
       - name: graylog.rootEmail
         value: {{ .Values.maintainer_email }}
       - name: graylog.ingress.hosts
@@ -54,6 +55,8 @@ releases:
     chart: radar/fluent-bit
     version: {{ .Values.fluent_bit._chart_version }}
     installed: {{ .Values.fluent_bit._install }}
+    timeout: {{ add .Values.base_timeout .Values.fluent_bit._extra_timeout }}
+    <<: *logFailedRelease
     values:
       - "../etc/fluent-bit/values.yaml"
       - {{ .Values.fluent_bit | toYaml | indent 8 | trim }}
@@ -62,12 +65,13 @@ releases:
         value: {{ .Values.server_name }}
 
   - name: kube-prometheus-stack
+    namespace: monitoring
     chart: radar/kube-prometheus-stack
     version: {{ .Values.kube_prometheus_stack._chart_version }}
-    wait: true
-    namespace: monitoring
     installed: {{ .Values.kube_prometheus_stack._install }}
+    timeout: {{ add .Values.base_timeout .Values.kube_prometheus_stack._extra_timeout }}
     disableValidation: true
+    <<: *logFailedRelease
     values:
       - {{ .Values.kube_prometheus_stack | toYaml | indent 8 | trim }}
     set:
@@ -101,11 +105,12 @@ releases:
 
   - name: cert-manager
     namespace: cert-manager
-    wait: true
-    installed: {{ .Values.cert_manager._install }}
-    disableValidation: true
     chart: radar/cert-manager
     version: {{ .Values.cert_manager._chart_version }}
+    installed: {{ .Values.cert_manager._install }}
+    timeout: {{ add .Values.base_timeout .Values.cert_manager._extra_timeout }}
+    disableValidation: true
+    <<: *logFailedRelease
     values:
       - {{ .Values.cert_manager | toYaml | indent 8 | trim }}
     hooks:
@@ -117,9 +122,10 @@ releases:
   - name: nginx-ingress
     chart: radar/ingress-nginx
     version: {{ .Values.nginx_ingress._chart_version }}
-    force: false
     installed: {{ .Values.nginx_ingress._install }}
+    timeout: {{ add .Values.base_timeout .Values.nginx_ingress._extra_timeout }}
     disableValidation: true
+    <<: *logFailedRelease
     values:
       - "../etc/nginx-ingress/values.yaml"
       - {{ .Values.nginx_ingress | toYaml | indent 8 | trim }}
@@ -127,8 +133,9 @@ releases:
   - name: kafka-manager
     chart: radar/kafka-manager
     version: {{ .Values.kafka_manager._chart_version }}
-    wait: false
     installed: {{ .Values.kafka_manager._install }}
+    timeout: {{ add .Values.base_timeout .Values.kafka_manager._extra_timeout }}
+    <<: *logFailedRelease
     values:
       - {{ .Values.kafka_manager | toYaml | indent 8 | trim }}
     set:

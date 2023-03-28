@@ -1,34 +1,113 @@
-name: CI
-on: [push]
+name: Install applications on Kubernets
+
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'
+        required: false
+        default: false
+
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  install:
+    strategy:
+      matrix:
+        KUBECTL_VERSION: ["v1.23.0", "v1.24.0", "v1.25.0", "v1.26.0"]
+        include:
+          - KUBECTL_VERSION: "v1.23.0"
+            K3S_VERSION: "v1.23.15+k3s1"
+          - KUBECTL_VERSION: "v1.24.0"
+            K3S_VERSION: "v1.24.9+k3s2"
+          - KUBECTL_VERSION: "v1.25.0"
+            K3S_VERSION: "v1.25.5+k3s2"
+          - KUBECTL_VERSION: "v1.26.0"
+            K3S_VERSION: "v1.26.0+k3s2"
+    runs-on: self-hosted
     steps:
-    - uses: actions/checkout@v1.0.0
+    - name: Cleanup
+      continue-on-error: true
+      run: |
+        ls -la ./
+        rm -rf ./* || true
+        rm -rf ./.??* || true
+        ls -la ./
+        /usr/local/bin/k3s-uninstall.sh
 
-    - name: Setup helmfile
-      uses: mamezou-tech/setup-helmfile@v1.0.0
+    - uses: actions/checkout@v3
 
-    - name: Set up helmfile config
-      run: cp .github/environments.yaml environments.yaml
+    - name: Install dependencies
+      env:
+        KUBECTL_VERSION: ${{ matrix.KUBECTL_VERSION }}
+        HELM_VERSION: "v3.10.2"
+        HELM_DIFF_VERSION: "3.4.2"
+        HELMFILE_VERSION: "v0.148.1"
+        YQ_VERSION: "v4.30.1"
+      run: |
+        ./.github/ci_config/bin/install-dependencies
+
+    - name: Prepare the environment
+      run: |
+        DNAME='CN=CI,O=TheHyve,L=Utrecht,C=NL' ./bin/init
+        yq -i -f process '.environments.default.values += ["../.github/ci_config/install-all.yaml", "../.github/ci_config/secrets.yaml.gotmpl"]' environments.yaml
 
     - name: Run helmfile template
+      env:
+        FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
       run: |
         helmfile template
 
-    # - name: Start a local k8s cluster
-    #   uses: jupyterhub/action-k3s-helm@v3
-    #   with:
-    #     # See available:
-    #     # - k3s release channels at https://github.com/k3s-io/k3s/blob/HEAD/channel.yaml
-    #     # - k3s versions at https://github.com/k3s-io/k3s/tags
-    #     # - helm versions at https://github.com/helm/helm/tags
-    #     k3s-channel: latest
-    #
-    # - name: Verify function of k8s, kubectl, and helm
-    #   run: |
-    #     echo "kubeconfig: $KUBECONFIG"
-    #     kubectl version
-    #     kubectl get pods --all-namespaces
-    #
-    #     helmfile sync --concurrency 1
+    - name: Install K3S
+      env:
+        INSTALL_K3S_VERSION: ${{ matrix.K3S_VERSION }}
+        INSTALL_K3S_SYMLINK: "skip"
+        K3S_KUBECONFIG_MODE: "644"
+      run: |
+        curl -sfL https://get.k3s.io | sh -s - --disable traefik --disable-helm-controller
+        cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+
+    - name: Install RADAR-Kubernetes
+      env:
+        FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
+      run: |
+        echo "kubeconfig: $KUBECONFIG"
+        kubectl get pods --all-namespaces
+
+        helmfile sync --concurrency 1
+
+    # Enable tmate debugging of manually-triggered workflows if the input option was provided
+    - name: Manually triggered tmate session
+      uses: mxschmitt/action-tmate@v3
+      if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+      with:
+        limit-access-to-actor: true
+
+    - name: Setup tmate session if jobs have failed
+      if: ${{ failure() }}
+      uses: mxschmitt/action-tmate@v3
+      timeout-minutes: 15
+      with:
+        limit-access-to-actor: true
+
+    - name: Report cluster state
+      if: always()
+      run: |
+        kubectl get pods --all-namespaces
+
+  check-gitignore:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Check gitignore
+      run: |
+        echo "Checking whether any files that should be ignored are uploaded"
+        echo
+        if find . -not -path './.git/*' -type f | git check-ignore --stdin --no-index; then
+          echo
+          echo "Remove the above files from this branch"
+          exit 1
+        else
+          echo "No ignored files have been added"
+        fi

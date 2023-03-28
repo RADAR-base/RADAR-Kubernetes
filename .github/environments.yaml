@@ -1,4 +1,0 @@
-environments:
- default:
-   values:
-     - ../etc/base.yaml

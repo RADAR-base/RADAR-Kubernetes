@@ -3,29 +3,20 @@ bases:
 
 ---
 
-helmDefaults:
-  atomic: true
-  timeout: 120
-  kubeContext: {{ .Values.kubeContext }}
-
-repositories:
-  - name: radar
-    url: https://radar-base.github.io/radar-helm-charts
+{{ readFile "../etc/helmfile-templates.yaml" }}
 
 releases:
   - name: velero
-    chart: radar/velero-s3-deployment
     namespace: velero
+    chart: radar/velero-s3-deployment
     version: {{ .Values.velero._chart_version }}
     installed: {{ .Values.velero._install }}
+    timeout: {{ add .Values.base_timeout .Values.velero._extra_timeout }}
+    <<: *logFailedRelease
     values:
       - {{ .Values.velero | toYaml | indent 8 | trim }}
     set:
-      {{- if not (hasKey .Values.velero "local.accessKey") }}
       - name: local.accessKey
-        value: {{ .Values.s3_access_key }}
-      {{- end }}
-      {{- if not (hasKey .Values.velero "local.secretKey") }}
+        value: {{ dig "local" "accessKey" .Values.s3_access_key .Values.velero }}
       - name: local.secretKey
-        value: {{ .Values.s3_secret_key }}
-      {{- end }}
+        value: {{ dig "local" "secretKey" .Values.s3_secret_key .Values.velero }}

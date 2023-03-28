@@ -4,3 +4,17 @@ environments:
    - ../etc/base.yaml
    - ../etc/production.yaml
    - ../etc/production.yaml.gotmpl
+   - ../etc/secrets.yaml
+
+---
+
+helmDefaults:
+  atomic: {{ .Values.atomicInstall }}
+  kubeContext: {{ .Values.kubeContext }}
+  wait: true
+
+repositories:
+  - name: radar
+    url: https://radar-base.github.io/radar-helm-charts
+  - name: cp-radar
+    url: https://radar-base.github.io/cp-helm-charts

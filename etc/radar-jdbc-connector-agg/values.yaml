@@ -1,0 +1,31 @@
+sink:
+  # -- Name of the connector Kafka consumer group
+  name: radar-timescale-sink
+  # -- create table if it does not exist
+  autoCreate: true
+  # -- How to insert new values into the database
+  insertMode: upsert
+
+  transforms:
+    # -- Whether to merge the key fields into the inserted values.
+    enabled: true
+    # -- Class to handle merging the key into the record
+    mergeKeyType: org.radarbase.kafka.connect.transforms.MergeKey
+    # -- Class to convert time-based fields into SQL timestamps
+    timestampType: org.radarbase.kafka.connect.transforms.TimestampConverter
+    # -- Field names to consider for converting to timestamp
+    timestampFields:
+      - TIME
+
+  primaryKeys:
+    # -- where to read the primary keys from when creating the table
+    mode: record_value
+    # -- fields to include as primary keys when creating the table
+    fields:
+      - TIME
+      - USERID
+      - PROJECTID
+  # -- Comma-separated list of topics the connector will read from and ingest into the database
+  topics: PUSH_GARMIN_HEART_RATE_SAMPLE_TIMESTAMP_LONG_WINDOWED_1H_TABLE
+  # -- How to format a table name based on the inserted topic
+  tableNameFormat: "${topic}"
