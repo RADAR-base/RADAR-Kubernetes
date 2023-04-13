@@ -4,4 +4,70 @@ templates:
       - events: ["postsync"]
         showlogs: true
         command: "../bin/log-failed-release"
-        args: ["-c", "'{{ .Values.kubeContext }}'", "-n", "'{{ .Release.Namespace }}'", "-r", "'{{ .Release.Name }}'", "-e", "'{{ if .Event.Error }}{{ .Event.Error }}{{ end }}'"]
+        args:
+          [
+            "-c",
+            "'{{ .Values.kubeContext }}'",
+            "-n",
+            "'{{ .Release.Namespace }}'",
+            "-r",
+            "'{{ .Release.Name }}'",
+            "-e",
+            "'{{ if .Event.Error }}{{ .Event.Error }}{{ end }}'",
+          ]
+  logFailedReleasePrometheus: &logFailedReleasePrometheus
+    hooks:
+      - events: ["postsync"]
+        showlogs: true
+        command: "../bin/log-failed-release"
+        args:
+          [
+            "-c",
+            "'{{ .Values.kubeContext }}'",
+            "-n",
+            "'{{ .Release.Namespace }}'",
+            "-r",
+            "'{{ .Release.Name }}'",
+            "-e",
+            "'{{ if .Event.Error }}{{ .Event.Error }}{{ end }}'",
+          ]
+      - events: ["presync"]
+        showlogs: true
+        command: "kubectl"
+        args:
+          [
+            "--context",
+            "{{ .Values.kubeContext }}",
+            "apply",
+            "--force-conflicts",
+            "--server-side",
+            "-f",
+            "../etc/kube-prometheus-stack/files/crds.yaml",
+          ]
+  logFailedReleaseCertManager: &logFailedReleaseCertManager
+    hooks:
+      - events: ["postsync"]
+        showlogs: true
+        command: "../bin/log-failed-release"
+        args:
+          [
+            "-c",
+            "'{{ .Values.kubeContext }}'",
+            "-n",
+            "'{{ .Release.Namespace }}'",
+            "-r",
+            "'{{ .Release.Name }}'",
+            "-e",
+            "'{{ if .Event.Error }}{{ .Event.Error }}{{ end }}'",
+          ]
+      - events: ["presync"]
+        showlogs: true
+        command: "kubectl"
+        args:
+          [
+            "--context",
+            "{{ .Values.kubeContext }}",
+            "apply",
+            "-f",
+            "../etc/cert-manager/files/crds.yaml",
+          ]
