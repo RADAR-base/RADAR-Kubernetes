@@ -25,9 +25,16 @@
 **Applicable issues**
 
 <!-- Enter any applicable Issues here (You can reference an issue using #) -->
-  - fixes #
+
+- fixes #
 
 **Additional information**
 
 <!-- If there's anything else that's important and relevant to your pull
 request, mention that information here.-->
+
+**Checklist**
+
+<!-- [Place an '[X]' (no spaces) in all applicable fields. Please remove unrelated fields.] -->
+
+- Make sure application versions in compatiblity section of README is same as the versions tested in CI

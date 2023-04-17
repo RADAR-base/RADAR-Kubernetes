@@ -71,7 +71,7 @@ releases:
     installed: {{ .Values.kube_prometheus_stack._install }}
     timeout: {{ add .Values.base_timeout .Values.kube_prometheus_stack._extra_timeout }}
     disableValidation: true
-    <<: *logFailedRelease
+    <<: *logFailedReleasePrometheus
     values:
       - {{ .Values.kube_prometheus_stack | toYaml | indent 8 | trim }}
     set:
@@ -97,11 +97,6 @@ releases:
         value: radar-base-tls-grafana
       - name: kube-prometheus-stack.grafana.ingress.tls[0].hosts
         values: ["grafana.{{ .Values.server_name }}"]
-    hooks:
-      - events: ["presync"]
-        showlogs: true
-        command: "kubectl"
-        args: ["--context", "{{ .Values.kubeContext }}", "apply", "--force-conflicts", "--server-side", "-f", "../etc/kube-prometheus-stack/files/crds.yaml"]
 
   - name: cert-manager
     namespace: cert-manager
@@ -110,14 +105,9 @@ releases:
     installed: {{ .Values.cert_manager._install }}
     timeout: {{ add .Values.base_timeout .Values.cert_manager._extra_timeout }}
     disableValidation: true
-    <<: *logFailedRelease
+    <<: *logFailedReleaseCertManager
     values:
       - {{ .Values.cert_manager | toYaml | indent 8 | trim }}
-    hooks:
-      - events: ["presync"]
-        showlogs: true
-        command: "kubectl"
-        args: ["--context", "{{ .Values.kubeContext }}", "apply", "-f", "../etc/cert-manager/files/crds.yaml"]
 
   - name: nginx-ingress
     chart: radar/ingress-nginx
