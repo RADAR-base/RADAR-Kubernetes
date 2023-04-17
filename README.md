@@ -55,16 +55,17 @@ RADAR-Kubernetes is one of the youngest project of RADAR-base and will be the **
 ### Compatibility
 
 Currently RADAR-Kubernetes is tested and supported following versions:
+| Component | Version |
+| ---- | ------- |
+| Kubernetes | v1.23 to v1.26 |
+| K3s | v1.23.17+k3s1 to v1.26.3+k3s1 |
+| Kubectl | v1.23 to v1.26 |
+| Helm | v3.11.3 |
+| Helm diff | v3.6.0 |
+| Helmfile | v0.152.0 |
+| YQ | v4.33.3 |
 
-- Kubernetes: v1.23 to v1.26
-- K3S: v1.23.17+k3s1 to v1.26.3+k3s1
-- Kubectl: v1.23 to v1.26
-- Helm: v3.11.3
-- Helm diff: v3.6.0
-- Helmfile: v0.152.0
-- YQ: v4.33.3
-
-It's possible to install RADAR-Kubernetes on different version of tools as well, but you might encounter compatiblity issues.
+It's possible to install RADAR-Kubernetes on different version of tools as well, but you might encounter compatiblity issues. Make sure that `kubectl` version matches or it's higher than Kubernetes or K3s version that you're using. For other tools such as Git or Java the version, as long as it's not very old, it's not very impactful.
 
 ### Disclaimer
 
