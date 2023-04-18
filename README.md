@@ -54,7 +54,7 @@ RADAR-Kubernetes is one of the youngest project of RADAR-base and will be the **
 
 ### Compatibility
 
-Currently RADAR-Kubernetes is tested and supported following versions:
+Currently RADAR-Kubernetes is tested and supported on following component versions:
 | Component | Version |
 | ---- | ------- |
 | Kubernetes | v1.23 to v1.26 |
@@ -65,7 +65,7 @@ Currently RADAR-Kubernetes is tested and supported following versions:
 | Helmfile | v0.152.0 |
 | YQ | v4.33.3 |
 
-It's possible to install RADAR-Kubernetes on different version of tools as well, but you might encounter compatiblity issues. Make sure that `kubectl` version matches or it's higher than Kubernetes or K3s version that you're using. For other tools such as Git or Java the version, as long as it's not very old, it's not very impactful.
+It's possible to install RADAR-Kubernetes on different version of tools as well, but you might encounter compatibility issues. Make sure that `kubectl` version matches or it's higher than Kubernetes or K3s version that you're using. For other tools such as Git or Java the version, as long as it's not very old, it's not very impactful.
 
 ### Disclaimer
 
@@ -112,7 +112,7 @@ The following tools should be installed in your local machine to install the RAD
    git clone https://github.com/RADAR-base/RADAR-Kubernetes.git
    ```
 
-2. Run the initialization script to create basic config files.
+2. Run the initialization script to create basic configuration files.
 
    ```shell
    cd RADAR-Kubernetes
@@ -349,6 +349,9 @@ Run the following instructions to upgrade an existing RADAR-Kubernetes cluster.
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Upgrading the major version of a PostgreSQL image is not supported. If necessary, we propose to use a `pg_dump` to dump the current data and a `pg_restore` to restore that data on a newer version. Please find instructions for this elsewhere. |
 
+### Upgrade to RADAR-Kubernetes version 1.1.x
+Before running the upgrade make sure to copy `environments.yaml.tmpl` to `environments.yaml` and if you've previously changed `environments.yaml` apply the changes again. This is necessary due to addition of `helmDefaults` and `repositories` configurations to this file.
+
 ### Upgrade to RADAR-Kubernetes version 1.0.0
 
 Before running the upgrade, compare `etc/base.yaml` and `etc/base.yaml.gotmpl` with their `production.yaml` counterparts. Please ensure that all properties in `etc/base.yaml` are overridden in your `production.yaml` or that the `base.yaml` default value is fine, in which case no value needs to be provided in `production.yaml`.
@@ -553,5 +556,5 @@ bin/chart-updates
 
 ## Feedback and Contributions
 
-Enabling RADAR-base community to use RADAR-Kubernetes is important for us. If you have troubles setting up the platform using provided instructions, you can create an issue with exact details to reproduce and the expected behaviour.
+Enabling RADAR-base community to use RADAR-Kubernetes is important for us. If you have troubles setting up the platform using provided instructions, you can create an issue with exact details to reproduce and the expected behavior.
 You can also reach out to the RADAR-base community via RADAR-base Slack on **[radar-kubernetes channel](https://radardevelopment.slack.com/archives/C021AGGESC9)**. The RADAR-base developers support the community on a voluntary basis and will pick up your requests as time permits.
