@@ -10,34 +10,29 @@ server_name: example.com
 maintainer_email: MAINTAINER_EMAIL@example.com
 # Number of Kafka pods that will be installed
 kafka_num_brokers: 3
-
 # --------------------------------------------------------- 00-init.yaml ---------------------------------------------------------
 
 # Needed for graylog. If graylog is set not to install, this can be disabled as well.
 mongodb:
   _install: true
-  _chart_version: 11.1.10
+  _chart_version: 10.31.2
   _extra_timeout: 60
   # Use standalone for a leaner installation, replicaset for a distributed one.
   architecture: replicaset
-
 # Needed for graylog. If graylog is set not to install, this can be disabled as well.
 elasticsearch:
   _install: true
   _chart_version: 7.17.3
   _extra_timeout: 180
-
 graylog:
   _install: true
   _chart_version: 2.1.2
   _extra_timeout: 180
-
 # Needed for graylog. If graylog is set not to install, this can be disabled as well.
 fluent_bit:
   _install: true
   _chart_version: 0.19.24
   _extra_timeout: 0
-
 cert_manager:
   _install: true
   _chart_version: v1.10.0
@@ -50,7 +45,6 @@ cert_manager:
   prometheus:
     servicemonitor:
       enabled: true
-
 # Should be installed at least once to get the necessary resource definitions.
 # If disabled, you can still install those definitions with the command:
 # kubectl --context <my-context> apply --force-conflicts --server-side -f etc/kube-prometheus-stack/files/crds.yaml
@@ -85,7 +79,6 @@ kube_prometheus_stack:
                   storage: 1Gi
     kubeStateMetrics:
       enabled: true
-
 # Always needed
 nginx_ingress:
   _install: true
@@ -98,32 +91,27 @@ nginx_ingress:
       enabled: true
       serviceMonitor:
         enabled: true
-
 # Kafka manager is outdated but can still be used. Otherwise, use Kafka command-line tools.
 kafka_manager:
   _install: false
   _chart_version: 2.1.6
   _extra_timeout: 0
-
 # --------------------------------------------------------- 10-base.yaml ---------------------------------------------------------
 # Use letsencrypt to retrieve SSL certificates.
 cert_manager_letsencrypt:
   _install: true
   _chart_version: 0.1.0
   _extra_timeout: 0
-
 # Use confluent cloud instead of a local Kafka cluster.
 # If this is enabled, then cp_kafka and cp_zookeeper should be disabled.
 confluent_cloud:
   enabled: false
-
 cp_zookeeper:
   _install: true
   _chart_version: 0.3.3
   _extra_timeout: 510
   imageTag: 7.2.2
   servers: 3
-
 cp_kafka:
   _install: true
   _chart_version: 0.3.2
@@ -138,32 +126,28 @@ cp_kafka:
   # Increase for larger installations.
   persistence:
     size: 10Gi
-
 cp_schema_registry:
   _install: true
   _chart_version: 0.3.0
   _extra_timeout: 90
   imageTag: 7.2.2
   replicaCount: 1
-
 catalog_server:
   _install: true
   _chart_version: 0.4.3
   _extra_timeout: 90
   replicaCount: 1
   schema_registry: http://cp-schema-registry:8081
-
 radar_home:
   _install: true
   _chart_version: 0.1.1
   _extra_timeout: 0
-
 # --------------------------------------------------------- 10-managementportal.yaml ---------------------------------------------------------
 
 # This Postgresql is used for Management Portal and App config, postgres password should be same in them
 postgresql:
   _install: true
-  _chart_version: 11.1.24
+  _chart_version: 12.1.9
   _extra_timeout: 0
   # Check https://hub.docker.com/r/bitnami/postgresql/tags
   # On first install, choose the latest major version. This cannot be modified afterwards
@@ -176,12 +160,11 @@ postgresql:
       size: 10Gi
       # Uncomment when upgrading
       #existingClaim: "data-postgresql-postgresql-0"
-
 management_portal:
   _install: true
   _chart_version: 0.2.5
   _extra_timeout: 210
-  replicaCount: 1  # should be 1
+  replicaCount: 1 # should be 1
   postgres:
     host: postgresql
     ssl:
@@ -193,7 +176,6 @@ management_portal:
     oauth_checking_key_aliases_1: selfsigned
   smtp:
     password: secret
-
 app_config:
   _install: true
   _chart_version: 0.2.4
@@ -201,13 +183,11 @@ app_config:
   replicaCount: 1
   jdbc:
     url: jdbc:postgresql://postgresql:5432/appconfig
-
 app_config_frontend:
   _install: true
   _chart_version: 0.2.3
   _extra_timeout: 0
   replicaCount: 1
-
 # --------------------------------------------------------- 20-appserver.yaml ---------------------------------------------------------
 # The charts in 20-appserver.yaml only need to be installed if you have a custom aRMT app.
 radar_appserver_postgresql:
@@ -223,7 +203,6 @@ radar_appserver_postgresql:
       size: 8Gi
       # Uncomment when upgrading
       #existingClaim: "data-radar-appserver-postgresql-postgresql-0"
-
 radar_appserver:
   _install: false
   _chart_version: 0.1.4
@@ -231,7 +210,6 @@ radar_appserver:
   replicaCount: 1
   managementportal_resource_name: res_AppServer
   public_key_endpoints: []
-
 # --------------------------------------------------------- 20-fitbit.yaml ---------------------------------------------------------
 # The charts in 20-fitbit.yaml only need to be installed if you will use a Fitbit or Garmin API integration.
 radar_fitbit_connector:
@@ -240,13 +218,11 @@ radar_fitbit_connector:
   _extra_timeout: 0
   replicaCount: 1
   oauthClientId: radar_fitbit_connector
-
 radar_rest_sources_authorizer:
   _install: false
   _chart_version: 0.4.5
   _extra_timeout: 0
   replicaCount: 1
-
 radar_rest_sources_backend:
   _install: false
   _chart_version: 0.4.6
@@ -262,13 +238,10 @@ radar_rest_sources_backend:
       enable: "false"
     garmin:
       enable: "false"
-
 # --------------------------------------------------------- 20-grafana.yaml ---------------------------------------------------------
-
 timescaledb_username: postgres
 timescaledb_db_name: grafana-metrics
 grafana_metrics_username: postgres
-
 timescaledb:
   _install: true
   _chart_version: 12.1.9
@@ -287,7 +260,6 @@ timescaledb:
       size: 8Gi
       # Uncomment when upgrading
       #existingClaim: "data-timescaledb-postgresql-0"
-
 radar_grafana:
   _install: true
   _chart_version: 6.26.8
@@ -295,7 +267,6 @@ radar_grafana:
   replicaCount: 1
   env:
     GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/allprojects/home.json
-
 radar_jdbc_connector:
   _install: true
   _chart_version: 0.4.0
@@ -304,17 +275,13 @@ radar_jdbc_connector:
   sink:
     # Change the list of topics if you have dashboards that read other data or if you don't have certain topics available on your cluster.
     topics: android_phone_relative_location, android_phone_battery_level, connect_fitbit_intraday_heart_rate, connect_fitbit_intraday_steps
-
 # --------------------------------------------------------- 20-ingestion.yaml ---------------------------------------------------------
-
 radar_gateway:
   _install: true
   _chart_version: 0.2.6
   _extra_timeout: 0
   replicaCount: 1
-
 # --------------------------------------------------------- 20-kafka-analysis.yaml ---------------------------------------------------------
-
 radar_backend_monitor:
   _install: false
   _chart_version: 0.1.2
@@ -326,31 +293,25 @@ radar_backend_monitor:
     user: user@gmail.com
   persistence:
     size: 1Gi
-
 radar_backend_stream:
   _install: false
   _chart_version: 0.1.2
   _extra_timeout: 0
   replicaCount: 1
-
 # --------------------------------------------------------- 20-redcap.yaml ---------------------------------------------------------
-
 radar_integration:
   _install: false
   _chart_version: 0.4.0
   _extra_timeout: 0
   replicaCount: 1
   oauth_client_id: radar_redcap_integrator
-
 # --------------------------------------------------------- 20-s3-connector.yaml ---------------------------------------------------------
-
 redis:
   _install: true
   _chart_version: 16.8.7
   _extra_timeout: 0
   metrics:
     enabled: true
-
 minio:
   _install: true
   _chart_version: 11.9.1
@@ -375,7 +336,6 @@ minio:
     ##     policies:
     ##       - read-output
     users: []
-
 radar_s3_connector:
   # set to true if radar-s3-connector should be installed
   _install: true
@@ -385,7 +345,6 @@ radar_s3_connector:
   # The bucket name where intermediate data for cold storage should be written to.
   bucketName: radar-intermediate-storage
   s3Endpoint: http://minio:9000/
-
 s3_proxy:
   _install: false
   _chart_version: 0.1.3
@@ -393,7 +352,6 @@ s3_proxy:
   replicaCount: 1
   target:
     provider: azureblob
-
 radar_output:
   _install: true
   _chart_version: 0.3.1
@@ -407,12 +365,9 @@ radar_output:
     s3:
       endpoint: http://minio:9000/
       bucket: radar-output-storage
-
   redis:
     uri: redis://redis-master:6379
-
 # --------------------------------------------------------- 20-upload.yaml ---------------------------------------------------------
-
 radar_upload_postgresql:
   _install: true
   _chart_version: 11.1.24
@@ -424,36 +379,29 @@ radar_upload_postgresql:
       size: 10Gi
       # Uncomment when upgrading
       #existingClaim: "data-radar-upload-postgresql-postgresql-0"
-
 radar_upload_connect_backend:
   _install: true
   _chart_version: 0.2.3
   _extra_timeout: 0
   replicaCount: 1
-
 radar_upload_connect_frontend:
   _install: true
   _chart_version: 0.2.3
   _extra_timeout: 0
   replicaCount: 1
-
 radar_upload_source_connector:
   _install: true
   _chart_version: 0.2.2
   _extra_timeout: 60
   replicaCount: 1
   s3Endpoint: http://minio:9000/
-
 # --------------------------------------------------------- 30-confluent-cloud.yaml ---------------------------------------------------------
-
 ccSchemaRegistryProxy:
   _install: false
   _chart_version: 0.2.3
   _extra_timeout: 0
   externalName: schema-registry-domain
-
 # --------------------------------------------------------- 20-push-endpoint.yaml ---------------------------------------------------------
-
 radar_push_endpoint:
   _install: false
   _chart_version: 0.1.4
@@ -462,15 +410,12 @@ radar_push_endpoint:
   adminProperties: {}
   garmin:
     enabled: true
-
 # --------------------------------------------------------- 40-realtime-analyses.yaml ---------------------------------------------------------
-
 radar_jdbc_connector_agg:
   _install: false
   _chart_version: 0.4.1
   _extra_timeout: 0
   replicaCount: 1
-
 ksql_server:
   _install: false
   _chart_version: 0.3.1
@@ -486,16 +431,14 @@ ksql_server:
   configurationOverrides:
     "ksql.server.url": "http://0.0.0.0:8088"
     "ksql.advertised.listener": "http://ksql-server:8088"
-
 # --------------------------------------------------------- 99-velero.yaml ---------------------------------------------------------
-
 velero:
   _install: false
-  _chart_version: 0.1.0
+  _chart_version: 2.30.1
   _extra_timeout: 0
   objectStorageBackupReplicaCount: 1
   backup:
-    address: s3.amazon.com  # protocol should not be specified
+    address: s3.amazon.com # protocol should not be specified
     bucket: radar-base-backups
   velero:
     configuration:
