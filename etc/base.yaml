@@ -356,7 +356,7 @@ minio:
   _chart_version: 11.9.1
   _extra_timeout: 210
   image:
-    tag: 2022.10.15-debian-11-r0
+    tag: 2023-debian-11
   persistence:
     size: 20Gi
   metrics:
