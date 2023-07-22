@@ -34,7 +34,7 @@ releases:
     version: {{ .Values.graylog._chart_version }}
     installed: {{ .Values.graylog._install }}
     timeout: {{ add .Values.base_timeout .Values.graylog._extra_timeout }}
-    needs:
+    needs: # TODO: Fix the map so it wouldn't break if monogo and elastic both won't be installed
       {{ if .Values.mongodb._install }}- graylog/mongodb{{ end }}
       {{ if .Values.elasticsearch._install }}- graylog/elasticsearch{{ end }}    
     <<: *logFailedRelease
@@ -131,7 +131,7 @@ releases:
     set:
       - name: controller.metrics.serviceMonitor.enabled
         value: {{ .Values.kube_prometheus_stack._install }}
-        
+
   - name: kafka-manager
     chart: radar/kafka-manager
     version: {{ .Values.kafka_manager._chart_version }}

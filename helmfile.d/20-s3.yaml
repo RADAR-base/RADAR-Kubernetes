@@ -80,6 +80,7 @@ releases:
     timeout: {{ add .Values.base_timeout .Values.radar_output._extra_timeout }}
     <<: *logFailedRelease
     needs:
+      - radar-s3-connector
       {{ if .Values.redis._install }}- redis{{ end }}
       {{ if .Values.minio._install }}- minio{{ end }}
     values:
