@@ -81,7 +81,7 @@ jobs:
           echo "kubeconfig: $KUBECONFIG"
           kubectl get pods --all-namespaces
 
-          helmfile sync --concurrency 1
+          helmfile sync
 
       # Enable tmate debugging of manually-triggered workflows if the input option was provided
       - name: Manually triggered tmate session
@@ -102,6 +102,19 @@ jobs:
         run: |
           kubectl get pods --all-namespaces
 
+      - name: Prepare the logs for upload
+        if: always()
+        run: |
+          sudo chmod -R 777 /var/log/pods
+          
+      - name: Upload logs as artifacts
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: kubenretes-logs-${{ matrix.K3S_VERSION }}
+          path: /var/log/pods
+          if-no-files-found: ignore
+          
   check-gitignore:
     runs-on: ubuntu-latest
     steps:

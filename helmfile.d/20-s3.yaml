@@ -34,12 +34,17 @@ releases:
         value: {{ dig "auth" "rootUser" (dig "accessKey" .Values.s3_access_key .Values.minio) .Values.minio }}
       - name: auth.rootPassword
         value: {{ dig "auth" "rootPassword" (dig "secretKey" .Values.s3_secret_key .Values.minio) .Values.minio }}
+      - name: metrics.serviceMonitor.enabled
+        value: {{ .Values.kube_prometheus_stack._install }}
+      - name: metrics.prometheusRule.enabled
+        value: {{ .Values.kube_prometheus_stack._install }}
 
   - name: radar-s3-connector
     chart: radar/radar-s3-connector
     version: {{ .Values.radar_s3_connector._chart_version }}
     installed: {{ .Values.radar_s3_connector._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_s3_connector._extra_timeout }}
+    {{ if .Values.minio._install }}needs: [minio]{{ end }}
     <<: *logFailedRelease
     values:
       - {{ .Values.radar_s3_connector | toYaml | indent 8 | trim }}
@@ -74,6 +79,9 @@ releases:
     installed: {{ .Values.radar_output._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_output._extra_timeout }}
     <<: *logFailedRelease
+    needs:
+      {{ if .Values.redis._install }}- redis{{ end }}
+      {{ if .Values.minio._install }}- minio{{ end }}
     values:
       - {{ .Values.radar_output | toYaml | indent 8 | trim }}
     set:

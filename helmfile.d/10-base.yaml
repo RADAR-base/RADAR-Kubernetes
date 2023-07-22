@@ -34,6 +34,7 @@ releases:
     installed: {{ .Values.cp_kafka._install }}
     timeout: {{ add .Values.base_timeout .Values.cp_kafka._extra_timeout }}
     wait: true
+    {{ if .Values.cp_zookeeper._install }}needs: [cp-zookeeper]{{ end }}
     <<: *logFailedRelease
     values:
       - "../etc/cp-kafka/values.yaml"
@@ -48,6 +49,7 @@ releases:
     installed: {{ .Values.cp_schema_registry._install }}
     timeout: {{ add .Values.base_timeout .Values.cp_schema_registry._extra_timeout }}
     wait: true
+    {{ if .Values.cp_kafka._install }}needs: [cp-kafka]{{ end }}
     <<: *logFailedRelease
     values:
       - "../etc/cp-schema-registry/values.yaml"
@@ -68,6 +70,7 @@ releases:
     installed: {{ .Values.catalog_server._install }}
     timeout: {{ add .Values.base_timeout .Values.catalog_server._extra_timeout }}
     wait: true
+    {{ if .Values.cp_schema_registry._install }}needs: [cp-schema-registry]{{ end }}
     <<: *logFailedRelease
     values:
       - {{ .Values.catalog_server | toYaml | indent 8 | trim }}

@@ -21,6 +21,7 @@ releases:
     version: {{ .Values.management_portal._chart_version }}
     installed: {{ .Values.management_portal._install }}
     timeout: {{ add .Values.base_timeout .Values.management_portal._extra_timeout }}
+    {{ if .Values.postgresql._install }}needs: [postgresql]{{ end }}
     <<: *logFailedRelease
     values:
       - {{ .Values.management_portal | toYaml | indent 8 | trim }}
@@ -62,6 +63,7 @@ releases:
     version: {{ .Values.app_config._chart_version }}
     installed: {{ .Values.app_config._install }}
     timeout: {{ add .Values.base_timeout .Values.app_config._extra_timeout }}
+    {{ if .Values.postgresql._install }}needs: [postgresql]{{ end }}
     <<: *logFailedRelease
     values:
       - {{ .Values.app_config | toYaml | indent 8 | trim }}

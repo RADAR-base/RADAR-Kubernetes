@@ -173,7 +173,7 @@ Once all configuration files are ready, the RADAR-Kubernetes can be deployed on 
 #### Install RADAR-Kubernetes on your cluster.
 
 ```shell
-helmfile sync --concurrency 1
+helmfile sync
 ```
 
 The `helmfile sync` will synchronize all the Kubernetes resources defined in the helmfiles with your Kubernetes cluster. Having `--concurrency 1` will make sure components are installed in required order. Depending on your cluster specification, this may take around 30 minutes when installed for the first time.
@@ -402,6 +402,7 @@ In `production.yaml` rename sections:
 | radar_jdbc_connector_agg | radar_jdbc_connector_realtime_dashboard |
 
 ### Upgrade to RADAR-Kubernetes version 1.1.x
+
 Before running the upgrade make sure to copy `environments.yaml.tmpl` to `environments.yaml` and if you've previously changed `environments.yaml` apply the changes again. This is necessary due to addition of `helmDefaults` and `repositories` configurations to this file.
 
 ### Upgrade to RADAR-Kubernetes version 1.0.0
