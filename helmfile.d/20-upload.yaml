@@ -59,7 +59,9 @@ releases:
     version: {{ .Values.radar_upload_source_connector._chart_version }}
     installed: {{ .Values.radar_upload_source_connector._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_upload_source_connector._extra_timeout }}
-    <<: *logFailedRelease    
+    <<: *logFailedRelease
+    needs:
+    - radar-upload-connect-backend
     values:
       - {{ .Values.radar_upload_source_connector | toYaml | indent 8 | trim }}
     set:
