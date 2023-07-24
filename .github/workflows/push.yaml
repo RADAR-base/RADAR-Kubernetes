@@ -83,6 +83,11 @@ jobs:
 
           helmfile sync
 
+      - name: Report cluster state
+        if: always()
+        run: |
+          kubectl get pods --all-namespaces
+
       # Enable tmate debugging of manually-triggered workflows if the input option was provided
       - name: Manually triggered tmate session
         uses: mxschmitt/action-tmate@v3
@@ -109,19 +114,16 @@ jobs:
         with:
           limit-access-to-actor: true
 
-      - name: Report cluster state
-        if: always()
-        run: |
-          kubectl get pods --all-namespaces
-
+      # Takes very long to upload artifcats for some reason
+      # https://github.com/RADAR-base/RADAR-Kubernetes/actions/runs/5642728153/job/15283146473
       - name: Prepare the logs for upload
-        if: always()
+        if: ${{ failure() }}
         run: |
           sudo chmod -R 777 /var/log/pods
 
       - name: Upload logs as artifacts
         uses: actions/upload-artifact@v3
-        if: always()
+        if: ${{ failure() }}
         with:
           name: kubenretes-logs-${{ matrix.K3S_VERSION }}
           path: /var/log/pods
