@@ -226,7 +226,7 @@ radar_appserver_postgresql:
 
 radar_appserver:
   _install: false
-  _chart_version: 0.1.6
+  _chart_version: 0.1.7
   _extra_timeout: 0
   replicaCount: 1
   managementportal_resource_name: res_AppServer
