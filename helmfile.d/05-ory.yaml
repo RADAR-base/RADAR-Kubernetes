@@ -1,0 +1,23 @@
+bases:
+- ../environments.yaml
+
+---
+
+releases:
+  - name: kratos
+    chart: ory/kratos
+    version: {{ .Values.kratos._chart_version }}
+    installed: {{ .Values.kratos._install }}
+    timeout: {{ add .Values.base_timeout .Values.kratos._extra_timeout }}
+    values:
+      - "../etc/kratos/values.yaml"
+      - {{ .Values.kratos | toYaml | indent 8 | trim }}
+
+  - name: kratos-selfservice-ui-node
+    chart: ory/kratos-selfservice-ui-node
+    version: {{ .Values.kratos_ui._chart_version }}
+    installed: {{ .Values.kratos_ui._install }}
+    timeout: {{ add .Values.base_timeout .Values.kratos_ui._extra_timeout }}
+    values:
+      - "../etc/kratos_ui/values.yaml"
+      - {{ .Values.kratos_ui | toYaml | indent 8 | trim }}

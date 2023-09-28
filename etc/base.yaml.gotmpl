@@ -33,3 +33,24 @@ radar_grafana:
 #  ksql:
 #    queries: |
 #      {{/*- readFile "cp-ksql-server/queries.sql" | nindent 8 */}}
+
+# If ory kratos is used, please remove the Go template comments and yaml comments.
+# These templates generate the connection strings based on multiple secrets.
+#{{/*
+#kratos:
+#  kratos:
+#    {{- $secrets := exec "sops" (list "-d" "production.yaml") | fromYaml }}
+#    config:
+#      {{- $postgres_user := $secrets.management_portal.postgres.user | default "postgres" }}
+#      {{- $postgres_password := $secrets.management_portal.postgres.password }}
+#      {{- $postgres_host := $secrets.management_portal.postgres.host | default "postgresql" }}
+#      {{- $postgres_port := $secrets.management_portal.postgres.port | default "5432" }}
+#      {{- $postgres_database := "kratos" }}
+#      dsn: {{ printf "postgres://%s:%s@%s:%d/%s" $postgres_user $postgres_password $postgres_host $postgres_port $postgres_database | quote }}
+#      courier:
+#        smtp:
+#          {{- $smtp_user := $secrets.management_portal.smtp.username }}
+#          {{- $smtp_password := $secrets.management_portal.smtp.password }}
+#          {{- $smtp_host := $secrets.management_portal.smtp.host }}
+#          connection_uri: {{ printf "%s:%s@%s" $smtp_user $smtp_password $smtp_host | quote }}
+#*/}}
