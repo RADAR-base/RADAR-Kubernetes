@@ -1,0 +1,34 @@
+config:
+  csrfCookieName: "radar_csrf"
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: localhost
+      paths:
+        - path: "/kratos-ui/?(.*)"
+          pathType: ImplementationSpecific
+  tls:
+    - secretName: radar-base-tls
+      hosts:
+        - localhost
+        # -- Set this to ORY Kratos's Admin URL
+kratosAdminUrl: "kratos-admin"
+
+# -- Set this to ORY Kratos's public URL
+kratosPublicUrl: "https://localhost/kratos"
+
+# -- Set this to ORY Kratos's public URL accessible from the outside world.
+kratosBrowserUrl: "https://localhost/kratos"
+
+# -- The basePath
+basePath: ""
+
+# -- The jwksUrl
+jwksUrl: ""
+
+projectName: "SecureApp"

@@ -182,8 +182,12 @@ management_portal:
   _chart_version: 1.1.4
   _extra_timeout: 210
   replicaCount: 1  # should be 1
+  # FIXME: Should the postgres database connection info not be a global property?
+  # Now I have to repeat this here so that other charts can use it (e.g., 15-ory.yaml).
   postgres:
     host: postgresql
+    user: postgres
+    port: 5432
     ssl:
       enabled: false
   managementportal:
@@ -192,7 +196,9 @@ management_portal:
     oauth_checking_key_aliases_0: radarbase-managementportal-ec
     oauth_checking_key_aliases_1: selfsigned
   smtp:
+    username: secret
     password: secret
+    host: localhost
 
 app_config:
   _install: true
@@ -207,6 +213,18 @@ app_config_frontend:
   _chart_version: 1.1.1
   _extra_timeout: 0
   replicaCount: 1
+
+# --------------------------------------------------------- 15-ory.yaml ---------------------------------------------------------
+
+kratos:
+  _install: false
+  _chart_version: 2.1.6
+  _extra_timeout: 0
+
+kratos_ui:
+  _install: false
+  _chart_version: 2.1.6
+  _extra_timeout: 0
 
 # --------------------------------------------------------- 20-appserver.yaml ---------------------------------------------------------
 # The charts in 20-appserver.yaml only need to be installed if you have a custom aRMT app.
