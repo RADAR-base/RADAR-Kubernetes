@@ -148,14 +148,14 @@ cp_schema_registry:
 
 catalog_server:
   _install: true
-  _chart_version: 0.5.0
+  _chart_version: 0.5.1
   _extra_timeout: 90
   replicaCount: 1
   schema_registry: http://cp-schema-registry:8081
 
 radar_home:
   _install: true
-  _chart_version: 0.2.1
+  _chart_version: 0.2.2
   _extra_timeout: 0
 
 # --------------------------------------------------------- 10-managementportal.yaml ---------------------------------------------------------
@@ -196,7 +196,7 @@ management_portal:
 
 app_config:
   _install: true
-  _chart_version: 1.1.0
+  _chart_version: 1.1.1
   _extra_timeout: 0
   replicaCount: 1
   jdbc:
@@ -204,7 +204,7 @@ app_config:
 
 app_config_frontend:
   _install: true
-  _chart_version: 1.1.0
+  _chart_version: 1.1.1
   _extra_timeout: 0
   replicaCount: 1
 
@@ -243,7 +243,7 @@ radar_fitbit_connector:
 
 radar_rest_sources_authorizer:
   _install: false
-  _chart_version: 1.1.1
+  _chart_version: 1.1.2
   _extra_timeout: 0
   replicaCount: 1
 
