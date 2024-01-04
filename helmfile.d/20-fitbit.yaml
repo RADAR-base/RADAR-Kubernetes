@@ -73,3 +73,25 @@ releases:
         value: {{ dig "restSourceClients" "garmin" "clientSecret" (dig "garmin" "consumerSecret" "" .Values.radar_push_endpoint) .Values.radar_rest_sources_backend }}
       - name: client_secret
         value: {{ dig "client_secret" (dig "oauth_clients" "radar_rest_sources_auth_backend" "client_secret" "" .Values.management_portal) .Values.radar_rest_sources_backend }}
+
+  - name: radar-oura-connector
+    chart: radar/radar-oura-connector
+    version: {{ .Values.radar_oura_connector._chart_version }}
+    installed: {{ .Values.radar_oura_connector._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_oura_connector._extra_timeout }}
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.radar_oura_connector | toYaml | indent 8 | trim }}
+    set:
+      - name: kafka_num_brokers
+        value: {{ .Values.kafka_num_brokers }}
+      {{- if hasKey .Values "oura_api_client" }}
+      - name: oura_api_client
+        value: {{ .Values.oura_api_client }}
+      {{- end }}
+      {{- if hasKey .Values "oura_api_secret" }}
+      - name: oura_api_secret
+        value: {{ .Values.oura_api_secret }}
+      {{- end }}
+      - name: oauthClientSecret
+        value: secret
