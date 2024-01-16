@@ -166,7 +166,7 @@ Once all configuration files are ready, the RADAR-Kubernetes can be deployed on 
 #### Install RADAR-Kubernetes on your cluster.
 
 ```shell
-helmfile sync --concurrency 1
+helmfile sync
 ```
 
 The `helmfile sync` will synchronize all the Kubernetes resources defined in the helmfiles with your Kubernetes cluster. Having `--concurrency 1` will make sure components are installed in required order. Depending on your cluster specification, this may take a few minutes when installed for the first time.
@@ -350,6 +350,7 @@ Run the following instructions to upgrade an existing RADAR-Kubernetes cluster.
 | Upgrading the major version of a PostgreSQL image is not supported. If necessary, we propose to use a `pg_dump` to dump the current data and a `pg_restore` to restore that data on a newer version. Please find instructions for this elsewhere. |
 
 ### Upgrade to RADAR-Kubernetes version 1.1.x
+
 Before running the upgrade make sure to copy `environments.yaml.tmpl` to `environments.yaml` and if you've previously changed `environments.yaml` apply the changes again. This is necessary due to addition of `helmDefaults` and `repositories` configurations to this file.
 
 ### Upgrade to RADAR-Kubernetes version 1.0.0

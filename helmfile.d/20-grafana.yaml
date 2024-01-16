@@ -33,6 +33,7 @@ releases:
     version: {{ .Values.radar_grafana._chart_version }}
     installed: {{ .Values.radar_grafana._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_grafana._extra_timeout }}
+    {{ if .Values.timescaledb._install }}needs: [timescaledb]{{ end }}
     <<: *logFailedRelease
     values:
       - "../etc/radar-grafana/values.yaml"
@@ -66,6 +67,7 @@ releases:
     version: {{ .Values.radar_jdbc_connector._chart_version }}
     installed: {{ .Values.radar_jdbc_connector._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_jdbc_connector._extra_timeout }}
+    {{ if .Values.timescaledb._install }}needs: [timescaledb]{{ end }}
     <<: *logFailedRelease    
     values:
       - {{ .Values.radar_jdbc_connector | toYaml | indent 8 | trim }}
