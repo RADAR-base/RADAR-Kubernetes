@@ -113,3 +113,14 @@ releases:
         value: {{ dig "logging" "enabled" .Values.graylog._install .Values.radar_home }}
       - name: logging.url
         value: {{ dig "logging" "url" (printf "https://graylog.%s/" .Values.server_name) .Values.radar_home }}
+
+  - name: nginx-ingress
+    chart: radar/ingress-nginx
+    version: {{ .Values.nginx_ingress._chart_version }}
+    installed: {{ .Values.nginx_ingress._install }}
+    timeout: {{ add .Values.base_timeout .Values.nginx_ingress._extra_timeout }}
+    disableValidation: true
+    <<: *logFailedRelease
+    values:
+      - "../etc/nginx-ingress/values.yaml"
+      - {{ .Values.nginx_ingress | toYaml | indent 8 | trim }}
