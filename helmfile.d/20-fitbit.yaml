@@ -94,4 +94,4 @@ releases:
         value: {{ .Values.oura_api_secret }}
       {{- end }}
       - name: oauthClientSecret
-        value: secret
+        value: {{ dig "radar_oura_connector" "client_secret" "" .Values.management_portal.oauth_clients }}
