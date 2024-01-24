@@ -14,7 +14,7 @@ jobs:
   install:
     strategy:
       matrix:
-        KUBECTL_VERSION: ["v1.23.0", "v1.24.0", "v1.25.0", "v1.26.0"]
+        KUBECTL_VERSION: ["v1.23.0", "v1.24.0", "v1.25.0", "v1.26.0", "v1.27.0"]
         include:
           - KUBECTL_VERSION: "v1.23.0"
             K3S_VERSION: "v1.23.17+k3s1"
@@ -24,6 +24,8 @@ jobs:
             K3S_VERSION: "v1.25.8+k3s1"
           - KUBECTL_VERSION: "v1.26.0"
             K3S_VERSION: "v1.26.3+k3s1"
+          - KUBECTL_VERSION: "v1.27.0"
+            K3S_VERSION: "v1.27.1+k3s1"
     runs-on: self-hosted
     steps:
       - name: Cleanup
