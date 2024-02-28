@@ -45,10 +45,12 @@ releases:
         value: {{ .Values.maintainer_email }}
       - name: graylog.ingress.hosts
         values: [graylog.{{ .Values.server_name }}]
+        {{- if .Values.graylog.ingress.tls }}
       - name: graylog.ingress.tls[0].secretName
         value: radar-base-tls
       - name: graylog.ingress.tls[0].hosts
         values: ["graylog.{{ .Values.server_name }}"]
+        {{ end }}
 
   - name: fluent-bit
     namespace: graylog
@@ -79,24 +81,30 @@ releases:
         value: {{ .Values.server_name }}
       - name: kube-prometheus-stack.prometheus.ingress.hosts
         values: ["prometheus.{{ .Values.server_name }}"]
+        {{- if .Values.kube_prometheus_stack.ingress.tls }}
       - name: kube-prometheus-stack.prometheus.ingress.tls[0].secretName
         value: radar-base-tls-prometheus
       - name: kube-prometheus-stack.prometheus.ingress.tls[0].hosts
         values: ["prometheus.{{ .Values.server_name }}"]
+        {{ end }}
 
       - name: kube-prometheus-stack.alertmanager.ingress.hosts
         values: ["alertmanager.{{ .Values.server_name }}"]
+        {{- if .Values.kube-prometheus-stack.alertmanager.ingress.tls }}
       - name: kube-prometheus-stack.alertmanager.ingress.tls[0].secretName
         value: radar-base-tls-alertmanager
       - name: kube-prometheus-stack.alertmanager.ingress.tls[0].hosts
         values: ["alertmanager.{{ .Values.server_name }}"]
+        {{ end }}
 
       - name: kube-prometheus-stack.grafana.ingress.hosts
         values: ["grafana.{{ .Values.server_name }}"]
+        {{- if .Values.kube-prometheus-stack.grafana.ingress.tls }}
       - name: kube-prometheus-stack.grafana.ingress.tls[0].secretName
         value: radar-base-tls-grafana
       - name: kube-prometheus-stack.grafana.ingress.tls[0].hosts
         values: ["grafana.{{ .Values.server_name }}"]
+        {{ end }}
 
   - name: cert-manager
     namespace: cert-manager
