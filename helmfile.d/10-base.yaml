@@ -57,10 +57,6 @@ releases:
         value: "{{ .Values.server_name }}"
       - name: ingress.hosts[0].paths
         values: ["/schema/?(.*)"]
-      - name: ingress.tls[0].secretName
-        value: radar-base-tls
-      - name: ingress.tls[0].hosts
-        values: ["{{ .Values.server_name }}"]
 
   - name: catalog-server
     chart: radar/catalog-server

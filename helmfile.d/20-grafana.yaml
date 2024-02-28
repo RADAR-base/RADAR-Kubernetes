@@ -48,10 +48,14 @@ releases:
         values: ["dashboard.{{ .Values.server_name }}"]
       - name: "grafana\\.ini.server.root_url"
         value: "https://dashboard.{{ .Values.server_name }}/"
+        {{- $values := .Values.radar_grafana }}
+        {{- $useTLS := or (not (hasKey $values ".ingress")) (not (kindIs "invalid" .Values.ingress.tls)) }}
+        {{- if $useTLS }}
       - name: ingress.tls[0].secretName
         value: radar-base-tls-dashboard
       - name: ingress.tls[0].hosts
         values: ["dashboard.{{ .Values.server_name }}"]
+        {{- end }}
       - name: "grafana\\.ini.metrics.basic_auth_username"
         value: {{ .Values.grafana_metrics_username }}
       - name: "grafana\\.ini.metrics.basic_auth_password"
