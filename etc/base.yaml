@@ -105,6 +105,249 @@ kafka_manager:
   _chart_version: 2.1.6
   _extra_timeout: 0
 
+# --------------------------------------------------------- 05-ory.yaml ---------------------------------------------------------
+
+kratos:
+  ingress:
+    admin:
+      enabled: true
+      className: "nginx"
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+    public:
+      enabled: true
+      className: "nginx"
+      annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /$1
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+
+
+  kratos:
+    development: false
+
+    # -- Enables database migration
+    automigration:
+      enabled: true
+      # -- Configure the way to execute database migration. Possible values: job, initContainer
+      # When set to job, the migration will be executed as a job on release or upgrade.
+      # When set to initContainer, the migration will be executed when Kratos pod is created
+      # Defaults to job
+      type: job
+      # -- Ability to override the entrypoint of the automigration container
+      # (e.g. to source dynamic secrets or export environment dynamic variables)
+      customCommand: [ ]
+      # -- Ability to override arguments of the entrypoint. Can be used in-depended of customCommand
+      # eg:
+      # - sleep 5;
+      #   - kratos
+      customArgs: [ ]
+      # -- resource requests and limits for the automigration initcontainer
+      resources: { }
+
+    # -- You can add multiple identity schemas here. You can pass JSON schema using `--set-file` Helm CLI argument.
+    identitySchemas:
+      "identity.user.schema.json": |
+        {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "$id": "user",
+          "title": "user",
+          "type": "object",
+          "properties": {
+            "traits": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "format": "email",
+                  "title": "E-Mail",
+                  "minLength": 5,
+                  "ory.sh/kratos": {
+                    "credentials": {
+                      "password": {
+                        "identifier": true
+                      },
+                      "totp": {
+                        "account_name": true
+                      }
+                    },
+                    "verification": {
+                      "via": "email"
+                    },
+                    "recovery": {
+                      "via": "email"
+                    }
+                  }
+                }
+              },
+              "required": [ "email" ]
+            }
+          },
+          "additionalProperties": false
+        }
+      "identity.default.schema.json": |
+        {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "$id": "default",
+          "title": "user",
+          "type": "object",
+          "properties": {
+            "traits": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "format": "email",
+                  "title": "E-Mail",
+                  "minLength": 5,
+                  "ory.sh/kratos": {
+                    "credentials": {
+                      "password": {
+                        "identifier": true
+                      },
+                      "totp": {
+                        "account_name": true
+                      }
+                    },
+                    "verification": {
+                      "via": "email"
+                    },
+                    "recovery": {
+                      "via": "email"
+                    }
+                  }
+                }
+              },
+              "required": [ "email" ]
+            }
+          },
+          "additionalProperties": false
+        }
+
+    # -- You can customize the emails Kratos is sending (also uncomment config.courier.template_override_path below)
+    emailTemplates:
+     emailTemplates:
+       recovery:
+         valid:
+           subject: Recover access to your account
+           body: |-
+             Hi, please recover access to your account by clicking the following link:
+             <a href="{{ .RecoveryURL }}">{{ .RecoveryURL }}</a>
+           plainBody: |-
+             Hi, please recover access to your account by clicking the following link: {{ .RecoveryURL }}
+         invalid:
+           subject: Account access attempted
+           body: |-
+             Hi, you (or someone else) entered this email address when trying to recover access to an account.
+             However, this email address is not on our database of registered users and therefore the attempt has failed. If this was you, check if you signed up using a different address. If this was not you, please ignore this email.
+           plainBody: |-
+             Hi, you (or someone else) entered this email address when trying to recover access to an account.
+       verification:
+         valid:
+           subject: Please verify your email address
+           body: |-
+             Hi, please verify your account by clicking the following link:
+             <a href="{{ .VerificationURL }}">{{ .VerificationURL }}</a>
+           plainBody: |-
+             Hi, please verify your account by clicking the following link: {{ .VerificationURL }}
+    #     invalid:
+    #       subject:
+    #       body:
+    #       plainBody:
+
+    config:
+
+      session:
+        # Defines how long a session is active. Once that lifespan has been reached, the user needs to sign in again.
+        lifespan: 24h
+
+        cookie:
+          ##-- If false, cookie is removed when the browser is closed --##
+          persistent: false
+
+      serve:
+        public:
+          cors:
+            enabled: true
+            allowed_methods:
+              - POST
+              - GET
+              - PUT
+              - PATCH
+              - DELETE
+            allowed_headers:
+              - Authorization
+              - Cookie
+              - Content-Type
+              - Accept
+            exposed_headers:
+              - Content-Type
+              - Set-Cookie
+              - Accept
+            allow_credentials: true
+
+      selfservice:
+        methods:
+          password:
+            config:
+              haveibeenpwned_enabled: true
+              max_breaches: 0
+              ignore_network_errors: false
+              min_password_length: 12
+              identifier_similarity_check_enabled: true
+            enabled: true
+          totp:
+            config:
+              issuer: Radar
+            enabled: true
+          link:
+            enabled: true
+
+        flows:
+          settings:
+            required_aal: highest_available
+
+          recovery:
+            enabled: true
+            use: link
+
+          verification:
+            enabled: false
+            use: link
+
+          registration:
+            after:
+              password:
+                hooks:
+                  - hook: session
+              oidc:
+                hooks:
+                  - hook: session
+
+      identity:
+        default_schema_id: user
+        schemas:
+          # identitySchemas:
+          - id: user
+            url: file:///etc/config/identity.user.schema.json
+
+      log:
+        level: debug
+        format: text
+        leak_sensitive_values: true
+
+kratos_ui:
+  config:
+    csrfCookieName: "radar_csrf"
+
+  ingress:
+    enabled: true
+    className: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /$1
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+
+  kratosAdminUrl: "kratos-admin"
+
 # --------------------------------------------------------- 10-base.yaml ---------------------------------------------------------
 # Use letsencrypt to retrieve SSL certificates.
 cert_manager_letsencrypt:
@@ -243,7 +486,7 @@ radar_fitbit_connector:
 
 radar_rest_sources_authorizer:
   _install: false
-  _chart_version: 1.1.2
+  _chart_version: 1.1.3
   _extra_timeout: 0
   replicaCount: 1
 

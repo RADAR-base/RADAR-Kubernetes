@@ -1,0 +1,17 @@
+bases:
+  - ../environments.yaml
+
+---
+
+helmDefaults:
+  kubeContext: {{ .Values.kubeContext }}
+
+releases:
+  - name: kratos
+    chart: ory/kratos
+    values:
+      - {{ .Values.kratos | toYaml | indent 8 | trim }}
+  - name: kratos-selfservice-ui-node
+    chart: ory/kratos-selfservice-ui-node
+    values:
+      - {{ .Values.kratos_ui | toYaml | indent 8 | trim }}
