@@ -123,6 +123,7 @@ kratos:
 
 
   kratos:
+    # When installing, you must manually create a database named kratos in the postgresql database.
     development: false
 
     # -- Enables database migration
@@ -333,7 +334,7 @@ kratos:
       log:
         level: debug
         format: text
-        leak_sensitive_values: true
+        leak_sensitive_values: false
 
 kratos_ui:
   config:
