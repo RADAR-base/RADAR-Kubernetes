@@ -3,7 +3,7 @@ name: Update versions.md
 on:
   push:
     branches:
-      - version_scan
+      - main
 
 jobs:
   update_versions:
