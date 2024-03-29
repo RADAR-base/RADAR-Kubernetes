@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "data-dashboard-backend.fullname" . }}
+  labels:
+    {{- include "data-dashboard-backend.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "data-dashboard-backend.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secrets: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
+      {{- range $key, $value := .Values.podAnnotations }}
+        {{ $key }}: {{ $value | quote }}
+      {{- end }}
+      labels:
+        {{- include "data-dashboard-backend.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - "/etc/data-dashboard-backend/dashboard.yml"
+          env:
+          - name: DATABASE_URL
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "data-dashboard-backend.secretName" . }}
+                key: databaseUrl
+          - name: DATABASE_USER
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "data-dashboard-backend.secretName" . }}
+                key: databaseUser
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "data-dashboard-backend.secretName" . }}
+                key: databasePassword
+          ports:
+            - name: http
+              containerPort: 9000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+              httpHeaders:
+                - name: Accept
+                  value: application/json
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+              httpHeaders:
+                - name: Accept
+                  value: application/json
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/data-dashboard-backend/
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "data-dashboard-backend.fullname" . }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

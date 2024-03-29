@@ -282,11 +282,10 @@ radar_rest_sources_backend:
     garmin:
       enable: "false"
 
-# --------------------------------------------------------- 20-grafana.yaml ---------------------------------------------------------
+# --------------------------------------------------------- 20-dashboard.yaml ---------------------------------------------------------
 
 timescaledb_username: postgres
-timescaledb_db_name: grafana-metrics
-grafana_metrics_username: postgres
+timescaledb_db_name: data-dashboard
 
 timescaledb:
   _install: true
@@ -307,6 +306,8 @@ timescaledb:
       # Uncomment when upgrading
       #existingClaim: "data-timescaledb-postgresql-0"
 
+grafana_metrics_username: postgres
+
 radar_grafana:
   _install: true
   _chart_version: 6.26.8
@@ -314,6 +315,11 @@ radar_grafana:
   replicaCount: 1
   env:
     GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/allprojects/home.json
+
+data_dashboard_backend:
+  _install: false
+  _chart_version: 0.1.0
+  replicaCount: 1
 
 radar_jdbc_connector:
   _install: true
@@ -465,6 +471,22 @@ radar_upload_source_connector:
   _extra_timeout: 60
   replicaCount: 1
   s3Endpoint: http://minio:9000/
+
+# --------------------------------------------------------- 20-outcomes-transform.yaml ---------------------------------------------------------
+
+outcomes_jdbc_sink_connector:
+  _install: true
+  _chart_version: 0.3.0
+  replicaCount: 1
+
+outcomes_jdbc_source_connector:
+  _install: true
+  _chart_version: 0.3.0
+  replicaCount: 1
+
+outcomes_ksql_transform:
+  _install: true
+  _chart_version: 0.3.1
 
 # --------------------------------------------------------- 30-confluent-cloud.yaml ---------------------------------------------------------
 

@@ -407,7 +407,7 @@ If installed, to upgrade `timescaledb`, uncomment the `production.yaml` line `ti
 ```shell
 kubectl delete secrets timescaledb-postgresql
 kubectl delete statefulsets timescaledb-postgresql
-helmfile -f helmfile.d/20-grafana.yaml apply
+helmfile -f helmfile.d/20-dashboard.yaml apply
 ```
 
 If installed, to upgrade `radar-upload-postgresql`, uncomment the `production.yaml` line `radar_upload_postgresql.primary.existingClaim: "data-radar-upload-postgresql-postgresql-0"`. Then run

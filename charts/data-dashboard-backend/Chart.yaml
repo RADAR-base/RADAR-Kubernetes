@@ -1,0 +1,22 @@
+apiVersion: v2
+appVersion: "0.1.0"
+name: data-dashboard-backend
+description: API for data in the data dashboard
+version: 0.1.6
+sources: ["https://github.com/thehyve/radar-data-dashboard-backend"]
+deprecated: false
+type: application
+home: "https://radar-base.org"
+maintainers:
+  - email: keyvan@thehyve.nl
+    name: Keyvan Hedayati
+    url: https://www.thehyve.nl
+  - email: nivethika@thehyve.nl
+    name: Nivethika Mahasivam
+    url: https://www.thehyve.nl/experts/nivethika-mahasivam
+  - email: bastiaan@thehyve.nl
+    name: Bastiaan de Graaf
+    url: https://www.thehyve.nl/experts/bastiaan-de-graaf
+  - email: pim@thehyve.nl
+    name: Pim van Nierop
+    url: https://www.thehyve.nl/experts/pim-van-nierop

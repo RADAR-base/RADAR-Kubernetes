@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "data-dashboard-backend.fullname" . }}
+  labels:
+    app: {{ template "data-dashboard-backend.name" . }}
+    chart: {{ template "data-dashboard-backend.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  dashboard.yml: |
+    service:
+      baseUri: http://0.0.0.0:9000{{ .Values.path }}
+      advertisedBaseUri: null
+      enableCors: true
+    auth:
+      managementPortal:
+        url: {{ .Values.managementPortal.url }}
+        clientId: {{ .Values.managementPortal.clientId }}
+        clientSecret: {{ .Values.managementPortal.clientSecret }}
+      jwtResourceName: res_data_dashboard_backend
+    database:
+      url: {{ .Values.jdbc.url }}
+      user: {{ .Values.jdbc.user }}
+      password: {{ .Values.jdbc.password }}
+      dialect: {{ .Values.jdbc.dialect }}

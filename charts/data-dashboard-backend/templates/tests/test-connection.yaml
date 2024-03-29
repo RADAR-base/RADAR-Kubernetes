@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "data-dashboard-backend.fullname" . }}-test-connection"
+  labels:
+    {{- include "data-dashboard-backend.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox:1.36
+      command: ['wget']
+      args: ['{{ include "data-dashboard-backend.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never

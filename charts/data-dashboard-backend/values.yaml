@@ -1,0 +1,118 @@
+# Default values for data-dashboard-backend.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# -- Number of replicas to deploy
+replicaCount: 2
+
+image:
+  # -- docker image repository
+  repository: ghcr.io/thehyve/radar-data-dashboard-backend
+  # -- image pull policy
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: v0.1.3-alpha
+
+# -- Docker registry secret names as an array
+imagePullSecrets: []
+
+# -- String to partially override fullname template with a string (will prepend the release name)
+nameOverride: ""
+# -- String to fully override fullname template with a string
+fullnameOverride: ""
+
+# -- Configure pod's Security Context
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# -- Configure container's Security Context
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  # -- Kubernetes Service type
+  type: ClusterIP
+  # -- data-dashboard-backend port
+  port: 9000
+
+ingress:
+  # -- Enable ingress controller resource
+  enabled: true
+  # -- Ingress class name
+  className: ""
+  # -- Annotations that define default ingress class, certificate issuer
+  # @default -- check values.yaml
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  # -- Path within the url structure
+  path: /api
+  pathType: ImplementationSpecific
+  # -- Hosts to accept requests from
+  hosts:
+    - localhost
+  tls:
+    secretName: radar-base-data-dashboard
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  # -- Enable horizontal autoscaling
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# -- Node labels for pod assignment
+nodeSelector: {}
+
+# -- Toleration labels for pod assignment
+tolerations: []
+
+# -- Affinity labels for pod assignment
+affinity: {}
+
+existingSecret: ""
+
+# -- Standard JAVA_OPTS that should be passed to this service
+javaOpts: "-Xmx550m"
+
+
+managementPortal:
+  # -- ManagementPortal URL
+  url: http://management-portal:8080/managementportal
+  # -- ManagementPortal OAuth 2.0 client ID, having grant type client_credentials
+  clientId: radar_data_dashboard_backend
+  # -- ManagementPortal OAuth 2.0 client secret
+  clientSecret: secret
+
+# Base path to use in application
+path: /api
+
+jdbc:
+  # -- JDBC Driver to connect to the database.
+  driver: org.postgresql.Driver
+  # -- JDBC Connection url of the database.
+  url: jdbc:postgresql://postgresql:5432/data-dashboard
+  # -- Username of the database
+  user: radarbase
+  # -- Password of the user
+  password: password
+  # -- Hibernate dialect to use for JDBC Connection
+  dialect: org.hibernate.dialect.PostgreSQLDialect
