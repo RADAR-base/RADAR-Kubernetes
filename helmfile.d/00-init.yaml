@@ -90,7 +90,7 @@ releases:
 
       - name: kube-prometheus-stack.alertmanager.ingress.hosts
         values: ["alertmanager.{{ .Values.server_name }}"]
-        {{- if .Values.kube-prometheus-stack.alertmanager.ingress.tls }}
+        {{- if .Values.kube_prometheus_stack.alertmanager.ingress.tls }}
       - name: kube-prometheus-stack.alertmanager.ingress.tls[0].secretName
         value: radar-base-tls-alertmanager
       - name: kube-prometheus-stack.alertmanager.ingress.tls[0].hosts
@@ -99,7 +99,7 @@ releases:
 
       - name: kube-prometheus-stack.grafana.ingress.hosts
         values: ["grafana.{{ .Values.server_name }}"]
-        {{- if .Values.kube-prometheus-stack.grafana.ingress.tls }}
+        {{- if .Values.kube_prometheus_stack.grafana.ingress.tls }}
       - name: kube-prometheus-stack.grafana.ingress.tls[0].secretName
         value: radar-base-tls-grafana
       - name: kube-prometheus-stack.grafana.ingress.tls[0].hosts
