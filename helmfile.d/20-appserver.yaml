@@ -31,3 +31,5 @@ releases:
         values: [{{ .Values.server_name }}]
       - name: serverName
         value: {{ .Values.server_name }}
+      - name: postgres.password
+        value: {{ .Values.radar_appserver.postgres.password }}
