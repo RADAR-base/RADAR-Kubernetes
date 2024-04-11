@@ -1,0 +1,8 @@
+ingress:
+  annotations:
+    # Nginx decodes the uri before passing it to the backend server. This is dangerous because it can allow for XSS
+    # attacks. Grizzly servers have a bug where they send the decoded uri as part of error messages (see
+    # https://github.com/Graylog2/graylog2-server/issues/3171). To prevent this, we need to re-encode the uri
+    # ($request_uri is the original encoded request) before passing it to the Grizzly server.
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      rewrite ^ $request_uri;
