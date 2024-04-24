@@ -1,0 +1,12 @@
+replicaCount: 1
+
+kafka:
+  bootstrapServers: PLAINTEXT://cp-kafka-headless:9092
+
+cp-schema-registry:
+  url: http://cp-schema-registry:8081
+
+configurationOverrides:
+  log4j.loggers: org.apache.kafka.streams.processor.internals.StreamThread=WARN,org.apache.kafka.clients.producer.ProducerConfig=WARN,org.apache.kafka.clients.consumer.ConsumerConfig=WARN,org.apache.kafka.clients.admin.AdminClientConfig=WARN,io.confluent.kafka.serializers.KafkaAvroSerializerConfig=WARN,io.confluent.kafka.serializers.KafkaAvroDeserializerConfig=WARN,io.confluent.connect.avro.AvroConverterConfig=WARN,io.confluent.connect.avro.AvroDataConfig=WARN,org.apache.kafka.streams.StreamsConfig=WARN,io.confluent.ksql.util.KsqlConfig=WARN
+  confluent.telemetry.enabled: "false"
+  confluent.support.metrics.enable: "false"
