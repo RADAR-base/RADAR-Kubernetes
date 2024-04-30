@@ -461,7 +461,7 @@ ccSchemaRegistryProxy:
 
 radar_push_endpoint:
   _install: false
-  _chart_version: 0.2.2
+  _chart_version: 0.2.3
   _extra_timeout: 180
   replicaCount: 1
   adminProperties: {}
