@@ -496,7 +496,7 @@ ksql_server:
 
 velero:
   _install: false
-  _chart_version: 0.2.1
+  _chart_version: 0.2.2
   _extra_timeout: 0
   objectStorageBackupReplicaCount: 1
   backup:
