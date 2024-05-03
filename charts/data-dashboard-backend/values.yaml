@@ -7,11 +7,11 @@ replicaCount: 2
 
 image:
   # -- docker image repository
-  repository: ghcr.io/thehyve/radar-data-dashboard-backend
+  repository: ghcr.io/thehyve/radar-data-dashboard-backend-kafka_transformer
   # -- image pull policy
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: v0.1.5-alpha
+  tag: latest
 
 # -- Docker registry secret names as an array
 imagePullSecrets: []

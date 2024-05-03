@@ -22,10 +22,10 @@ radar_grafana:
 # If radar_jdbc_connector is used, and data transformation is needed, please remove the Go template comments and yaml comments.
 # Example transformation is exploding an array field in kafka message into multiple database rows.
 # Make sure to defined the transformation logic in the queries.sql file as needed for the use case.
-# kafka-data-transform:
+# kafka_data_transformer:
 #  ksql:
 #    queries: |
-#      {{- readFile "../etc/kafka-data-transform/queries.sql" | nindent 8 }}
+#      {{/* - readFile "../etc/kafka-data-transformer/queries.sql" | nindent 8 */}}
 
 # If appserver is used, please remove the Go template comments and yaml comments.
 # Again, like with management_portal, if you want to store the credentials in a

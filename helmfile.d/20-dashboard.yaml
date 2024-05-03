@@ -92,7 +92,7 @@ releases:
     wait: false
     installed: {{ .Values.kafka_data_transformer._install }}
     values:
-      - "../etc/kafka_data_transformer/values.yaml"
+      - "../etc/kafka-data-transformer/values.yaml"
       - {{ .Values.kafka_data_transformer | toYaml | indent 8 | trim }}
 
   - name: radar-jdbc-connector
