@@ -362,6 +362,8 @@ minio:
   _install: true
   _chart_version: 12.6.9
   _extra_timeout: 210
+  image:
+    tag: 2022.10.15-debian-11-r0
   persistence:
     size: 20Gi
   metrics:
