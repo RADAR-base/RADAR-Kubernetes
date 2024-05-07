@@ -179,7 +179,7 @@ postgresql:
 
 management_portal:
   _install: true
-  _chart_version: 1.1.2
+  _chart_version: 1.1.4
   _extra_timeout: 210
   replicaCount: 1  # should be 1
   postgres:
@@ -226,7 +226,7 @@ radar_appserver_postgresql:
 
 radar_appserver:
   _install: false
-  _chart_version: 0.2.1
+  _chart_version: 0.2.2
   _extra_timeout: 0
   replicaCount: 1
   managementportal_resource_name: res_AppServer
@@ -256,7 +256,7 @@ radar_rest_sources_authorizer:
 
 radar_rest_sources_backend:
   _install: false
-  _chart_version: 1.1.1
+  _chart_version: 1.1.2
   _extra_timeout: 0
   replicaCount: 1
   postgres:
@@ -432,7 +432,7 @@ radar_upload_postgresql:
 
 radar_upload_connect_backend:
   _install: true
-  _chart_version: 0.3.1
+  _chart_version: 0.3.2
   _extra_timeout: 0
   replicaCount: 1
 
