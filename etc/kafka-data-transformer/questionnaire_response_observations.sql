@@ -45,14 +45,14 @@ AS SELECT
     'questionnaire_response' as `TOPIC`,
     q.name as CATEGORY,
     CAST(NULL as TIMESTAMP) as END_DATE,
-    CASE
-        WHEN a->value->int IS NOT NULL THEN 'INTEGER'
-        WHEN a->value->double IS NOT NULL THEN 'DOUBLE'
-        ELSE NULL
-    END as TYPE,
     -- WARNING!!! The cast from VARCHAR (string) to DOUBLE will throw an JAVA exception if the string is not a number.
     -- This does not mean that the message will be lost. The value will be present in the VALUE_TEXTUAL_OPTIONAL field.
     EXPLODE(TRANSFORM(q.answers, a => COALESCE(a->value->double, CAST(a->value->int as DOUBLE), CAST(a->value->string as DOUBLE)))) as VALUE_NUMERIC,
+    EXPLODE(TRANSFORM(q.answers, a => CASE
+        WHEN a->value->int IS NOT NULL THEN 'INTEGER'
+        WHEN a->value->double IS NOT NULL THEN 'DOUBLE'
+        ELSE NULL
+    END)) as TYPE,
     -- Note: When cast to double works for the string value, the VALUE_TEXTUAL_OPTIONAL will also be set.
     EXPLODE(TRANSFORM(q.answers, a => a->value->string)) as VALUE_TEXTUAL_OPTIONAL
 FROM questionnaire_response q
