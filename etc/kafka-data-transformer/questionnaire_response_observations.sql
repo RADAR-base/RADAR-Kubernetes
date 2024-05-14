@@ -1,24 +1,3 @@
--- This is the ksqlDB script that reads the questionnaire_response and questionnaire_app_event topics and writes
--- the observations to a new topic named 'ksql_observations_<topic>'. More topics transformations can be added.
--- Every topic must be transformed to the common format:
--- KEY:
---   PROJECT: the project identifier
---   SOURCE: the source identifier
---   SUBJECT: the subject/study participant identifier
--- VALUE:
---   TOPIC: the topic identifier
---   CATEGORY: the category identifier (optional)
---   VARIABLE: the variable identifier
---   DATE: the date of the observation
---   END_DATE: the end date of the observation (optional)
---   TYPE: the type of the observation (STRING, STRING_JSON, INTEGER, DOUBLE)
---   VALUE_TEXTUAL: the textual value of the observation (optional, must be set when VALUE_NUMERIC is NULL)
---   VALUE_NUMERIC: the numeric value of the observation (optional, must be set when VALUE_TEXTUAL is NULL)
-
-SET 'auto.offset.reset' = 'earliest';
-
--- * -- * -- topic: QUESTIONNAIRE_RESPONSE -- * -- * --
-
 CREATE STREAM questionnaire_response (
     projectId VARCHAR KEY, -- 'KEY' means that this field is part of the kafka message key
     userId VARCHAR KEY,
@@ -58,13 +37,8 @@ AS SELECT
 FROM questionnaire_response q
 EMIT CHANGES;
 
-CREATE STREAM questionnaire_response_observations
-WITH (
-    kafka_topic = 'ksql_observations',
-    partitions = 3,
-    format = 'avro'
-)
-AS SELECT
+INSERT INTO observations
+SELECT
    q.projectId as PROJECT,
    q.sourceId as SOURCE,
    q.userId as SUBJECT,
@@ -91,13 +65,8 @@ EMIT CHANGES;
 -- When 'questionId' is like 'select:%' create a new stream with the select options.
 -- The options in the value field split commas and added as separate VARIABLE records.
 -- The VALUE_NUMERIC is set to 1 and VALUE_TEXTUAL is set to NULL.
--- CREATE STREAM questionnaire_response_observations_select
--- WITH (
---     kafka_topic = 'ksql_observations',
---     partitions = 3,
---     format = 'avro'
--- )
--- AS SELECT
+-- INSERT INTO observations
+-- SELECT
 --     EXPLODE(SPLIT(VALUE_TEXTUAL, ',')) as VARIABLE,
 --     PROJECT, SOURCE, SUBJECT, `TOPIC`, CATEGORY, DATE, END_DATE,
 --     'INTEGER' as TYPE,

@@ -29,3 +29,13 @@ files should transform towards the following format of the _ksql_observations_ t
       VALUE_TEXTUAL: the textual value of the observation (optional, must be set when VALUE_NUMERIC is NULL)
       VALUE_NUMERIC: the numeric value of the observation (optional, must be set when VALUE_TEXTUAL is NULL)
 ```
+
+New messages are added to the _ksql_observations_ topic by inserting into the _observations_ stream (see [_base_observations_stream.sql](_base_observations_stream.sql)):
+
+```
+INSERT INTO observations
+SELECT
+...
+PARTITION BY q.projectId, q.userId, q.sourceId
+EMIT CHANGES;
+```
