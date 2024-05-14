@@ -1,20 +1,3 @@
--- This is the ksqlDB script that reads the questionnaire_response and questionnaire_app_event topics and writes
--- the observations to a new topic named 'ksql_observations_<topic>'. More topics transformations can be added.
--- Every topic must be transformed to the common format:
--- KEY:
---   PROJECT: the project identifier
---   SOURCE: the source identifier
---   SUBJECT: the subject/study participant identifier
--- VALUE:
---   TOPIC: the topic identifier
---   CATEGORY: the category identifier (optional)
---   VARIABLE: the variable identifier
---   DATE: the date of the observation
---   END_DATE: the end date of the observation (optional)
---   TYPE: the type of the observation (STRING, STRING_JSON, INTEGER, DOUBLE)
---   VALUE_TEXTUAL: the textual value of the observation (optional, must be set when VALUE_NUMERIC is NULL)
---   VALUE_NUMERIC: the numeric value of the observation (optional, must be set when VALUE_TEXTUAL is NULL)
-
 SET 'auto.offset.reset' = 'earliest';
 
 -- * -- * -- topic: QUESTIONNAIRE_APP_EVENT -- * -- * --
@@ -35,7 +18,7 @@ CREATE STREAM questionnaire_app_event (
 
 CREATE STREAM questionnaire_app_event_observations
 WITH (
-    kafka_topic = 'ksql_observations_questionnaire_app_event',
+    kafka_topic = 'ksql_observations',
     partitions = 3,
     format = 'avro'
 )

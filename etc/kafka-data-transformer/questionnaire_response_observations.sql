@@ -60,7 +60,7 @@ EMIT CHANGES;
 
 CREATE STREAM questionnaire_response_observations
 WITH (
-    kafka_topic = 'ksql_observations_questionnaire_response',
+    kafka_topic = 'ksql_observations',
     partitions = 3,
     format = 'avro'
 )
