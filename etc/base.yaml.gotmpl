@@ -19,13 +19,16 @@ radar_grafana:
       home:
         json: {{ readFile "radar-grafana/dashboards/allprojects/home.json" | quote }}
 
-# If radar_jdbc_connector is used, and data transformation is needed, please remove the Go template comments and yaml comments.
-# Example transformation is exploding an array field in kafka message into multiple database rows.
-# Make sure to defined the transformation logic in the queries.sql file as needed for the use case.
+# If data transformation of kafka topic data is needed, please remove the Go template comments and yaml comments.
+# Make sure to reference a ksql transformation file that contains the required transformation logic.
+# The files below are transform the data from the questionnaire_response and questionnaire_app_events topics to the
+# ksql_observations topic, used by the data-dashboard-backend. If using the data-dashboard-backend, please make sure
+# to uncomment the relevant ksql transformer files.
 # kafka_data_transformer:
 #  ksql:
 #    queries: |
-#      {{/* - readFile "../etc/kafka-data-transformer/queries.sql" | nindent 8 */}}
+#      {{/* - readFile "../etc/kafka-data-transformer/questionnaire_response_observations.sql"   | nindent 8 */}}
+#      {{/* - readFile "../etc/kafka-data-transformer/questionnaire_app_events_observations.sql" | nindent 8 */}}
 
 # If appserver is used, please remove the Go template comments and yaml comments.
 # Again, like with management_portal, if you want to store the credentials in a
@@ -35,13 +38,6 @@ radar_grafana:
 #radar_appserver:
 #  google_application_credentials: {{ readFile "../etc/radar-appserver/firebase-adminsdk.json" | quote }}
 #*/}}
-
-# Remove below Go comment to read the queries.sql and set the queries
-# in the ksql_server
-#ksql_server:
-#  ksql:
-#    queries: |
-#      {{/*- readFile "cp-ksql-server/queries.sql" | nindent 8 */}}
 
 # If ory kratos is used, please remove the Go template comments and yaml comments.
 # These templates generate the connection strings based on multiple secrets.
