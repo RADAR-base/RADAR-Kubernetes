@@ -106,7 +106,7 @@ In order to contribute to the repository, first, you need to make sure that you 
 - Have a good knowledge of Kubernetes, Helm and Helmfile as listed in [How to get started with tools around RADAR-Kubernetes](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/2731638785/How+to+get+started+with+tools+around+RADAR-Kubernetes)
 - Have a working installation of RADAR-Base for testing your changes
 
-Then you can make a new fork or branch and make your changes there and after you have tested it and added neccessarry documentation create a pull request to `dev` branch. The changes will be reviewed and once merged, they'll be released in the next cycle.
+Then you can make a new fork or branch and make your changes there and after you have tested it and added neccessarry documentation create a pull request to `dev` branch. We test the installation automatically on supported Kubernetes versions so make sure that the Github actions run successfully. The changes will be reviewed and once merged, they'll be released in the next cycle.
 If you're changing an existing code, make sure that it is either backwards compatible or the documentation shows a clear path of applying the changes without breaking the existing installations.
 
 
@@ -133,7 +133,7 @@ You can also use other the helmfile commands like `helmfile template` and `helmf
 Updating, improving and correcting the documentation
 
 -->
-Feel free to make a PR for any part of the documentation that is missing or isn't clear. If the documentation in question is in the wiki create an issue and we'll help you with updating it.
+Feel free to make a PR for any part of the documentation that is missing or isn't clear. If the documentation in question is in the wiki send an email to radar-base@kcl.ac.uk and radar-base@thehyve.nl so we can create an account for you to edit the documentation.
 
 
 ## Join The Project Team
