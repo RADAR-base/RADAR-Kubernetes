@@ -101,21 +101,44 @@ Enhancement suggestions are tracked as [GitHub issues](https://github.com/RADAR-
 include Setup of env, IDE and typical getting started instructions?
 
 -->
+In order to contribute to the repository, first, you need to make sure that you have:
+- Read the README.md
+- Have a good knowledge of Kubernetes, Helm and Helmfile as listed in [How to get started with tools around RADAR-Kubernetes](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/2731638785/How+to+get+started+with+tools+around+RADAR-Kubernetes)
+- Have a working installation of RADAR-Base for testing your changes
+
+Then you can make a new fork or branch and make your changes there and after you have tested it and added neccessarry documentation create a pull request to `dev` branch. The changes will be reviewed and once merged, they'll be released in the next cycle.
+If you're changing an existing code, make sure that it is either backwards compatible or the documentation shows a clear path of applying the changes without breaking the existing installations.
+
+
+#### Adding a new component to RADAR-Kuberentes
+In order to add a new component you first need to add its helm chart to [radar-helm-charts)](https://github.com/RADAR-base/radar-helm-charts) repository. Refer to contributing guidelines of that repository for more information. Once the chart has been added you need to:
+- Add a helmfile for it in `helmfile.d` directory. The helmfiles are seperated in a modular way in order to avoid having a huge file and also installing certain components in order. Have a look at the current helmfiles and if your component is related to one of them add your component in that file other file create a new file. If your component is a dependency to other components, like Kafka or PostgreSQL prefix the file name with a smaller number so it will be installed first, but if it's a standalone component, the prefix number can be higher.
+- Add release to helmfile. Depending on the helm chart this can mostly be copy pasted from other releases and change names to your component. If you've added custom values files in `etc` directory make sure to reference them in the release.
+- Add a basic configuration of it to `etc/base.yaml` which should include at least `_install`, `_chart_version` and `_extra_timeout` values. In order to keep the `base.yaml` short, only add configurations that the user will most likely to change during installation.
+- If your component is dealing with credentials, the values in the helm charts that refer to that has to be added to `etc/base-secrets.yaml` file.
+ - If the credentials isn't something external and can be auto-generated be sure to add it to `bin/generate-secrets`, following examples of the current credentials
+- If the user has to input a file to the helm chart, add the relavant key to the `base.yaml.gotmpl` file.
+- If the component that you're adding is an external component and you want it to have some default configuartion, create a folder with its name in `etc` directory and add the default configuration there in a YAML file and refer to that configuration in the helmfile of the component.
+
+#### Testing the changes
+In order to test the changes locally you can use helmfile command to install the component in your cluster. You can make installation faster if you only select your component to install:
+```
+helmfile sync --file helmfile.d/name-of-the-helmfile.yaml --selector name=name-of-the-component
+```
+You can also use other the helmfile commands like `helmfile template` and `helmfile diff` to see what is being applied to the cluster.
+
 
 ### Improving The Documentation
 <!-- TODO
 Updating, improving and correcting the documentation
 
 -->
+Feel free to make a PR for any part of the documentation that is missing or isn't clear. If the documentation in question is in the wiki create an issue and we'll help you with updating it.
 
-## Styleguides
-### Commit Messages
-<!-- TODO
-
--->
 
 ## Join The Project Team
 <!-- TODO -->
+It's highly recommended to join the [RADAR-Base slack community](https://docs.google.com/forms/d/e/1FAIpQLScKNZ-QonmxNkekDMLLbP-b_IrNHyDRuQValBy1BAsLOjEFpg/viewform) in order to be involved with the community. You can joing #radar-kubernetes to discuss with other developers and attend weekly development meetings.
 
 <!-- omit in toc -->
 ## Attribution
