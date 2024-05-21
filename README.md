@@ -129,7 +129,7 @@ The following tools should be installed in your local machine to install the RAD
 
 It is recommended make a private clone of this repository, if you want to version control your configurations and/or share with other people.
 
-**You must keep `etc/secrets.yaml` secure and confidential once you have started installing the platform** and the best practice to share your platform configurations is by **sharing the encrypted version of `etc/secrets.yaml`, this can be done via `sops` but it's outside the scope of this document**.
+**You must keep `etc/secrets.yaml` secure and confidential once you have started installing the platform** and the best practice to share your platform configurations is by **sharing the encrypted version of `etc/secrets.yaml`, this can be done via the combination of [sops](https://github.com/getsops/sops) and [helm-secrets](https://github.com/jkroepke/helm-secrets) but it's outside the scope of this document**.
 
 ### Project Structure
 
