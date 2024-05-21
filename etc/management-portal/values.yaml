@@ -1,0 +1,20 @@
+postgres:
+  host: postgresql
+  ssl:
+    enabled: false
+managementportal:
+  catalogue_server_enable_auto_import: true
+  common_privacy_policy_url: http://info.thehyve.nl/radar-cns-privacy-policy
+  oauth_checking_key_aliases_0: radarbase-managementportal-ec
+  oauth_checking_key_aliases_1: selfsigned
+identity_server:
+  admin_email: admin@radar.org
+  server_url: http://kratos
+  server_admin_url: http://kratos-admin
+smtp:
+  enabled: false
+  host: my.smtp.server
+  port: 587
+  from: radar@radar.org
+  starttls: true
+  password: secret

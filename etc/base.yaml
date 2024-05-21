@@ -196,17 +196,6 @@ management_portal:
   _chart_version: 1.1.4
   _extra_timeout: 210
   replicaCount: 1  # should be 1
-  postgres:
-    host: postgresql
-    ssl:
-      enabled: false
-  managementportal:
-    catalogue_server_enable_auto_import: true
-    common_privacy_policy_url: http://info.thehyve.nl/radar-cns-privacy-policy
-    oauth_checking_key_aliases_0: radarbase-managementportal-ec
-    oauth_checking_key_aliases_1: selfsigned
-  smtp:
-    password: secret
 
 app_config:
   _install: true

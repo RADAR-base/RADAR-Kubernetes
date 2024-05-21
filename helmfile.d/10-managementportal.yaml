@@ -23,6 +23,7 @@ releases:
     timeout: {{ add .Values.base_timeout .Values.management_portal._extra_timeout }}
     <<: *logFailedRelease
     values:
+      - "../etc/management-portal/values.yaml"
       - {{ .Values.management_portal | toYaml | indent 8 | trim }}
     set:
       - name: ingress.hosts
@@ -53,9 +54,13 @@ releases:
         value: {{ .Values.radar_grafana._install }}
       - name: oauth_clients.radar_push_endpoint.enable
         value: {{ .Values.radar_push_endpoint._install }}
+      - name: oauth_clients.radar_data_dashboard_backend.enable
+        value: {{ .Values.data_dashboard_backend._install }}
       - name: oauth_clients.grafana_dashboard.redirect_uri
         values:
           - "https://dashboard.{{ .Values.server_name }}/login/generic_oauth"
+      - name: identity_server.server_url
+        value: "https://{{ .Values.server_name }}/kratos"
 
   - name: app-config
     chart: radar/app-config
