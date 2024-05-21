@@ -12,6 +12,28 @@ releases:
     values:
       - "../etc/kratos/values.yaml"
       - {{ .Values.kratos | toYaml | indent 8 | trim }}
+    set:
+      - name: serverName
+        value: {{ .Values.server_name }}
+      {{- $values := .Values.kratos }}
+      {{- $hasPublicIngress := and (hasKey $values "public") (hasKey $values.public "ingress") }}
+      {{- $useTLSPublic := or (not $hasPublicIngress) (not (kindIs "invalid" $values.public.ingress.tls)) }}
+      {{- if $useTLSPublic }}
+      - name: ingress.public.hosts[0].host
+        value: {{ .Values.server_name }}
+      - name: ingress.admin.tls[0].hosts
+        values:
+          - {{ .Values.server_name }}
+      {{- end }}
+      {{- $hasAdminIngress := and (hasKey $values "admin") (hasKey $values.admin "ingress") }}
+      {{- $useTLSAdmin := or (not $hasAdminIngress) (not (kindIs "invalid" $values.admin.ingress.tls)) }}
+      {{- if $useTLSAdmin }}
+      - name: ingress.admin.hosts[0].host
+        value: {{ .Values.server_name }}
+      - name: ingress.public.tls[0].hosts
+        values:
+          - {{ .Values.server_name }}
+      {{- end }}
 
   - name: kratos-selfservice-ui-node
     chart: ory/kratos-selfservice-ui-node
