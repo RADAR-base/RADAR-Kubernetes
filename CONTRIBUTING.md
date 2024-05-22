@@ -118,12 +118,12 @@ In order to add a new component you first need to add its helm chart to [radar-h
 - If your component is dealing with credentials, the values in the helm charts that refer to that has to be added to `etc/base-secrets.yaml` file.
  - If the credentials isn't something external and can be auto-generated be sure to add it to `bin/generate-secrets`, following examples of the current credentials
 - If the user has to input a file to the helm chart, add the relavant key to the `base.yaml.gotmpl` file.
-- If the component that you're adding is an external component and you want it to have some default configuartion, create a folder with its name in `etc` directory and add the default configuration there in a YAML file and refer to that configuration in the helmfile of the component.
+- If the component that you're adding is an external component and you want it to have some default configuration, create a folder with its name in `etc` directory and add the default configuration there in a YAML file and refer to that configuration in the helmfile of the component.
 
 #### Testing the changes
 In order to test the changes locally you can use helmfile command to install the component in your cluster. You can make installation faster if you only select your component to install:
 ```
-helmfile sync --file helmfile.d/name-of-the-helmfile.yaml --selector name=name-of-the-component
+helmfile apply --file helmfile.d/name-of-the-helmfile.yaml --selector name=name-of-the-component
 ```
 You can also use other the helmfile commands like `helmfile template` and `helmfile diff` to see what is being applied to the cluster.
 
