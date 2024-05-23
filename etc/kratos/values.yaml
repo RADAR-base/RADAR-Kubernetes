@@ -5,14 +5,14 @@ ingress:
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-prod
     hosts:
-      - host: radar-k3s-test.thehyve.net
+      - host: localhost
         paths:
           - path: "/admin/kratos/?(.*)"
             pathType: ImplementationSpecific
     tls:
       - secretName: kratos-admin-tls
-        host:
-          - radar-k3s-test.thehyve.net
+        hosts:
+          - localhost
   public:
     enabled: true
     className: "nginx"
@@ -20,14 +20,14 @@ ingress:
       nginx.ingress.kubernetes.io/rewrite-target: /$1
       cert-manager.io/cluster-issuer: letsencrypt-prod
     hosts:
-      - host: radar-k3s-test.thehyve.net
+      - host: localhost
         paths:
           - path: "/kratos/?(.*)"
             pathType: ImplementationSpecific
     tls:
       - secretName: kratos-public-tls
         hosts:
-          - radar-k3s-test.thehyve.net
+          - localhost
 
 kratos:
   development: false
@@ -177,11 +177,11 @@ kratos:
 
     serve:
       public:
-        base_url: https://radar-k3s-test.thehyve.net/kratos/
+        base_url: https://localhost/kratos/
         cors:
           enabled: true
           allowed_origins:
-            - https://radar-k3s-test.thehyve.net/kratos-ui/
+            - https://localhost/kratos-ui/
           allowed_methods:
             - POST
             - GET
@@ -199,13 +199,13 @@ kratos:
             - Accept
           allow_credentials: true
       admin:
-        base_url: https://radar-k3s-test.thehyve.net/admin/kratos/
+        base_url: https://localhost/admin/kratos/
 
     selfservice:
-      default_browser_return_url: https://radar-k3s-test.thehyve.net/managementportal
+      default_browser_return_url: https://localhost/managementportal
       allowed_return_urls:
-        - "https://radar-k3s-test.thehyve.net/"
-        - "http://radar-k3s-test.thehyve.net/"
+        - "https://localhost/"
+        - "http://localhost/"
 
       methods:
         password:
@@ -225,35 +225,35 @@ kratos:
 
       flows:
         error:
-          ui_url: https://radar-k3s-test.thehyve.net/kratos-ui/error
+          ui_url: https://localhost/kratos-ui/error
 
         settings:
-          ui_url: https://radar-k3s-test.thehyve.net/kratos-ui/settings
+          ui_url: https://localhost/kratos-ui/settings
           required_aal: highest_available
 
         recovery:
           enabled: true
-          ui_url: https://radar-k3s-test.thehyve.net/kratos-ui/recovery
+          ui_url: https://localhost/kratos-ui/recovery
           use: link
 
         verification:
           # our current flow necessitates that users reset their password after they activate an account in managementportal,
           # this works as verification
-          ui_url: https://radar-k3s-test.thehyve.net/kratos-ui/verification
+          ui_url: https://localhost/kratos-ui/verification
           enabled: false
           use: link
           after:
-            default_browser_return_url: https://radar-k3s-test.thehyve.net/kratos-ui
+            default_browser_return_url: https://localhost/kratos-ui
 
         logout:
           after:
-            default_browser_return_url: https://radar-k3s-test.thehyve.net/kratos-ui/login
+            default_browser_return_url: https://localhost/kratos-ui/login
 
         login:
-          ui_url: https://radar-k3s-test.thehyve.net/kratos-ui/login
+          ui_url: https://localhost/kratos-ui/login
 
         registration:
-          ui_url: https://radar-k3s-test.thehyve.net/kratos-ui/registration
+          ui_url: https://localhost/kratos-ui/registration
           after:
             password:
               hooks:

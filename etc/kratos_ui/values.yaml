@@ -8,22 +8,22 @@ ingress:
     nginx.ingress.kubernetes.io/rewrite-target: /$1
     cert-manager.io/cluster-issuer: letsencrypt-prod
   hosts:
-    - host: radar-k3s-test.thehyve.net
+    - host: localhost
       paths:
         - path: "/kratos-ui/?(.*)"
           pathType: ImplementationSpecific
   tls:
     - secretName: radar-kratos-tls
       hosts:
-        - radar-k3s-test.thehyve.net
+        - localhost
         # -- Set this to ORY Kratos's Admin URL
 kratosAdminUrl: "kratos-admin"
 
 # -- Set this to ORY Kratos's public URL
-kratosPublicUrl: "https://radar-k3s-test.thehyve.net/kratos"
+kratosPublicUrl: "https://localhost/kratos"
 
 # -- Set this to ORY Kratos's public URL accessible from the outside world.
-kratosBrowserUrl: "https://radar-k3s-test.thehyve.net/kratos"
+kratosBrowserUrl: "https://localhost/kratos"
 
 # -- The basePath
 basePath: ""
