@@ -1,5 +1,7 @@
 postgres:
+  user: postgres
   host: postgresql
+  port: 5432
   ssl:
     enabled: false
 managementportal:
