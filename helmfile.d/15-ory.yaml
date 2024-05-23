@@ -13,6 +13,11 @@ releases:
       - "../etc/kratos/values.yaml"
       - {{ .Values.kratos | toYaml | indent 8 | trim }}
     set:
+      - name: kratos.config.dsn
+        value: postgres://{{ .Values.management_portal.postgres.user }}:{{ .Values.management_portal.postgres.password }}@{{ .Values.management_portal.postgres.host }}:{{ .Values.management_portal.postgres.port }}/kratos
+      - name: kratos.config.courier.smtp.connection_uri
+        #  Note: encoding of "/" in password is necessary for the smtp connection_uri because kratos is not able to handle this.
+        value: smtp://{{ .Values.management_portal.smtp.username }}:{{ replace "/" "%2F" .Values.management_portal.smtp.password }}@{{ .Values.management_portal.smtp.host }}:587
       - name: serverName
         value: {{ .Values.server_name }}
       {{- $values := .Values.kratos }}
