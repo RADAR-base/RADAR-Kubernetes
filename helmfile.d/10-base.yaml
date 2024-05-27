@@ -57,6 +57,15 @@ releases:
         value: "{{ .Values.server_name }}"
       - name: ingress.hosts[0].paths
         values: ["/schema/?(.*)"]
+      {{- $values := .Values.cp_schema_registry }}
+      {{- $useTLS := or (not (hasKey $values ".ingress")) (not (kindIs "invalid" .Values.ingress.tls)) }}
+      {{- if $useTLS }}
+      - name: ingress.tls[0].secretName
+        value: radar-base-tls
+      - name: ingress.tls[0].hosts
+        values: [ "{{ .Values.server_name }}" ]
+      {{- end }}
+
 
   - name: catalog-server
     chart: radar/catalog-server
@@ -85,6 +94,7 @@ releases:
     timeout: {{ add .Values.base_timeout .Values.radar_home._extra_timeout }}
     <<: *logFailedRelease
     values:
+      - "../etc/radar-home/values.yaml"
       - {{ .Values.radar_home | toYaml | indent 8 | trim }}
     set:
       - name: ingress.hosts

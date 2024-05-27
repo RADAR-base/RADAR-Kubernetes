@@ -13,7 +13,7 @@ ingress:
         - path: "/kratos-ui/?(.*)"
           pathType: ImplementationSpecific
   tls:
-    - secretName: radar-kratos-tls
+    - secretName: radar-base-tls
       hosts:
         - localhost
         # -- Set this to ORY Kratos's Admin URL

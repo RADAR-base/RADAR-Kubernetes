@@ -35,6 +35,7 @@ releases:
     timeout: {{ add .Values.base_timeout .Values.radar_rest_sources_authorizer._extra_timeout }}
     <<: *logFailedRelease
     values:
+      - "../etc/radar-rest-sources-authorizer/values.yaml"
       - {{ .Values.radar_rest_sources_authorizer | toYaml | indent 8 | trim }}
     set:
       - name: ingress.hosts
@@ -49,6 +50,7 @@ releases:
     timeout: {{ add .Values.base_timeout .Values.radar_rest_sources_backend._extra_timeout }}
     <<: *logFailedRelease    
     values:
+      - "../etc/radar-rest-sources-backend/values.yaml"
       - {{ .Values.radar_rest_sources_backend | toYaml | indent 8 | trim }}
     set:
       - name: ingress.hosts

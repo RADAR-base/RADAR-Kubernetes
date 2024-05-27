@@ -1,3 +1,9 @@
+ingress:
+  tls:
+    secretName: radar-base-tls
+ingress_rate_limited:
+  tls:
+    secretName: radar-base-tls
 postgres:
   user: postgres
   host: postgresql

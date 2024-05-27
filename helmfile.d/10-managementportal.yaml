@@ -69,6 +69,7 @@ releases:
     timeout: {{ add .Values.base_timeout .Values.app_config._extra_timeout }}
     <<: *logFailedRelease
     values:
+      - "../etc/radar-appconfig/values.yaml"
       - {{ .Values.app_config | toYaml | indent 8 | trim }}
     set:
       - name: ingress.hosts
@@ -83,6 +84,7 @@ releases:
     timeout: {{ add .Values.base_timeout .Values.app_config_frontend._extra_timeout }}
     <<: *logFailedRelease
     values:
+      - "../etc/radar-appconfig-frontend/values.yaml"
       - {{ .Values.app_config_frontend | toYaml | indent 8 | trim }}
     set:
       - name: ingress.hosts

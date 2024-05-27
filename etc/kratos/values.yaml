@@ -10,7 +10,7 @@ ingress:
           - path: "/admin/kratos/?(.*)"
             pathType: ImplementationSpecific
     tls:
-      - secretName: kratos-admin-tls
+      - secretName: radar-base-tls
         hosts:
           - localhost
   public:
@@ -25,7 +25,7 @@ ingress:
           - path: "/kratos/?(.*)"
             pathType: ImplementationSpecific
     tls:
-      - secretName: kratos-public-tls
+      - secretName: radar-base-tls
         hosts:
           - localhost
 
