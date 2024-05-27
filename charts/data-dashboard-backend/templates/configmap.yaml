@@ -18,7 +18,7 @@ data:
         url: {{ .Values.managementPortal.url }}
         clientId: {{ .Values.managementPortal.clientId }}
         clientSecret: {{ .Values.managementPortal.clientSecret }}
-      jwtResourceName: res_data_dashboard_backend
+      jwtResourceName: {{ .Values.jwtResourceName }}
     database:
       url: {{ .Values.jdbc.url }}
       user: {{ .Values.jdbc.user }}

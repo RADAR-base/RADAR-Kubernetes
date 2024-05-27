@@ -111,8 +111,8 @@ jdbc:
   # -- JDBC Connection url of the database.
   url: jdbc:postgresql://postgresql:5432/data-dashboard
   # -- Username of the database
-  user: radarbase
+  user: postgres
   # -- Password of the user
-  password: password
+  password: secret
   # -- Hibernate dialect to use for JDBC Connection
   dialect: org.hibernate.dialect.PostgreSQLDialect

@@ -58,14 +58,14 @@ spec:
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /api/health
+              path: {{ .Values.path }}/health
               port: http
               httpHeaders:
                 - name: Accept
                   value: application/json
           readinessProbe:
             httpGet:
-              path: /api/health
+              path: {{ .Values.path }}/health
               port: http
               httpHeaders:
                 - name: Accept

@@ -10,6 +10,14 @@ ingress:
     secretName: radar-base-data-dashboard
     hosts:
       - localhost
+path: /api
 jdbc:
   url: jdbc:postgresql://timescaledb-postgresql-hl:5432/data-dashboard
-  user: radarbase
+  user: postgres
+  dialect: org.hibernate.dialect.PostgreSQLDialect
+  password: secret
+managementPortal:
+  url: http://management-portal:8080/managementportal
+  clientId: radar_data_dashboard_backend
+  clientSecret: secret
+jwtResourceName: res_DataDashboardAPI

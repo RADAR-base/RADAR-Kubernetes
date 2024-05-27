@@ -84,6 +84,8 @@ releases:
         value: {{ .Values.timescaledb_password }}
       - name: jdbc.url
         value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://timescaledb-postgresql-hl:5432/%s" .Values.timescaledb_db_name) .Values.data_dashboard_backend }}
+      - name: managementPortal.clientSecret
+        value: {{ .Values.management_portal.oauth_clients.radar_data_dashboard_backend.client_secret }}
 
   - name: kafka-data-transformer
     chart: cp-radar/cp-ksql-server
