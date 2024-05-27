@@ -1,0 +1,11 @@
+ingress:
+  admin:
+    tls:
+      - secretName: radar-base-tls
+        hosts:
+          - localhost
+  public:
+    tls:
+      - secretName: radar-base-tls
+        hosts:
+          - localhost

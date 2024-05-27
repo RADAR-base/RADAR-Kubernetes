@@ -29,6 +29,12 @@ releases:
         values: [{{ .Values.server_name }}]
       - name: ingress_rate_limited.hosts
         values: [{{ .Values.server_name }}]
+      # --- Keep in secrets in sync with hostnames (main and subdomains have dedicated secrets)
+      - name: ingress.tls.secretName
+        value: radar-base-tls
+      - name: ingress_rate_limited.tls.secretName
+        value: radar-base-tls
+      # ---
       - name: server_name
         value: {{ .Values.server_name }}
       - name: oauth_clients.radar_redcap_integrator.enable
@@ -68,6 +74,10 @@ releases:
     set:
       - name: ingress.hosts
         values: [{{ .Values.server_name }}]
+      # --- Keep in secret in sync with hostname (main and subdomains have dedicated secrets)
+      - name: ingress.tls.secretName
+        value: radar-base-tls
+      # ---
       - name: clientSecret
         value: {{ .Values.management_portal.oauth_clients.radar_appconfig.client_secret }}
 
@@ -82,6 +92,10 @@ releases:
     set:
       - name: ingress.hosts
         values: [{{ .Values.server_name }}]
+      # --- Keep in secret in sync with hostname (main and subdomains have dedicated secrets)
+      - name: ingress.tls.secretName
+        value: radar-base-tls
+      # ---
       - name: authUrl
         value: https://{{ .Values.server_name }}/managementportal/oauth
       - name: authCallbackUrl

@@ -29,5 +29,9 @@ releases:
     set:
       - name: ingress.hosts
         values: [{{ .Values.server_name }}]
+      # --- Keep in secret in sync with hostname (main and subdomains have dedicated secrets)
+      - name: ingress.tls.secretName
+        value: radar-base-tls
+      # ---
       - name: serverName
         value: {{ .Values.server_name }}

@@ -48,8 +48,10 @@ releases:
         values: ["dashboard.{{ .Values.server_name }}"]
       - name: "grafana\\.ini.server.root_url"
         value: "https://dashboard.{{ .Values.server_name }}/"
+      # --- Keep in secret in sync with hostname (main and subdomains have dedicated secrets)
       - name: ingress.tls[0].secretName
         value: radar-base-tls-dashboard
+      # ---
       - name: ingress.tls[0].hosts
         values: ["dashboard.{{ .Values.server_name }}"]
       - name: "grafana\\.ini.metrics.basic_auth_username"

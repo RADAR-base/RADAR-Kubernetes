@@ -35,10 +35,15 @@ releases:
     timeout: {{ add .Values.base_timeout .Values.radar_rest_sources_authorizer._extra_timeout }}
     <<: *logFailedRelease
     values:
+      - "../etc/radar-rest-sources-authorizer/values.yaml"
       - {{ .Values.radar_rest_sources_authorizer | toYaml | indent 8 | trim }}
     set:
       - name: ingress.hosts
         values: [{{ .Values.server_name }}]
+      # --- Keep in secret in sync with hostname (main and subdomains have dedicated secrets)
+      - name: ingress.tls.secretName
+        value: radar-base-tls
+      # ---
       - name: serverName
         value: {{ .Values.server_name }}
 
@@ -53,6 +58,10 @@ releases:
     set:
       - name: ingress.hosts
         values: [{{ .Values.server_name }}]
+      # --- Keep in secret in sync with hostname (main and subdomains have dedicated secrets)
+      - name: ingress.tls.secretName
+        value: radar-base-tls
+      # ---
       - name: serverName
         value: {{ .Values.server_name }}
       {{- if hasKey .Values "fitbit_api_client" }}

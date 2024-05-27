@@ -57,8 +57,10 @@ releases:
         value: "{{ .Values.server_name }}"
       - name: ingress.hosts[0].paths
         values: ["/schema/?(.*)"]
+      # --- Keep in secret in sync with hostname (main and subdomains have dedicated secrets)
       - name: ingress.tls[0].secretName
         value: radar-base-tls
+      # ---
       - name: ingress.tls[0].hosts
         values: ["{{ .Values.server_name }}"]
 
@@ -93,6 +95,10 @@ releases:
     set:
       - name: ingress.hosts
         values: [ {{ .Values.server_name }} ]
+      # --- Keep in secret in sync with hostname (main and subdomains have dedicated secrets)
+      - name: ingress.tls.secretName
+        value: radar-base-tls
+      # ---
       - name: s3.enabled
         value: {{ dig "s3" "enabled" .Values.minio._install .Values.radar_home }}
       - name: s3.url
