@@ -61,6 +61,38 @@ releases:
       - name: "grafana\\.ini.auth\\.generic_oauth.token_url"
         value: "https://{{ .Values.server_name }}/managementportal/oauth/token"
 
+  - name: data-dashboard-backend
+    chart: radar/data-dashboard-backend
+    version: {{ .Values.data_dashboard_backend._chart_version }}
+    installed: {{ .Values.data_dashboard_backend._install }}
+    values:
+      - "../etc/data-dashboard-backend/values.yaml"
+      - {{ .Values.data_dashboard_backend | toYaml | indent 8 | trim }}
+    set:
+      - name: serverName
+        value: {{ .Values.server_name }}
+      - name: ingress.hosts
+        values:
+          - data.{{ .Values.server_name }}
+      - name: jdbc.user
+        value: {{ .Values.timescaledb_username }}
+      - name: jdbc.password
+        value: {{ .Values.timescaledb_password }}
+      - name: jdbc.url
+        value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://timescaledb-postgresql-hl:5432/%s" .Values.timescaledb_db_name) .Values.data_dashboard_backend }}
+      - name: managementPortal.clientSecret
+        value: {{ .Values.management_portal.oauth_clients.radar_data_dashboard_backend.client_secret }}
+
+  - name: kafka-data-transformer
+    chart: cp-radar/cp-ksql-server
+    version: {{ .Values.kafka_data_transformer._chart_version }}
+    timeout: {{ add .Values.base_timeout .Values.kafka_data_transformer._extra_timeout }}
+    wait: false
+    installed: {{ .Values.kafka_data_transformer._install }}
+    values:
+      - "../etc/cp-ksql-server/values.yaml"
+      - {{ .Values.kafka_data_transformer | toYaml | indent 8 | trim }}
+
   - name: radar-jdbc-connector
     chart: radar/radar-jdbc-connector
     version: {{ .Values.radar_jdbc_connector._chart_version }}

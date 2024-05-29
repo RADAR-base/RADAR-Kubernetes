@@ -27,9 +27,15 @@ radar_grafana:
 #  google_application_credentials: {{ readFile "../etc/radar-appserver/firebase-adminsdk.json" | quote }}
 #*/}}
 
-# Remove below Go comment to read the queries.sql and set the queries
-# in the ksql_server
-#ksql_server:
+# If data transformation of kafka topic data is needed, please remove the Go template comments and yaml comments.
+# Make sure to reference a ksql transformation file that contains the required transformation logic.
+# The files below are transform the data from the questionnaire_response and questionnaire_app_events topics to the
+# ksql_observations topic, used by the data-dashboard-backend. If using the data-dashboard-backend, please make sure
+# to uncomment the relevant ksql transformer files.
+# Note: never remove the _base_observations_stream.sql file.
+# kafka_data_transformer:
 #  ksql:
 #    queries: |
-#      {{/*- readFile "cp-ksql-server/queries.sql" | nindent 8 */}}
+#      {{/* - readFile "../etc/cp-ksql-server/_base_observations_stream.sql"             | nindent 8 */}}
+#      {{/* - readFile "../etc/cp-ksql-server/questionnaire_response_observations.sql"   | nindent 8 */}}
+#      {{/* - readFile "../etc/cp-ksql-server/questionnaire_app_events_observations.sql" | nindent 8 */}}
