@@ -1,6 +1,10 @@
-# kafka-data transformer (KSQLDB)
+# kafka-data transformer (KSQLDB) for data-dashboard-backend service
 
 Reference: https://docs.ksqldb.io/
+
+The data-dashboard-backend service uses data from Kafka topics to the _observation_ table in the RADAR-base Data
+Dashboard backend service database. The data in the Kafka topics is transformed by the KSQLDB Kafka data transformer to
+be imported into the _observation_ table.
 
 The KSQLDB Kafka data transformer is able to register Consumer/Producers to Kafka that transform data in a topic and
 publish the results to another topic.
@@ -30,7 +34,8 @@ files should transform towards the following format of the _ksql_observations_ t
       VALUE_NUMERIC: the numeric value of the observation (optional, must be set when VALUE_TEXTUAL is NULL)
 ```
 
-New messages are added to the _ksql_observations_ topic by inserting into the _observations_ stream (see [_base_observations_stream.sql](_base_observations_stream.sql)):
+New messages are added to the _ksql_observations_ topic by inserting into the _observations_ stream (
+see [_base_observations_stream.sql](_base_observations_stream.sql)):
 
 ```
 INSERT INTO observations
