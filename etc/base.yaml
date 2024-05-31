@@ -344,6 +344,7 @@ radar_jdbc_connector:
 ksql_server_data_dashboard_backend:
   _install: false
   _chart_version: 0.3.1
+  _extra_timeout: 0
 
 # --------------------------------------------------------- 20-ingestion.yaml ---------------------------------------------------------
 
