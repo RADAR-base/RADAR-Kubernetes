@@ -1,15 +1,3 @@
-ingress:
-  enabled: true
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/enable-cors: "true"
-  className: nginx
-  hosts:
-    - host: localhost
-  tls:
-    secretName: radar-base-data-dashboard
-    hosts:
-      - localhost
 path: /api
 jdbc:
   url: jdbc:postgresql://timescaledb-postgresql-hl:5432/data-dashboard
