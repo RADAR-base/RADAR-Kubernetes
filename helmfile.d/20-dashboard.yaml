@@ -75,7 +75,7 @@ releases:
         value: {{ .Values.server_name }}
       - name: ingress.hosts
         values:
-          - data.{{ .Values.server_name }}
+          - {{ .Values.server_name }}
       - name: jdbc.user
         value: {{ .Values.timescaledb_username }}
       - name: jdbc.password

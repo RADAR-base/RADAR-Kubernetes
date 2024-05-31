@@ -1,4 +1,4 @@
-path: /api
+path: /dashboard-data
 jdbc:
   url: jdbc:postgresql://timescaledb-postgresql-hl:5432/data-dashboard
   dialect: org.hibernate.dialect.PostgreSQLDialect
