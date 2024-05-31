@@ -293,7 +293,10 @@ radar_rest_sources_backend:
 # --------------------------------------------------------- 20-dashboard.yaml ---------------------------------------------------------
 
 timescaledb_username: postgres
-timescaledb_db_name: data-dashboard
+timescaledb_db_name: grafana-metrics
+data_dashboard_backend_db_name: data-dashboard
+data_dashboard_backend_db_username: postgres
+grafana_metrics_username: postgres
 
 timescaledb:
   _install: true
@@ -314,8 +317,6 @@ timescaledb:
       # Uncomment when upgrading
       #existingClaim: "data-timescaledb-postgresql-0"
 
-grafana_metrics_username: postgres
-
 radar_grafana:
   _install: true
   _chart_version: 6.26.8
@@ -329,6 +330,7 @@ data_dashboard_backend:
   _chart_version: 0.1.0
   _extra_timeout: 0
   replicaCount: 1
+  database_name: data-dashboard
 
 radar_jdbc_connector:
   _install: true

@@ -80,7 +80,7 @@ releases:
       - name: jdbc.password
         value: {{ .Values.timescaledb_password }}
       - name: jdbc.url
-        value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://timescaledb-postgresql-hl:5432/%s" .Values.timescaledb_db_name) .Values.data_dashboard_backend }}
+        value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://timescaledb-postgresql-hl:5432/%s" .Values.data_dashboard_backend.database_name) .Values.data_dashboard_backend }}
       - name: managementPortal.clientSecret
         value: {{ .Values.management_portal.oauth_clients.radar_data_dashboard_backend.client_secret }}
 
