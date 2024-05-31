@@ -87,13 +87,13 @@ releases:
 
   - name: ksql-server-data-dashboard-backend
     chart: cp-radar/cp-ksql-server
-    installed: {{ .Values.kafka_data_transformer._install }}
-    version: {{ .Values.kafka_data_transformer._chart_version }}
-    timeout: {{ add .Values.base_timeout .Values.kafka_data_transformer._extra_timeout }}
+    installed: {{ .Values.ksql_server_data_dashboard_backend._install }}
+    version: {{ .Values.ksql_server_data_dashboard_backend._chart_version }}
+    timeout: {{ add .Values.base_timeout .Values.ksql_server_data_dashboard_backend._extra_timeout }}
     <<: *logFailedRelease
     values:
       - "../etc/cp-ksql-server/values.yaml"
-      - {{ .Values.kafka_data_transformer | toYaml | indent 8 | trim }}
+      - {{ .Values.ksql_server_data_dashboard_backend | toYaml | indent 8 | trim }}
 
   - name: radar-jdbc-connector
     chart: radar/radar-jdbc-connector

@@ -15,7 +15,7 @@ _ksql_observations_ topic. The _ksql_observations_ topic is consumed by the Kafk
 RADAR-base Data Dashboard backend service (see: [20-data-dashboard.yaml](../../helmfile.d/20-dashboard.yaml)).
 
 When transformation of other topics is required, new SQL files can be added to this directory. These new files should be
-referenced in the _kafka_data_transformer -> ksql -> queries_ section of the `etc/base.yaml.gotmpl` file. New KSQLDB SQL
+referenced in the _cp-ksql-server_ -> ksql -> queries_ section of the `etc/base.yaml.gotmpl` file. New KSQLDB SQL
 files should transform towards the following format of the _ksql_observations_ topic:
 
 ```

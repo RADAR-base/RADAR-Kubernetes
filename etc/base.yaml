@@ -341,7 +341,7 @@ radar_jdbc_connector:
     # Change the list of topics if you have dashboards that read other data or if you don't have certain topics available on your cluster.
     topics: android_phone_relative_location, android_phone_battery_level, connect_fitbit_intraday_heart_rate, connect_fitbit_intraday_steps
 
-kafka_data_transformer:
+ksql_server_data_dashboard_backend:
   _install: false
   _chart_version: 0.3.1
 
