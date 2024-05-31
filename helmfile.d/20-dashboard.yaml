@@ -65,6 +65,7 @@ releases:
     chart: radar/data-dashboard-backend
     version: {{ .Values.data_dashboard_backend._chart_version }}
     installed: {{ .Values.data_dashboard_backend._install }}
+    timeout: {{ add .Values.base_timeout .Values.data_dashboard_backend._extra_timeout }}
     values:
       - "../etc/data-dashboard-backend/values.yaml"
       - {{ .Values.data_dashboard_backend | toYaml | indent 8 | trim }}

@@ -327,6 +327,7 @@ radar_grafana:
 data_dashboard_backend:
   _install: false
   _chart_version: 0.1.0
+  _extra_timeout: 0
   replicaCount: 1
 
 radar_jdbc_connector:
