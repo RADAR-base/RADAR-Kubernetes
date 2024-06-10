@@ -27,6 +27,7 @@ The Kubernetes stack of RADAR-base platform.
    * [Configure](#configure)
    * [Install](#install)
 - [Usage and accessing the applications](#usage-and-accessing-the-applications)
+- [Service-specific documentation](#service-specific-documentation)
 - [Troubleshooting](#troubleshooting)
 - [Upgrade instructions](#upgrade-instructions)
    * [Upgrade to RADAR-Kubernetes version 1.1.x](#upgrade-to-radar-kubernetes-version-11x)
@@ -35,7 +36,6 @@ The Kubernetes stack of RADAR-base platform.
 - [Uninstall](#uninstall)
 - [Update charts](#update-charts)
 - [Feedback and Contributions](#feedback-and-contributions)
-- [Service-specific documentation](#service-specific-documentation)
 
 <!-- TOC end -->
 
@@ -329,6 +329,11 @@ https://k8s.radar-base.org
 Now you can head over to the [Management Portal](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/49512484/Management+Portal) guide for next steps.
 
 
+## Service-specific documentation
+
+- [Data Dashboard Backend data transformation](docs/KSQLDB_transformer_for_data-dashboard-backend.md)
+
+
 ## Troubleshooting
 
 If an application doesn't become fully ready, installation will not be successful. In this case, you should investigate the root cause by investigating the relevant component. It's suggested to run the following command when `helmfile sync` command is running so you can keep an eye on the installation:
@@ -548,7 +553,3 @@ bin/chart-updates
 Enabling RADAR-base community to use RADAR-Kubernetes is important for us. If you have troubles setting up the platform using provided instructions, you can create an dicussion with exact details to reproduce and the expected behavior.
 You can also reach out to the RADAR-base community via RADAR-base Slack on **[radar-kubernetes channel](https://radardevelopment.slack.com/archives/C021AGGESC9)**. The RADAR-base developers support the community on a voluntary basis and will pick up your requests as time permits.
 If you'd like to contribute to this project, please checkout [CONTRIBUTING.md](https://github.com/RADAR-base/RADAR-Kubernetes/blob/main/CONTRIBUTING.md) file.
-
-## Service-specific documentation
-
-- [Data Dashboard Backend data transformation](docs/KSQLDB_transformer_for_data-dashboard-backend.md)
