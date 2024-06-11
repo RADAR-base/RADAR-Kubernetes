@@ -16,7 +16,7 @@ ingress:
     - secretName: radar-base-tls
       hosts:
         - localhost
-        # -- Set this to ORY Kratos's Admin URL
+# -- Set this to ORY Kratos's Admin URL
 kratosAdminUrl: "kratos-admin"
 
 # -- Set this to ORY Kratos's public URL
