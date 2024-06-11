@@ -3,12 +3,15 @@ bases:
 
 ---
 
+{{ readFile "../etc/helmfile-templates.yaml" }}
+
 releases:
   - name: kratos
     chart: ory/kratos
     version: {{ .Values.kratos._chart_version }}
     installed: {{ .Values.kratos._install }}
     timeout: {{ add .Values.base_timeout .Values.kratos._extra_timeout }}
+    <<: *logFailedRelease
     values:
       - "../etc/kratos/values.yaml"
       - {{ .Values.kratos | toYaml | indent 8 | trim }}
@@ -68,6 +71,7 @@ releases:
     version: {{ .Values.kratos_ui._chart_version }}
     installed: {{ .Values.kratos_ui._install }}
     timeout: {{ add .Values.base_timeout .Values.kratos_ui._extra_timeout }}
+    <<: *logFailedRelease
     values:
       - "../etc/kratos_ui/values.yaml"
       - {{ .Values.kratos_ui | toYaml | indent 8 | trim }}
