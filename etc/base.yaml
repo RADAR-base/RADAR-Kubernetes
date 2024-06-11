@@ -217,12 +217,12 @@ app_config_frontend:
 # --------------------------------------------------------- 15-ory.yaml ---------------------------------------------------------
 
 kratos:
-  _install: false
-  _chart_version: 2.1.6
+  _install: true
+  _chart_version: 2
   _extra_timeout: 0
 
 kratos_ui:
-  _install: false
+  _install: true
   _chart_version: 2.1.6
   _extra_timeout: 0
 
