@@ -81,28 +81,28 @@ releases:
       - name: jdbc.password
         value: {{ .Values.timescaledb_password }}
       - name: jdbc.url
-        value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://timescaledb-postgresql-hl:5432/%s" .Values.data_dashboard_backend.database_name) .Values.data_dashboard_backend }}
+        value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://timescaledb-postgresql-hl:5432/%s" .Values.data_dashboard_backend_db_name) .Values.data_dashboard_backend }}
       - name: managementPortal.clientSecret
         value: {{ .Values.management_portal.oauth_clients.radar_data_dashboard_backend.client_secret }}
 
-  - name: ksql-server-data-dashboard-backend
+  - name: ksql-server
     chart: cp-radar/cp-ksql-server
-    installed: {{ .Values.ksql_server_data_dashboard_backend._install }}
-    version: {{ .Values.ksql_server_data_dashboard_backend._chart_version }}
-    timeout: {{ add .Values.base_timeout .Values.ksql_server_data_dashboard_backend._extra_timeout }}
+    installed: {{ .Values.ksql_server._install }}
+    version: {{ .Values.ksql_server._chart_version }}
+    timeout: {{ add .Values.base_timeout .Values.ksql_server._extra_timeout }}
     <<: *logFailedRelease
     values:
       - "../etc/cp-ksql-server/values.yaml"
-      - {{ .Values.ksql_server_data_dashboard_backend | toYaml | indent 8 | trim }}
+      - {{ .Values.ksql_server | toYaml | indent 8 | trim }}
 
-  - name: radar-jdbc-connector
+  - name: radar-jdbc-connector-grafana
     chart: radar/radar-jdbc-connector
-    version: {{ .Values.radar_jdbc_connector._chart_version }}
-    installed: {{ .Values.radar_jdbc_connector._install }}
-    timeout: {{ add .Values.base_timeout .Values.radar_jdbc_connector._extra_timeout }}
-    <<: *logFailedRelease    
+    version: {{ .Values.radar_jdbc_connector_grafana._chart_version }}
+    installed: {{ .Values.radar_jdbc_connector_grafana._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_jdbc_connector_grafana._extra_timeout }}
+    <<: *logFailedRelease
     values:
-      - {{ .Values.radar_jdbc_connector | toYaml | indent 8 | trim }}
+      - {{ .Values.radar_jdbc_connector_grafana | toYaml | indent 8 | trim }}
     set:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
@@ -111,4 +111,42 @@ releases:
       - name: jdbc.password
         value: {{ .Values.timescaledb_password }}
       - name: jdbc.url
-        value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://timescaledb-postgresql-hl:5432/%s" .Values.timescaledb_db_name) .Values.radar_jdbc_connector }}
+        value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://timescaledb-postgresql-hl:5432/%s" .Values.timescaledb_db_name) .Values.radar_jdbc_connector_realtime_dashboard }}
+
+  - name: radar-jdbc-connector-data-dashboard-backend
+    chart: radar/radar-jdbc-connector
+    version: {{ .Values.radar_jdbc_connector_data_dashboard_backend._chart_version }}
+    installed: {{ .Values.radar_jdbc_connector_data_dashboard_backend._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_jdbc_connector_data_dashboard_backend._extra_timeout }}
+    <<: *logFailedRelease
+    values:
+      - "../etc/radar-jdbc-connector-data-dashboard-backend/values.yaml"
+      - {{ .Values.radar_jdbc_connector_data_dashboard_backend | toYaml | indent 8 | trim }}
+    set:
+      - name: kafka_num_brokers
+        value: {{ .Values.kafka_num_brokers }}
+      - name: jdbc.user
+        value: {{ .Values.data_dashboard_backend_db_username }}
+      - name: jdbc.password
+        value: {{ .Values.data_dashboard_backend_db_password }}
+      - name: jdbc.url
+        value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://timescaledb-postgresql-hl:5432/%s" .Values.data_dashboard_backend_db_name) .Values.radar_jdbc_connector_data_dashboard_backend }}
+
+  - name: radar-jdbc-connector-realtime-dashboard
+    chart: radar/radar-jdbc-connector
+    version: {{ .Values.radar_jdbc_connector_realtime_dashboard._chart_version }}
+    installed: {{ .Values.radar_jdbc_connector_realtime_dashboard._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_jdbc_connector_realtime_dashboard._extra_timeout }}
+    <<: *logFailedRelease
+    values:
+      - "../etc/radar-jdbc-connector-realtime-dashboard/values.yaml"
+      - {{ .Values.radar_jdbc_connector_realtime_dashboard | toYaml | indent 8 | trim }}
+    set:
+      - name: kafka_num_brokers
+        value: {{ .Values.kafka_num_brokers }}
+      - name: jdbc.user
+        value: {{ .Values.timescaledb_username }}
+      - name: jdbc.password
+        value: {{ .Values.timescaledb_password }}
+      - name: jdbc.url
+        value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://timescaledb-postgresql-hl:5432/%s" .Values.timescaledb_db_name) .Values.radar_jdbc_connector_realtime_dashboard }}
