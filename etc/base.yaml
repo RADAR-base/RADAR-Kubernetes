@@ -220,6 +220,8 @@ kratos:
   _install: true
   _chart_version: 2
   _extra_timeout: 0
+  jdbc:
+    database: kratos
 
 kratos_ui:
   _install: true
