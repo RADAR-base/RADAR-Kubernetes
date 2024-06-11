@@ -7,7 +7,7 @@ bases:
 
 releases:
   - name: kratos
-    chart: ory/kratos
+    chart: radar/kratos
     version: {{ .Values.kratos._chart_version }}
     installed: {{ .Values.kratos._install }}
     timeout: {{ add .Values.base_timeout .Values.kratos._extra_timeout }}
@@ -67,7 +67,7 @@ releases:
           - {{ .Values.server_name }}
 
   - name: kratos-selfservice-ui-node
-    chart: ory/kratos-selfservice-ui-node
+    chart: radar/kratos-selfservice-ui-node
     version: {{ .Values.kratos_ui._chart_version }}
     installed: {{ .Values.kratos_ui._install }}
     timeout: {{ add .Values.base_timeout .Values.kratos_ui._extra_timeout }}

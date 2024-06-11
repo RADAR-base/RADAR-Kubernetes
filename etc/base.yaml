@@ -218,14 +218,14 @@ app_config_frontend:
 
 kratos:
   _install: true
-  _chart_version: 2
+  _chart_version: 0.43.0
   _extra_timeout: 0
   jdbc:
     database: kratos
 
 kratos_ui:
   _install: true
-  _chart_version: 2.1.6
+  _chart_version: 0.43.0
   _extra_timeout: 0
 
 # --------------------------------------------------------- 20-appserver.yaml ---------------------------------------------------------
