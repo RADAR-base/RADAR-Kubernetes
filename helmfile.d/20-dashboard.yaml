@@ -68,7 +68,6 @@ releases:
     timeout: {{ add .Values.base_timeout .Values.data_dashboard_backend._extra_timeout }}
     <<: *logFailedRelease
     values:
-      - "../etc/data-dashboard-backend/values.yaml"
       - {{ .Values.data_dashboard_backend | toYaml | indent 8 | trim }}
     set:
       - name: serverName
