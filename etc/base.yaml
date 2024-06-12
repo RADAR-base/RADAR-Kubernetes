@@ -317,6 +317,9 @@ timescaledb:
       # Uncomment when upgrading
       #existingClaim: "data-timescaledb-postgresql-0"
 
+# Make sure to set:
+#- radar_jdbc_connector_grafana._install to true
+#- ksql_server._install to true
 radar_grafana:
   _install: false
   _chart_version: 6.26.8
@@ -325,12 +328,16 @@ radar_grafana:
   env:
     GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/allprojects/home.json
 
+# Make sure to set:
+#- radar_jdbc_connector_data_dashboard_backend._install to true
+#- ksql_server._install to true
 data_dashboard_backend:
   _install: false
   _chart_version: 0.1.0
   _extra_timeout: 0
   replicaCount: 1
 
+# Install when radar_grafana._install is 'true'
 radar_jdbc_connector_grafana:
   _install: false
   _chart_version: 0.5.1
@@ -340,18 +347,24 @@ radar_jdbc_connector_grafana:
     # Change the list of topics if you have dashboards that read other data or if you don't have certain topics available on your cluster.
     topics: android_phone_relative_location, android_phone_battery_level, connect_fitbit_intraday_heart_rate, connect_fitbit_intraday_steps
 
+# Install when data_dashboard_backend._install is 'true'
 radar_jdbc_connector_data_dashboard_backend:
   _install: false
   _chart_version: 0.5.1
   _extra_timeout: 0
   replicaCount: 1
 
+# Install when using realtime analysis
 radar_jdbc_connector_realtime_dashboard:
   _install: false
   _chart_version: 0.5.1
   _extra_timeout: 0
   replicaCount: 1
 
+# Install when:
+#- radar_grafana._install is 'true'
+#- data_dashboard_backend._install is 'true'
+#- using realtime analysis
 ksql_server:
   _install: false
   _chart_version: 0.3.1
