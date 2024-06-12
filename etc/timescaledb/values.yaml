@@ -39,7 +39,7 @@ auth:
   postgresPassword: ""
   ## @param auth.database Name for a custom database to create
   ##
-  database: data-dashboard
+  database: grafana-metrics
 ## @param architecture PostgreSQL architecture (`standalone` or `replication`)
 ##
 architecture: standalone
