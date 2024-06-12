@@ -392,6 +392,15 @@ Run the following instructions to upgrade an existing RADAR-Kubernetes cluster.
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Upgrading the major version of a PostgreSQL image is not supported. If necessary, we propose to use a `pg_dump` to dump the current data and a `pg_restore` to restore that data on a newer version. Please find instructions for this elsewhere. |
 
+### Upgrade to RADAR-Kubernetes version >=1.1.4
+
+In `production.yaml` rename sections:
+
+| Old Name                 | New Name                           |
+|--------------------------|------------------------------------|
+| radar_jdbc_connector     | radar_jdbc_connector_grafana       |
+| radar_jdbc_connector_agg | radar_jdbc_connector_realtime_dashboard |
+
 ### Upgrade to RADAR-Kubernetes version 1.1.x
 Before running the upgrade make sure to copy `environments.yaml.tmpl` to `environments.yaml` and if you've previously changed `environments.yaml` apply the changes again. This is necessary due to addition of `helmDefaults` and `repositories` configurations to this file.
 
