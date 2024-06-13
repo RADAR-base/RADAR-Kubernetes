@@ -1,21 +1,21 @@
-# kafka-data transformer (KSQLDB) for data-dashboard-backend service
+# Kafka-data transformer (ksql-server) for data-dashboard-backend service
 
-Reference: https://docs.ksqldb.io/
+Reference: https://docs.ksql-server.io/
 
-The data-dashboard-backend service uses data from Kafka topics to the _observation_ table in the RADAR-base Data
-Dashboard backend service database. The data in the Kafka topics is transformed by the KSQLDB Kafka data transformer to
-be imported into the _observation_ table.
+The data-dashboard-backend service uses data derived from Kafka topics imported into the _observation_ table
+data-dashboard-backend service database. The data in the Kafka topics is transformed by the ksql-server data transformer
+to be imported into the _observation_ table.
 
-The KSQLDB Kafka data transformer is able to register Consumer/Producers to Kafka that transform data in a topic and
+The ksql-server data transformer is able to register Consumer/Producers to Kafka that transform data in a topic and
 publish the results to another topic.
 
-The provided KSQLDB _questionnaire_response_observations.sql_ and _questionnaire_app_events_observation.sql_ SQL files
+The provided ksql-server _questionnaire_response_observations.sql_ and _questionnaire_app_events_observation.sql_ SQL files
 transform, respectively, the _questionnaire_response_ and _questionnaire_app_event_ topics and publish the data to the
-_ksql_observations_ topic. The _ksql_observations_ topic is consumed by the Kafka-JDBC-connector used for the by the
-RADAR-base Data Dashboard backend service (see: [20-data-dashboard.yaml](../../helmfile.d/20-dashboard.yaml)).
+_ksql_observations_ topic. The _ksql_observations_ topic is consumed by the radar-jdbc-connector service deployed for the
+data-dashboard-backend service (see: [20-data-dashboard.yaml](../helmfile.d/20-dashboard.yaml)).
 
 When transformation of other topics is required, new SQL files can be added to this directory. These new files should be
-referenced in the _cp-ksql-server_ -> ksql -> queries_ section of the `etc/base.yaml.gotmpl` file. New KSQLDB SQL
+referenced in the _cp-ksql-server_ -> ksql -> queries_ section of the `etc/base.yaml.gotmpl` file. New ksql-server SQL
 files should transform towards the following format of the _ksql_observations_ topic:
 
 ```

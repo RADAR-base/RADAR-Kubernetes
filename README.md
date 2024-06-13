@@ -331,7 +331,7 @@ Now you can head over to the [Management Portal](https://radar-base.atlassian.ne
 
 ## Service-specific documentation
 
-- [Data Dashboard Backend data transformation](docs/KSQLDB_transformer_for_data-dashboard-backend.md)
+- [Data Dashboard Backend data transformation](docs/ksql-server_for_data-dashboard-backend.md)
 
 
 ## Troubleshooting
