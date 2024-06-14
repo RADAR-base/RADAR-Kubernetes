@@ -222,6 +222,10 @@ kratos:
   _extra_timeout: 0
   jdbc:
     database: kratos
+  kratos:
+    courier:
+      smtp:
+        from_address: radar@thehyve.nl
 
 kratos_ui:
   _install: true
