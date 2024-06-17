@@ -5,7 +5,7 @@ CREATE STREAM observations (
     PROJECT VARCHAR KEY,    -- 'KEY' means that this field is part of the kafka message key
     SUBJECT VARCHAR KEY,
     SOURCE VARCHAR KEY,
-    `TOPIC` VARCHAR,
+    TOPIC_NAME VARCHAR,
     CATEGORY VARCHAR,
     VARIABLE VARCHAR,
     DATE TIMESTAMP,

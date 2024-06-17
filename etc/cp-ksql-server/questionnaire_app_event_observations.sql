@@ -17,7 +17,7 @@ SELECT
     q.projectId AS PROJECT,
     q.userId AS SUBJECT,
     q.sourceId AS SOURCE,
-    'questionnaire_app_event' as `TOPIC`,
+    'questionnaire_app_event' as TOPIC_NAME,
     CAST(NULL as VARCHAR) as CATEGORY,
     q.questionnaireName as VARIABLE,
     FROM_UNIXTIME(CAST(q.time * 1000 AS BIGINT)) as DATE,

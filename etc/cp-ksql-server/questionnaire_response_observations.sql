@@ -21,7 +21,7 @@ AS SELECT
     q.projectId,
     q.userId,
     q.sourceId,
-    'questionnaire_response' as `TOPIC`,
+    'questionnaire_response' as TOPIC_NAME,
     q.name as CATEGORY,
     CAST(NULL as TIMESTAMP) as END_DATE,
     -- WARNING!!! The cast from VARCHAR (string) to DOUBLE will throw an JAVA exception if the string is not a number.
@@ -42,7 +42,7 @@ SELECT
    q.projectId as PROJECT,
    q.sourceId as SOURCE,
    q.userId as SUBJECT,
-   `TOPIC`, CATEGORY, VARIABLE, DATE, END_DATE,
+   TOPIC_NAME, CATEGORY, VARIABLE, DATE, END_DATE,
    CASE
        WHEN TYPE IS NULL AND VALUE_NUMERIC IS NOT NULL THEN 'DOUBLE' -- must have been derived from a string cast
        WHEN TYPE IS NULL AND VALUE_NUMERIC IS NULL THEN 'STRING'
@@ -68,7 +68,7 @@ EMIT CHANGES;
 -- INSERT INTO observations
 -- SELECT
 --     EXPLODE(SPLIT(VALUE_TEXTUAL, ',')) as VARIABLE,
---     PROJECT, SOURCE, SUBJECT, `TOPIC`, CATEGORY, DATE, END_DATE,
+--     PROJECT, SOURCE, SUBJECT, TOPIC_NAME, CATEGORY, DATE, END_DATE,
 --     'INTEGER' as TYPE,
 --     CAST(1 as DOUBLE) VALUE_NUMERIC,
 --     CAST(NULL as VARCHAR) as VALUE_TEXTUAL
