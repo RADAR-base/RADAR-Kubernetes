@@ -38,6 +38,7 @@ FROM questionnaire_response q
 EMIT CHANGES;
 
 INSERT INTO observations
+WITH (QUERY_ID='questionnaire_response_observations')
 SELECT
    q.projectId as PROJECT,
    q.sourceId as SOURCE,

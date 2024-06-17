@@ -13,6 +13,7 @@ CREATE STREAM questionnaire_app_event (
 );
 
 INSERT INTO observations
+WITH (QUERY_ID='questionnaire_app_event_observations')
 SELECT
     q.projectId AS PROJECT,
     q.userId AS SUBJECT,
