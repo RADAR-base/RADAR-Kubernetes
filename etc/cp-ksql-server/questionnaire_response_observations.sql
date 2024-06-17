@@ -17,13 +17,13 @@ CREATE STREAM questionnaire_response (
 CREATE STREAM questionnaire_response_exploded
 AS SELECT
     EXPLODE(TRANSFORM(q.answers, a => a->questionId)) as VARIABLE,
-    FROM_UNIXTIME(CAST(q.time * 1000 AS BIGINT)) as DATE,
+    FROM_UNIXTIME(CAST(q.time * 1000 AS BIGINT)) as OBSERVATION_TIME,
     q.projectId,
     q.userId,
     q.sourceId,
     'questionnaire_response' as TOPIC_NAME,
     q.name as CATEGORY,
-    CAST(NULL as TIMESTAMP) as END_DATE,
+    CAST(NULL as TIMESTAMP) as OBSERVATION_TIME_END,
     -- WARNING!!! The cast from VARCHAR (string) to DOUBLE will throw an JAVA exception if the string is not a number.
     -- This does not mean that the message will be lost. The value will be present in the VALUE_TEXTUAL_OPTIONAL field.
     EXPLODE(TRANSFORM(q.answers, a => COALESCE(a->value->double, CAST(a->value->int as DOUBLE), CAST(a->value->string as DOUBLE)))) as VALUE_NUMERIC,
@@ -42,7 +42,7 @@ SELECT
    q.projectId as PROJECT,
    q.sourceId as SOURCE,
    q.userId as SUBJECT,
-   TOPIC_NAME, CATEGORY, VARIABLE, DATE, END_DATE,
+   TOPIC_NAME, CATEGORY, VARIABLE, OBSERVATION_TIME, OBSERVATION_TIME_END,
    CASE
        WHEN TYPE IS NULL AND VALUE_NUMERIC IS NOT NULL THEN 'DOUBLE' -- must have been derived from a string cast
        WHEN TYPE IS NULL AND VALUE_NUMERIC IS NULL THEN 'STRING'
@@ -68,7 +68,7 @@ EMIT CHANGES;
 -- INSERT INTO observations
 -- SELECT
 --     EXPLODE(SPLIT(VALUE_TEXTUAL, ',')) as VARIABLE,
---     PROJECT, SOURCE, SUBJECT, TOPIC_NAME, CATEGORY, DATE, END_DATE,
+--     PROJECT, SOURCE, SUBJECT, TOPIC_NAME, CATEGORY, OBSERVATION_TIME, OBSERVATION_TIME_END,
 --     'INTEGER' as TYPE,
 --     CAST(1 as DOUBLE) VALUE_NUMERIC,
 --     CAST(NULL as VARCHAR) as VALUE_TEXTUAL

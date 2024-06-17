@@ -5,7 +5,7 @@ CREATE STREAM questionnaire_app_event (
     questionnaireName VARCHAR,
     eventType VARCHAR,
     time DOUBLE,
-    metadata MAP<VARCHAR, VARCHAR>
+    metadata MAP<VARCHAR, VARCHAR>+
 ) WITH (
     kafka_topic = 'questionnaire_app_event',
     partitions = 3,
@@ -20,8 +20,8 @@ SELECT
     'questionnaire_app_event' as TOPIC_NAME,
     CAST(NULL as VARCHAR) as CATEGORY,
     q.questionnaireName as VARIABLE,
-    FROM_UNIXTIME(CAST(q.time * 1000 AS BIGINT)) as DATE,
-    CAST(NULL as TIMESTAMP) as END_DATE,
+    FROM_UNIXTIME(CAST(q.time * 1000 AS BIGINT)) as OBSERVATION_TIME,
+    CAST(NULL as TIMESTAMP) as OBSERVATION_TIME_END,
     'STRING_JSON' as TYPE,
     CAST(NULL as DOUBLE) as VALUE_NUMERIC,
     TO_JSON_STRING(q.metadata) as VALUE_TEXTUAL
