@@ -8,6 +8,6 @@ sink:
       - PROJECT
       - SUBJECT
       - SOURCE
-      - TOPIC
+      - TOPIC_NAME
       - VARIABLE
-      - DATE
+      - OBSERVATION_TIME
