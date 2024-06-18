@@ -184,6 +184,8 @@ management_portal:
   replicaCount: 1  # should be 1
   postgres:
     host: postgresql
+    user: postgres
+    port: 5432
     ssl:
       enabled: false
   managementportal:
@@ -192,7 +194,25 @@ management_portal:
     oauth_checking_key_aliases_0: radarbase-managementportal-ec
     oauth_checking_key_aliases_1: selfsigned
   smtp:
+    username: secret
     password: secret
+    host: localhost
+
+kratos:
+  _install: true
+  _chart_version: 0.43.1
+  _extra_timeout: 0
+  jdbc:
+    database: kratos
+  kratos:
+    courier:
+      smtp:
+        from_address: radar@thehyve.nl
+
+kratos_ui:
+  _install: true
+  _chart_version: 0.43.1
+  _extra_timeout: 0
 
 app_config:
   _install: true
