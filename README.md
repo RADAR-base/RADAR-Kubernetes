@@ -27,6 +27,7 @@ The Kubernetes stack of RADAR-base platform.
    * [Configure](#configure)
    * [Install](#install)
 - [Usage and accessing the applications](#usage-and-accessing-the-applications)
+- [Service-specific documentation](#service-specific-documentation)
 - [Troubleshooting](#troubleshooting)
 - [Upgrade instructions](#upgrade-instructions)
    * [Upgrade to RADAR-Kubernetes version 1.1.x](#upgrade-to-radar-kubernetes-version-11x)
@@ -328,6 +329,11 @@ https://k8s.radar-base.org
 Now you can head over to the [Management Portal](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/49512484/Management+Portal) guide for next steps.
 
 
+## Service-specific documentation
+
+- [Data Dashboard Backend data transformation](docs/ksql-server_for_data-dashboard-backend.md)
+
+
 ## Troubleshooting
 
 If an application doesn't become fully ready, installation will not be successful. In this case, you should investigate the root cause by investigating the relevant component. It's suggested to run the following command when `helmfile sync` command is running so you can keep an eye on the installation:
@@ -385,6 +391,15 @@ Run the following instructions to upgrade an existing RADAR-Kubernetes cluster.
 | :exclamation: Note                                                                                                                                                                                                                                |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Upgrading the major version of a PostgreSQL image is not supported. If necessary, we propose to use a `pg_dump` to dump the current data and a `pg_restore` to restore that data on a newer version. Please find instructions for this elsewhere. |
+
+### Upgrade to RADAR-Kubernetes version >=1.1.4
+
+In `production.yaml` rename sections:
+
+| Old Name                 | New Name                           |
+|--------------------------|------------------------------------|
+| radar_jdbc_connector     | radar_jdbc_connector_grafana       |
+| radar_jdbc_connector_agg | radar_jdbc_connector_realtime_dashboard |
 
 ### Upgrade to RADAR-Kubernetes version 1.1.x
 Before running the upgrade make sure to copy `environments.yaml.tmpl` to `environments.yaml` and if you've previously changed `environments.yaml` apply the changes again. This is necessary due to addition of `helmDefaults` and `repositories` configurations to this file.

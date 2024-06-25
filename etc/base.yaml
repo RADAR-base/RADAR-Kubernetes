@@ -290,10 +290,12 @@ radar_rest_sources_backend:
     garmin:
       enable: "false"
 
-# --------------------------------------------------------- 20-grafana.yaml ---------------------------------------------------------
+# --------------------------------------------------------- 20-dashboard.yaml ---------------------------------------------------------
 
 timescaledb_username: postgres
 timescaledb_db_name: grafana-metrics
+data_dashboard_backend_db_name: data-dashboard
+data_dashboard_backend_db_username: postgres
 grafana_metrics_username: postgres
 
 timescaledb:
@@ -315,22 +317,62 @@ timescaledb:
       # Uncomment when upgrading
       #existingClaim: "data-timescaledb-postgresql-0"
 
+# Make sure to set:
+#- radar_jdbc_connector_grafana._install to true
+#- ksql_server._install to true
 radar_grafana:
-  _install: true
+  _install: false
   _chart_version: 6.26.8
   _extra_timeout: 0
   replicaCount: 1
   env:
     GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/allprojects/home.json
 
-radar_jdbc_connector:
-  _install: true
+# Make sure to set:
+#- radar_jdbc_connector_data_dashboard_backend._install to true
+#- ksql_server._install to true
+data_dashboard_backend:
+  _install: false
+  _chart_version: 0.1.0
+  _extra_timeout: 0
+  replicaCount: 1
+
+# Install when radar_grafana._install is 'true'
+radar_jdbc_connector_grafana:
+  _install: false
   _chart_version: 0.5.1
   _extra_timeout: 0
   replicaCount: 1
   sink:
     # Change the list of topics if you have dashboards that read other data or if you don't have certain topics available on your cluster.
     topics: android_phone_relative_location, android_phone_battery_level, connect_fitbit_intraday_heart_rate, connect_fitbit_intraday_steps
+
+# Install when data_dashboard_backend._install is 'true'
+radar_jdbc_connector_data_dashboard_backend:
+  _install: false
+  _chart_version: 0.5.1
+  _extra_timeout: 0
+  replicaCount: 1
+
+# Install when using realtime analysis
+radar_jdbc_connector_realtime_dashboard:
+  _install: false
+  _chart_version: 0.5.1
+  _extra_timeout: 0
+  replicaCount: 1
+
+# Install when:
+#- radar_grafana._install is 'true'
+#- data_dashboard_backend._install is 'true'
+#- using realtime analysis
+ksql_server:
+  _install: false
+  _chart_version: 0.3.1
+  _extra_timeout: 0
+  # -- Uncomment when using real-time analysis
+  # ksql:
+  #   headless: false
+  # --
 
 # --------------------------------------------------------- 20-ingestion.yaml ---------------------------------------------------------
 
@@ -487,30 +529,6 @@ radar_push_endpoint:
   adminProperties: {}
   garmin:
     enabled: true
-
-# --------------------------------------------------------- 40-realtime-analyses.yaml ---------------------------------------------------------
-
-radar_jdbc_connector_agg:
-  _install: false
-  _chart_version: 0.5.1
-  _extra_timeout: 0
-  replicaCount: 1
-
-ksql_server:
-  _install: false
-  _chart_version: 0.3.1
-  _extra_timeout: 0
-  replicaCount: 1
-  servicePort: 8088
-  kafka:
-    bootstrapServers: PLAINTEXT://cp-kafka:9092
-  cp-schema-registry:
-    url: http://cp-schema-registry:8081
-  ksql:
-    headless: false
-  configurationOverrides:
-    "ksql.server.url": "http://0.0.0.0:8088"
-    "ksql.advertised.listener": "http://ksql-server:8088"
 
 # --------------------------------------------------------- 99-velero.yaml ---------------------------------------------------------
 

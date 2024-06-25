@@ -1,0 +1,13 @@
+sink:
+  # Central topic for transformed topics (see docs/KSQLDB_transformer_for_data-dashboard-backend.md)
+  topics: ksql_observations
+  tableNameFormat: observation
+  insertMode: insert
+  primaryKeys:
+    fields:
+      - PROJECT
+      - SUBJECT
+      - SOURCE
+      - TOPIC_NAME
+      - VARIABLE
+      - OBSERVATION_TIME
