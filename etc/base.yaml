@@ -15,6 +15,13 @@ kafka_num_brokers: 3
 enable_tls: true
 
 
+# Disable TLS redirection and retrieval of Let's Encrypt certificates.
+# Can be used when TLS termination is handled upstream of the on-cluster Nginx reverse proxy.
+disable_tls: false
+# Minimal deployment for development (disables TLS, monitoring and logging, sets kafka and minio brokers to 1).
+dev_deployment: false
+
+
 # --------------------------------------------------------- 00-init.yaml ---------------------------------------------------------
 
 # Needed for graylog. If graylog is set not to install, this can be disabled as well.
