@@ -125,9 +125,9 @@ releases:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
       - name: jdbc.user
-        value: {{ .Values.data_dashboard_backend_db_username }}
+        value: {{ .Values.timescaledb_username }}
       - name: jdbc.password
-        value: {{ .Values.data_dashboard_backend_db_password }}
+        value: {{ .Values.timescaledb_password }}
       - name: jdbc.url
         value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://timescaledb-postgresql-hl:5432/%s" .Values.data_dashboard_backend_db_name) .Values.radar_jdbc_connector_data_dashboard_backend }}
 
