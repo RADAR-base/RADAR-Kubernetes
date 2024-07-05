@@ -251,6 +251,9 @@ radar_appserver:
   replicaCount: 1
   managementportal_resource_name: res_AppServer
   public_key_endpoints: []
+  smtp:
+    enabled: false
+    host: localhost
 
 # --------------------------------------------------------- 20-fitbit.yaml ---------------------------------------------------------
 # The charts in 20-fitbit.yaml only need to be installed if you will use a Fitbit, Garmin, or Oura API integration.
