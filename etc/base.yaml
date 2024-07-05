@@ -252,7 +252,7 @@ radar_appserver:
   managementportal_resource_name: res_AppServer
   public_key_endpoints: []
   smtp:
-    enabled: false
+    enabled: false # -- set to true, if sending of notifications via email should be enabled.
     host: localhost
 
 # --------------------------------------------------------- 20-fitbit.yaml ---------------------------------------------------------
