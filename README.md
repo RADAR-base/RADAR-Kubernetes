@@ -562,3 +562,5 @@ bin/chart-updates
 Enabling RADAR-base community to use RADAR-Kubernetes is important for us. If you have troubles setting up the platform using provided instructions, you can create an dicussion with exact details to reproduce and the expected behavior.
 You can also reach out to the RADAR-base community via RADAR-base Slack on **[radar-kubernetes channel](https://radardevelopment.slack.com/archives/C021AGGESC9)**. The RADAR-base developers support the community on a voluntary basis and will pick up your requests as time permits.
 If you'd like to contribute to this project, please checkout [CONTRIBUTING.md](https://github.com/RADAR-base/RADAR-Kubernetes/blob/main/CONTRIBUTING.md) file.
+
+test CI
