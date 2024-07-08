@@ -1,0 +1,17 @@
+hydraAdminUrl: http://hydra-admin:4445
+hydraPublicUrl: http://hydra-public:4444
+baseUrl: https://radar-k3s-test.thehyve.net/hydra-ui/
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+  hosts:
+    - host: radar-k3s-test.thehyve.net
+      paths:
+        - path: "/hydra-ui/?(.*)"
+          pathType: ImplementationSpecific
+  tls:
+    - hosts: [radar-k3s-test.thehyve.net]
+      secretName: radar-base-tls

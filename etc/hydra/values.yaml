@@ -1,0 +1,47 @@
+ingress:
+  admin:
+    enabled: true
+    className: "nginx"
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    hosts:
+      - host: radar-k3s-test.thehyve.net
+        paths:
+          - path: "/admin/hydra/?(.*)"
+            pathType: ImplementationSpecific
+    tls:
+      - secretName: hydra-admin-tls
+        host:
+          - radar-k3s-test.thehyve.net
+  public:
+    enabled: true
+    className: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /$1
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    hosts:
+      - host: radar-k3s-test.thehyve.net
+        paths:
+          - path: "/hydra/?(.*)"
+            pathType: ImplementationSpecific
+    tls:
+      - secretName: hydra-public-tls
+        hosts:
+          - radar-k3s-test.thehyve.net
+hydra:
+  automigration:
+    enabled: true
+  config:
+    urls:
+      self:
+        issuer: https://radar-k3s-test.thehyve.net/hydra/
+      login: https://radar-k3s-test.thehyve.net/hydra-ui/login
+      consent: https://radar-k3s-test.thehyve.net/hydra-ui/consent
+
+    log:
+      level: debug
+      format: text
+      leak_sensitive_values: true
+
+
+#https://www.ory.sh/docs/hydra/reference/configuration

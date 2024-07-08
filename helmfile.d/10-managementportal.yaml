@@ -154,7 +154,7 @@ releases:
     timeout: {{ add .Values.base_timeout .Values.kratos_ui._extra_timeout }}
     <<: *logFailedRelease
     values:
-      - "../etc/kratos_ui/values.yaml"
+      - "../etc/kratos-ui/values.yaml"
       - {{ .Values.kratos_ui | toYaml | indent 8 | trim }}
     set:
       - name: serverName
@@ -177,6 +177,9 @@ releases:
     values:
       - "../etc/hydra/values.yaml"
       - {{ .Values.hydra | toYaml | indent 8 | trim }}
+    set:
+      - name: hydra.config.dsn
+        value: postgres://{{ .Values.management_portal.postgres.user }}:{{ .Values.management_portal.postgres.password }}@{{ .Values.management_portal.postgres.host }}:{{ .Values.management_portal.postgres.port }}/{{ .Values | get "hydra.jdbc.database" "hydra" }}
 
   - name: hydra-ui
     chart: ory/example-idp
