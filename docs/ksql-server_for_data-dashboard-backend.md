@@ -27,12 +27,22 @@ files should transform towards the following format of the _ksql_observations_ t
       TOPIC: the topic identifier
       CATEGORY: the category identifier (optional)
       VARIABLE: the variable identifier
-      DATE: the date of the observation
-      END_DATE: the end date of the observation (optional)
+      OBSERVATION_TIME: datetime of the observation
+      OBSERVATION_TIME_END: the end datetime of the observation (optional)
       TYPE: the type of the observation (STRING, STRING_JSON, INTEGER, DOUBLE)
       VALUE_TEXTUAL: the textual value of the observation (optional, must be set when VALUE_NUMERIC is NULL)
       VALUE_NUMERIC: the numeric value of the observation (optional, must be set when VALUE_TEXTUAL is NULL)
 ```
+
+## Conventions
+
+The mapping of topic fields is straightforward. The CATEGORY and VARIABLE fields are flexible that map to:
+
+| Topic                   | CATEGORY                                        | VARIABLE                                  | VALUE              |
+|-------------------------|-------------------------------------------------|-------------------------------------------|--------------------|
+| questionnaire_reponse   | questionnaire name (e.g., _follow_up_a.1.0.3_)  | questionId (e.g, _blwbg_lt2w_nervous_)    | answer to question |
+| questionnaire_app_event | questionnaire name (e.g., _follow_up_a.1.0.3_)  | eventType (e.g., _QUESTIONNAIRE_STARTED_) | event metadata     |
+
 
 New messages are added to the _ksql_observations_ topic by inserting into the _observations_ stream (
 see [_base_observations_stream.sql](_base_observations_stream.sql)):
