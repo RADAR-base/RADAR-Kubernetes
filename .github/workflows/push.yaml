@@ -47,10 +47,11 @@ jobs:
         run: |
           ./.github/ci_config/bin/install-dependencies
 
-      - name: Prepare the environment
+      - name: Prepare the environment (add secrets and enable installation of all components)
         run: |
           DNAME='CN=CI,O=TheHyve,L=Utrecht,C=NL' ./bin/init
-          yq -i -f process '.environments.default.values += ["../.github/ci_config/install-all.yaml", "../.github/ci_config/secrets.yaml.gotmpl"]' environments.yaml
+          yq -i -f process '.environments.default.values += ["../.github/ci_config/ci-config.yaml", "../.github/ci_config/secrets.yaml.gotmpl"]' environments.yaml
+          sed -i '/_install: /s/false/true/' etc/production.yaml
 
       - name: Run helmfile template
         env:

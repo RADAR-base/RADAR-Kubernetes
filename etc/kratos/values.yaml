@@ -225,3 +225,6 @@ kratos:
       level: debug
       format: text
       leak_sensitive_values: true
+
+    oauth2_provider:
+      url: http://hydra-admin

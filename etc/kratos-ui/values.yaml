@@ -32,3 +32,8 @@ basePath: ""
 jwksUrl: ""
 
 projectName: "SecureApp"
+
+deployment:
+  extraEnv:
+    - name: HYDRA_ADMIN_URL
+      value: http://hydra-admin
