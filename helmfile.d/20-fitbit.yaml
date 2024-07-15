@@ -41,6 +41,8 @@ releases:
         values: [{{ .Values.server_name }}]
       - name: serverName
         value: {{ .Values.server_name }}
+      - name: authUrl
+        value: {{ .Values.server_name }}/managementportal/oauth
 
   - name: radar-rest-sources-backend
     chart: radar/radar-rest-sources-backend
