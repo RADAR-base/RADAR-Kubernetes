@@ -32,7 +32,10 @@ jobs:
           ls -la ./
           rm -rf ./* || true
           rm -rf ./.??* || true
+          rm -rf /opt/images || true
           ls -la ./
+          mkdir -p /opt/images
+          for ref in `k3s ctr images ls | \grep -oE "^\S+" | sort -u` ; do k3s ctr images export /opt/images/`openssl rand -hex 10`.tar $ref; done
           /usr/local/bin/k3s-uninstall.sh
 
       - uses: actions/checkout@v3
@@ -67,6 +70,7 @@ jobs:
         run: |
           curl -sfL https://get.k3s.io | sh -s - --disable traefik --disable-helm-controller
           cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+          ls -1 /opt/images | xargs -L1 k3s ctr images import
 
       - name: Install RADAR-Kubernetes
         env:
