@@ -1,6 +1,7 @@
 kafka_num_brokers: 1
 server_name: localhost-alt
 base_timeout: 360
+atomicInstall: false
 
 radar_s3_connector:
   kafka_num_brokers: 1
