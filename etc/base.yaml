@@ -148,7 +148,7 @@ cp_schema_registry:
 
 catalog_server:
   _install: true
-  _chart_version: 0.6.0
+  _chart_version: 0.6.1
   _extra_timeout: 90
   replicaCount: 1
   schema_registry: http://cp-schema-registry:8081
@@ -266,7 +266,7 @@ radar_appserver:
 # The charts in 20-fitbit.yaml only need to be installed if you will use a Fitbit, Garmin, or Oura API integration.
 radar_fitbit_connector:
   _install: false
-  _chart_version: 0.3.1
+  _chart_version: 0.3.2
   _extra_timeout: 0
   replicaCount: 1
   oauthClientId: radar_fitbit_connector
@@ -350,7 +350,7 @@ data_dashboard_backend:
 # Install when radar_grafana._install is 'true'
 radar_jdbc_connector_grafana:
   _install: false
-  _chart_version: 0.5.1
+  _chart_version: 0.5.3
   _extra_timeout: 0
   replicaCount: 1
   sink:
@@ -360,14 +360,14 @@ radar_jdbc_connector_grafana:
 # Install when data_dashboard_backend._install is 'true'
 radar_jdbc_connector_data_dashboard_backend:
   _install: false
-  _chart_version: 0.5.1
+  _chart_version: 0.5.3
   _extra_timeout: 0
   replicaCount: 1
 
 # Install when using realtime analysis
 radar_jdbc_connector_realtime_dashboard:
   _install: false
-  _chart_version: 0.5.1
+  _chart_version: 0.5.3
   _extra_timeout: 0
   replicaCount: 1
 
@@ -388,7 +388,7 @@ ksql_server:
 
 radar_gateway:
   _install: true
-  _chart_version: 1.1.2
+  _chart_version: 1.1.7
   _extra_timeout: 0
   replicaCount: 1
 
