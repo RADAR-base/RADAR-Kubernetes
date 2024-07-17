@@ -70,7 +70,9 @@ jobs:
         run: |
           curl -sfL https://get.k3s.io | sh -s - --disable traefik --disable-helm-controller
           cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
-          ls -1 /var/tmp/images | xargs -L1 sudo k3s ctr images import || true
+          cd /var/tmp/images 
+          ls -1 | xargs -L1 sudo k3s ctr images import || true
+          cd -
 
       - name: Install RADAR-Kubernetes
         env:
