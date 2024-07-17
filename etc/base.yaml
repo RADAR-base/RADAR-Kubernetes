@@ -194,9 +194,12 @@ management_portal:
     oauth_checking_key_aliases_0: radarbase-managementportal-ec
     oauth_checking_key_aliases_1: selfsigned
   smtp:
-    username: secret
-    password: secret
-    host: localhost
+    enabled: true
+    host: smtp
+    port: 25
+    from: noreply@example.com
+    starttls: false
+    auth: true
 
 kratos:
   _install: true
@@ -251,6 +254,13 @@ radar_appserver:
   replicaCount: 1
   managementportal_resource_name: res_AppServer
   public_key_endpoints: []
+  smtp:
+    enabled: false # -- set to true, if sending of notifications via email should be enabled.
+    host: smtp
+    port: 25
+    from: noreply@example.com
+    starttls: false
+    auth: true
 
 # --------------------------------------------------------- 20-fitbit.yaml ---------------------------------------------------------
 # The charts in 20-fitbit.yaml only need to be installed if you will use a Fitbit, Garmin, or Oura API integration.
