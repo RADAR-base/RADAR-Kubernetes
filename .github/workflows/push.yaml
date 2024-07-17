@@ -34,9 +34,6 @@ jobs:
           rm -rf ./.??* || true
           rm -rf /var/tmp/images || true
           ls -la ./
-          mkdir -p /var/tmp/images
-          for ref in `sudo k3s ctr images ls | \grep -oE "^\S+" | sort -u` ; do sudo k3s ctr images export /var/tmp/images/`openssl rand -hex 10`.tar $ref || true; done
-          /usr/local/bin/k3s-uninstall.sh
 
       - uses: actions/checkout@v3
 
@@ -62,12 +59,15 @@ jobs:
         run: |
           helmfile template
 
-      - name: Install K3S
+      - name: Reinstall K3S
         env:
           INSTALL_K3S_VERSION: ${{ matrix.K3S_VERSION }}
           INSTALL_K3S_SYMLINK: "skip"
           K3S_KUBECONFIG_MODE: "644"
         run: |
+          mkdir -p /var/tmp/images
+          for ref in `sudo k3s ctr images ls | \grep -oE "^\S+" | sort -u` ; do sudo k3s ctr images export /var/tmp/images/`openssl rand -hex 10`.tar $ref || true; done
+          /usr/local/bin/k3s-uninstall.sh        
           curl -sfL https://get.k3s.io | sh -s - --disable traefik --disable-helm-controller
           cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
           cd /var/tmp/images 
