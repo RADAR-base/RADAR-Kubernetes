@@ -8,9 +8,12 @@ environments:
     {{ if not .Values.enable_tls }}
       - ../mods/disable_tls.yaml
     {{ end }}
+    {{ if not .Values.enable_logging_monitoring }}
+      - ../mods/disable_monitoring_logging.yaml
+    {{ end }}
     {{ if .Values.dev_deployment }}
-      - ../etc/_mods/disable_tls.yaml
-      - ../etc/_mods/disable_logging_and_monitoring.yaml
+      - ../mods/disable_tls.yaml
+      - ../mods/disable_monitoring_logging.yaml
       - ../mods/localdev.yaml
       - ../mods/minimal.yaml
     {{ end }}
