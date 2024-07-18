@@ -1,0 +1,12 @@
+# See:
+# - https://github.com/k3d-io/k3d/issues/19#issuecomment-1967513596
+# - https://github.com/ligfx/k3d-registry-dockerd
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+registries:
+  create:
+    image: ligfx/k3d-registry-dockerd:v0.4
+    proxy:
+      remoteURL: "*"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
