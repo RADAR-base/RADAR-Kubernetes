@@ -1,0 +1,17 @@
+# must be localhost for session cookies to work in 'secure' mode
+server_name: localhost
+
+base_timeout: 360
+atomicInstall: false
+
+radar_home:
+  s3:
+    url: http://s3.localhost/login
+  dashboard:
+    url: http://grafana.localhost
+  logging:
+    enabled: true # either logging or monitoring must be enabled or radar-home crashes
+    url: http://graylog.localhost
+  monitoring:
+    enabled: true # either logging or monitoring must be enabled or radar-home crashes
+    url: http://grafana.localhost/login

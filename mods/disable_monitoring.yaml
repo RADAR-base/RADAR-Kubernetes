@@ -1,3 +1,5 @@
+# disables logging (in graylog) and monitoring (with prometheus)
+
 kube_prometheus_stack:
   _install: false
 mongodb:

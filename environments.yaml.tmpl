@@ -9,9 +9,10 @@ environments:
       - ../mods/disable_tls.yaml
     {{ end }}
     {{ if .Values.dev_deployment }}
-    - ../etc/_mods/disable_tls.yaml
-    - ../etc/_mods/disable_logging_and_monitoring.yaml
-    - ../etc/_mods/local_development.yaml
+      - ../etc/_mods/disable_tls.yaml
+      - ../etc/_mods/disable_logging_and_monitoring.yaml
+      - ../mods/localdev.yaml
+      - ../mods/minimal.yaml
     {{ end }}
 
 ---

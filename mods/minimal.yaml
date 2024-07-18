@@ -1,7 +1,4 @@
 kafka_num_brokers: 1
-server_name: localhost-alt
-base_timeout: 360
-atomicInstall: false
 
 radar_s3_connector:
   kafka_num_brokers: 1
@@ -9,17 +6,6 @@ radar_s3_connector:
   kafkaHeapOpts: "-Xms128m -Xmx256m"
 radar_output:
   javaOpts: "-Xms128m -Xmx128m"
-radar_home:
-  s3:
-    url: http://s3.localhost-alt/login
-  dashboard:
-    url: http://grafana.localhost-alt
-  logging:
-    enabled: true # either logging or monitoring must be enabled or radar-home crashes
-    url: http://graylog.localhost-alt
-  monitoring:
-    enabled: true # either logging or monitoring must be enabled or radar-home crashes
-    url: http://grafana.localhost-alt/login
 catalog_server:
   kafka_num_brokers: 1
   kafka_num_replication: 1
