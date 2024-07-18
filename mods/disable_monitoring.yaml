@@ -14,7 +14,7 @@ fluent_bit:
 cert_manager:
   prometheus:
     servicemonitor:
-      enabled: true
+      enabled: false
 postgresql:
   metrics:
     enabled: false
