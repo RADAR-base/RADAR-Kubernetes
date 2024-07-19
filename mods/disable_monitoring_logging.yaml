@@ -25,10 +25,6 @@ timescaledb:
     enabled: false
   primary:
     sidecars: []
-radar_grafana:
-  _install: false
-radar_jdbc_connector:
-  _install: false
 nginx_ingress:
   controller:
     metrics:
