@@ -15,3 +15,26 @@ radar_home:
   monitoring:
     enabled: true # either logging or monitoring must be enabled or radar-home crashes
     url: http://grafana.localhost/login
+
+radar_appserver:
+  public_key_endpoints:
+    - http://localhost/managementportal/oauth/token_key
+radar_upload_connect_frontend:
+  vue_app_api_base_url: http://localhost/upload/api/
+  vue_app_auth_api: http://localhost/managementportal/oauth
+radar_upload_connect_backend:
+  advertised_baseuri: http://localhost/upload/api/
+radar_rest_sources_authorizer:
+  backendBaseUrl: http://localhost/rest-sources/backend
+  authUrl: http://localhost/managementportal/oauth
+  authCallbackUrl: http://localhost/rest-sources/authorizer/login
+radar_rest_sources_backend:
+  advertised_baseuri: http://localhost/rest-sources/backend/
+radar_app_config_frontend:
+  authUrl: http://localhost/managementportal/oauth
+  authCallbackUrl: http://localhost/appconfig/login
+#kratos:
+#  kratos:
+kratos_ui:
+  kratosPublicUrl: "http://localhost/kratos"
+  kratosBrowserUrl: "http://localhost/kratos"
