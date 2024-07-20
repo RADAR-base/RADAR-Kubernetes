@@ -72,7 +72,7 @@ jobs:
           FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
         run: |
           echo "kubeconfig: $KUBECONFIG"
-          kubectl get pods --all-namespaces
+          kubectl get pods --all-namespaces --context k3d-${{ matrix.KUBECTL_VERSION }}
           helmfile sync --concurrency 1
 
       - name: Destroy cluster
