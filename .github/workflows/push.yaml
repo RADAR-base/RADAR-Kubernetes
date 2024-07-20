@@ -12,6 +12,46 @@ on:
 
 jobs:
   install:
+    runs-on: self-hosted
+    steps:
+    - name: Cleanup
+      continue-on-error: true
+      run: |
+        ls -la ./
+        rm -rf ./* || true
+        rm -rf ./.??* || true
+        ls -la ./
+
+    - uses: actions/checkout@v3
+
+    - name: Install dependencies
+      env:
+        HELM_VERSION: "v3.11.3"
+        HELM_DIFF_VERSION: "3.6.0"
+        HELMFILE_VERSION: "v0.152.0"
+        YQ_VERSION: "v4.33.3"
+      run: |
+        ./.github/ci_config/bin/install-dependencies
+
+    - name: Prepare the environment (add secrets and enable installation of all components)
+      run: |
+        DNAME='CN=CI,O=TheHyve,L=Utrecht,C=NL' ./bin/init
+        yq -i -f process '.environments.default.values += ["../.github/ci_config/ci-config.yaml", "../.github/ci_config/secrets.yaml.gotmpl"]' environments.yaml
+        sed -i '/_install: /s/false/true/' etc/production.yaml
+
+  test-helmfile-template:
+    needs: install
+    runs-on: self-hosted
+    steps:
+    - name: Test helmfile template
+      env:
+        FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
+      run: |
+        helmfile template
+
+  test-k8s-versions:
+    needs: test-helmfile-template
+    runs-on: self-hosted
     strategy:
       matrix:
         KUBECTL_VERSION: ["v1.27.0", "v1.28.0", "v1.29.0", "v1.30.0"]
@@ -24,40 +64,7 @@ jobs:
             K3S_VERSION: "v1.29.5+k3s1"
           - KUBECTL_VERSION: "v1.30.0"
             K3S_VERSION: "v1.30.1+k3s1"
-    runs-on: self-hosted
     steps:
-      - name: Cleanup
-        continue-on-error: true
-        run: |
-          ls -la ./
-          rm -rf ./* || true
-          rm -rf ./.??* || true
-          ls -la ./
-
-      - uses: actions/checkout@v3
-
-      - name: Install dependencies
-        env:
-          HELM_VERSION: "v3.11.3"
-          HELM_DIFF_VERSION: "3.6.0"
-          HELMFILE_VERSION: "v0.152.0"
-          YQ_VERSION: "v4.33.3"
-        run: |
-          ./.github/ci_config/bin/install-dependencies
-
-      - name: Prepare the environment (add secrets and enable installation of all components)
-        run: |
-          DNAME='CN=CI,O=TheHyve,L=Utrecht,C=NL' ./bin/init
-          yq -i -f process '.environments.default.values += ["../.github/ci_config/ci-config.yaml", "../.github/ci_config/secrets.yaml.gotmpl"]' environments.yaml
-          sed -i '/_install: /s/false/true/' etc/production.yaml
-          sed -i "/kubeContext: /s/default/k3d-${{ matrix.KUBECTL_VERSION }}/" etc/production.yaml
-
-      - name: Run helmfile template
-        env:
-          FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
-        run: |
-          helmfile template
-
       - uses: nolar/setup-k3d-k3s@v1
         with:
           version: ${{ matrix.K3S_VERSION }}
@@ -65,11 +72,15 @@ jobs:
           # Note: k3d adds a 'k3d-' prefix to this name
           k3d-name: ${{ matrix.KUBECTL_VERSION }}
 
+      - name: Set kubeContext
+        run: |
+          sed -i "s/kubeContext: .*/kubeContext: k3d-${{ matrix.KUBECTL_VERSION }}/" etc/production.yaml
+
       - name: Install RADAR-Kubernetes
         env:
           FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
         run: |
-          kubectl get pods --all-namespaces
+          kubectl get pods --all-namespaces --context k3d-${{ matrix.KUBECTL_VERSION }}
           helmfile sync --concurrency 1
 
       - name: Destroy cluster
