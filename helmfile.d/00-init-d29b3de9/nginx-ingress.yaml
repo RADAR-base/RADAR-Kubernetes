@@ -1,0 +1,22 @@
+_chart_version: 4.10.1
+_extra_timeout: 0
+_install: true
+controller:
+  addHeaders:
+    X-Content-Type-Options: nosniff
+    X-Frame-Options: Deny
+    X-Xss-Protection: 1; mode=block
+  allowSnippetAnnotations: true
+  config:
+    http-snippet: limit_req_zone $binary_remote_addr zone=login_limit:10m rate=2r/s;
+    server-tokens: "false"
+    ssl-redirect: "false"
+  metrics:
+    enabled: false
+    serviceMonitor:
+      enabled: false
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 90Mi

@@ -35,6 +35,10 @@ radar_app_config_frontend:
   authCallbackUrl: http://localhost/appconfig/login
 #kratos:
 #  kratos:
+management_portal:
+  identity_server:
+    server_url: http://localhost/kratos
+    login_url: http://localhost/kratos-ui
 kratos_ui:
   kratosPublicUrl: "http://localhost/kratos"
   kratosBrowserUrl: "http://localhost/kratos"
