@@ -16,29 +16,66 @@ radar_home:
     enabled: true # either logging or monitoring must be enabled or radar-home crashes
     url: http://grafana.localhost/login
 
-radar_appserver:
-  public_key_endpoints:
-    - http://localhost/managementportal/oauth/token_key
-radar_upload_connect_frontend:
-  vue_app_api_base_url: http://localhost/upload/api/
-  vue_app_auth_api: http://localhost/managementportal/oauth
-radar_upload_connect_backend:
-  advertised_baseuri: http://localhost/upload/api/
-radar_rest_sources_authorizer:
-  backendBaseUrl: http://localhost/rest-sources/backend
-  authUrl: http://localhost/managementportal/oauth
-  authCallbackUrl: http://localhost/rest-sources/authorizer/login
-radar_rest_sources_backend:
-  advertised_baseuri: http://localhost/rest-sources/backend/
-radar_app_config_frontend:
-  authUrl: http://localhost/managementportal/oauth
-  authCallbackUrl: http://localhost/appconfig/login
-#kratos:
-#  kratos:
+app_config:
+  disable_tls: true
+app_config_frontend:
+  disable_tls: true
 management_portal:
-  identity_server:
-    server_url: http://localhost/kratos
-    login_url: http://localhost/kratos-ui
+  disable_tls: true
+kratos:
+  config:
+    serve:
+      public:
+        base_url: http://localhost/kratos/
+        cors:
+          allowed_origins:
+            - http://localhost/kratos-ui/
+      admin:
+        base_url: http://localhost/admin/kratos/
+    selfservice:
+      default_browser_return_url: http://localhost/managementportal
+      allowed_return_urls:
+        - "http://localhost/"
+      flows:
+        error:
+          ui_url: http://localhost/kratos-ui/
+        recovery:
+          ui_url: http://localhost/kratos-ui/recovery
+        registration:
+          ui_url: http://localhost/kratos-ui/registration
+        login:
+          ui_url: http://localhost/kratos-ui/login
+        logout:
+          after:
+            default_browser_return_url: http://localhost/kratos-ui/login
+        verification:
+          ui_url: http://localhost/kratos-ui/verification
+          after:
+            default_browser_return_url: http://localhost/kratos-ui
+        settings:
+          ui_url: http://localhost/kratos-ui/settings
 kratos_ui:
-  kratosPublicUrl: "http://localhost/kratos"
-  kratosBrowserUrl: "http://localhost/kratos"
+  kratosPublicUrl: http://localhost/kratos
+  kratosBrowserUrl: http://localhost/kratos
+radar_appserver:
+  disable_tls: true
+data_dashboard_backend:
+  disable_tls: true
+radar_rest_sources_authorizer:
+  disable_tls: true
+radar_rest_sources_backend:
+  disable_tls: true
+radar_gateway:
+  disable_tls: true
+radar_integration:
+  disable_tls: true
+radar_upload_connect_frontend:
+  disable_tls: true
+radar_upload_connect_backend:
+  disable_tls: true
+radar_push_endpoint:
+  disable_tls: true
+kafka_manager:
+  disable_tls: true
+ccSchemaRegistryProxy:
+  disable_tls: true
