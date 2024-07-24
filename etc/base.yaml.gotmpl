@@ -36,6 +36,6 @@ radar_grafana:
 ksql_server:
  ksql:
    queries: |
-     {{/*- readFile "../etc/cp-ksql-server/_base_observations_stream.sql"             | nindent 8 */}}
-     {{/*- readFile "../etc/cp-ksql-server/questionnaire_response_observations.sql"   | nindent 8 */}}
-     {{/*- readFile "../etc/cp-ksql-server/questionnaire_app_event_observations.sql"  | nindent 8 */}}
+     {{- readFile "../etc/cp-ksql-server/_base_observations_stream.sql"             | nindent 8 }}
+     {{- readFile "../etc/cp-ksql-server/questionnaire_response_observations.sql"   | nindent 8 }}
+     {{- readFile "../etc/cp-ksql-server/questionnaire_app_event_observations.sql"  | nindent 8 }}
