@@ -26,6 +26,27 @@ releases:
     - radar-appserver-postgresql
     values:
       - {{ .Values.radar_appserver | toYaml | indent 8 | trim }}
+      - extraEnvVars:
+          - name: RADAR_FILE_UPLOAD_ENABLED
+            value: "true"
+          - name: RADAR_STORAGE_TYPE
+            value: "s3"
+          - name: RADAR_STORAGE_S3_URL
+            value: "http://minio-headless:9000"
+          - name: RADAR_STORAGE_S3_BUCKETNAME
+            value: "radar-output-storage"
+          - name: RADAR_STORAGE_S3_PATH_PREFIX
+            value: "output"
+          - name: RADAR_STORAGE_S3_PATH_COLLECTPERDAY
+            value: "true"
+          - name: SPRING_SERVLET_MULTIPART_MAXFILESIZE
+            value: "20MB"
+          - name: SPRING_SERVLET_MULTIPART_ENABLED
+            value: "true"
+          - name: RADAR_STORAGE_S3_ACCESSKEY
+            value: {{ .Values.s3_access_key }}
+          - name: RADAR_STORAGE_S3_SECRETKEY
+            value: {{ .Values.s3_secret_key }}
     set:
       - name: ingress.hosts
         values: [{{ .Values.server_name }}]
