@@ -1,7 +1,14 @@
-name: Install applications on Kubernets
+name: Install applications on Kubernetes
 
 on:
   push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
   workflow_dispatch:
     inputs:
       debug_enabled:
@@ -49,8 +56,16 @@ jobs:
       run: |
         helmfile template
 
-  test-k8s-versions:
+  delete-old-clusters:
+    runs-on: self-hosted
     needs: test-helmfile-template
+    steps:
+      - name: Delete old clusters
+        run: |
+          k3d cluster delete --all || true
+
+  test-k8s-versions:
+    needs: delete-old-clusters
     runs-on: self-hosted
     strategy:
       matrix:
@@ -68,10 +83,11 @@ jobs:
       - uses: nolar/setup-k3d-k3s@v1
         with:
           version: ${{ matrix.K3S_VERSION }}
-          k3d-args: --k3s-arg --disable=traefik@server:0 --k3s-arg --disable-helm-controller@server:0 --config .github/ci_config/k3d-local-image-repo.yaml
+          k3d-args: --config .github/ci_config/k3d-config.yaml
           # Note: k3d adds a 'k3d-' prefix to this name
           k3d-name: ${{ matrix.KUBECTL_VERSION }}
 
+      # TODO would be better to do this with a command line parameter. I have been unable to get this to work.
       - name: Set kubeContext
         run: |
           sed -i "s/kubeContext: .*/kubeContext: k3d-${{ matrix.KUBECTL_VERSION }}/" etc/production.yaml
@@ -83,23 +99,10 @@ jobs:
           kubectl get pods --all-namespaces --context k3d-${{ matrix.KUBECTL_VERSION }}
           helmfile sync --concurrency 1
 
-      - name: Destroy cluster
-        if: always()
-        run: | 
-          k3d cluster delete ${{ matrix.KUBECTL_VERSION }}
-          k3d cluster delete k3d-${{ matrix.KUBECTL_VERSION }}
-
       # Enable tmate debugging of manually-triggered workflows if the input option was provided
       - name: Manually triggered tmate session
         uses: mxschmitt/action-tmate@v3
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
-        with:
-          limit-access-to-actor: true
-
-      - name: Setup tmate session if jobs have failed
-        if: ${{ failure() }}
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 15
         with:
           limit-access-to-actor: true
 
