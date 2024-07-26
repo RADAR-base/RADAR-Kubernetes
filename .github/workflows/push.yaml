@@ -1,4 +1,4 @@
-name: Install applications on Kubernets
+name: Install applications on Kubernetes
 
 on:
   pull_request:
@@ -60,6 +60,14 @@ jobs:
         run: |
           helmfile template
 
+  delete-old-clusters:
+    runs-on: self-hosted
+    needs: test-helmfile-template
+    steps:
+      - name: Delete old clusters
+        run: |
+          k3d cluster delete --all || true
+
       - uses: nolar/setup-k3d-k3s@v1
         with:
           version: ${{ matrix.K3S_VERSION }}
@@ -74,12 +82,6 @@ jobs:
           echo "kubeconfig: $KUBECONFIG"
           kubectl get pods --all-namespaces --context k3d-${{ matrix.KUBECTL_VERSION }}
           helmfile sync --concurrency 1
-
-      - name: Destroy cluster
-        if: always()
-        run: | 
-          k3d cluster delete ${{ matrix.KUBECTL_VERSION }}
-          k3d cluster delete k3d-${{ matrix.KUBECTL_VERSION }}
 
       - name: Run end-to-end tests
         run: |
