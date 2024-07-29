@@ -47,7 +47,7 @@ jobs:
       env:
         FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
       run: |
-        helmfile template
+        helmfile template > /tmp/helmfile.yaml
 
   delete-old-clusters:
     runs-on: self-hosted
