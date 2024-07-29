@@ -44,7 +44,14 @@ releases:
     version: {{ .Values.radar_s3_connector._chart_version }}
     installed: {{ .Values.radar_s3_connector._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_s3_connector._extra_timeout }}
-    {{ if .Values.minio._install }}needs: [minio]{{ end }}
+    {{ if or .Values.minio._install .Values.cp_kafka._install }}
+    needs:
+      {{ if .Values.minio._install }}- minio{{ end }}
+      {{ if .Values.cp_kafka._install }}
+      - cp-kafka
+      - cp-schema-registry
+      {{ end }}
+    {{ end }}
     <<: *logFailedRelease
     values:
       - {{ .Values.radar_s3_connector | toYaml | indent 8 | trim }}
