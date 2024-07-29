@@ -351,6 +351,9 @@ data_dashboard_backend:
 radar_jdbc_connector_grafana:
   _install: false
   _chart_version: 0.5.2
+  # TODO remove after upgrade to chart version 0.5.3
+  image:
+    tag: 10.5.3-hotfix
   _extra_timeout: 0
   replicaCount: 1
   sink:
@@ -361,6 +364,9 @@ radar_jdbc_connector_grafana:
 radar_jdbc_connector_data_dashboard_backend:
   _install: false
   _chart_version: 0.5.2
+  # TODO remove after upgrade to chart version 0.5.3
+  image:
+    tag: 10.5.3-hotfix
   _extra_timeout: 0
   replicaCount: 1
 
@@ -368,6 +374,9 @@ radar_jdbc_connector_data_dashboard_backend:
 radar_jdbc_connector_realtime_dashboard:
   _install: false
   _chart_version: 0.5.2
+  # TODO remove after upgrade to chart version 0.5.3
+  image:
+    tag: 10.5.3-hotfix
   _extra_timeout: 0
   replicaCount: 1
 
