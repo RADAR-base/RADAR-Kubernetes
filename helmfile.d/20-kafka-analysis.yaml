@@ -11,6 +11,14 @@ releases:
     version: {{ .Values.radar_backend_monitor._chart_version }}
     installed: {{ .Values.radar_backend_monitor._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_backend_monitor._extra_timeout }}
+    {{ if .Values.cp_kafka._install }}
+    needs:
+      - cp-zookeeper
+      - cp-kafka
+      - cp-schema-registry
+      # Does this still exist?
+      # - cp-kafka-rest
+    {{ end }}
     <<: *logFailedRelease
     values:
       - "../etc/radar-backend-monitor/values.yaml"
@@ -24,6 +32,14 @@ releases:
     version: {{ .Values.radar_backend_monitor._chart_version }}
     installed: {{ .Values.radar_backend_stream._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_backend_stream._extra_timeout }}
+    {{ if .Values.cp_kafka._install }}
+    needs:
+      - cp-zookeeper
+      - cp-kafka
+      - cp-schema-registry
+      # Does this still exist?
+      # - cp-kafka-rest
+    {{ end }}
     <<: *logFailedRelease    
     values:
       - "../etc/radar-backend-stream/values.yaml"
