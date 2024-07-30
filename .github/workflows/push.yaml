@@ -1,7 +1,7 @@
 name: Install applications on Kubernets
 
 on:
-  push:
+  pull_request:
   workflow_dispatch:
     inputs:
       debug_enabled:
@@ -15,6 +15,8 @@ jobs:
     strategy:
       matrix:
         KUBECTL_VERSION: ["v1.27.0", "v1.28.0", "v1.29.0", "v1.30.0"]
+        isMain:
+          - ${{ contains(github.ref, 'main') }}
         include:
           - KUBECTL_VERSION: "v1.27.0"
             K3S_VERSION: "v1.27.14+k3s1"
@@ -25,7 +27,8 @@ jobs:
           - KUBECTL_VERSION: "v1.30.0"
             K3S_VERSION: "v1.30.1+k3s1"
         exclude:
-          - KUBECTL_VERSION: ${{ github.base_ref != 'refs/heads/main' && 'v1.27.0' }}
+          - KUBECTL_VERSION: "v1.27.0"
+            isMain: false
           - KUBECTL_VERSION: ${{ github.base_ref != 'refs/heads/main' && 'v1.28.0' }}
           - KUBECTL_VERSION: ${{ github.base_ref != 'refs/heads/main' && 'v1.29.0' }}
     runs-on: self-hosted
