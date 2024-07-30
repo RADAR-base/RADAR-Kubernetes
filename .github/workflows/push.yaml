@@ -24,6 +24,10 @@ jobs:
             K3S_VERSION: "v1.29.5+k3s1"
           - KUBECTL_VERSION: "v1.30.0"
             K3S_VERSION: "v1.30.1+k3s1"
+        exclude:
+          - KUBECTL_VERSION: ${{ github.base_ref != 'refs/heads/main' && 'v1.27.0' }}
+          - KUBECTL_VERSION: ${{ github.base_ref != 'refs/heads/main' && 'v1.28.0' }}
+          - KUBECTL_VERSION: ${{ github.base_ref != 'refs/heads/main' && 'v1.29.0' }}
     runs-on: self-hosted
     steps:
       - name: Cleanup
