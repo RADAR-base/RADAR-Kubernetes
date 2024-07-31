@@ -55,3 +55,9 @@ radar_upload_postgresql:
 
 ccSchemaRegistryProxy:
   _install: false
+
+nginx_ingress:
+  controller:
+    admissionWebhooks:
+      image:
+        digest: null
