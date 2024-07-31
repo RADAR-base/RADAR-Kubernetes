@@ -2,7 +2,15 @@
 ## Ref: https://github.com/kubernetes/ingress-nginx/blob/main/docs/user-guide/nginx-configuration/index.md
 ##
 
+
 controller:
+  image:
+    digest: false
+    digestChroot: false
+  admissionWebhooks:
+    patch:
+      image:
+        digest: false
   allowSnippetAnnotations: true
   # -- Will add custom configuration options to Nginx https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
   config:

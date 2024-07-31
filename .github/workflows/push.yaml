@@ -1,4 +1,4 @@
-name: Install applications on Kubernets
+name: Install applications on Kubernetes
 
 on:
   push:
@@ -12,6 +12,54 @@ on:
 
 jobs:
   install:
+    runs-on: self-hosted
+    steps:
+    - name: Cleanup
+      continue-on-error: true
+      run: |
+        ls -la ./
+        rm -rf ./* || true
+        rm -rf ./.??* || true
+        ls -la ./
+
+    - uses: actions/checkout@v3
+
+    - name: Install dependencies
+      env:
+        HELM_VERSION: "v3.11.3"
+        HELM_DIFF_VERSION: "3.6.0"
+        HELMFILE_VERSION: "v0.152.0"
+        YQ_VERSION: "v4.33.3"
+      run: |
+        ./.github/ci_config/bin/install-dependencies
+
+    - name: Prepare the environment (add secrets and enable installation of all components)
+      run: |
+        DNAME='CN=CI,O=TheHyve,L=Utrecht,C=NL' ./bin/init
+        yq -i -f process '.environments.default.values += ["../.github/ci_config/ci-config.yaml", "../.github/ci_config/secrets.yaml.gotmpl"]' environments.yaml
+        sed -i '/_install: /s/false/true/' etc/production.yaml
+
+  test-helmfile-template:
+    needs: install
+    runs-on: self-hosted
+    steps:
+    - name: Test helmfile template
+      env:
+        FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
+      run: |
+        helmfile template > /tmp/helmfile.yaml
+
+  delete-old-clusters:
+    runs-on: self-hosted
+    needs: test-helmfile-template
+    steps:
+      - name: Delete old clusters
+        run: |
+          k3d cluster delete --all || true
+
+  test-k8s-versions:
+    needs: delete-old-clusters
+    runs-on: self-hosted
     strategy:
       matrix:
         KUBECTL_VERSION: ["v1.27.0", "v1.28.0", "v1.29.0", "v1.30.0"]
@@ -24,63 +72,24 @@ jobs:
             K3S_VERSION: "v1.29.5+k3s1"
           - KUBECTL_VERSION: "v1.30.0"
             K3S_VERSION: "v1.30.1+k3s1"
-    runs-on: self-hosted
     steps:
-      - name: Cleanup
-        continue-on-error: true
-        run: |
-          ls -la ./
-          rm -rf ./* || true
-          rm -rf ./.??* || true
-          rm -rf /var/tmp/images || true
-          ls -la ./
+      - uses: nolar/setup-k3d-k3s@v1
+        with:
+          version: ${{ matrix.K3S_VERSION }}
+          k3d-args: --config .github/ci_config/k3d-config.yaml
+          # Note: k3d adds a 'k3d-' prefix to this name
+          k3d-name: ${{ matrix.KUBECTL_VERSION }}
 
-      - uses: actions/checkout@v3
-
-      - name: Install dependencies
-        env:
-          KUBECTL_VERSION: ${{ matrix.KUBECTL_VERSION }}
-          HELM_VERSION: "v3.11.3"
-          HELM_DIFF_VERSION: "3.6.0"
-          HELMFILE_VERSION: "v0.152.0"
-          YQ_VERSION: "v4.33.3"
+      # TODO would be better to do this with a command line parameter. I have been unable to get this to work.
+      - name: Set kubeContext
         run: |
-          ./.github/ci_config/bin/install-dependencies
-
-      - name: Prepare the environment (add secrets and enable installation of all components)
-        run: |
-          DNAME='CN=CI,O=TheHyve,L=Utrecht,C=NL' ./bin/init
-          yq -i -f process '.environments.default.values += ["../.github/ci_config/ci-config.yaml", "../.github/ci_config/secrets.yaml.gotmpl"]' environments.yaml
-          sed -i '/_install: /s/false/true/' etc/production.yaml
-
-      - name: Run helmfile template
-        env:
-          FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
-        run: |
-          helmfile template
-
-      - name: Reinstall K3S
-        env:
-          INSTALL_K3S_VERSION: ${{ matrix.K3S_VERSION }}
-          INSTALL_K3S_SYMLINK: "skip"
-          K3S_KUBECONFIG_MODE: "644"
-        run: |
-          mkdir -p /var/tmp/images
-          for ref in `sudo k3s ctr images ls | \grep -oE "^\S+" | sort -u` ; do sudo k3s ctr images export /var/tmp/images/`openssl rand -hex 10`.tar $ref || true; done
-          /usr/local/bin/k3s-uninstall.sh        
-          curl -sfL https://get.k3s.io | sh -s - --disable traefik --disable-helm-controller
-          cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
-          cd /var/tmp/images 
-          ls -1 | xargs -L1 sudo k3s ctr images import || true
-          cd -
+          sed -i "s/kubeContext: .*/kubeContext: k3d-${{ matrix.KUBECTL_VERSION }}/" etc/production.yaml
 
       - name: Install RADAR-Kubernetes
         env:
           FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
         run: |
-          echo "kubeconfig: $KUBECONFIG"
-          kubectl get pods --all-namespaces
-
+          kubectl get pods --all-namespaces --context k3d-${{ matrix.KUBECTL_VERSION }}
           helmfile sync --concurrency 1
 
       # Enable tmate debugging of manually-triggered workflows if the input option was provided
@@ -90,17 +99,17 @@ jobs:
         with:
           limit-access-to-actor: true
 
-      - name: Setup tmate session if jobs have failed
-        if: ${{ failure() }}
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 15
-        with:
-          limit-access-to-actor: true
-
       - name: Report cluster state
         if: always()
         run: |
           kubectl get pods --all-namespaces
+
+      # TODO We can remove the k3s uninstallation once the k3d PR is merged.
+      - name: Delete clusters when job was canceled
+        if: cancelled()
+        run: |
+          k3d cluster delete --all || true
+          k3s-uninstall.sh || true
 
   check-gitignore:
     runs-on: ubuntu-latest
