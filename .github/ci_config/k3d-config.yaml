@@ -3,6 +3,10 @@
 # - https://github.com/ligfx/k3d-registry-dockerd
 apiVersion: k3d.io/v1alpha5
 kind: Simple
+volumes:
+  - volume: $HOME/k3d-containerd:/var/lib/rancher/k3s/agent/containerd/
+    nodeFilters:
+      - server:0
 registries:
   create:
     image: ligfx/k3d-registry-dockerd:dev
