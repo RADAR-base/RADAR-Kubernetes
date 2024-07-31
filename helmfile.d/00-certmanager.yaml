@@ -1,0 +1,59 @@
+bases:
+- ../environments.yaml
+
+---
+
+{{ readFile "../etc/helmfile-templates.yaml" }}
+
+releases:
+  - name: kube-prometheus-stack
+    namespace: monitoring
+    chart: radar/kube-prometheus-stack
+    version: {{ .Values.kube_prometheus_stack._chart_version }}
+    installed: {{ .Values.kube_prometheus_stack._install }}
+    timeout: {{ add .Values.base_timeout .Values.kube_prometheus_stack._extra_timeout }}
+    disableValidation: true
+    <<: *logFailedReleasePrometheus
+    values:
+      - {{ .Values.kube_prometheus_stack | toYaml | indent 8 | trim }}
+    set:
+      - name: server_name
+        value: {{ .Values.server_name }}
+      - name: kube-prometheus-stack.prometheus.ingress.hosts
+        values: ["prometheus.{{ .Values.server_name }}"]
+      - name: kube-prometheus-stack.prometheus.ingress.tls[0].secretName
+        value: radar-base-tls-prometheus
+      - name: kube-prometheus-stack.prometheus.ingress.tls[0].hosts
+        values: ["prometheus.{{ .Values.server_name }}"]
+
+      - name: kube-prometheus-stack.alertmanager.ingress.hosts
+        values: ["alertmanager.{{ .Values.server_name }}"]
+      - name: kube-prometheus-stack.alertmanager.ingress.tls[0].secretName
+        value: radar-base-tls-alertmanager
+      - name: kube-prometheus-stack.alertmanager.ingress.tls[0].hosts
+        values: ["alertmanager.{{ .Values.server_name }}"]
+
+      - name: kube-prometheus-stack.grafana.ingress.hosts
+        values: ["grafana.{{ .Values.server_name }}"]
+      - name: kube-prometheus-stack.grafana.ingress.tls[0].secretName
+        value: radar-base-tls-grafana
+      - name: kube-prometheus-stack.grafana.ingress.tls[0].hosts
+        values: ["grafana.{{ .Values.server_name }}"]
+
+  - name: cert-manager
+    namespace: cert-manager
+    chart: radar/cert-manager
+    version: {{ .Values.cert_manager._chart_version }}
+    installed: {{ .Values.cert_manager._install }}
+    timeout: {{ add .Values.base_timeout .Values.cert_manager._extra_timeout }}
+    {{ if .Values.kube_prometheus_stack._install }}
+    needs:
+      - monitoring/kube-prometheus-stack
+    {{ end }}
+    disableValidation: true
+    <<: *logFailedReleaseCertManager
+    values:
+      - {{ .Values.cert_manager | toYaml | indent 8 | trim }}
+    set:
+      - name: global.prometheus.servicemonitor.enabled
+        value: {{ .Values.kube_prometheus_stack._install }}
