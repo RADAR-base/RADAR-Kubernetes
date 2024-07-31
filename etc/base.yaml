@@ -350,24 +350,24 @@ data_dashboard_backend:
 # Install when radar_grafana._install is 'true'
 radar_jdbc_connector_grafana:
   _install: false
-  _chart_version: 0.5.2
+  _chart_version: 0.5.3
   _extra_timeout: 0
   replicaCount: 1
   sink:
     # Change the list of topics if you have dashboards that read other data or if you don't have certain topics available on your cluster.
     topics: android_phone_relative_location, android_phone_battery_level, connect_fitbit_intraday_heart_rate, connect_fitbit_intraday_steps
 
-# Install when data_dashboard_backend._install is 'true'
+# Install when data_dashboard_backend._install is 'true'.
 radar_jdbc_connector_data_dashboard_backend:
   _install: false
-  _chart_version: 0.5.2
+  _chart_version: 0.5.3
   _extra_timeout: 0
   replicaCount: 1
 
 # Install when using realtime analysis
 radar_jdbc_connector_realtime_dashboard:
   _install: false
-  _chart_version: 0.5.2
+  _chart_version: 0.5.3
   _extra_timeout: 0
   replicaCount: 1
 
