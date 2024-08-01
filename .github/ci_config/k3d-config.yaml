@@ -23,3 +23,8 @@ options:
       - arg: --disable=traefik
         nodeFilters:
           - server:*
+ports:
+  # same as `--port '80:80@loadbalancer'`
+  - port: 80:80
+    nodeFilters:
+      - loadbalancer
