@@ -1,10 +1,13 @@
 environments:
- default:
-   values:
-   - ../etc/base.yaml
-   - ../etc/production.yaml
-   - ../etc/production.yaml.gotmpl
-   - ../etc/secrets.yaml
+  default:
+    values:
+      - ../etc/base.yaml
+      - ../etc/production.yaml
+      - ../etc/production.yaml.gotmpl
+      - ../etc/secrets.yaml
+    {{ if not .Values.enable_tls }}
+      - ../mods/disable_tls.yaml
+    {{ end }}
 
 ---
 
