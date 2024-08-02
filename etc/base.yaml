@@ -10,9 +10,14 @@ server_name: example.com
 maintainer_email: MAINTAINER_EMAIL@example.com
 # Number of Kafka pods that will be installed
 kafka_num_brokers: 3
+# Enable logging and monitoring
+enable_logging_monitoring: false
 # Enable TLS redirection and retrieval of Let's Encrypt certificates.
 # Can be disabled when TLS termination is handled upstream of the on-cluster Nginx reverse proxy.
 enable_tls: true
+
+# Minimal deployment for development (disables TLS, monitoring and logging, sets kafka and minio brokers to 1).
+dev_deployment: false
 
 
 # --------------------------------------------------------- 00-init.yaml ---------------------------------------------------------

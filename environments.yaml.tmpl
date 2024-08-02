@@ -8,6 +8,17 @@ environments:
     {{ if not .Values.enable_tls }}
       - ../mods/disable_tls.yaml
     {{ end }}
+    {{ if not .Values.enable_logging_monitoring }}
+      - ../mods/disable_monitoring_logging.yaml
+    {{ end }}
+    {{ if .Values.dev_deployment }}
+      - ../mods/disable_tls.yaml
+      - ../mods/disable_monitoring_logging.yaml
+      - ../mods/localdev.yaml
+      - ../mods/minimal.yaml
+      - ../mods/minimal_kafka.yaml.gotmpl
+      - ../mods/fast_deploy.yaml
+    {{ end }}
 
 ---
 

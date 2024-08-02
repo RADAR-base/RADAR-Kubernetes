@@ -1,0 +1,52 @@
+radar_home:
+  readinessProbe:
+    periodSeconds: 5
+app_config:
+  readinessProbe:
+    periodSeconds: 5
+app_config_frontend:
+  readinessProbe:
+    periodSeconds: 5
+management_portal:
+  readinessProbe:
+    periodSeconds: 5
+radar_appserver:
+  readinessProbe:
+    periodSeconds: 5
+data_dashboard_backend:
+  readinessProbe:
+    periodSeconds: 5
+radar_rest_sources_authorizer:
+  readinessProbe:
+    periodSeconds: 5
+radar_rest_sources_backend:
+  readinessProbe:
+    periodSeconds: 5
+radar_gateway:
+  readinessProbe:
+    periodSeconds: 5
+radar_integration:
+  readinessProbe:
+    periodSeconds: 5
+radar_upload_connect_frontend:
+  readinessProbe:
+    periodSeconds: 5
+radar_upload_connect_backend:
+  readinessProbe:
+    periodSeconds: 5
+radar_push_endpoint:
+  readinessProbe:
+    periodSeconds: 5
+kafka_manager:
+  readinessProbe:
+    periodSeconds: 5
+ccSchemaRegistryProxy:
+  readinessProbe:
+    periodSeconds: 5
+cert_manager:
+  webhook:
+    readinessProbe:
+      periodSeconds: 5
+minio:
+  readinessProbe:
+    periodSeconds: 5
