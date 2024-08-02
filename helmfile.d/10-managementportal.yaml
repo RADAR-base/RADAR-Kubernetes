@@ -82,10 +82,6 @@ releases:
     set:
       - name: ingress.hosts
         values: [{{ .Values.server_name }}]
-      - name: authUrl
-        value: https://{{ .Values.server_name }}/managementportal/oauth
-      - name: authCallbackUrl
-        value: https://{{ .Values.server_name }}/appconfig/login
 
   - name: kratos
     chart: radar/kratos

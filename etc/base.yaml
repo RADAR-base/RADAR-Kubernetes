@@ -106,7 +106,7 @@ nginx_ingress:
 # Kafka manager is outdated but can still be used. Otherwise, use Kafka command-line tools.
 kafka_manager:
   _install: false
-  _chart_version: 2.1.6
+  _chart_version: 2.2.0
   _extra_timeout: 0
 
 # --------------------------------------------------------- 10-base.yaml ---------------------------------------------------------
@@ -183,11 +183,12 @@ postgresql:
 
 management_portal:
   _install: true
-  _chart_version: 1.1.7
+  _chart_version: 1.2.0
   _extra_timeout: 210
   replicaCount: 1  # should be 1
   postgres:
     host: postgresql
+    user: postgres
     user: postgres
     port: 5432
     ssl:
@@ -223,7 +224,7 @@ kratos_ui:
 
 app_config:
   _install: true
-  _chart_version: 1.1.1
+  _chart_version: 1.2.0
   _extra_timeout: 0
   replicaCount: 1
   jdbc:
@@ -231,7 +232,7 @@ app_config:
 
 app_config_frontend:
   _install: true
-  _chart_version: 1.1.1
+  _chart_version: 2.0.0
   _extra_timeout: 0
   replicaCount: 1
 
@@ -253,7 +254,7 @@ radar_appserver_postgresql:
 
 radar_appserver:
   _install: false
-  _chart_version: 0.2.2
+  _chart_version: 0.4.0
   _extra_timeout: 0
   replicaCount: 1
   managementportal_resource_name: res_AppServer
@@ -284,13 +285,13 @@ radar_oura_connector:
 
 radar_rest_sources_authorizer:
   _install: false
-  _chart_version: 1.1.4
+  _chart_version: 2.0.0
   _extra_timeout: 0
   replicaCount: 1
 
 radar_rest_sources_backend:
   _install: false
-  _chart_version: 1.1.3
+  _chart_version: 1.1.4
   _extra_timeout: 0
   replicaCount: 1
   postgres:
@@ -347,7 +348,7 @@ radar_grafana:
 #- ksql_server._install to true
 data_dashboard_backend:
   _install: false
-  _chart_version: 0.2.3
+  _chart_version: 0.3.0
   _extra_timeout: 0
   replicaCount: 1
 
@@ -392,7 +393,7 @@ ksql_server:
 
 radar_gateway:
   _install: true
-  _chart_version: 1.1.7
+  _chart_version: 1.2.0
   _extra_timeout: 0
   replicaCount: 1
 
@@ -420,7 +421,7 @@ radar_backend_stream:
 
 radar_integration:
   _install: false
-  _chart_version: 0.5.1
+  _chart_version: 0.6.0
   _extra_timeout: 0
   replicaCount: 1
   oauth_client_id: radar_redcap_integrator
@@ -508,13 +509,13 @@ radar_upload_postgresql:
 
 radar_upload_connect_backend:
   _install: true
-  _chart_version: 0.3.2
+  _chart_version: 0.4.0
   _extra_timeout: 0
   replicaCount: 1
 
 radar_upload_connect_frontend:
   _install: true
-  _chart_version: 0.3.1
+  _chart_version: 0.4.0
   _extra_timeout: 0
   replicaCount: 1
 
@@ -529,7 +530,7 @@ radar_upload_source_connector:
 
 ccSchemaRegistryProxy:
   _install: false
-  _chart_version: 0.2.4
+  _chart_version: 0.3.0
   _extra_timeout: 0
   externalName: schema-registry-domain
 
@@ -537,7 +538,7 @@ ccSchemaRegistryProxy:
 
 radar_push_endpoint:
   _install: false
-  _chart_version: 0.2.3
+  _chart_version: 0.3.0
   _extra_timeout: 180
   replicaCount: 1
   adminProperties: {}
