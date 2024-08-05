@@ -129,11 +129,11 @@ kratos:
 
     serve:
       public:
-        base_url: https://localhost/kratos/
+        base_url: http://localhost/kratos/
         cors:
           enabled: true
           allowed_origins:
-            - https://localhost/kratos-ui/
+            - http://localhost/kratos-ui/
           allowed_methods:
             - POST
             - GET
@@ -151,12 +151,12 @@ kratos:
             - Accept
           allow_credentials: true
       admin:
-        base_url: https://localhost/admin/kratos/
+        base_url: http://localhost/admin/kratos/
 
     selfservice:
-      default_browser_return_url: https://localhost/managementportal
+      default_browser_return_url: http://localhost/managementportal
       allowed_return_urls:
-        - "https://localhost/"
+        - "http://localhost/"
         - "http://localhost/"
 
       methods:
@@ -177,35 +177,35 @@ kratos:
 
       flows:
         error:
-          ui_url: https://localhost/kratos-ui/error
+          ui_url: http://localhost/kratos-ui/error
 
         settings:
-          ui_url: https://localhost/kratos-ui/settings
+          ui_url: http://localhost/kratos-ui/settings
           required_aal: highest_available
 
         recovery:
           enabled: true
-          ui_url: https://localhost/kratos-ui/recovery
+          ui_url: http://localhost/kratos-ui/recovery
           use: link
 
         verification:
           # our current flow necessitates that users reset their password after they activate an account in managementportal,
           # this works as verification
-          ui_url: https://localhost/kratos-ui/verification
+          ui_url: http://localhost/kratos-ui/verification
           enabled: false
           use: link
           after:
-            default_browser_return_url: https://localhost/kratos-ui
+            default_browser_return_url: http://localhost/kratos-ui
 
         logout:
           after:
-            default_browser_return_url: https://localhost/kratos-ui/login
+            default_browser_return_url: http://localhost/kratos-ui/login
 
         login:
-          ui_url: https://localhost/kratos-ui/login
+          ui_url: http://localhost/kratos-ui/login
 
         registration:
-          ui_url: https://localhost/kratos-ui/registration
+          ui_url: http://localhost/kratos-ui/registration
           after:
             password:
               hooks:
@@ -225,3 +225,7 @@ kratos:
       level: debug
       format: text
       leak_sensitive_values: true
+
+
+    oauth2_provider:
+      url: http://hydra-admin
