@@ -10,7 +10,7 @@ radar_home:
   _chart_version: 0.3.0
   disable_tls: true
 app_config:
-  _chart_version: 0.2.0
+  _chart_version: 1.2.0
   disable_tls: true
 app_config_frontend:
   _chart_version: 2.0.0
