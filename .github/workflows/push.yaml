@@ -103,6 +103,13 @@ jobs:
         run: |
           kubectl get pods --all-namespaces
 
+      # TODO We can remove the k3s uninstallation once the k3d PR is merged.
+      - name: Delete clusters when job was canceled
+        if: cancelled()
+        run: |
+          k3d cluster delete --all || true
+          k3s-uninstall.sh || true
+
   check-gitignore:
     runs-on: ubuntu-latest
     steps:
