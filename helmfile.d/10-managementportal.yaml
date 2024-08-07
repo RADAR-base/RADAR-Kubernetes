@@ -97,45 +97,39 @@ releases:
       - "../etc/kratos/values.yaml"
       - {{ .Values.kratos | toYaml | indent 8 | trim }}
     set:
-      - name: serverName
-        value: {{ .Values.server_name }}
       - name: kratos.config.dsn
         value: postgres://{{ .Values.management_portal.postgres.user }}:{{ .Values.management_portal.postgres.password }}@{{ .Values.management_portal.postgres.host }}:{{ .Values.management_portal.postgres.port }}/{{ .Values | get "kratos.jdbc.database" "kratos" }}
       - name: kratos.config.courier.smtp.connection_uri
         #  Note: encoding of "/" in password is necessary for the smtp connection_uri because kratos is not able to handle this.
         value: smtp://{{ .Values.management_portal.smtp.username }}:{{ replace "/" "%2F" .Values.management_portal.smtp.password }}@{{ .Values.management_portal.smtp.host }}:{{ .Values | get "management_portal.smtp.port" 587 }}
       - name: kratos.config.serve.public.base_url
-        value: https://{{ .Values.server_name }}/kratos/
+        value: {{ default (printf "https://%s/kratos/" .Values.server_name) .Values.kratos.config.serve.public.base_url }}
       - name: kratos.config.serve.admin.base_url
-        value: https://{{ .Values.server_name }}/admin/kratos/
+        value: {{ default (printf "https://%s/admin/kratos/" .Values.server_name) .Values.kratos.config.serve.admin.base_url }}
       - name: kratos.config.serve.public.cors.allowed_origins
         values:
-        - https://{{ .Values.server_name }}/kratos-ui/
+        - {{ default (printf "https://%s/kratos-ui/" .Values.server_name) .Values.kratos.config.serve.public.cors.allowed_origins }}
       - name: kratos.config.selfservice.default_browser_return_url
-        value: https://{{ .Values.server_name }}/managementportal
+        value: {{ default (printf "https://%s/managementportal" .Values.server_name) .Values.kratos.config.selfservice.default_browser_return_url }}
       - name: kratos.config.selfservice.allowed_return_urls
         values:
-          - https://{{ .Values.server_name }}/
-          # FIXME: http://localhost/ is not a valid return URL for production
-          - http://{{ .Values.server_name }}/
+          - {{ default (printf "https://%s/" .Values.server_name) .Values.kratos.config.selfservice.allowed_return_urls }}
       - name: kratos.config.selfservice.flows.error.ui_url
-        value: https://{{ .Values.server_name }}/kratos-ui/error
-      - name: kratos.config.selfservice.flows.settings.ui_url
-        value: https://{{ .Values.server_name }}/kratos-ui/settings
+        value: {{ default (printf "https://%s/kratos-ui/error" .Values.server_name) .Values.kratos.config.selfservice.flows.error.ui_url }}
       - name: kratos.config.selfservice.flows.recovery.ui_url
-        value: https://{{ .Values.server_name }}/kratos-ui/recovery
+        value: {{ default (printf "https://%s/kratos-ui/recovery" .Values.server_name) .Values.kratos.config.selfservice.flows.recovery.ui_url }}
       - name: kratos.config.selfservice.flows.registration.ui_url
-        value: https://{{ .Values.server_name }}/kratos-ui/registration
+        value: {{ default (printf "https://%s/kratos-ui/registration" .Values.server_name) .Values.kratos.config.selfservice.flows.registration.ui_url }}
       - name: kratos.config.selfservice.flows.login.ui_url
-        value: https://{{ .Values.server_name }}/kratos-ui/login
+        value: {{ default (printf "https://%s/kratos-ui/login" .Values.server_name) .Values.kratos.config.selfservice.flows.login.ui_url }}
       - name: kratos.config.selfservice.flows.logout.after.default_browser_return_url
-        value: https://{{ .Values.server_name }}/kratos-ui/login
+        value: {{ default (printf "https://%s/kratos-ui/login" .Values.server_name) .Values.kratos.config.selfservice.flows.logout.after.default_browser_return_url }}
       - name: kratos.config.selfservice.flows.verification.ui_url
-        value: https://{{ .Values.server_name }}/kratos-ui/verification
+        value: {{ default (printf "https://%s/kratos-ui/verification" .Values.server_name) .Values.kratos.config.selfservice.flows.verification.ui_url }}
       - name: kratos.config.selfservice.flows.verification.after.default_browser_return_url
-        value: https://{{ .Values.server_name }}/kratos-ui
+        value: {{ default (printf "https://%s/kratos-ui" .Values.server_name) .Values.kratos.config.selfservice.flows.verification.after.default_browser_return_url }}
       - name: kratos.config.selfservice.flows.settings.ui_url
-        value: https://{{ .Values.server_name }}/kratos-ui/settings
+        value: {{ default (printf "https://%s/kratos-ui/settings" .Values.server_name) .Values.kratos.config.selfservice.flows.settings.ui_url }}
       - name: ingress.public.hosts[0].host
         value: {{ .Values.server_name }}
       - name: ingress.admin.tls[0].hosts
@@ -157,14 +151,12 @@ releases:
       - "../etc/kratos_ui/values.yaml"
       - {{ .Values.kratos_ui | toYaml | indent 8 | trim }}
     set:
-      - name: serverName
-        value: {{ .Values.server_name }}
       - name: ingress.hosts[0].host
         value: {{ .Values.server_name }}
       - name: ingress.tls[0].hosts
         values:
           - {{ .Values.server_name }}
       - name: kratosPublicUrl
-        value: https://{{ .Values.server_name }}/kratos
+        value: {{ default (printf "https://%s/kratos" .Values.server_name) .Values.kratos_ui.kratosPublicUrl }}
       - name: kratosBrowserUrl
-        value: https://{{ .Values.server_name }}/kratos
+        value: {{ default (printf "https://%s/kratos" .Values.server_name) .Values.kratos_ui.kratosBrowserUrl }}
