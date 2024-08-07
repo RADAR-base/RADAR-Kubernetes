@@ -20,7 +20,7 @@ enable_tls: true
 # Needed for graylog. If graylog is set not to install, this can be disabled as well.
 mongodb:
   _install: true
-  _chart_version: 15.6.12
+  _chart_version: 15.6.16
   _extra_timeout: 60
   # Use standalone for a leaner installation, replicaset for a distributed one.
   architecture: replicaset
@@ -436,7 +436,7 @@ redis:
 
 minio:
   _install: true
-  _chart_version: 14.6.19
+  _chart_version: 14.6.32
   _extra_timeout: 210
   persistence:
     size: 20Gi
