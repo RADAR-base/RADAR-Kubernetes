@@ -336,7 +336,7 @@ timescaledb:
 #- ksql_server._install to true
 radar_grafana:
   _install: false
-  _chart_version: 8.3.2
+  _chart_version: 8.3.7
   _extra_timeout: 0
   replicaCount: 1
   env:
