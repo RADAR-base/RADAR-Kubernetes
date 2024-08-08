@@ -34,9 +34,11 @@ releases:
     version: {{ .Values.graylog._chart_version }}
     installed: {{ .Values.graylog._install }}
     timeout: {{ add .Values.base_timeout .Values.graylog._extra_timeout }}
-    needs: # TODO: Fix the map so it wouldn't break if monogo and elastic both won't be installed
-      {{ if .Values.mongodb._install }}- graylog/mongodb{{ end }}
-      {{ if .Values.elasticsearch._install }}- graylog/elasticsearch{{ end }}    
+    {{ if and ( .Values.mongodb._install ) ( .Values.elasticsearch._install ) }}
+    needs:
+      - mongodb
+      - elasticsearch
+    {{ end }}
     <<: *logFailedRelease
     values:
       - "../etc/graylog/values.yaml"
@@ -59,7 +61,7 @@ releases:
     version: {{ .Values.fluent_bit._chart_version }}
     installed: {{ .Values.fluent_bit._install }}
     timeout: {{ add .Values.base_timeout .Values.fluent_bit._extra_timeout }}
-    {{ if .Values.graylog._install }}needs: [graylog/graylog]{{ end }}
+    {{ if .Values.graylog._install }}needs: [graylog]{{ end }}
     <<: *logFailedRelease
     values:
       - "../etc/fluent-bit/values.yaml"
@@ -461,8 +463,7 @@ releases:
     version: {{ .Values.data_dashboard_backend._chart_version }}
     installed: {{ .Values.data_dashboard_backend._install }}
     timeout: {{ add .Values.base_timeout .Values.data_dashboard_backend._extra_timeout }}
-    needs:
-      - timescaledb
+    {{ if .Values.timescaledb._install }}needs: [timescaledb]{{ end }}
     <<: *logFailedRelease
     values:
       - {{ .Values.data_dashboard_backend | toYaml | indent 8 | trim }}
@@ -623,8 +624,7 @@ releases:
     version: {{ .Values.radar_rest_sources_backend._chart_version }}
     installed: {{ .Values.radar_rest_sources_backend._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_rest_sources_backend._extra_timeout }}
-    needs:
-      - postgresql
+    {{ if .Values.postgresql._install }}needs: [postgresql]{{ end }}
     <<: *logFailedRelease    
     values:
       - {{ .Values.radar_rest_sources_backend | toYaml | indent 8 | trim }}
@@ -685,8 +685,7 @@ releases:
     version: {{ .Values.radar_gateway._chart_version }}
     installed: {{ .Values.radar_gateway._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_gateway._extra_timeout }}
-    needs:
-      - cp-schema-registry
+    {{ if .Values.cp_schema_registry._install }}needs: [cp-schema-registry]{{ end }}
     <<: *logFailedRelease    
     values:
       - {{ .Values.radar_gateway | toYaml | indent 8 | trim }}
