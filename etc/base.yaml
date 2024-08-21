@@ -277,7 +277,7 @@ radar_fitbit_connector:
 
 radar_oura_connector:
   _install: false
-  _chart_version: 0.0.3
+  _chart_version: 0.0.4
   _extra_timeout: 0
   replicaCount: 1
   oauthClientId: radar_oura_connector
