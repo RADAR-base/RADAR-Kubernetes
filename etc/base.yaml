@@ -347,7 +347,7 @@ radar_grafana:
 #- ksql_server._install to true
 data_dashboard_backend:
   _install: false
-  _chart_version: 0.2.3
+  _chart_version: 0.3.0
   _extra_timeout: 0
   replicaCount: 1
 
