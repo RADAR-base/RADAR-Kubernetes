@@ -508,19 +508,19 @@ radar_upload_postgresql:
 
 radar_upload_connect_backend:
   _install: true
-  _chart_version: 0.4.0
+  _chart_version: 0.4.1
   _extra_timeout: 0
   replicaCount: 1
 
 radar_upload_connect_frontend:
   _install: true
-  _chart_version: 0.4.0
+  _chart_version: 0.4.1
   _extra_timeout: 0
   replicaCount: 1
 
 radar_upload_source_connector:
   _install: true
-  _chart_version: 0.3.1
+  _chart_version: 0.3.2
   _extra_timeout: 60
   replicaCount: 1
   s3Endpoint: http://minio:9000/
