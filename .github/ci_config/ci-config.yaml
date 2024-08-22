@@ -1,5 +1,5 @@
 atomicInstall: false
-base_timeout: 3600 # we need long timouts because pulling images can take a long time.
+base_timeout: 180
 
 elasticsearch:
   resources:

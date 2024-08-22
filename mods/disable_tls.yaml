@@ -7,49 +7,32 @@ nginx_ingress:
     config:
       ssl-redirect: "false"
 radar_home:
-  _chart_version: 0.3.0
   disable_tls: true
 app_config:
-  _chart_version: 1.2.0
   disable_tls: true
 app_config_frontend:
-  _chart_version: 2.0.0
   disable_tls: true
 management_portal:
-  _chart_version: 1.2.0
-  image:
-    tag: 2.0.0
   disable_tls: true
 radar_appserver:
-  _chart_version: 0.4.0
   disable_tls: true
 data_dashboard_backend:
-  _chart_version: 0.3.0
   disable_tls: true
 radar_rest_sources_authorizer:
-  _chart_version: 2.0.0
   disable_tls: true
 radar_rest_sources_backend:
-  _chart_version: 1.1.4
   disable_tls: true
 radar_gateway:
-  _chart_version: 1.2.0
   disable_tls: true
 radar_integration:
-  _chart_version: 0.6.0
   disable_tls: true
 radar_upload_connect_frontend:
-  _chart_version: 0.4.0
   disable_tls: true
 radar_upload_connect_backend:
-  _chart_version: 0.4.0
   disable_tls: true
 radar_push_endpoint:
-  _chart_version: 0.3.0
   disable_tls: true
 kafka_manager:
-  _chart_version: 2.2.0
   disable_tls: true
 ccSchemaRegistryProxy:
-  _chart_version: 0.3.0
   disable_tls: true

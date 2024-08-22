@@ -10,7 +10,7 @@ cp_zookeeper:
   servers: 1
 ksql_server:
   ksql:
-    # Needed to reduce the number of partitions to 1.
+    # Needed to reduce the number of partitions (hard-coded in these SQL files) to 1.
     queries: |
       {{- readFile "ksql-queries/_base_observations_stream.sql"             | nindent 8 }}
       {{- readFile "ksql-queries/questionnaire_response_observations.sql"   | nindent 8 }}

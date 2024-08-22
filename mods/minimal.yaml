@@ -1,10 +1,11 @@
 radar_s3_connector:
-  # Todo make heap opts configurable!!! Is now locked at 3Gb!
   kafkaHeapOpts: "-Xms128m -Xmx256m"
 radar_output:
   javaOpts: "-Xms128m -Xmx128m"
 cp_kafka:
   heapOptions: "-Xms128M -Xmx512M"
+  persistence:
+    size: 1Gi
 cp_zookeeper:
   heapOptions: "-Xms128M -Xmx128M"
 cp_schema_registry:
@@ -12,3 +13,38 @@ cp_schema_registry:
 minio:
   # Turn off distributed mode for minio
   mode: standalone
+  persistence:
+    size: 1Gi
+elasticsearch:
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "500Mi"
+postgresql:
+  primary:
+    resources:
+      requests:
+        cpu: 50m
+    persistence:
+      size: 1Gi
+radar_appserver_postgresql:
+  primary:
+    resources:
+      requests:
+        cpu: 50m
+    persistence:
+      size: 1Gi
+timescaledb:
+  primary:
+    resources:
+      requests:
+        cpu: 50m
+    persistence:
+      size: 1Gi
+radar_upload_postgresql:
+  primary:
+    resources:
+      requests:
+        cpu: 50m
+    persistence:
+      size: 1Gi
