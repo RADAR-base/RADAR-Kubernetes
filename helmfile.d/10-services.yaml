@@ -486,11 +486,9 @@ releases:
     installed: {{ .Values.ksql_server._install }}
     version: {{ .Values.ksql_server._chart_version }}
     timeout: {{ add .Values.base_timeout .Values.ksql_server._extra_timeout }}
-    {{ if .Values.cp_kafka._install }}
+    # When catalog server is 'ready', kafka can be used.
     needs:
-      - cp-kafka
-      - cp-schema-registry
-    {{ end }}
+      - catalog-server
     <<: *logFailedRelease
     values:
       - "../etc/cp-ksql-server/values.yaml"
@@ -501,14 +499,10 @@ releases:
     version: {{ .Values.radar_jdbc_connector_grafana._chart_version }}
     installed: {{ .Values.radar_jdbc_connector_grafana._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_jdbc_connector_grafana._extra_timeout }}
-    {{ if or .Values.timescaledb._install .Values.cp_kafka._install }}
     needs:
+      # When catalog server is 'ready', kafka can be used.
+      - catalog-server
       {{ if .Values.timescaledb._install }}- timescaledb{{ end }}
-      {{ if .Values.cp_kafka._install }}
-      - cp-kafka
-      - cp-schema-registry
-      {{ end }}
-    {{ end }}
     <<: *logFailedRelease
     values:
       - {{ .Values.radar_jdbc_connector_grafana | toYaml | indent 8 | trim }}
@@ -527,14 +521,10 @@ releases:
     version: {{ .Values.radar_jdbc_connector_data_dashboard_backend._chart_version }}
     installed: {{ .Values.radar_jdbc_connector_data_dashboard_backend._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_jdbc_connector_data_dashboard_backend._extra_timeout }}
-    {{ if or .Values.timescaledb._install .Values.cp_kafka._install }}
     needs:
+      # When catalog server is 'ready', kafka can be used.
+      - catalog-server
       {{ if .Values.timescaledb._install }}- timescaledb{{ end }}
-      {{ if .Values.cp_kafka._install }}
-      - cp-kafka
-      - cp-schema-registry
-      {{ end }}
-    {{ end }}
     <<: *logFailedRelease
     values:
       - "../etc/radar-jdbc-connector-data-dashboard-backend/values.yaml"
@@ -554,14 +544,10 @@ releases:
     version: {{ .Values.radar_jdbc_connector_realtime_dashboard._chart_version }}
     installed: {{ .Values.radar_jdbc_connector_realtime_dashboard._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_jdbc_connector_realtime_dashboard._extra_timeout }}
-    {{ if or .Values.timescaledb._install .Values.cp_kafka._install }}
     needs:
+      # When catalog server is 'ready', kafka can be used.
+      - catalog-server
       {{ if .Values.timescaledb._install }}- timescaledb{{ end }}
-      {{ if .Values.cp_kafka._install }}
-      - cp-kafka
-      - cp-schema-registry
-      {{ end }}
-    {{ end }}
     <<: *logFailedRelease
     values:
       - "../etc/radar-jdbc-connector-realtime-dashboard/values.yaml"
@@ -581,12 +567,9 @@ releases:
     version: {{ .Values.radar_fitbit_connector._chart_version }}
     installed: {{ .Values.radar_fitbit_connector._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_fitbit_connector._extra_timeout }}
-    {{ if .Values.cp_kafka._install }}
     needs:
-      - cp-kafka
-      - cp-schema-registry
-      - cp-zookeeper
-    {{ end }}
+      # When catalog server is 'ready', kafka can be used.
+      - catalog-server
     <<: *logFailedRelease
     values:
       - {{ .Values.radar_fitbit_connector | toYaml | indent 8 | trim }}
@@ -657,12 +640,9 @@ releases:
     version: {{ .Values.radar_oura_connector._chart_version }}
     installed: {{ .Values.radar_oura_connector._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_oura_connector._extra_timeout }}
-    {{ if .Values.cp_kafka._install }}
     needs:
-      - cp-kafka
-      - cp-schema-registry
-      - cp-zookeeper
-    {{ end }}
+      # When catalog server is 'ready', kafka can be used.
+      - catalog-server
     <<: *logFailedRelease
     values:
       - {{ .Values.radar_oura_connector | toYaml | indent 8 | trim }}
@@ -710,7 +690,6 @@ releases:
     version: {{ .Values.radar_backend_monitor._chart_version }}
     installed: {{ .Values.radar_backend_monitor._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_backend_monitor._extra_timeout }}
-    {{ if .Values.cp_kafka._install }}
     needs:
       - cp-zookeeper
       - cp-kafka
@@ -731,14 +710,9 @@ releases:
     version: {{ .Values.radar_backend_monitor._chart_version }}
     installed: {{ .Values.radar_backend_stream._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_backend_stream._extra_timeout }}
-    {{ if .Values.cp_kafka._install }}
     needs:
-      - cp-zookeeper
-      - cp-kafka
-      - cp-schema-registry
-      # Does this still exist?
-      # - cp-kafka-rest
-    {{ end }}
+      # When catalog server is 'ready', kafka can be used.
+      - catalog-server
     <<: *logFailedRelease    
     values:
       - "../etc/radar-backend-stream/values.yaml"
@@ -799,14 +773,10 @@ releases:
     version: {{ .Values.radar_s3_connector._chart_version }}
     installed: {{ .Values.radar_s3_connector._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_s3_connector._extra_timeout }}
-    {{ if or .Values.minio._install .Values.cp_kafka._install }}
     needs:
+      # When catalog server is 'ready', kafka can be used.
+      - catalog-server
       {{ if .Values.minio._install }}- minio{{ end }}
-      {{ if .Values.cp_kafka._install }}
-      - cp-kafka
-      - cp-schema-registry
-      {{ end }}
-    {{ end }}
     <<: *logFailedRelease
     values:
       - {{ .Values.radar_s3_connector | toYaml | indent 8 | trim }}
