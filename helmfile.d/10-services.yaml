@@ -690,12 +690,7 @@ releases:
     installed: {{ .Values.radar_backend_monitor._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_backend_monitor._extra_timeout }}
     needs:
-      - cp-zookeeper
-      - cp-kafka
-      - cp-schema-registry
-      # Does this still exist?
-      # - cp-kafka-rest
-    {{ end }}
+      - catalog-server
     <<: *logFailedRelease
     values:
       - "../etc/radar-backend-monitor/values.yaml"
@@ -930,7 +925,7 @@ releases:
         value: {{ .Values.confluent_cloud.enabled }}
       - name: serviceMonitor.enabled
         value: {{ .Values.kube_prometheus_stack._install }}
-      {{- if .Values.confluent_cloud.enabled }}
+      {{ if .Values.confluent_cloud.enabled }}
       - name: schemaRegistry
         value: {{ .Values.confluent_cloud.cc.schemaRegistryUrl }}
       - name: bootstrapServers
