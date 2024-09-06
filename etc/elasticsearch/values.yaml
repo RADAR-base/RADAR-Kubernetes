@@ -3,6 +3,8 @@ clusterName: "elasticsearch"
 replicas: 3
 minimumMasterNodes: 2
 
+maxUnavailable: 0
+
 esMajorVersion: "7"
 
 esJavaOpts: "-Xmx1g -Xms1g"

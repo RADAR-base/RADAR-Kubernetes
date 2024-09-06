@@ -79,6 +79,18 @@ jobs:
         with:
           limit-access-to-actor: true
 
+      - name: Slack Notification
+        if: ${{ failure() }}
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_CHANNEL: ci-notifications
+          SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
+          SLACK_ICON: https://github.com/rtCamp.png?size=48
+          SLACK_MESSAGE: 'The job has failed, go to https://github.com/RADAR-base/RADAR-Kubernetes/actions and use SSH for more information'
+          SLACK_TITLE: Post Title
+          SLACK_USERNAME: rtCamp
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
       - name: Setup tmate session if jobs have failed
         if: ${{ failure() }}
         uses: mxschmitt/action-tmate@v3
@@ -90,6 +102,13 @@ jobs:
         if: always()
         run: |
           kubectl get pods --all-namespaces
+
+      # TODO We can remove the k3s uninstallation once the k3d PR is merged.
+      - name: Delete clusters when job was canceled
+        if: cancelled()
+        run: |
+          k3d cluster delete --all || true
+          k3s-uninstall.sh || true
 
   check-gitignore:
     runs-on: ubuntu-latest
