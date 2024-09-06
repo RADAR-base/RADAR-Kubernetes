@@ -677,7 +677,7 @@ releases:
         value: {{ .Values.confluent_cloud.enabled }}
       - name: serviceMonitor.enabled
         value: {{ .Values.kube_prometheus_stack._install }}
-      {{- if .Values.confluent_cloud.enabled }}
+      {{ if .Values.confluent_cloud.enabled }}
       - name: schemaRegistry
         value: {{ .Values.confluent_cloud.cc.schemaRegistryUrl }}
       - name: bootstrapServers
