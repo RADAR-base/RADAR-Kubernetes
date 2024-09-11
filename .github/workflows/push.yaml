@@ -9,7 +9,7 @@ on:
         description: "Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)"
         required: false
         default: false
-
+ 
 jobs:
   install:
     strategy:
@@ -47,6 +47,7 @@ jobs:
           helmfile_mods+='\ \ \ \ \ \ - ../.github/ci_config/secrets.yaml.gotmpl'
           sed -i "/secrets.yaml/a $helmfile_mods" environments.yaml
           sed -i '/_install: /s/false/true/' etc/production.yaml
+          sed -i '/enable_logging_monitoring: /s/false/true/' etc/production.yaml
 
       - name: Run helmfile template
         env:
@@ -59,7 +60,7 @@ jobs:
           INSTALL_K3S_VERSION: ${{ matrix.K3S_VERSION }}
           K3S_KUBECONFIG_MODE: "644"
         run: |
-          /usr/local/bin/k3s-uninstall.sh        
+          /usr/local/bin/k3s-uninstall.sh || true
           curl -sfL https://get.k3s.io | sh -s - --disable traefik --disable-helm-controller
           cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
 
