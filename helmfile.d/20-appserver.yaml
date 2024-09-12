@@ -41,6 +41,8 @@ releases:
             value: "true"
           - name: SPRING_SERVLET_MULTIPART_MAXFILESIZE
             value: "20MB"
+          - name: SPRING_SERVLET_MULTIPART_MAXREQUESTSIZE
+            value: "20MB"
           - name: SPRING_SERVLET_MULTIPART_ENABLED
             value: "true"
           - name: RADAR_STORAGE_S3_ACCESSKEY
