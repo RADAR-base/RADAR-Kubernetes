@@ -32,7 +32,5 @@ radar_upload_connect_backend:
   disable_tls: true
 radar_push_endpoint:
   disable_tls: true
-kafka_manager:
-  disable_tls: true
 ccSchemaRegistryProxy:
   disable_tls: true

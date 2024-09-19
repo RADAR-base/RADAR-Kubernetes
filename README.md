@@ -412,7 +412,7 @@ Before running the upgrade, compare `etc/base.yaml` and `etc/base.yaml.gotmpl` w
 To upgrade the initial services, run
 
 ```shell
-kubectl delete -n monitoring deployments kube-prometheus-stack-kube-state-metrics kafka-manager
+kubectl delete -n monitoring deployments kube-prometheus-stack-kube-state-metrics
 helm -n graylog uninstall mongodb
 kubectl delete -n graylog pvc datadir-mongodb-0 datadir-mongodb-1
 ```
