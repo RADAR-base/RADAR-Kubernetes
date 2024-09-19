@@ -7,9 +7,6 @@ elasticsearch:
       cpu: "100m"
       memory: "500Mi"
 
-kafka_manager:
-  _install: false
-
 confluent_cloud:
   enabled: false
 

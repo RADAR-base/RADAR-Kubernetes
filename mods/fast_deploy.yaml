@@ -37,9 +37,6 @@ radar_upload_connect_backend:
 radar_push_endpoint:
   readinessProbe:
     periodSeconds: 5
-kafka_manager:
-  readinessProbe:
-    periodSeconds: 5
 ccSchemaRegistryProxy:
   readinessProbe:
     periodSeconds: 5

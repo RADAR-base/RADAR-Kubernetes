@@ -108,12 +108,6 @@ nginx_ingress:
       serviceMonitor:
         enabled: true
 
-# Kafka manager is outdated but can still be used. Otherwise, use Kafka command-line tools.
-kafka_manager:
-  _install: false
-  _chart_version: 2.2.0
-  _extra_timeout: 0
-
 # --------------------------------------------------------- 10-base.yaml ---------------------------------------------------------
 # Use letsencrypt to retrieve SSL certificates.
 cert_manager_letsencrypt:

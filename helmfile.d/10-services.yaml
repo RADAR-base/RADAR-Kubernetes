@@ -84,24 +84,6 @@ releases:
       - name: controller.metrics.serviceMonitor.enabled
         value: {{ .Values.kube_prometheus_stack._install }}
 
-  - name: kafka-manager
-    chart: radar/kafka-manager
-    version: {{ .Values.kafka_manager._chart_version }}
-    installed: {{ .Values.kafka_manager._install }}
-    timeout: {{ add .Values.base_timeout .Values.kafka_manager._extra_timeout }}
-    <<: *logFailedRelease
-    values:
-      - {{ .Values.kafka_manager | toYaml | indent 8 | trim }}
-    set:
-      - name: ingress.hosts
-        values:
-          - {{ .Values.server_name }}
-      - name: ingress.tls.secretName
-        value: radar-base-tls
-      - name: ingress.tls.hosts
-        values:
-          - {{ .Values.server_name }}
-
   - name: cert-manager-letsencrypt
     namespace: cert-manager
     chart: radar/cert-manager-letsencrypt
