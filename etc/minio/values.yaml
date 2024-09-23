@@ -125,6 +125,11 @@ ingress:
   ## @param ingress.enabled Enable ingress controller resource
   ##
   enabled: true
+  ## @param ingress.ingressClassName IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)
+  ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster.
+  ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
+  ##
+  ingressClassName: "nginx"
   ## @param ingress.hostname Default host for the ingress resource
   ##
   hostname: s3.example.com
@@ -140,7 +145,6 @@ ingress:
   ##   cert-manager.io/cluster-issuer: cluster-issuer-name
   ##
   annotations:
-    kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/proxy-body-size: 200m
     nginx.ingress.kubernetes.io/proxy-buffering: "off"
@@ -163,6 +167,11 @@ apiIngress:
   ## @param apiIngress.enabled Enable ingress controller resource
   ##
   enabled: true
+  ## @param ingress.ingressClassName IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)
+  ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster.
+  ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
+  ##
+  ingressClassName: "nginx"
   ## @param apiIngress.hostname Default host for the ingress resource
   ##
   hostname: api.s3.example.com
@@ -178,7 +187,6 @@ apiIngress:
   ##   cert-manager.io/cluster-issuer: cluster-issuer-name
   ##
   annotations:
-    kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/proxy-body-size: 200m
     nginx.ingress.kubernetes.io/proxy-buffering: "off"
