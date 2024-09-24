@@ -238,7 +238,7 @@ kratos:
                   config:
                     method: POST
                     url: http://management-portal:8080/managementportal/api/kratos/subjects/activate
-                    body: /etc/config/kratos/webhook_body.jsonnet
+                    body: base64://ZnVuY3Rpb24oY3R4KSB7CiAgICBpZGVudGl0eTogaWYgc3RkLm9iamVjdEhhcyhjdHgsICJpZGVudGl0eSIpIHRoZW4gY3R4LmlkZW50aXR5IGVsc2UgbnVsbCwKICAgIHBheWxvYWQ6IGlmIHN0ZC5vYmplY3RIYXMoY3R4LCAiZmxvdyIpICYmIHN0ZC5vYmplY3RIYXMoY3R4LmZsb3csICJ0cmFuc2llbnRfcGF5bG9hZCIpIHRoZW4gY3R4LmZsb3cudHJhbnNpZW50X3BheWxvYWQgZWxzZSBudWxsLAogICAgY29va2llczogY3R4LnJlcXVlc3RfY29va2llcwp9Cg==
                     response:
                       ignore: true
 
@@ -258,7 +258,7 @@ kratos:
                     config:
                       method: POST
                       url: http://management-portal:8080/managementportal/api/kratos/subjects
-                      body: /etc/config/kratos/webhook_body.jsonnet
+                      body: base64://ZnVuY3Rpb24oY3R4KSB7CiAgICBpZGVudGl0eTogaWYgc3RkLm9iamVjdEhhcyhjdHgsICJpZGVudGl0eSIpIHRoZW4gY3R4LmlkZW50aXR5IGVsc2UgbnVsbCwKICAgIHBheWxvYWQ6IGlmIHN0ZC5vYmplY3RIYXMoY3R4LCAiZmxvdyIpICYmIHN0ZC5vYmplY3RIYXMoY3R4LmZsb3csICJ0cmFuc2llbnRfcGF5bG9hZCIpIHRoZW4gY3R4LmZsb3cudHJhbnNpZW50X3BheWxvYWQgZWxzZSBudWxsLAogICAgY29va2llczogY3R4LnJlcXVlc3RfY29va2llcwp9Cg==
                       response:
                         ignore: true
                 -   hook: session
