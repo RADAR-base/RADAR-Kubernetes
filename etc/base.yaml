@@ -4,19 +4,28 @@ atomicInstall: true
 base_timeout: 90
 # Context that you use in kubectl to access the Kubernetes cluster. Will be translated to `helm --kube-context <context_name>`
 kubeContext: default
-# Domain name that RADAR-Base installation will be acessible from
+# Domain name that RADAR-Base installation will be accessible from
 server_name: example.com
-# This email address will be used to notify for SSL certifcate expiration
+# This email address will be used to notify for SSL certificate expiration
 maintainer_email: MAINTAINER_EMAIL@example.com
 # Number of Kafka pods that will be installed
 kafka_num_brokers: 3
+# Enable logging and monitoring
+enable_logging_monitoring: false
+# Enable TLS redirection and retrieval of Let's Encrypt certificates.
+# Can be disabled when TLS termination is handled upstream of the on-cluster Nginx reverse proxy.
+enable_tls: true
+
+# Minimal deployment for development (disables TLS, monitoring and logging, sets kafka and minio brokers to 1).
+dev_deployment: false
+
 
 # --------------------------------------------------------- 00-init.yaml ---------------------------------------------------------
 
 # Needed for graylog. If graylog is set not to install, this can be disabled as well.
 mongodb:
   _install: true
-  _chart_version: 11.1.10
+  _chart_version: 15.6.16
   _extra_timeout: 60
   # Use standalone for a leaner installation, replicaset for a distributed one.
   architecture: replicaset
@@ -29,7 +38,7 @@ elasticsearch:
 
 graylog:
   _install: true
-  _chart_version: 2.1.2
+  _chart_version: 2.2.1
   _extra_timeout: 180
 
 # Needed for graylog. If graylog is set not to install, this can be disabled as well.
@@ -40,7 +49,7 @@ fluent_bit:
 
 cert_manager:
   _install: true
-  _chart_version: v1.10.0
+  _chart_version: v1.14.5
   _extra_timeout: 0
   global:
     # Needed for compatibility with K8S 1.25+
@@ -99,17 +108,11 @@ nginx_ingress:
       serviceMonitor:
         enabled: true
 
-# Kafka manager is outdated but can still be used. Otherwise, use Kafka command-line tools.
-kafka_manager:
-  _install: false
-  _chart_version: 2.1.6
-  _extra_timeout: 0
-
 # --------------------------------------------------------- 10-base.yaml ---------------------------------------------------------
 # Use letsencrypt to retrieve SSL certificates.
 cert_manager_letsencrypt:
   _install: true
-  _chart_version: 0.1.1
+  _chart_version: 0.1.2
   _extra_timeout: 0
 
 # Use confluent cloud instead of a local Kafka cluster.
@@ -141,21 +144,21 @@ cp_kafka:
 
 cp_schema_registry:
   _install: true
-  _chart_version: 0.3.0
+  _chart_version: 0.3.1
   _extra_timeout: 90
   imageTag: 7.2.2
   replicaCount: 1
 
 catalog_server:
   _install: true
-  _chart_version: 0.6.0
+  _chart_version: 0.6.2
   _extra_timeout: 90
   replicaCount: 1
   schema_registry: http://cp-schema-registry:8081
 
 radar_home:
   _install: true
-  _chart_version: 0.2.2
+  _chart_version: 0.3.0
   _extra_timeout: 0
 
 # --------------------------------------------------------- 10-managementportal.yaml ---------------------------------------------------------
@@ -179,7 +182,7 @@ postgresql:
 
 management_portal:
   _install: true
-  _chart_version: 1.1.7
+  _chart_version: 1.2.2
   _extra_timeout: 210
   replicaCount: 1  # should be 1
   postgres:
@@ -194,9 +197,12 @@ management_portal:
     oauth_checking_key_aliases_0: radarbase-managementportal-ec
     oauth_checking_key_aliases_1: selfsigned
   smtp:
-    username: secret
-    password: secret
-    host: localhost
+    enabled: true
+    host: smtp
+    port: 25
+    from: noreply@example.com
+    starttls: false
+    auth: true
 
 kratos:
   _install: true
@@ -221,7 +227,7 @@ hydra:
 
 app_config:
   _install: true
-  _chart_version: 1.1.1
+  _chart_version: 1.2.0
   _extra_timeout: 0
   replicaCount: 1
   jdbc:
@@ -229,7 +235,7 @@ app_config:
 
 app_config_frontend:
   _install: true
-  _chart_version: 1.1.1
+  _chart_version: 2.0.0
   _extra_timeout: 0
   replicaCount: 1
 
@@ -251,37 +257,44 @@ radar_appserver_postgresql:
 
 radar_appserver:
   _install: false
-  _chart_version: 0.2.2
+  _chart_version: 0.5.1
   _extra_timeout: 0
   replicaCount: 1
   managementportal_resource_name: res_AppServer
   public_key_endpoints: []
+  smtp:
+    enabled: false # -- set to true, if sending of notifications via email should be enabled.
+    host: smtp
+    port: 25
+    from: noreply@example.com
+    starttls: false
+    auth: true
 
 # --------------------------------------------------------- 20-fitbit.yaml ---------------------------------------------------------
 # The charts in 20-fitbit.yaml only need to be installed if you will use a Fitbit, Garmin, or Oura API integration.
 radar_fitbit_connector:
   _install: false
-  _chart_version: 0.3.1
+  _chart_version: 0.3.3
   _extra_timeout: 0
   replicaCount: 1
   oauthClientId: radar_fitbit_connector
 
 radar_oura_connector:
   _install: false
-  _chart_version: 0.0.3
+  _chart_version: 0.0.4
   _extra_timeout: 0
   replicaCount: 1
   oauthClientId: radar_oura_connector
 
 radar_rest_sources_authorizer:
   _install: false
-  _chart_version: 1.1.4
+  _chart_version: 2.0.1
   _extra_timeout: 0
   replicaCount: 1
 
 radar_rest_sources_backend:
   _install: false
-  _chart_version: 1.1.3
+  _chart_version: 1.1.5
   _extra_timeout: 0
   replicaCount: 1
   postgres:
@@ -327,7 +340,7 @@ timescaledb:
 #- ksql_server._install to true
 radar_grafana:
   _install: false
-  _chart_version: 6.26.8
+  _chart_version: 8.3.7
   _extra_timeout: 0
   replicaCount: 1
   env:
@@ -338,31 +351,31 @@ radar_grafana:
 #- ksql_server._install to true
 data_dashboard_backend:
   _install: false
-  _chart_version: 0.2.1
+  _chart_version: 0.3.0
   _extra_timeout: 0
   replicaCount: 1
 
 # Install when radar_grafana._install is 'true'
 radar_jdbc_connector_grafana:
   _install: false
-  _chart_version: 0.5.1
+  _chart_version: 0.5.3
   _extra_timeout: 0
   replicaCount: 1
   sink:
     # Change the list of topics if you have dashboards that read other data or if you don't have certain topics available on your cluster.
     topics: android_phone_relative_location, android_phone_battery_level, connect_fitbit_intraday_heart_rate, connect_fitbit_intraday_steps
 
-# Install when data_dashboard_backend._install is 'true'
+# Install when data_dashboard_backend._install is 'true'.
 radar_jdbc_connector_data_dashboard_backend:
   _install: false
-  _chart_version: 0.5.1
+  _chart_version: 0.5.3
   _extra_timeout: 0
   replicaCount: 1
 
 # Install when using realtime analysis
 radar_jdbc_connector_realtime_dashboard:
   _install: false
-  _chart_version: 0.5.1
+  _chart_version: 0.5.3
   _extra_timeout: 0
   replicaCount: 1
 
@@ -383,7 +396,7 @@ ksql_server:
 
 radar_gateway:
   _install: true
-  _chart_version: 1.1.2
+  _chart_version: 1.2.1
   _extra_timeout: 0
   replicaCount: 1
 
@@ -411,7 +424,7 @@ radar_backend_stream:
 
 radar_integration:
   _install: false
-  _chart_version: 0.5.1
+  _chart_version: 0.6.0
   _extra_timeout: 0
   replicaCount: 1
   oauth_client_id: radar_redcap_integrator
@@ -427,7 +440,7 @@ redis:
 
 minio:
   _install: true
-  _chart_version: 12.6.9
+  _chart_version: 14.6.32
   _extra_timeout: 210
   persistence:
     size: 20Gi
@@ -451,7 +464,7 @@ minio:
 radar_s3_connector:
   # set to true if radar-s3-connector should be installed
   _install: true
-  _chart_version: 0.3.4
+  _chart_version: 0.4.0
   _extra_timeout: 90
   replicaCount: 1
   # The bucket name where intermediate data for cold storage should be written to.
@@ -460,7 +473,7 @@ radar_s3_connector:
 
 s3_proxy:
   _install: false
-  _chart_version: 0.3.1
+  _chart_version: 0.3.2
   _extra_timeout: 0
   replicaCount: 1
   target:
@@ -468,7 +481,7 @@ s3_proxy:
 
 radar_output:
   _install: true
-  _chart_version: 0.4.1
+  _chart_version: 1.0.0
   _extra_timeout: 0
   replicaCount: 1
   source:
@@ -499,19 +512,19 @@ radar_upload_postgresql:
 
 radar_upload_connect_backend:
   _install: true
-  _chart_version: 0.3.2
+  _chart_version: 0.4.1
   _extra_timeout: 0
   replicaCount: 1
 
 radar_upload_connect_frontend:
   _install: true
-  _chart_version: 0.3.1
+  _chart_version: 0.4.1
   _extra_timeout: 0
   replicaCount: 1
 
 radar_upload_source_connector:
   _install: true
-  _chart_version: 0.3.1
+  _chart_version: 0.3.2
   _extra_timeout: 60
   replicaCount: 1
   s3Endpoint: http://minio:9000/
@@ -520,7 +533,7 @@ radar_upload_source_connector:
 
 ccSchemaRegistryProxy:
   _install: false
-  _chart_version: 0.2.4
+  _chart_version: 0.3.0
   _extra_timeout: 0
   externalName: schema-registry-domain
 
@@ -528,7 +541,7 @@ ccSchemaRegistryProxy:
 
 radar_push_endpoint:
   _install: false
-  _chart_version: 0.2.3
+  _chart_version: 0.3.2
   _extra_timeout: 180
   replicaCount: 1
   adminProperties: {}

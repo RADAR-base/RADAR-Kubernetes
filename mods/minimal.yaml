@@ -1,19 +1,25 @@
-atomicInstall: false
-base_timeout: 180
-
+radar_s3_connector:
+  kafkaHeapOpts: "-Xms128m -Xmx256m"
+radar_output:
+  javaOpts: "-Xms128m -Xmx128m"
+cp_kafka:
+  heapOptions: "-Xms128M -Xmx512M"
+  persistence:
+    size: 1Gi
+cp_zookeeper:
+  heapOptions: "-Xms128M -Xmx128M"
+cp_schema_registry:
+  heapOptions: "-Xms128M -Xmx128M"
+minio:
+  # Turn off distributed mode for minio
+  mode: standalone
+  persistence:
+    size: 1Gi
 elasticsearch:
   resources:
     requests:
       cpu: "100m"
       memory: "500Mi"
-
-confluent_cloud:
-  enabled: false
-
-cp_kafka:
-  persistence:
-    size: 1Gi
-
 postgresql:
   primary:
     resources:
@@ -21,7 +27,6 @@ postgresql:
         cpu: 50m
     persistence:
       size: 1Gi
-
 radar_appserver_postgresql:
   primary:
     resources:
@@ -29,7 +34,6 @@ radar_appserver_postgresql:
         cpu: 50m
     persistence:
       size: 1Gi
-
 timescaledb:
   primary:
     resources:
@@ -37,11 +41,6 @@ timescaledb:
         cpu: 50m
     persistence:
       size: 1Gi
-
-minio:
-  persistence:
-    size: 1Gi
-
 radar_upload_postgresql:
   primary:
     resources:
@@ -49,6 +48,3 @@ radar_upload_postgresql:
         cpu: 50m
     persistence:
       size: 1Gi
-
-ccSchemaRegistryProxy:
-  _install: false
