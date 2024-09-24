@@ -45,3 +45,35 @@ hydra:
 
     strategies:
       access_token: jwt
+
+    oauth2:
+      allowed_top_level_claims: scope,roles,authorities,sources,user_name
+      mirror_top_level_claims: false
+    
+    serve:
+      public:
+        base_url: https://localhost/hydra/
+        cors:
+          enabled: true
+          allowed_origins:
+            - "*"
+          allowed_methods:
+            - POST
+            - GET
+            - PUT
+            - PATCH
+            - DELETE
+          allowed_headers:
+            - Authorization
+            - Cookie
+            - Content-Type
+            - Accept
+          exposed_headers:
+            - Content-Type
+            - Set-Cookie
+            - Accept
+          allow_credentials: true
+      admin:
+        base_url: https://localhost/admin/hydra/
+        cors:
+          enabled: true

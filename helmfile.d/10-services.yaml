@@ -342,7 +342,12 @@ releases:
         values:
           - {{ .Values.server_name }}
       - name: kratos.config.oauth2_provider.url
-        value: http://hydra-admin
+        value: http://{{ .Values.server_name }}/admin/hydra
+      - name: kratos.config.selfservice.flows.registration.after.password.hooks[0].config.url
+        value: https://{{ .Values.server_name }}/managementportal/api/kratos/subjects
+      - name: kratos.config.selfservice.flows.verification.after.hooks[0].config.url
+        value: https://{{ .Values.server_name }}/managementportal/api/kratos/subjects/activate
+
 
   - name: kratos-selfservice-ui-node
     chart: radar/kratos-selfservice-ui-node
@@ -378,7 +383,11 @@ releases:
       - name: serverName
         value: {{ .Values.server_name }}
       - name: hydra.config.dsn
-        value: postgres://{{ .Values.management_portal.postgres.user }}:{{ .Values.management_portal.postgres.password }}@{{ .Values.management_portal.postgres.host }}:{{ .Values.management_portal.postgres.port }}/{{ .Values | get "hydra.jdbc.database" "hydra" }}
+        value: postgres://{{ .Values.management_portal.postgres.user }}:{{ .Values.management_portal.postgres.password }}@{{ .Values.management_portal.postgres.host }}:{{ .Values.management_portal.postgres.port }}/{{ .Values | get "hydra.jdbc.database" "hydra" }}      - name: kratos.config.serve.public.base_url
+      - name: hydra.config.serve.public.base_url
+        value: https://{{ .Values.server_name }}/hydra/
+      - name: hydra.config.serve.admin.base_url
+        value: https://{{ .Values.server_name }}/admin/hydra/
       - name: hydra.config.urls.self.issuer
         value: https://{{ .Values.server_name }}/hydra/
       - name: hydra.config.urls.login

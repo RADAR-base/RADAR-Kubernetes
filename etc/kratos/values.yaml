@@ -196,6 +196,14 @@ kratos:
           use: link
           after:
             default_browser_return_url: https://localhost/kratos-ui
+            hooks:
+              -   hook: web_hook
+                  config:
+                    method: POST
+                    url: http://management-portal:8080/managementportal/api/kratos/subjects/activate
+                    body: /etc/config/kratos/webhook_body.jsonnet
+                    response:
+                      ignore: true
 
         logout:
           after:
@@ -209,7 +217,14 @@ kratos:
           after:
             password:
               hooks:
-                -   hook: session
+                -   hook: web_hook
+                    config:
+                      method: POST
+                      url: http://management-portal:8080/managementportal/api/kratos/subjects
+                      body: /etc/config/kratos/webhook_body.jsonnet
+                      response:
+                        ignore: true
+                -  hook: session
             oidc:
               hooks:
                 -   hook: session

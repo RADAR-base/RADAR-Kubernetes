@@ -221,7 +221,7 @@ kratos_ui:
   _extra_timeout: 0
 
 hydra:
-  _install: false
+  _install: true
   _chart_version: 0.41.0
   _extra_timeout: 0
 
