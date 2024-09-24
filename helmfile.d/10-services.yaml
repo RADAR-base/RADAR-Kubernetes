@@ -356,7 +356,7 @@ releases:
     timeout: {{ add .Values.base_timeout .Values.kratos_ui._extra_timeout }}
     <<: *logFailedRelease
     values:
-      - "../etc/kratos_ui/values.yaml"
+      - "../etc/kratos-ui/values.yaml"
       - {{ .Values.kratos_ui | toYaml | indent 8 | trim }}
     set:
       - name: serverName
