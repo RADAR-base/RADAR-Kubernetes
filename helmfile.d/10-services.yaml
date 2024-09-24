@@ -383,7 +383,7 @@ releases:
       - name: serverName
         value: {{ .Values.server_name }}
       - name: hydra.config.dsn
-        value: postgres://{{ .Values.management_portal.postgres.user }}:{{ .Values.management_portal.postgres.password }}@{{ .Values.management_portal.postgres.host }}:{{ .Values.management_portal.postgres.port }}/{{ .Values | get "hydra.jdbc.database" "hydra" }}      - name: kratos.config.serve.public.base_url
+        value: postgres://{{ .Values.management_portal.postgres.user }}:{{ .Values.management_portal.postgres.password }}@{{ .Values.management_portal.postgres.host }}:{{ .Values.management_portal.postgres.port }}/{{ .Values | get "hydra.jdbc.database" "hydra" }}
       - name: hydra.config.serve.public.base_url
         value: https://{{ .Values.server_name }}/hydra/
       - name: hydra.config.serve.admin.base_url
