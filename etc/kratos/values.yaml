@@ -224,7 +224,7 @@ kratos:
                       body: /etc/config/kratos/webhook_body.jsonnet
                       response:
                         ignore: true
-                -  hook: session
+                -   hook: session
             oidc:
               hooks:
                 -   hook: session
