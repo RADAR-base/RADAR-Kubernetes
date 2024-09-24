@@ -36,11 +36,11 @@ kratos:
 
   # -- You can add multiple identity schemas here. You can pass JSON schema using `--set-file` Helm CLI argument.
   identitySchemas:
-    "identity.user.schema.json": |
+    "identity.schema.admin.json": |
       {
         "$schema": "http://json-schema.org/draft-07/schema#",
-        "$id": "user",
-        "title": "user",
+        "$id": "admin",
+        "title": "admin",
         "type": "object",
         "properties": {
           "traits": {
@@ -69,16 +69,16 @@ kratos:
                 }
               }
             },
-            "required": [ "email" ]
+            "required": ["email"]
           }
         },
         "additionalProperties": false
       }
-    "identity.default.schema.json": |
+    "identity.schema.researcher.json": |
       {
         "$schema": "http://json-schema.org/draft-07/schema#",
-        "$id": "default",
-        "title": "user",
+        "$id": "researcher",
+        "title": "researcher",
         "type": "object",
         "properties": {
           "traits": {
@@ -107,12 +107,49 @@ kratos:
                 }
               }
             },
-            "required": [ "email" ]
+            "required": ["email"]
           }
         },
         "additionalProperties": false
       }
-
+    "identity.schema.subject.json": |
+      {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "$id": "subject",
+        "title": "subject",
+        "type": "object",
+        "properties": {
+          "traits": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "string",
+                "format": "email",
+                "title": "E-Mail",
+                "minLength": 5,
+                "ory.sh/kratos": {
+                  "credentials": {
+                    "password": {
+                      "identifier": true
+                    },
+                    "totp": {
+                      "account_name": true
+                    }
+                  },
+                  "verification": {
+                    "via": "email"
+                  },
+                  "recovery": {
+                    "via": "email"
+                  }
+                }
+              }
+            },
+            "required": ["email"]
+          }
+        },
+        "additionalProperties": false
+      }
   config:
 
     session:
@@ -230,11 +267,14 @@ kratos:
                 -   hook: session
 
     identity:
-      default_schema_id: user
+      default_schema_id: subject
       schemas:
-        # identitySchemas:
-        -   id: user
-            url: file:///etc/config/identity.user.schema.json
+        - id: subject
+          url: file:///etc/config/identity.schema.subject.json
+        - id: researcher
+          url: file:///etc/config/identity.schema.researcher.json
+        - id: admin
+          url: file:///etc/config/identity.schema.admin.json
 
     log:
       level: debug
