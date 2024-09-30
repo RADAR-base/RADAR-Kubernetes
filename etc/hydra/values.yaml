@@ -5,7 +5,7 @@ ingress:
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-prod
     hosts:
-      - host: radar-k3s-test.thehyve.net
+      - host: localhost
         paths:
           - path: "/admin/hydra/?(.*)"
             pathType: ImplementationSpecific
@@ -25,7 +25,7 @@ ingress:
           - path: "/hydra/?(.*)"
             pathType: ImplementationSpecific
     tls:
-      - secretName: hydra-public-tls
+      - secretName: radar-base-tls
         hosts:
           - localhost
 hydra:
@@ -45,6 +45,8 @@ hydra:
 
     strategies:
       access_token: jwt
+      jwt:
+        scope_claim: both
 
     oauth2:
       allowed_top_level_claims: [scope,roles,authorities,sources,user_name]
