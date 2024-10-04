@@ -4,10 +4,11 @@ ingress:
     className: "nginx"
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/rewrite-target: /admin/$2
     hosts:
       - host: localhost
         paths:
-          - path: "/admin/kratos/?(.*)"
+          - path: "/admin/kratos(/|$)(.*)"
             pathType: ImplementationSpecific
     tls:
       - secretName: radar-base-tls
