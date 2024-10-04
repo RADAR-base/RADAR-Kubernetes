@@ -407,7 +407,6 @@ releases:
         values:
           - {{ .Values.server_name }}
 
-
   - name: radar-appserver-postgresql
     chart: radar/postgresql
     version: {{ .Values.radar_appserver_postgresql._chart_version }}

@@ -4,10 +4,11 @@ ingress:
     className: "nginx"
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/rewrite-target: /admin/$2
     hosts:
       - host: localhost
         paths:
-          - path: "/admin/hydra/?(.*)"
+          - path: "/admin/hydra(/|$)(.*)" 
             pathType: ImplementationSpecific
     tls:
       - secretName: radar-base-tls
@@ -45,8 +46,6 @@ hydra:
 
     strategies:
       access_token: jwt
-      jwt:
-        scope_claim: both
 
     oauth2:
       allowed_top_level_claims: [scope,roles,authorities,sources,user_name]
