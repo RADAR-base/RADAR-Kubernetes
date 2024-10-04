@@ -281,6 +281,8 @@ releases:
     set:
       - name: ingress.hosts
         values: [{{ .Values.server_name }}]
+      - name: serverName
+        value: {{ .Values.server_name }}
 
   - name: kratos
     chart: radar/kratos
