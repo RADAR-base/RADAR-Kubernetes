@@ -350,7 +350,7 @@ releases:
 
 
   - name: kratos-selfservice-ui-node
-    chart: radar/kratos-selfservice-ui-node
+    chart: radar/radar-self-enrolment-ui
     version: {{ .Values.kratos_ui._chart_version }}
     installed: {{ .Values.kratos_ui._install }}
     timeout: {{ add .Values.base_timeout .Values.kratos_ui._extra_timeout }}
