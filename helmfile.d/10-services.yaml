@@ -342,7 +342,7 @@ releases:
         values:
           - {{ .Values.server_name }}
       - name: kratos.config.oauth2_provider.url
-        value: http://{{ .Values.server_name }}/admin/hydra
+        value: http://hydra-admin:4445
       - name: kratos.config.selfservice.flows.registration.after.password.hooks[0].config.url
         value: https://{{ .Values.server_name }}/managementportal/api/kratos/subjects
       - name: kratos.config.selfservice.flows.verification.after.hooks[0].config.url
