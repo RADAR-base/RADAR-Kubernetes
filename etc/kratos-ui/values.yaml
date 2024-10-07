@@ -10,7 +10,7 @@ ingress:
   hosts:
     - host: localhost
       paths:
-        - path: "/kratos-ui/?(.*)"
+        - path: "/kratos-ui(/|$)(.*)"
           pathType: ImplementationSpecific
   tls:
     - secretName: radar-base-tls
@@ -26,9 +26,14 @@ kratosPublicUrl: "https://localhost/kratos"
 kratosBrowserUrl: "https://localhost/kratos"
 
 # -- The basePath
-basePath: ""
+basePath: "/kratos-ui"
 
 # -- The jwksUrl
 jwksUrl: ""
 
 projectName: "SecureApp"
+
+deployment:
+  extraEnv:
+    - name: HYDRA_ADMIN_URL
+      value: http://hydra-admin

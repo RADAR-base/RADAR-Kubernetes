@@ -343,15 +343,22 @@ releases:
       - name: ingress.public.tls[0].hosts
         values:
           - {{ .Values.server_name }}
+      - name: kratos.config.oauth2_provider.url
+        value: http://hydra-admin:4445
+      - name: kratos.config.selfservice.flows.registration.after.password.hooks[0].config.url
+        value: https://{{ .Values.server_name }}/managementportal/api/kratos/subjects
+      - name: kratos.config.selfservice.flows.verification.after.hooks[0].config.url
+        value: https://{{ .Values.server_name }}/managementportal/api/kratos/subjects/activate
+
 
   - name: kratos-selfservice-ui-node
-    chart: radar/kratos-selfservice-ui-node
+    chart: radar/radar-self-enrolment-ui
     version: {{ .Values.kratos_ui._chart_version }}
     installed: {{ .Values.kratos_ui._install }}
     timeout: {{ add .Values.base_timeout .Values.kratos_ui._extra_timeout }}
     <<: *logFailedRelease
     values:
-      - "../etc/kratos_ui/values.yaml"
+      - "../etc/kratos-ui/values.yaml"
       - {{ .Values.kratos_ui | toYaml | indent 8 | trim }}
     set:
       - name: serverName
@@ -365,6 +372,42 @@ releases:
         value: https://{{ .Values.server_name }}/kratos
       - name: kratosBrowserUrl
         value: https://{{ .Values.server_name }}/kratos
+
+  - name: hydra
+    chart: radar/hydra
+    version: {{ .Values.hydra._chart_version }}
+    installed: {{ .Values.hydra._install }}
+    timeout: {{ add .Values.base_timeout .Values.hydra._extra_timeout }}
+    values:
+      - "../etc/hydra/values.yaml"
+      - {{ .Values.hydra | toYaml | indent 8 | trim }}
+    set:
+      - name: serverName
+        value: {{ .Values.server_name }}
+      - name: hydra.config.dsn
+        value: postgres://{{ .Values.management_portal.postgres.user }}:{{ .Values.management_portal.postgres.password }}@{{ .Values.management_portal.postgres.host }}:{{ .Values.management_portal.postgres.port }}/{{ .Values | get "hydra.jdbc.database" "hydra" }}
+      - name: hydra.config.urls.self.public
+        value: https://{{ .Values.server_name }}/hydra/
+      - name: hydra.config.urls.self.admin
+        value: https://{{ .Values.server_name }}/admin/hydra/
+      - name: hydra.config.urls.self.issuer
+        value: https://{{ .Values.server_name }}/hydra/
+      - name: hydra.config.urls.login
+        value: https://{{ .Values.server_name }}/kratos-ui/login
+      - name: hydra.config.urls.logout
+        value: https://{{ .Values.server_name }}/kratos-ui/logout
+      - name: hydra.config.urls.consent
+        value: https://{{ .Values.server_name }}/kratos-ui/consent
+      - name: ingress.public.hosts[0].host
+        value: {{ .Values.server_name }}
+      - name: ingress.admin.tls[0].hosts
+        values:
+          - {{ .Values.server_name }}
+      - name: ingress.admin.hosts[0].host
+        value: {{ .Values.server_name }}
+      - name: ingress.public.tls[0].hosts
+        values:
+          - {{ .Values.server_name }}
 
   - name: radar-appserver-postgresql
     chart: radar/postgresql

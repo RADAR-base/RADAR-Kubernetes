@@ -217,7 +217,12 @@ kratos:
 
 kratos_ui:
   _install: true
-  _chart_version: 0.43.1
+  _chart_version: 0.0.2
+  _extra_timeout: 0
+
+hydra:
+  _install: true
+  _chart_version: 0.48.0
   _extra_timeout: 0
 
 app_config:
