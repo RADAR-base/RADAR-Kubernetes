@@ -468,7 +468,7 @@ radar_s3_connector:
 
 s3_proxy:
   _install: false
-  _chart_version: 0.4.1
+  _chart_version: 0.4.2
   _extra_timeout: 0
   replicaCount: 1
   target:
