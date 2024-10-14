@@ -346,7 +346,7 @@ radar_grafana:
 #- ksql_server._install to true
 data_dashboard_backend:
   _install: false
-  _chart_version: 0.3.2
+  _chart_version: 0.3.3
   _extra_timeout: 0
   replicaCount: 1
 
@@ -445,6 +445,7 @@ minio:
     prometheusRule:
       enabled: true
   provisioning:
+    ## @param provisioning.users MinIO&reg; users provisioning. Can be used in addition to provisioning.usersExistingSecrets.
     ## @param provisioning.users MinIO&reg; users provisioning. Can be used in addition to provisioning.usersExistingSecrets.
     ## https://docs.min.io/docs/minio-admin-complete-guide.html#user
     ## e.g.
