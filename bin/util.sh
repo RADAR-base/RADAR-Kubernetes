@@ -49,10 +49,8 @@ create_production_yaml() {
   copy_template_if_absent etc/production.yaml etc/base.yaml
   tempfile=$(mktemp)
   mv etc/production.yaml $tempfile
-  # only keep the 'atomicInstall', etc. fields
-  cat $tempfile | grep -vE "^\s*#" | grep -E "atomicInstall|kubeContext|server_name|maintainer_email" > etc/production.yaml
-  # only keep the '_install: true/false' fields
-  cat $tempfile | grep -vE "^\s*#" | grep -B 1 --no-group-separator "_install:" >> etc/production.yaml
+  # remove all '_chart_version' fields
+  cat $tempfile | grep -v _chart_version > etc/production.yaml
 }
 
 # Copies the template (defined by the given config file with suffix
