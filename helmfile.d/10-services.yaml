@@ -251,6 +251,8 @@ releases:
         value: {{ .Values.radar_grafana._install }}
       - name: oauth_clients.radar_push_endpoint.enable
         value: {{ .Values.radar_push_endpoint._install }}
+      - name: oauth_clients.radar_data_dashboard_backend.enable
+        value: {{ .Values.data_dashboard_backend._install }}
       - name: oauth_clients.grafana_dashboard.redirect_uri
         values:
           - "https://dashboard.{{ .Values.server_name }}/login/generic_oauth"
