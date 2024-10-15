@@ -114,7 +114,7 @@ primary:
   ##
   extraEnvVars:
     - name: POSTGRES_MULTIPLE_DATABASES
-      value: managementportal,restsourceauthorizer,appconfig
+      value: managementportal,restsourceauthorizer,appconfig,kratos
   ## @param primary.podAnnotations Map of annotations to add to the pods (postgresql primary)
   ##
   podAnnotations:
