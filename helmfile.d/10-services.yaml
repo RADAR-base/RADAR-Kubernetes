@@ -379,7 +379,7 @@ releases:
       - {{ .Values.radar_appserver_postgresql | toYaml | indent 8 | trim }}
 
   - name: radar-appserver
-    chart: radar/radar-appserver
+    chart: ../../radar-helm-charts/charts/radar-appserver
     version: {{ .Values.radar_appserver._chart_version }}
     installed: {{ .Values.radar_appserver._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_appserver._extra_timeout }}
@@ -392,6 +392,12 @@ releases:
         values: [{{ .Values.server_name }}]
       - name: serverName
         value: {{ .Values.server_name }}
+    {{ if and .Values.radar_appserver.upload.enabled (eq .Values.radar_appserver.upload.storage.type "s3") }}
+      - name: upload.storage.access_key
+        value: {{ dig "s3" "identity" .Values.s3_access_key .Values.s3_proxy }}
+      - name: upload.storage.secret_key
+        value: {{ dig "s3" "credential" .Values.s3_secret_key .Values.s3_proxy }}
+    {{ end }}
 
   - name: timescaledb
     chart: radar/postgresql
