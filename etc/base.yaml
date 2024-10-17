@@ -151,7 +151,7 @@ cp_schema_registry:
 
 catalog_server:
   _install: true
-  _chart_version: 0.6.2
+  _chart_version: 0.6.3
   _extra_timeout: 90
   replicaCount: 1
   schema_registry: http://cp-schema-registry:8081
