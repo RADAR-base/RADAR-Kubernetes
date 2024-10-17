@@ -355,7 +355,7 @@ data_dashboard_backend:
 # Install when radar_grafana._install is 'true'
 radar_jdbc_connector_grafana:
   _install: false
-  _chart_version: 0.5.4
+  _chart_version: 0.5.5
   _extra_timeout: 0
   replicaCount: 1
   sink:
@@ -365,14 +365,14 @@ radar_jdbc_connector_grafana:
 # Install when data_dashboard_backend._install is 'true'.
 radar_jdbc_connector_data_dashboard_backend:
   _install: false
-  _chart_version: 0.5.4
+  _chart_version: 0.5.5
   _extra_timeout: 0
   replicaCount: 1
 
 # Install when using realtime analysis
 radar_jdbc_connector_realtime_dashboard:
   _install: false
-  _chart_version: 0.5.4
+  _chart_version: 0.5.5
   _extra_timeout: 0
   replicaCount: 1
 
