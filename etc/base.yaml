@@ -122,16 +122,14 @@ confluent_cloud:
 
 cp_zookeeper:
   _install: true
-  _chart_version: 0.3.3
+  _chart_version: 0.3.4
   _extra_timeout: 510
-  imageTag: 7.2.2
   servers: 3
 
 cp_kafka:
   _install: true
-  _chart_version: 0.3.2
+  _chart_version: 0.3.3
   _extra_timeout: 510
-  imageTag: 7.2.2
   customEnv:
     # Set this to 1.1 when upgrading from Kafka 5.x
     # and do a rolling upgrade as described in
@@ -144,9 +142,8 @@ cp_kafka:
 
 cp_schema_registry:
   _install: true
-  _chart_version: 0.3.1
+  _chart_version: 0.3.2
   _extra_timeout: 90
-  imageTag: 7.2.2
   replicaCount: 1
 
 catalog_server:
@@ -382,7 +379,7 @@ radar_jdbc_connector_realtime_dashboard:
 #- using realtime analysis
 ksql_server:
   _install: false
-  _chart_version: 0.3.1
+  _chart_version: 0.3.2
   _extra_timeout: 0
   # -- Uncomment when using real-time analysis
   # ksql:
