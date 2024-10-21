@@ -282,7 +282,7 @@ radar_oura_connector:
 
 radar_rest_sources_authorizer:
   _install: false
-  _chart_version: 2.0.4
+  _chart_version: 2.0.5
   _extra_timeout: 0
   replicaCount: 1
 
