@@ -179,7 +179,7 @@ postgresql:
 
 management_portal:
   _install: true
-  _chart_version: 1.2.4
+  _chart_version: 1.2.6
   _extra_timeout: 210
   replicaCount: 1  # should be 1
   postgres:
