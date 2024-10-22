@@ -4,6 +4,20 @@ server_name: localhost
 base_timeout: 360
 atomicInstall: false
 
+app_config_frontend:
+  advertised_protocol: http
+management_portal:
+  advertised_protocol: http
+radar_appserver:
+  advertised_protocol: http
+radar_rest_sources_authorizer:
+  advertised_protocol: http
+radar_rest_sources_backend:
+  advertised_protocol: http
+radar_upload_connect_frontend:
+  advertised_protocol: http
+radar_upload_connect_backend:
+  advertised_protocol: http
 radar_home:
   s3:
     url: http://s3.localhost/login
