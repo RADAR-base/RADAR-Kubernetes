@@ -383,7 +383,7 @@ releases:
       - {{ .Values.radar_appserver_postgresql | toYaml | indent 8 | trim }}
 
   - name: radar-appserver
-    chart: ../../radar-helm-charts/charts/radar-appserver
+    chart: radar/radar-appserver
     version: {{ .Values.radar_appserver._chart_version }}
     installed: {{ .Values.radar_appserver._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_appserver._extra_timeout }}
