@@ -38,7 +38,7 @@ elasticsearch:
 
 graylog:
   _install: true
-  _chart_version: 2.2.1
+  _chart_version: 2.2.2
   _extra_timeout: 180
 
 # Needed for graylog. If graylog is set not to install, this can be disabled as well.
