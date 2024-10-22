@@ -24,7 +24,7 @@ global:
 image:
   registry: docker.io
   repository: bitnami/postgresql
-  tag: 11.16.0
+  tag: 11.22.0
 ## Authentication parameters
 ## ref: https://github.com/bitnami/bitnami-docker-postgresql/blob/master/README.md#setting-the-root-password-on-first-run
 ## ref: https://github.com/bitnami/bitnami-docker-postgresql/blob/master/README.md#creating-a-database-on-first-run
