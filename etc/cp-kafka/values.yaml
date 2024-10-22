@@ -1,6 +1,3 @@
-image: confluentinc/cp-kafka
-imageTag: 7.2.0
-
 customEnv:
   KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
   KAFKA_LOG_RETENTION_HOURS: "730"
