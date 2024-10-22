@@ -155,7 +155,7 @@ catalog_server:
 
 radar_home:
   _install: true
-  _chart_version: 0.3.2
+  _chart_version: 0.3.3
   _extra_timeout: 0
 
 # --------------------------------------------------------- 10-managementportal.yaml ---------------------------------------------------------
