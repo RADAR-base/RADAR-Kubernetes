@@ -1,0 +1,30 @@
+# See:
+# - https://github.com/k3d-io/k3d/issues/19#issuecomment-1967513596
+# - https://github.com/ligfx/k3d-registry-dockerd
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+volumes:
+  - volume: $HOME/k3d-containerd:/var/lib/rancher/k3s/agent/containerd/
+    nodeFilters:
+      - server:0
+registries:
+  create:
+    image: ligfx/k3d-registry-dockerd:v0.5
+    proxy:
+      remoteURL: "*"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+options:
+  k3s:
+    extraArgs:
+      - arg: --disable=helm-controller
+        nodeFilters:
+          - server:*
+      - arg: --disable=traefik
+        nodeFilters:
+          - server:*
+# Same as CLI parameter `--port '80:80@loadbalancer'`
+#ports:
+#  - port: 80:80
+#    nodeFilters:
+#      - loadbalancer
