@@ -1,3 +1,6 @@
+radar_gateway:
+  hpa:
+    enabled: false
 radar_s3_connector:
   kafkaHeapOpts: "-Xms128m -Xmx256m"
 radar_output:
