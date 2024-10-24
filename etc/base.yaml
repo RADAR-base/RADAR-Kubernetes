@@ -128,7 +128,7 @@ cp_zookeeper:
 
 cp_kafka:
   _install: true
-  _chart_version: 0.3.4
+  _chart_version: 0.3.5
   _extra_timeout: 510
   customEnv:
     # Set this to 1.1 when upgrading from Kafka 5.x
