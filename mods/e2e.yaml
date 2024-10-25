@@ -1,0 +1,14 @@
+management_portal:
+  oauth_clients:
+    ci_test_client:
+      enable: true
+app_server:
+  upload:
+    enabled: true
+radar_s3_connector:
+  rotateInterval: 5000 # milliseconds
+  flushSize: 1 # number of records
+radar_output:
+  worker:
+    interval: 5 # seconds
+    minimumFileAge: 1 # seconds

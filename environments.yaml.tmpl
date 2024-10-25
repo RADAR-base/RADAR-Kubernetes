@@ -19,6 +19,9 @@ environments:
       - ../mods/minimal_kafka.yaml.gotmpl
       - ../mods/fast_deploy.yaml
     {{ end }}
+    {{ if .Values.e2e_test }}
+      - ../mods/e2e.yaml
+    {{ end }}
 
 ---
 
