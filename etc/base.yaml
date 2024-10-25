@@ -18,7 +18,7 @@ enable_tls: true
 
 # Minimal deployment for development (disables TLS, monitoring and logging, sets kafka and minio brokers to 1).
 dev_deployment: false
-
+e2e_test: false
 
 # --------------------------------------------------------- 00-init.yaml ---------------------------------------------------------
 

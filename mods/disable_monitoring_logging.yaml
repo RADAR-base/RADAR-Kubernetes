@@ -82,3 +82,6 @@ radar_upload_postgresql:
       enabled: false
     primary:
       sidecars: []
+gateway:
+  serviceMonitor:
+    enabled: false
