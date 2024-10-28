@@ -6,6 +6,13 @@ cp_kafka:
   configurationOverrides:
     "offsets.topic.replication.factor": 1
     "default.replication.factor": 1
+    "transaction.state.log.replication.factor": 1
+    "confluent.license.topic.replication.factor": 1
+    "confluent.tier.metadata.replication.factor": 1
+    "confluent.durability.topic.replication.factor": 1
+    "confluent.balancer.topic.replication.factor": 1
+    "confluent.monitoring.interceptor.topic.replication.factor": 1
+    "transaction.state.log.replication.factor": 1
 cp_zookeeper:
   servers: 1
 ksql_server:
