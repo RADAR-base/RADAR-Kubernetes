@@ -8,6 +8,19 @@ app_config_frontend:
   advertised_protocol: http
 management_portal:
   advertised_protocol: http
+  oauth_clients:
+    radar_rest_sources_authorizer:
+      redirect_uri:
+        - http://localhost/rest-sources/authorizer/login
+    radar_upload_frontend:
+      redirect_uri:
+        - http://localhost/upload/login
+    radar_app_config_frontend:
+      redirect_uri:
+        - http://localhost/appconfig/login
+    grafana_dashboard:
+      redirect_uri:
+        - http://dashboard.localhost/login/generic_oauth
 radar_appserver:
   advertised_protocol: http
 radar_rest_sources_authorizer:
