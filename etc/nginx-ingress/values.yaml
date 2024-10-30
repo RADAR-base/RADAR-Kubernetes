@@ -28,3 +28,9 @@ controller:
     enabled: true
     serviceMonitor:
       enabled: true
+
+  service:
+    ipFamilyPolicy: "PreferDualStack"
+    ipFamilies:
+      - IPv4
+      - IPv6
