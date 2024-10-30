@@ -15,26 +15,8 @@ project_name=TEST
 org_name=$project_name
 subject_external_id=test_user
 
-check_success() {
-  if [ -z "$1" ] || [ "$1" = "null" ]; then
-    echo "Error: $2 is null"
-    exit 1
-  elif $(grep -q "error" <<< "$1"); then
-    echo "Error: $2"
-    exit 1
-  else
-    echo "Success!!"
-  fi
-}
-
-assert_equals() {
-  if [ "$1" != "$2" ]; then
-    echo "Error: $3"
-    exit 1
-  else
-    echo "Success!!"
-  fi
-}
+path=$(dirname $BASH_SOURCE)
+. $path/util.sh
 
 echo "Starting e2e test on $protocol://$host"
 
