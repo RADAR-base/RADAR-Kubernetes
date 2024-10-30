@@ -844,6 +844,8 @@ grafana.ini:
     token_url: https://localhost/managementportal/oauth/token
     api_url: http://management-portal:8080/managementportal/api/account
     client_id: grafana_dashboard
+    # Fix for https://github.com/grafana/grafana/issues/70203#issuecomment-1798601871
+    oauth_allow_insecure_email_lookup: true
     #client_secret: ""
     empty_scopes: true
 
