@@ -38,15 +38,6 @@ check_success() {
   fi
 }
 
-assert_equals() {
-  if [ "$1" != "$2" ]; then
-    echo "Error: $3"
-    exit 1
-  else
-    echo "Success!!"
-  fi
-}
-
 echo "Starting e2e test on $protocol://$host"
 
 echo
@@ -163,18 +154,29 @@ if [ "$test_s3_storage" = "false" ]; then
   exit 0
 fi
 
-# Wait for 6 seconds
-sleep $s3_storage_timeout
-
+echo
 echo "Waiting for the data to be written to intermediate storage"
+timeout=0
 while [ $object_count_intermediate_storage -eq `mc ls --recursive s3-alias/radar-intermediate-storage | wc -l` ]; do
+  timeout=$((timeout+1))
+  if [ $timeout -ge $s3_storage_timeout ]; then
+    echo "Failure: timeout reached after $s3_storage_timeout seconds"
+    exit 1
+  fi
   echo "Waiting for the data to be written to intermediate storage"
   sleep 1
 done
 echo "Success!!"
 
+echo
 echo "Waiting for the data to be written to output storage"
+timeout=0
 while [ $object_count_output_storage -eq `mc ls --recursive s3-alias/radar-output-storage | wc -l` ]; do
+  timeout=$((timeout+1))
+  if [ $timeout -ge $s3_storage_timeout ]; then
+    echo "Failure: timeout reached after $s3_storage_timeout seconds"
+    exit 1
+  fi
   echo "Waiting for the data to be written to output storage"
   sleep 1
 done
