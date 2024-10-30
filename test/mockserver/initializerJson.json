@@ -1,0 +1,10 @@
+[
+  {
+    "httpRequest": {
+      "path": "/simpleFirst"
+    },
+    "httpResponse": {
+      "body": "some first response"
+    }
+  }
+]
