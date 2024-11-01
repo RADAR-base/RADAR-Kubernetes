@@ -18,7 +18,7 @@ subject_external_id=${SUBJECT_EXTERNAL_ID:-test_user}
 
 # TEST LOGIC
 test_s3_storage=${TEST_S3_STORAGE:-true}
-s3_storage_timeout=${S3_STORAGE_TIMEOUT:-3}
+s3_storage_timeout=${S3_STORAGE_TIMEOUT:-6}
 
 if ! command -v mc 2>&1 >/dev/null && [ $test_s3_storage = "true" ]
 then
@@ -49,7 +49,6 @@ subjects_json=`curl -s -X GET "http://localhost/managementportal/api/projects/$p
   --header 'Authorization: Bearer '$mpToken`
 subject_id=`echo $subjects_json | jq -r '.[] | select(.externalId == "'$subject_external_id'") | .login'`
 check_success "$subject_id" "subject_id"
-echo "Subject ID: $subject_id"
 
 # ------ SOURCE -------
 echo

@@ -14,6 +14,7 @@ s3_secret_key=`grep "s3_secret_key" etc/secrets.yaml | awk '{print $NF}'`
 project_name=TEST
 org_name=$project_name
 subject_external_id=test_user
+fitbit_url=http://mockserver:8080
 
 path=$(dirname $BASH_SOURCE)
 . $path/util.sh
@@ -29,37 +30,53 @@ response=`curl -s "$protocol://$host/managementportal/oauth/token" \
 mpToken=`echo $response | jq -r '.access_token'`
 check_success "$mpToken" "mpToken"
 
+
+# ------ SUBJECT -------
+
 echo
 echo "Get the subject id"
-
-users_json=`curl -s "http://localhost/rest-sources/backend/users?project-id=$project_name&authorized=all" \
+users_json=`curl -s "$protocol://$host/rest-sources/backend/projects/$project_name/users" \
   -H 'Accept: application/json, text/plain, */*' \
   -H "Authorization: Bearer $mpToken"`
-subject_id=`echo $users_json | jq -r ".users[] | select(.externalId == \"$subject_external_id\") | .userId"`
+user_json=`echo $users_json | jq -r ".users[] | select(.externalId == \"$subject_external_id\")"`
+check_success "$user_json" "user_json"
+subject_id=`echo $user_json | jq -r '.id'`
 check_success "$subject_id" "subject_id"
 
-user_json=`echo $users_json | jq -r ".users[] | select(.externalId == \"$subject_external_id\")"`
-user_id=`echo $user_json | jq -r '.id'`
-source_id=`echo $user_json | jq -r '.sourceId'`
 
-user_json=`curl -s -X POST 'http://localhost/rest-sources/backend/users' \
+# ------ AUTHORIZER USER -------
+
+echo
+echo "Get the user id"
+users_json=`curl -s "$protocol://$host/rest-sources/backend/users?project-id=$project_name&authorized=all" \
   -H 'Accept: application/json, text/plain, */*' \
-  -H "Authorization: Bearer $mpToken" \
-  -H 'Content-Type: application/json' \
-  --data @- <<EOF
+  -H "Authorization: Bearer $mpToken"`
+user_json=`echo $users_json | jq -r ".users[] | select(.externalId == \"$subject_external_id\")"`
+if [ -z "$user_json" ]; then
+  echo "Create a new user in rest sources authorizer backend"
+  user_json=`curl -s -X "$protocol://$host/rest-sources/backend/users" \
+      -H 'Accept: application/json, text/plain, */*' \
+      -H 'Content-Type: application/json' \
+      --data @- <<EOF
 {
-  "projectId": ["$project_name"],
-  "userId": "$user_id",
-  "sourceId"ff: "$source_id",
-  "startDate": "2024-10-28T23:00:00.000Z",
-  "endDate": "2024-10-29T23:00:00.000Z",
+  "projectId": "$project_name",
+  "userId": "$subject_id",
+  "startDate": "2024-11-18T23:00:00.000Z",
+  "endDate": "2024-11-29T23:00:00.000Z",
   "sourceType": "FitBit"
 }
 EOF
-`
-check_success "$user_json" "user_json"
+  `
+fi
+user_id=`echo $user_json | jq -r '.id'`
+check_success "$user_id" "user_id"
 
-registration_json=`curl -s -X POST 'http://localhost/rest-sources/backend/registrations' \
+
+# ------ FITBIT REGISTRATION -------
+
+echo
+echo "Register a new Fitbit user"
+registration_json=`curl -s -X POST "$protocol://$host/rest-sources/backend/registrations" \
   -H 'Accept: application/json, text/plain, */*' \
   -H "Authorization: Bearer $mpToken" \
   -H 'Content-Type: application/json' \
@@ -71,11 +88,27 @@ registration_json=`curl -s -X POST 'http://localhost/rest-sources/backend/regist
 EOF
 `
 check_success "$registration_json" "registration_json"
+registration_token=`echo $registration_json | jq -r '.token'`
+registration_secret=`echo $registration_json | jq -r '.secret'`
 
-curl -X GET 'https://www.fitbit.com/oauth2/authorize?response_type=code&response_type=code&client_id=change_me&state=LIRlVdJro51o&scope=activity+heartrate+sleep+profile&prompt=login&redirect_uri=http%3A%2F%2Flocalhost%2Frest-sources%2Fauthorizer%2Fusers%3Anew' \
-  -H 'accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8' \
-  -H 'cookie: fct=63cf43cf8a0e4f09b24c14b12c8e670a; JSESSIONID=30D3B4400C134EB59E1D169877B3BD39.fitbit1' \
-  -H 'user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36'
+echo
+echo "Registration token: $registration_token"
+echo "Registration secret: $registration_secret"
 
-echo "Register the FitBit token"
-curl -s -X POST 'http://localhost/rest-sources/authorizer/user/new
+# At this moment the user is redirected to Fitbit authorization page.
+# The user is redirected to RADAR-base frontend URL callback with the 'code' (of authorization_code grant).
+# The frontend redirects to the backend with the 'code' and the 'state' (registration_token).
+echo
+echo "Return the code that the user obtained from Fitbit authorization page to backend"
+code=mycode
+authorization_json=`curl -s "$protocol://$host/rest-sources/backend/registrations/$registration_token/authorize" \
+  -H 'accept: application/json, text/plain, */*' \
+  -H 'content-type: application/json' \
+  --data-raw '{"code":"'$code'"}'`
+check_success "$authorization_json" "authorization_json"
+
+# The rest source backend will exchange the code for an access token and refresh token.
+# This happens in the back chanel and is not part of the e2e test.
+# the call will be to $fitbit_url/oauth2/token?client_id=$client;client_secret=some_secret;redirect_uri=$protocol://$host/rest-sources/backend/users:new;grant_type=authorization_code
+# And body: '{"code":"'$code'"}'
+# The response is provided by the mock server.
