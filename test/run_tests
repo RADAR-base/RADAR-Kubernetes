@@ -2,11 +2,15 @@
 
 path=$(dirname $BASH_SOURCE)
 
+#echo
+#echo
+#echo "# --- INIT ---"
+#$path/1_e2e_init.sh
+#echo
+#echo
+#echo "# --- ARMT ---"
+#$path/2_e2e_armt.sh
 echo
 echo
-echo "# --- INIT ---"
-$path/1_e2e_init.sh
-echo
-echo
-echo "# --- ARMT ---"
-$path/2_e2e_armt.sh
+echo "# --- FITBIT ---"
+$path/3_e2e_fitbit.sh

@@ -12,3 +12,12 @@ radar_output:
   worker:
     interval: 5 # seconds
     minimumFileAge: 1 # seconds
+radar_rest_sources_backend:
+  restSourceClients:
+    fitbit:
+      enable: true
+      authorizationEndpoint: http://mockserver.mockserver:1080/fitbit/oauth2/authorize
+      tokenEndpoint: http://mockserver.mockserver:1080/fitbit/oauth2/token
+      scope: hartrate
+radar_fitbit_connector:
+  fitbit_api_url: http://mockserver.mockserver:1080/fitbit

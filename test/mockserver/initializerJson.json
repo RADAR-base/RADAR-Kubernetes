@@ -1,7 +1,7 @@
 [
   {
     "httpRequest": {
-      "path": "/simpleFirst"
+      "path": "/oauth2/token"
     },
     "httpResponse": {
       "body": "some first response"
