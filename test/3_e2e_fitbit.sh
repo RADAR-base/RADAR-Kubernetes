@@ -11,7 +11,7 @@ admin_password=`grep "common_admin_password" etc/secrets.yaml | awk '{print $NF}
 s3_access_key=`grep "s3_access_key" etc/secrets.yaml | awk '{print $NF}'`
 s3_secret_key=`grep "s3_secret_key" etc/secrets.yaml | awk '{print $NF}'`
 
-project_name=TEST
+project_name=test
 org_name=$project_name
 subject_external_id=test_user
 fitbit_url=http://mockserver:8080
@@ -35,12 +35,13 @@ check_success "$mpToken" "mpToken"
 
 echo
 echo "Get the subject id"
-users_json=`curl -s "$protocol://$host/rest-sources/backend/projects/$project_name/users" \
+subjects_json=`curl -s "$protocol://$host/rest-sources/backend/projects/$project_name/users" \
   -H 'Accept: application/json, text/plain, */*' \
   -H "Authorization: Bearer $mpToken"`
-user_json=`echo $users_json | jq -r ".users[] | select(.externalId == \"$subject_external_id\")"`
-check_success "$user_json" "user_json"
-subject_id=`echo $user_json | jq -r '.id'`
+check_success "$subjects_json" "subjects_json"
+subject_json=`echo $subjects_json | jq -r ".users[] | select(.externalId == \"$subject_external_id\")"`
+check_success "$subject_json" "subject_json"
+subject_id=`echo $subject_json | jq -r '.id'`
 check_success "$subject_id" "subject_id"
 
 
@@ -51,12 +52,14 @@ echo "Get the user id"
 users_json=`curl -s "$protocol://$host/rest-sources/backend/users?project-id=$project_name&authorized=all" \
   -H 'Accept: application/json, text/plain, */*' \
   -H "Authorization: Bearer $mpToken"`
+check_success "$users_json" "users_json"
 user_json=`echo $users_json | jq -r ".users[] | select(.externalId == \"$subject_external_id\")"`
 if [ -z "$user_json" ]; then
   echo "Create a new user in rest sources authorizer backend"
-  user_json=`curl -s -X "$protocol://$host/rest-sources/backend/users" \
+  user_json=`curl -s -X POST "$protocol://$host/rest-sources/backend/users" \
       -H 'Accept: application/json, text/plain, */*' \
       -H 'Content-Type: application/json' \
+      -H "Authorization: Bearer $mpToken" \
       --data @- <<EOF
 {
   "projectId": "$project_name",
@@ -68,6 +71,7 @@ if [ -z "$user_json" ]; then
 EOF
   `
 fi
+check_success "$user_json" "user_json"
 user_id=`echo $user_json | jq -r '.id'`
 check_success "$user_id" "user_id"
 

@@ -9,7 +9,8 @@ check_success() {
     echo "Error: $2 is null"
     exit 1
   elif $(grep -q "error" <<< "$1"); then
-    echo "Error: $2"
+    echo "Error: $2 has an error"
+    echo "Value: $1"
     exit 1
   else
     echo "Success!!"
