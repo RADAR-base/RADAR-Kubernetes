@@ -12,6 +12,8 @@ radar_output:
   worker:
     interval: 5 # seconds
     minimumFileAge: 1 # seconds
+  index:
+    fullSyncInterval: 5 # seconds
 radar_rest_sources_backend:
   restSourceClients:
     fitbit:
