@@ -1,3 +1,35 @@
+mockserver_config:
+  _install: true
+mockserver:
+  _install: true
+  expectations:
+    - httpRequest:
+        path: /fitbit/oauth2/token
+      httpResponse:
+        headers:
+          Content-Type: application/json
+        body:
+          access_token: some-access-token
+          token_type: Bearer
+          expires_in: 3600
+          refresh_token: some-refresh-token
+          user_id: someUserId
+    - httpRequest:
+        path: /fitbit/oauth2/authorize
+      httpResponse:
+        body: some first response
+    - httpRequest:
+        path: /fitbit/1/user/someUserId/activities/heart/**
+      httpResponse:
+        headers:
+          Content-Type: application/json
+        body:
+          activities-steps-intraday:
+          dataset:
+            - time: 00:00:00
+              value: 100
+            - time: 00:01:00
+              value: 200
 management_portal:
   oauth_clients:
     ci_test_client:
