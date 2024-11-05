@@ -32,7 +32,6 @@ The Kubernetes stack of RADAR-base platform.
 - [Volume expansion](#volume-expansion)
 - [Uninstall](#uninstall)
 - [Update charts](#update-charts)
-- [Development automation](#development-automation)
 - [Feedback and Contributions](#feedback-and-contributions)
 
 <!-- TOC end -->
@@ -421,42 +420,6 @@ To find any updates to the Helm charts that are listed in the repository, run
 ```shell
 bin/chart-updates
 ```
-
-## Development automation
-
-This repository can be used for development automation for instance on a k3s or k3d (dockerized k3s) cluster. The example below shows how to deploy on a k3d cluster.
-
-1. Install k3d (see [here](https://github.com/k3d-io/k3d#get))
-2. Create a k3d cluster that is configured to run RADAR-base
-
-```shell
-k3d cluster create my-test-cluster --port '80:80@loadbalancer' --config=.github/ci_config/k3d-config.yaml
-```
-
-This example creates a cluster named `my-test-cluster` with a load balancer that forwards local port 80 to the cluster. The
-configuration file `.github/ci_config/k3d-config.yaml` is used to configure the cluster. This cluster will be accessible
-in _kubectl_ with context name _k3d-my-test-cluster_.
-
-3. Initialize the RADAR-Kubernetes deployment. Run:
-
-```shell
-./bin/init
-```
-
-4. In file _etc/production.yaml_:
-
-- set _kubeContext_ to _k3d-my-test-cluster_
-- set _dev_deployment_ to _true_
-- (optional) enable/disable components as needed with the __install_ fields
-
-5. Install RADAR-Kubernetes on the k3d cluster:
-
-```shell
-helmfile sync
-```
-
-When installation is complete, you can access the applications at `http://localhost`.
-
 
 
 ## Feedback and Contributions
