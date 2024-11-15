@@ -58,13 +58,13 @@ While this documentation will provide guidance for installing and configuring RA
 Currently RADAR-Kubernetes is tested and supported on following component versions:
 | Component | Version |
 | ---- | ------- |
-| Kubernetes | v1.27 to v1.30 |
-| K3s | v1.27.14+k3s1 to v1.30.1+k3s1 |
-| Kubectl | v1.27 to v1.30 |
-| Helm | v3.11.3 |
-| Helm diff | v3.6.0 |
-| Helmfile | v0.152.0 |
-| YQ | v4.33.3 |
+| Kubernetes | v1.30 and v1.31 |
+| K3s | v1.30.6+k3s1 and v1.31.2+k3s1 |
+| Kubectl | v1.30 and v1.31 |
+| Helm | v3.16.3 |
+| Helm diff | 3.9.12 |
+| Helmfile | v0.169.1 |
+| YQ | v4.44.3 |
 
 It's possible to install RADAR-Kubernetes on different version of tools as well, but you might encounter compatibility issues. Make sure that `kubectl` version matches or it's higher than Kubernetes or K3s version that you're using. For other tools such as Git or Java the version, as long as it's not very old, it's not very impactful.
 
