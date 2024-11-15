@@ -3,21 +3,22 @@
 # TODO remove this when minio mc is provided in the PATH
 export PATH=$PATH:$HOME/minio-binaries/
 
-host=${HOST:-localhost}
+host=${HOST_NAME:-localhost}
 protocol=${PROTOCOL:-http}
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+source $SCRIPT_DIR/util.sh
+cd $SCRIPT_DIR/..
 
 admin_username=admin
 admin_password=`grep "common_admin_password" etc/secrets.yaml | awk '{print $NF}'`
 s3_access_key=`grep "s3_access_key" etc/secrets.yaml | awk '{print $NF}'`
 s3_secret_key=`grep "s3_secret_key" etc/secrets.yaml | awk '{print $NF}'`
 
-project_name=test
-org_name=$project_name
-subject_external_id=test_user
+org_name=${ORGANIZATION_NAME:-MAIN}
+project_name=${PROJECT_NAME:-test}
+subject_external_id=${SUBJECT_EXTERNAL_ID:-test_user}
 fitbit_url=http://mockserver:8080
-
-path=$(dirname $BASH_SOURCE)
-. $path/util.sh
 
 echo "Starting e2e test on $protocol://$host"
 
@@ -64,8 +65,8 @@ if [ -z "$user_json" ]; then
 {
   "projectId": "$project_name",
   "userId": "$subject_id",
-  "startDate": "2024-11-18T23:00:00.000Z",
-  "endDate": "2024-11-29T23:00:00.000Z",
+  "startDate": "2020-11-18T23:00:00.000Z",
+  "endDate": "3000-11-29T23:00:00.000Z",
   "sourceType": "FitBit"
 }
 EOF
@@ -76,7 +77,7 @@ user_id=`echo $user_json | jq -r '.id'`
 check_success "$user_id" "user_id"
 
 
-# ------ FITBIT REGISTRATION -------
+# ------ FITBIT REGISTRATION -------`
 
 echo
 echo "Register a new Fitbit user"
@@ -99,6 +100,17 @@ echo
 echo "Registration token: $registration_token"
 echo "Registration secret: $registration_secret"
 
+# Count the current number of fitbit files on s3.
+if [ $test_s3_storage = "true" ]
+then
+  mc alias set s3-alias http://api.s3.localhost/ $s3_access_key $s3_secret_key
+  object_count_intermediate_storage=`mc ls --recursive s3-alias/radar-intermediate-storage | grep connect_fitbit | wc -l`
+  object_count_output_storage=`mc ls --recursive s3-alias/radar-output-storage | grep connect_fitbit | wc -l`
+  echo "Intermediate storage object count: $object_count_intermediate_storage"
+  echo "Output storage object count: $object_count_output_storage"
+fi
+
+
 # At this moment the user is redirected to Fitbit authorization page.
 # The user is redirected to RADAR-base frontend URL callback with the 'code' (of authorization_code grant).
 # The frontend redirects to the backend with the 'code' and the 'state' (registration_token).
@@ -116,3 +128,39 @@ check_success "$authorization_json" "authorization_json"
 # the call will be to $fitbit_url/oauth2/token?client_id=$client;client_secret=some_secret;redirect_uri=$protocol://$host/rest-sources/backend/users:new;grant_type=authorization_code
 # And body: '{"code":"'$code'"}'
 # The response is provided by the mock server.
+
+# The Fitbit connector should now pick up the new user and start downloading data.
+if [ "$test_s3_storage" = "false" ]; then
+  echo
+  echo "Skipping S3 storage test"
+  exit 0
+fi
+
+
+echo
+echo "Waiting for the data to be written to intermediate storage"
+timeout=0
+while [ $object_count_intermediate_storage -eq `mc ls --recursive s3-alias/radar-intermediate-storage | grep connect_fitbit | wc -l` ]; do
+  timeout=$((timeout+1))
+  if [ $timeout -ge $s3_storage_timeout ]; then
+    echo "Failure: timeout reached after $s3_storage_timeout seconds"
+    exit 1
+  fi
+  echo "Waiting for the data to be written to intermediate storage"
+  sleep 1
+done
+echo "Success!!"
+
+echo
+echo "Waiting for the data to be written to output storage"
+timeout=0
+while [ $object_count_output_storage -eq `mc ls --recursive s3-alias/radar-output-storage | grep connect_fitbit | wc -l` ]; do
+  timeout=$((timeout+1))
+  if [ $timeout -ge $s3_storage_timeout ]; then
+    echo "Failure: timeout reached after $s3_storage_timeout seconds"
+    exit 1
+  fi
+  echo "Waiting for the data to be written to output storage"
+  sleep 1
+done
+echo "Success!!"

@@ -6,6 +6,10 @@ export PATH=$PATH:$HOME/minio-binaries/
 host=${HOST_NAME:-localhost}
 protocol=${PROTOCOL:-http}
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+source $SCRIPT_DIR/util.sh
+cd $SCRIPT_DIR/..
+
 # Get secrets from environment. Default to secrets from etc/secrets.yaml.
 admin_username=admin
 admin_password=${MP_ADMIN_PASSWORD:-`grep "common_admin_password" etc/secrets.yaml | awk '{print $NF}'`}
@@ -26,8 +30,6 @@ then
     exit 1
 fi
 
-path=$(dirname $BASH_SOURCE)
-. $path/util.sh
 
 echo "Starting e2e test on $protocol://$host"
 
@@ -97,8 +99,8 @@ avro_questionnaire_response_value_id=`curl -s --location "$protocol://$host/sche
 if [ $test_s3_storage = "true" ]
 then
   mc alias set s3-alias http://api.s3.localhost/ $s3_access_key $s3_secret_key
-  object_count_intermediate_storage=`mc ls --recursive s3-alias/radar-intermediate-storage | wc -l`
-  object_count_output_storage=`mc ls --recursive s3-alias/radar-output-storage | wc -l`
+  object_count_intermediate_storage=`mc ls --recursive s3-alias/radar-intermediate-storage | grep questionnaire_response | wc -l`
+  object_count_output_storage=`mc ls --recursive s3-alias/radar-output-storage | grep questionnaire_response | wc -l`
   echo "Intermediate storage object count: $object_count_intermediate_storage"
   echo "Output storage object count: $object_count_output_storage"
 fi
