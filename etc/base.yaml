@@ -507,7 +507,7 @@ radar_upload_postgresql:
 
 radar_upload_connect_backend:
   _install: true
-  _chart_version: 0.5.2
+  _chart_version: 0.5.3
   _extra_timeout: 0
   replicaCount: 1
 
