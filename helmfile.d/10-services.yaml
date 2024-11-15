@@ -845,11 +845,11 @@ releases:
     version: {{ .Values.radar_upload_connect_backend._chart_version }}
     installed: {{ .Values.radar_upload_connect_backend._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_upload_connect_backend._extra_timeout }}
-    {{ if .Values.radar_upload_postgresql._install }}needs: [radar-upload-postgresql]{{ end }}
     <<: *logFailedRelease
     {{ if .Values.management_portal._install }}
     needs:
       - management-portal
+      {{ if .Values.radar_upload_postgresql._install }}- radar-upload-postgresql{{ end }}
     {{ end }}
     values:
       - {{ .Values.radar_upload_connect_backend | toYaml | indent 8 | trim }}
