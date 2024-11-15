@@ -390,7 +390,7 @@ ksql_server:
 
 radar_gateway:
   _install: true
-  _chart_version: 1.2.7
+  _chart_version: 1.2.8
   _extra_timeout: 0
   replicaCount: 1
 
