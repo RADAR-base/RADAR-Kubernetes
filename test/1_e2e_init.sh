@@ -11,8 +11,8 @@ org_name=${ORGANIZATION_NAME:-MAIN}
 project_name=${PROJECT_NAME:-test}
 subject_external_id=${SUBJECT_EXTERNAL_ID:-test_user}
 
-path=$(dirname $BASH_SOURCE)
-. $path/util.sh
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+source $SCRIPT_DIR/util.sh
 
 echo "Starting e2e test on $protocol://$host"
 

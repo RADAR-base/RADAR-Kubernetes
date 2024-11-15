@@ -647,7 +647,8 @@ releases:
         value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://realtime-dashboard-timescaledb-postgresql-hl:5432/%s" .Values.realtime_dashboard_timescaledb.postgresql.auth.database) .Values.radar_jdbc_connector_realtime_dashboard }}
 
   - name: radar-fitbit-connector
-    chart: radar/radar-fitbit-connector
+    chart: ../../radar-helm-charts/charts/radar-fitbit-connector
+#    chart: radar/radar-fitbit-connector
     version: {{ .Values.radar_fitbit_connector._chart_version }}
     installed: {{ .Values.radar_fitbit_connector._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_fitbit_connector._extra_timeout }}
