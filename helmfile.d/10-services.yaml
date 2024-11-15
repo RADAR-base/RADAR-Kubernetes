@@ -847,6 +847,10 @@ releases:
     timeout: {{ add .Values.base_timeout .Values.radar_upload_connect_backend._extra_timeout }}
     {{ if .Values.radar_upload_postgresql._install }}needs: [radar-upload-postgresql]{{ end }}
     <<: *logFailedRelease
+    {{ if .Values.management_portal._install }}
+    needs:
+      - management-portal
+    {{ end }}
     values:
       - {{ .Values.radar_upload_connect_backend | toYaml | indent 8 | trim }}
     set:
@@ -879,10 +883,10 @@ releases:
     installed: {{ .Values.radar_upload_source_connector._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_upload_source_connector._extra_timeout }}
     <<: *logFailedRelease
+    {{ if .Values.radar_upload_connect_backend._install }}
     needs:
       - radar-upload-connect-backend
-    {{ if .Values.cp_schema_registry._install }}
-      - cp-schema-registry
+      {{ if .Values.cp_schema_registry._install }}- cp-schema-registry{{ end }}
     {{ end }}
     values:
       - {{ .Values.radar_upload_source_connector | toYaml | indent 8 | trim }}
