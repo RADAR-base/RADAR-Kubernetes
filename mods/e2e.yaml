@@ -27,9 +27,10 @@ radar_fitbit_connector:
     repository: pvannierop/radar-fitbit-connector
     tag: test26
   rest_source_poll_interval_ms: 5000
+  fitbit_user_poll_interval: 2
   application_loop_interval_ms: 15000
   user_cache_refresh_interval_ms: 5000
-mockserver_config:
+mockserver:
   _install: true
   expectations:
     - httpRequest:
@@ -350,5 +351,3 @@ mockserver_config:
               offset: 0
               previous: ""
               sort: asc
-mockserver:
-  _install: true
