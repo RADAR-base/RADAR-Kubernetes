@@ -229,8 +229,6 @@ releases:
     set:
       - name: ingress.hosts
         values: [{{ .Values.server_name }}]
-      - name: ingress_rate_limited.hosts
-        values: [{{ .Values.server_name }}]
       - name: server_name
         value: {{ .Values.server_name }}
       - name: oauth_clients.radar_redcap_integrator.enable
