@@ -12,6 +12,7 @@ ingress:
     nginx.ingress.kubernetes.io/session-cookie-name: "http-cookie"
     nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
     nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 
 service:
   sessionAffinity: ClientIP

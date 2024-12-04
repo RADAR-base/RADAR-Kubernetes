@@ -567,15 +567,9 @@ velero:
 
 nifi:
   _install: false
-  properties:
-    sensitiveKey: secret
-  auth:
-    singleUser:
-      username: username
-      password: password
+  _chart_version: 1.2.0
+  _extra_timeout: 300
   zookeeper:
     enabled: false
     url: cp-zookeeper-headless
     port: 2181
-  cert-manager:
-    keystorePasswd: secret
