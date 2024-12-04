@@ -575,7 +575,7 @@ nifi:
       password: password
   zookeeper:
     enabled: false
-    url: cp-zookeeper-headles
+    url: cp-zookeeper-headless
     port: 2181
   cert-manager:
     keystorePasswd: secret
