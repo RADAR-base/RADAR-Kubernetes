@@ -1,0 +1,21 @@
+properties:
+  isNode: true
+
+persistence:
+  enabled: true
+
+registry:
+    enabled: true
+
+jvmMemory: 4g
+
+resources:
+  limits:
+      cpu: 4
+      memory: 16Gi
+  requests:
+      cpu: 1
+      memory: 4Gi
+
+cert-manager:
+  enabled: true

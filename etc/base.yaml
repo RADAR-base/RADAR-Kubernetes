@@ -564,3 +564,18 @@ velero:
         bucket: radar-base-backups
         config:
           s3Url: https://s3.amazon.com # protocol should be specified
+
+nifi:
+  _install: false
+  properties:
+    sensitiveKey: secret
+  auth:
+    singleUser:
+      username: username
+      password: password
+  zookeeper:
+    enabled: false
+    url: cp-zookeeper-headles
+    port: 2181
+  cert-manager:
+    keystorePasswd: secret
