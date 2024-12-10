@@ -101,7 +101,7 @@ echo "Registration token: $registration_token"
 echo "Registration secret: $registration_secret"
 
 # Count the current number of fitbit files on s3.
-if [ $test_s3_storage = "true" ]
+if [[ $test_s3_storage = "true" ]]
 then
   mc alias set s3-alias http://api.s3.localhost/ $s3_access_key $s3_secret_key
   object_count_intermediate_storage=`mc ls --recursive s3-alias/radar-intermediate-storage | grep connect_fitbit | wc -l`
