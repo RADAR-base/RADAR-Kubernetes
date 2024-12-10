@@ -29,14 +29,11 @@ radar_rest_sources_backend:
 radar_fitbit_connector:
   _install: true
   fitbit_api_url: http://mockserver.mockserver:1080/fitbit
-  image:
-    repository: pvannierop/radar-fitbit-connector
-    tag: test26
   rest_source_poll_interval_ms: 5000
   fitbit_user_poll_interval: 2
   application_loop_interval_ms: 15000
   user_cache_refresh_interval_ms: 5000
-mockserver:
+radar_mockserver:
   _install: true
   expectations:
     - httpRequest:

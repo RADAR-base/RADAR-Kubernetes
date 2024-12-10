@@ -9,9 +9,9 @@ releases:
   - name: mockserver
     namespace: mockserver
     chart: radar/radar-mockserver
-    version: {{ .Values.mockserver._chart_version }}
-    installed: {{ .Values.mockserver._install }}
-    timeout: {{ add .Values.base_timeout .Values.mockserver._extra_timeout }}
+    version: {{ .Values.radar_mockserver._chart_version }}
+    installed: {{ .Values.radar_mockserver._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_mockserver._extra_timeout }}
     <<: *logFailedRelease
     values:
-      - {{ .Values.mockserver | toYaml | indent 8 | trim }}
+      - {{ .Values.radar_mockserver | toYaml | indent 8 | trim }}

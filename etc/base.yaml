@@ -615,14 +615,9 @@ velero:
         config:
           s3Url: https://s3.amazon.com # protocol should be specified
 
-mockserver_config:
+radar_mockserver:
   _install: false
   _chart_version: 0.1.0
-  _extra_timeout: 0
-
-mockserver:
-  _install: false
-  _chart_version: 5.15.0
   _extra_timeout: 0
 
 nifi:
