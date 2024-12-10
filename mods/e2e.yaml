@@ -1,20 +1,25 @@
 management_portal:
+  _install: true
   oauth_clients:
     ci_test_client:
       enable: true
 app_server:
+  _install: true
   upload:
     enabled: true
 radar_s3_connector:
+  _install: true
   rotateInterval: 5000 # milliseconds
   flushSize: 1 # number of records
 radar_output:
+  _install: true
   worker:
     interval: 5 # seconds
     minimumFileAge: 1 # seconds
   index:
     fullSyncInterval: 5 # seconds
 radar_rest_sources_backend:
+  _install: true
   restSourceClients:
     fitbit:
       enable: true
@@ -22,6 +27,7 @@ radar_rest_sources_backend:
       tokenEndpoint: http://mockserver.mockserver:1080/fitbit/oauth2/token
       scope: hartrate
 radar_fitbit_connector:
+  _install: true
   fitbit_api_url: http://mockserver.mockserver:1080/fitbit
   image:
     repository: pvannierop/radar-fitbit-connector
