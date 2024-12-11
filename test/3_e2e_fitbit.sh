@@ -20,6 +20,10 @@ project_name=${PROJECT_NAME:-test}
 subject_external_id=${SUBJECT_EXTERNAL_ID:-test_user}
 fitbit_url=http://mockserver:8080
 
+# TEST LOGIC
+test_s3_storage=${TEST_S3_STORAGE:-true}
+s3_storage_timeout=${S3_STORAGE_TIMEOUT:-6}
+
 echo "Starting e2e test on $protocol://$host"
 
 echo
@@ -55,7 +59,7 @@ users_json=`curl -s "$protocol://$host/rest-sources/backend/users?project-id=$pr
   -H "Authorization: Bearer $mpToken"`
 check_success "$users_json" "users_json"
 user_json=`echo $users_json | jq -r ".users[] | select(.externalId == \"$subject_external_id\")"`
-if [ -z "$user_json" ]; then
+if [[ -z "$user_json" ]]; then
   echo "Create a new user in rest sources authorizer backend"
   user_json=`curl -s -X POST "$protocol://$host/rest-sources/backend/users" \
       -H 'Accept: application/json, text/plain, */*' \
@@ -130,7 +134,7 @@ check_success "$authorization_json" "authorization_json"
 # The response is provided by the mock server.
 
 # The Fitbit connector should now pick up the new user and start downloading data.
-if [ "$test_s3_storage" = "false" ]; then
+if [[ "$test_s3_storage" = "false" ]]; then
   echo
   echo "Skipping S3 storage test"
   exit 0
@@ -140,9 +144,9 @@ fi
 echo
 echo "Waiting for the data to be written to intermediate storage"
 timeout=0
-while [ $object_count_intermediate_storage -eq `mc ls --recursive s3-alias/radar-intermediate-storage | grep connect_fitbit | wc -l` ]; do
+while [[ $object_count_intermediate_storage -eq `mc ls --recursive s3-alias/radar-intermediate-storage | grep connect_fitbit | wc -l` ]]; do
   timeout=$((timeout+1))
-  if [ $timeout -ge $s3_storage_timeout ]; then
+  if [[ $timeout -ge $s3_storage_timeout ]]; then
     echo "Failure: timeout reached after $s3_storage_timeout seconds"
     exit 1
   fi
@@ -154,9 +158,9 @@ echo "Success!!"
 echo
 echo "Waiting for the data to be written to output storage"
 timeout=0
-while [ $object_count_output_storage -eq `mc ls --recursive s3-alias/radar-output-storage | grep connect_fitbit | wc -l` ]; do
+while [[ $object_count_output_storage -eq `mc ls --recursive s3-alias/radar-output-storage | grep connect_fitbit | wc -l` ]]; do
   timeout=$((timeout+1))
-  if [ $timeout -ge $s3_storage_timeout ]; then
+  if [[ $timeout -ge $s3_storage_timeout ]]; then
     echo "Failure: timeout reached after $s3_storage_timeout seconds"
     exit 1
   fi
