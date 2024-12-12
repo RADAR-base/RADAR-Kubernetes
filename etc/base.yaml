@@ -377,7 +377,6 @@ realtime_dashboard_timescaledb:
 # Make sure to set:
 #- grafana_metrics_timescaledb._install to true
 #- radar_jdbc_connector_grafana._install to true
-#- ksql_server._install to true
 radar_grafana:
   _install: false
   _chart_version: 8.3.7
