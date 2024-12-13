@@ -81,7 +81,7 @@ primary:
         set -e
         set -u
         export PGPASSWORD="$POSTGRESQL_PASSWORD"
-        
+
         function create_user_and_database() {
           export PGPASSWORD="$POSTGRESQL_PASSWORD"
           local database=$1
@@ -93,11 +93,23 @@ primary:
             echo "  Creating database '$database' for user postgres"
             psql -U postgres -v ON_ERROR_STOP=1  <<-EOSQL
             CREATE DATABASE "$database";
-            GRANT ALL PRIVILEGES ON DATABASE $database TO postgres;
+            GRANT ALL PRIVILEGES ON DATABASE `$database` TO postgres;
+        EOSQL
+          fi
+          local timescaledb_installed=$(psql -U postgres -d $database -tAc "SELECT 1 FROM pg_extension WHERE extname='timescaledb';")
+          if [[ "$timescaledb_installed" == 1 ]]; then
+            echo "Timescaledb extension already installed for database '$database'"
+            return 0
+          else
+            echo "  Installing timescaledb extension for database '$database'"
+            psql -U postgres -d $database -v ON_ERROR_STOP=1  <<-EOSQL
+            -- As we're still only initializing, we cannot have synchronous_commit enabled just yet.
+            SET synchronous_commit to 'off';
+            CREATE EXTENSION timescaledb;
         EOSQL
           fi
         }
-        
+
         if [ -n "$POSTGRES_MULTIPLE_DATABASES" ]; then
           echo "Multiple database creation requested: $POSTGRES_MULTIPLE_DATABASES"
           #waiting for postgres
@@ -118,7 +130,7 @@ primary:
     - name: POSTGRES_USER
       value: postgres
     - name: POSTGRES_MULTIPLE_DATABASES
-      value: grafana,data-dashboard
+      value: grafana,grafana-metrics,data-dashboard
   ## @param primary.podAnnotations Map of annotations to add to the pods (postgresql primary)
   ##
   podAnnotations:
@@ -138,18 +150,18 @@ primary:
   ##         containerPort: 1234
   ##
   sidecars:
-  - name: fsfreeze
-    image: busybox
-    securityContext:
-      privileged: true
-    volumeMounts:
-      - mountPath: "/bitnami/postgresql"
-        name: data
-        readOnly: false
-    command:
-      - "/bin/sh"
-      - "-c"
-      - "sleep infinity"
+    - name: fsfreeze
+      image: busybox
+      securityContext:
+        privileged: true
+      volumeMounts:
+        - mountPath: "/bitnami/postgresql"
+          name: data
+          readOnly: false
+      command:
+        - "/bin/sh"
+        - "-c"
+        - "sleep infinity"
   ## PostgreSQL Primary persistence configuration
   ##
   persistence:
