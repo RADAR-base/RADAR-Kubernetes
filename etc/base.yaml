@@ -567,7 +567,7 @@ velero:
 
 nifi:
   _install: false
-  _chart_version: 1.2.0
+  _chart_version: 1.2.1
   _extra_timeout: 300
   zookeeper:
     enabled: false

@@ -989,7 +989,7 @@ releases:
         value: {{ dig "local" "secretKey" .Values.s3_secret_key .Values.velero }}
 
   - name: nifi
-    chart: cetic/nifi
+    chart: radar/nifi
     installed: {{ .Values.nifi._install }}
     version: {{ .Values.nifi._chart_version }}
     timeout: {{ add .Values.base_timeout .Values.nifi._extra_timeout }}
