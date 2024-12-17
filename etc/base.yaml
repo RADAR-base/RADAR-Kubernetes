@@ -304,32 +304,73 @@ radar_rest_sources_backend:
 
 # --------------------------------------------------------- 20-dashboard.yaml ---------------------------------------------------------
 
-timescaledb_username: postgres
-timescaledb_db_name: grafana-metrics
-data_dashboard_backend_db_name: data-dashboard
-data_dashboard_backend_db_username: postgres
-grafana_metrics_username: postgres
+data_dashboard_db_username: postgres
+grafana_metrics_db_username: postgres
+realtime_dashboard_db_username: postgres
 
-timescaledb:
-  _install: true
-  _chart_version: 12.1.9
+# Note: because of the way init scripts are handled in the timescaledb dependency chart (postgres), we
+# cannot create multiple databases in the same database service. Therefore, we need to create separate
+# timescaledb services for each component that uses a timescale database.
+
+# Install when data_dashboard_backend._install is 'true'
+data_dashboard_timescaledb:
+  _install: false
+  _chart_version: 0.1.0
   _extra_timeout: 210
-  # Check https://hub.docker.com/r/timescale/timescaledb/tags
-  # The suffix MUST be bitnami.
-  # On first install, choose the latest major postgresql version. This cannot be modified afterwards.
-  image:
-    tag: 2.8.1-pg12-bitnami
-    pullPolicy: Always
   replicaCount: 1
   replication:
     enable: false
-  primary:
-    persistence:
-      size: 8Gi
-      # Uncomment when upgrading
-      #existingClaim: "data-timescaledb-postgresql-0"
+  postgresql:
+    auth:
+      database: data-dashboard
+    primary:
+      persistence:
+        size: 8Gi
+    replication:
+      applicationName: radarDataDashboard
+        # Uncomment when upgrading
+        #existingClaim: "data-data-dashboard-timescaledb-postgresql-0"
+
+# Install when radar_grafana._install is 'true'
+grafana_metrics_timescaledb:
+  _install: false
+  _chart_version: 0.1.0
+  _extra_timeout: 210
+  replicaCount: 1
+  replication:
+    enable: false
+  postgresql:
+    auth:
+      database: grafana-metrics
+    primary:
+      persistence:
+        size: 8Gi
+    replication:
+      applicationName: radarGrafanaMetrics
+        # Uncomment when upgrading
+        #existingClaim: "data-grafana-metrics-timescaledb-postgresql-0"
+
+# Install when using realtime analysis
+realtime_dashboard_timescaledb:
+  _install: false
+  _chart_version: 0.1.0
+  _extra_timeout: 210
+  replicaCount: 1
+  replication:
+    enable: false
+  postgresql:
+    auth:
+      database: realtime-dashboard
+    primary:
+      persistence:
+        size: 8Gi
+    replication:
+      applicationName: radarRealtimeDashboard
+        # Uncomment when upgrading
+        #existingClaim: "data-realtime-dashboard-timescaledb-postgresql-0"
 
 # Make sure to set:
+#- grafana_metrics_timescaledb._install to true
 #- radar_jdbc_connector_grafana._install to true
 #- ksql_server._install to true
 radar_grafana:
@@ -341,6 +382,7 @@ radar_grafana:
     GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/allprojects/home.json
 
 # Make sure to set:
+#- data_dashboard_timescaledb._install to true
 #- radar_jdbc_connector_data_dashboard_backend._install to true
 #- ksql_server._install to true
 data_dashboard_backend:
