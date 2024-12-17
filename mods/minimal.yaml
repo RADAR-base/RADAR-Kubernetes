@@ -24,20 +24,36 @@ elasticsearch:
       cpu: "100m"
       memory: "500Mi"
 postgresql:
-  primary:
-    resources:
-      requests:
-        cpu: 50m
-    persistence:
-      size: 1Gi
+  postgresql:
+    primary:
+      resources:
+        requests:
+          cpu: 50m
+      persistence:
+        size: 1Gi
 radar_appserver_postgresql:
+  postgresql:
+    primary:
+      resources:
+        requests:
+          cpu: 50m
+      persistence:
+        size: 1Gi
+data_dashboard_timescaledb:
   primary:
     resources:
       requests:
         cpu: 50m
     persistence:
       size: 1Gi
-timescaledb:
+grafana_metrics_timescaledb:
+  primary:
+    resources:
+      requests:
+        cpu: 50m
+    persistence:
+      size: 1Gi
+realtime_dashboard_timescaledb:
   primary:
     resources:
       requests:
@@ -45,9 +61,10 @@ timescaledb:
     persistence:
       size: 1Gi
 radar_upload_postgresql:
-  primary:
-    resources:
-      requests:
-        cpu: 50m
-    persistence:
-      size: 1Gi
+  postgresql:
+    primary:
+      resources:
+        requests:
+          cpu: 50m
+      persistence:
+        size: 1Gi
