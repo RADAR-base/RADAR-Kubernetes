@@ -204,13 +204,12 @@ releases:
       {{ end }}
 
   - name: postgresql
-    chart: radar/postgresql
+    chart: radar/radar-postgresql
     version: {{ .Values.postgresql._chart_version }}
     installed: {{ .Values.postgresql._install }}
     timeout: {{ add .Values.base_timeout .Values.postgresql._extra_timeout }}
     <<: *logFailedRelease
     values:
-      - "../etc/postgresql/values.yaml"
       - {{ .Values.postgresql | toYaml | indent 8 | trim }}
 
   - name: management-portal
@@ -371,13 +370,12 @@ releases:
         value: https://{{ .Values.server_name }}/kratos
 
   - name: radar-appserver-postgresql
-    chart: radar/postgresql
+    chart: radar/radar-postgresql
     version: {{ .Values.radar_appserver_postgresql._chart_version }}
     installed: {{ .Values.radar_appserver_postgresql._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_appserver_postgresql._extra_timeout }}
     <<: *logFailedRelease
     values:
-      - "../etc/radar-appserver-postgresql/values.yaml"
       - {{ .Values.radar_appserver_postgresql | toYaml | indent 8 | trim }}
 
   - name: radar-appserver
@@ -868,18 +866,17 @@ releases:
         value: {{ dig "target" "s3" "secretKey" .Values.s3_secret_key .Values.radar_output }}
 
   - name: radar-upload-postgresql
-    chart: radar/postgresql
+    chart: radar/radar-postgresql
     version: {{ .Values.radar_upload_postgresql._chart_version }}
     installed: {{ .Values.radar_upload_postgresql._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_upload_postgresql._extra_timeout }}
     <<: *logFailedRelease
     values:
-      - "../etc/radar-upload-postgresql/values.yaml"
       - {{ .Values.radar_upload_postgresql | toYaml | indent 8 | trim }}
     set:
-      - name: global.postgresql.auth.postgresPassword
+      - name: postgresql.global.postgresql.auth.postgresPassword
         value: {{ .Values.radar_upload_postgres_password }}
-      - name: auth.replicationPassword
+      - name: postgresql.auth.replicationPassword
         value: {{ .Values.radar_upload_postgres_password }}
 
   - name: radar-upload-connect-backend
