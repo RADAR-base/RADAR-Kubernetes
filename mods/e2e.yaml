@@ -16,8 +16,10 @@ radar_output:
   worker:
     interval: 5 # seconds
     minimumFileAge: 1 # seconds
-  index:
-    fullSyncInterval: 5 # seconds
+  source:
+    index:
+      fullSyncInterval: 5 # seconds
+      emptyDirectorySyncInterval: 5 # seconds
 radar_rest_sources_backend:
   _install: true
   restSourceClients:
@@ -31,8 +33,16 @@ radar_fitbit_connector:
   fitbit_api_url: http://mockserver.mockserver:1080/fitbit
   rest_source_poll_interval_ms: 5000
   fitbit_user_poll_interval: 2
-  application_loop_interval_ms: 15000
-  user_cache_refresh_interval_ms: 5000
+  application_loop_interval_ms: 2000
+  user_cache_refresh_interval_ms: 2000
+data_dashboard_backend:
+  _install: true
+radar_jdbc_connector_data_dashboard_backend:
+  _install: true
+radar_jdbc_connector_grafana:
+  _install: true
+  sink:
+    topics: connect_fitbit_intraday_steps
 radar_mockserver:
   _install: true
   expectations:

@@ -22,7 +22,9 @@ subject_external_id=${SUBJECT_EXTERNAL_ID:-test_user}
 
 # TEST LOGIC
 test_s3_storage=${TEST_S3_STORAGE:-true}
-s3_storage_timeout=${S3_STORAGE_TIMEOUT:-6}
+test_data_dashboard=${TEST_DATA_DASHBOARD:-true}
+s3_storage_timeout=${S3_STORAGE_TIMEOUT:-15}
+data_dashboard_storage_timeout=${DATA_DASHBOARD_STORAGE_TIMEOUT:-15}
 
 if ! command -v mc 2>&1 >/dev/null && [ $test_s3_storage = "true" ]
 then
@@ -105,6 +107,15 @@ then
   echo "Output storage object count: $object_count_output_storage"
 fi
 
+if [ $test_data_dashboard = "true" ]
+then
+  questionnaire_response_data=`curl -s --location "$protocol://$host/api/project/$project_name/subject/$subject_id/topic/questionnaire_response/observations" \
+    --header "Authorization: Bearer $accesstoken"`
+  check_success "$questionnaire_response_data" "questionnaire_response_data"
+  object_count_data_dashboard_backend=`echo $questionnaire_response_data | jq '.observations | length'`
+  echo "Data dashboard backend object count: $object_count_data_dashboard_backend"
+fi
+
 echo
 echo "Push a questionnaire_response message to the questionnaire_response topic"
 questionnaire_response_response=`curl -s --location "$protocol://$host/kafka/topics/questionnaire_response" \
@@ -139,6 +150,27 @@ EOF
 `
 echo $questionnaire_response_response
 check_success "$questionnaire_response_response" "questionnaire_response_response"
+
+
+if [ "$test_data_dashboard" = "true" ]; then
+  echo
+  echo "Check whether the questionnaire data can be retrieved from the data dashboard backend"
+  timeout=0
+  current_count=$object_count_data_dashboard_backend
+  while [ $object_count_data_dashboard_backend -eq $current_count ]; do
+    questionnaire_response_data=`curl -s --location "$protocol://$host/api/project/$project_name/subject/$subject_id/topic/questionnaire_response/observations" \
+      --header "Authorization: Bearer $accesstoken"`
+    current_count=`echo $questionnaire_response_data | jq '.observations | length'`
+    timeout=$((timeout+1))
+    if [ $timeout -ge $data_dashboard_storage_timeout ]; then
+      echo "Failure: timeout reached after $s3_storage_timeout seconds"
+      exit 0
+    fi
+    sleep 1
+  done
+  echo "Success!!"
+fi
+
 
 if [ "$test_s3_storage" = "false" ]; then
   echo
