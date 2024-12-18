@@ -899,7 +899,8 @@ releases:
         value: {{ dig "s3" "credential" .Values.s3_secret_key .Values.s3_proxy }}
 
   - name: radar-output
-    chart: radar/radar-output
+#    chart: radar/radar-output
+    chart: ../../radar-helm-charts/charts/radar-output
     version: {{ .Values.radar_output._chart_version }}
     installed: {{ .Values.radar_output._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_output._extra_timeout }}

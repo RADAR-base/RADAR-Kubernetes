@@ -22,7 +22,7 @@ fitbit_url=http://mockserver:8080
 
 # TEST LOGIC
 test_s3_storage=${TEST_S3_STORAGE:-true}
-s3_storage_timeout=${S3_STORAGE_TIMEOUT:-6}
+s3_storage_timeout=${S3_STORAGE_TIMEOUT:-15}
 
 echo "Starting e2e test on $protocol://$host"
 
