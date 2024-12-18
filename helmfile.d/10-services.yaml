@@ -423,7 +423,7 @@ releases:
     installed: {{ .Values.radar_appserver._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_appserver._extra_timeout }}
     {{ if .Values.radar_appserver_postgresql._install }}needs: [radar-appserver-postgresql]{{ end }}
-    <<: *logFailedRelease    
+    <<: *logFailedRelease
     values:
       - {{ .Values.radar_appserver | toYaml | indent 8 | trim }}
     set:
@@ -691,7 +691,7 @@ releases:
     installed: {{ .Values.radar_rest_sources_backend._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_rest_sources_backend._extra_timeout }}
     {{ if .Values.postgresql._install }}needs: [postgresql]{{ end }}
-    <<: *logFailedRelease    
+    <<: *logFailedRelease
     values:
       - {{ .Values.radar_rest_sources_backend | toYaml | indent 8 | trim }}
     set:
@@ -749,7 +749,7 @@ releases:
     installed: {{ .Values.radar_gateway._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_gateway._extra_timeout }}
     {{ if .Values.cp_schema_registry._install }}needs: [cp-schema-registry]{{ end }}
-    <<: *logFailedRelease    
+    <<: *logFailedRelease
     values:
       - {{ .Values.radar_gateway | toYaml | indent 8 | trim }}
       - {{ .Values.confluent_cloud | toYaml | indent 8 | trim }}
@@ -790,7 +790,7 @@ releases:
     needs:
       # When catalog server is 'ready', kafka can be used.
       - catalog-server
-    <<: *logFailedRelease    
+    <<: *logFailedRelease
     values:
       - "../etc/radar-backend-stream/values.yaml"
       - {{ .Values.radar_backend_stream | toYaml | indent 8 | trim }}
@@ -803,7 +803,7 @@ releases:
     version: {{ .Values.radar_integration._chart_version }}
     installed: {{ .Values.radar_integration._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_integration._extra_timeout }}
-    <<: *logFailedRelease    
+    <<: *logFailedRelease
     values:
       - {{ .Values.radar_integration | toYaml | indent 8 | trim }}
     set:
