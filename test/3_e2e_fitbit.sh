@@ -109,11 +109,12 @@ if [[ $test_s3_storage = "true" ]]
 then
   mc alias set s3-alias http://api.s3.localhost/ $s3_access_key $s3_secret_key
   object_count_intermediate_storage=`mc ls --recursive s3-alias/radar-intermediate-storage | grep connect_fitbit | wc -l`
+  # remove all data in the output storage; this to prevent data depuplication to affect the test.
+  mc rm --recursive --force s3-alias/radar-output-storage
   object_count_output_storage=`mc ls --recursive s3-alias/radar-output-storage | grep connect_fitbit | wc -l`
   echo "Intermediate storage object count: $object_count_intermediate_storage"
   echo "Output storage object count: $object_count_output_storage"
 fi
-
 
 # At this moment the user is redirected to Fitbit authorization page.
 # The user is redirected to RADAR-base frontend URL callback with the 'code' (of authorization_code grant).
@@ -139,7 +140,6 @@ if [[ "$test_s3_storage" = "false" ]]; then
   echo "Skipping S3 storage test"
   exit 0
 fi
-
 
 echo
 echo "Waiting for the data to be written to intermediate storage"
