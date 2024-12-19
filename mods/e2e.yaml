@@ -35,6 +35,8 @@ radar_fitbit_connector:
   fitbit_user_poll_interval: 2
   application_loop_interval_ms: 2000
   user_cache_refresh_interval_ms: 2000
+ksql_server:
+  _install: true
 data_dashboard_timescaledb:
   _install: true
 data_dashboard_backend:
