@@ -85,3 +85,7 @@ radar_upload_postgresql:
 gateway:
   serviceMonitor:
     enabled: false
+ksql_server:
+  prometheus:
+    jmx:
+      enabled: false
