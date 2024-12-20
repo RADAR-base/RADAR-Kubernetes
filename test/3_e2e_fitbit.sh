@@ -144,7 +144,9 @@ fi
 echo
 echo "Waiting for the data to be written to intermediate storage"
 timeout=0
-while [[ $object_count_intermediate_storage -eq `mc ls --recursive s3-alias/radar-intermediate-storage | grep connect_fitbit | wc -l` ]]; do
+test=$object_count_intermediate_storage
+while [[ $object_count_intermediate_storage -eq $test ]]; do
+  test=`mc ls --recursive s3-alias/radar-intermediate-storage | grep connect_fitbit | wc -l`
   timeout=$((timeout+1))
   if [[ $timeout -ge $s3_storage_timeout ]]; then
     echo "Failure: timeout reached after $s3_storage_timeout seconds"
