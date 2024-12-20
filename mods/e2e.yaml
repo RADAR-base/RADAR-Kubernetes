@@ -32,9 +32,9 @@ radar_fitbit_connector:
   _install: true
   fitbit_api_url: http://mockserver.mockserver:1080/fitbit
   rest_source_poll_interval_ms: 5000
-  fitbit_user_poll_interval: 2
-  application_loop_interval_ms: 2000
-  user_cache_refresh_interval_ms: 2000
+  fitbit_user_poll_interval: 5
+  application_loop_interval_ms: 5000
+  user_cache_refresh_interval_ms: 5000
 ksql_server:
   _install: true
 data_dashboard_timescaledb:
