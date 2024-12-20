@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 path=$(dirname $BASH_SOURCE)
 
 echo
@@ -14,3 +16,7 @@ echo
 echo
 echo "# --- FITBIT ---"
 $path/3_e2e_fitbit.sh
+echo
+echo
+echo "# --- GRAFANA DASHBOARD ---"
+$path/4_e2e_grafana_metrics.sh
