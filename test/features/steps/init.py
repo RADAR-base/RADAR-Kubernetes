@@ -5,6 +5,7 @@ from base import TestConfig
 from base import Cache
 from base import get_secret
 from base import format_url
+from base import request_mp_token
 
 dev = TestConfig.dev_mode
 mp_admin_password = get_secret('management_portal', 'managementportal', 'common_admin_password')
@@ -23,38 +24,11 @@ def step_impl(context):
 
 @then('the management portal token can be requested')
 def step_impl(context):
-    headers = {
-        'Accept': 'application/json',
-        'Content-Type': 'application/x-www-form-urlencoded'
-    }
-    data={
-        'client_id': 'ManagementPortalapp',
-        'username': 'admin',
-        'password': mp_admin_password,
-        'grant_type': 'password',
-    }
-    response = requests.post(url=format_url('managementportal/oauth/token'), headers=headers, data=data)
-    assert response.status_code == 200
-    management_portal_json = response.json()
-    assert management_portal_json['access_token'] is not None
-    Cache.management_portal_token = management_portal_json['access_token']
+    request_mp_token()
 
 @given('retrieval of management portal token')
 def step_impl(context):
-    if Cache.management_portal_token is not None:
-        return
-    headers = {'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded'}
-    data={
-        'client_id': 'ManagementPortalapp',
-        'username': 'admin',
-        'password': mp_admin_password,
-        'grant_type': 'password',
-    }
-    response = requests.post(url=format_url('managementportal/oauth/token'), headers=headers, data=data)
-    assert response.status_code == 200
-    management_portal_json = response.json()
-    assert management_portal_json['access_token'] is not None
-    Cache.management_portal_token = management_portal_json['access_token']
+    request_mp_token()
 
 @given('the aRMT source type does not exist')
 def step_impl(context):

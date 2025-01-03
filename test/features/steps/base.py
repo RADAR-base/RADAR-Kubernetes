@@ -2,6 +2,7 @@ import os
 import yaml
 from functools import reduce  # forward compatibility for Python 3
 import operator
+import requests
 
 class TestConfig:
     protocol = os.environ.get('TEST_PROTOCOL', 'http')
@@ -33,3 +34,25 @@ def get_secret(*path_elements):
 
 def format_url(path):
     return f'{TestConfig.protocol}://{TestConfig.host}:{TestConfig.port}/{path}'
+
+def request_mp_token():
+    if Cache.management_portal_token is not None:
+        Cache.management_portal_token
+    mp_admin_password = get_secret('management_portal', 'managementportal', 'common_admin_password')
+    headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+    data={
+        'client_id': 'ManagementPortalapp',
+        'username': 'admin',
+        'password': mp_admin_password,
+        'grant_type': 'password',
+    }
+    response = requests.post(url=format_url('managementportal/oauth/token'), headers=headers, data=data)
+    assert response.status_code == 200
+    management_portal_json = response.json()
+    token = management_portal_json['access_token']
+    assert token is not None
+    Cache.management_portal_token = token
+    return token
