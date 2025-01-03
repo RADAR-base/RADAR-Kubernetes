@@ -153,27 +153,6 @@ EOF
 echo $questionnaire_response_response
 check_success "$questionnaire_response_response" "questionnaire_response_response"
 
-
-if [ "$test_data_dashboard" = "true" ]; then
-  echo
-  echo "Check whether the questionnaire data can be retrieved from the data dashboard backend"
-  timeout=0
-  current_count=$object_count_data_dashboard_backend
-  while [ $object_count_data_dashboard_backend -eq $current_count ]; do
-    questionnaire_response_data=`curl -s --location "$protocol://$host/api/project/$project_name/subject/$subject_id/topic/questionnaire_response/observations" \
-      --header "Authorization: Bearer $accesstoken"`
-    current_count=`echo $questionnaire_response_data | jq '.observations | length'`
-    timeout=$((timeout+1))
-    if [ $timeout -ge $data_dashboard_storage_timeout ]; then
-      echo "Failure: timeout reached after $s3_storage_timeout seconds"
-      exit 0
-    fi
-    sleep 1
-  done
-  echo "Success!!"
-fi
-
-
 if [ "$test_s3_storage" = "false" ]; then
   echo
   echo "Skipping S3 storage test"
@@ -207,3 +186,26 @@ while [ $object_count_output_storage -eq `mc ls --recursive s3-alias/radar-outpu
   sleep 1
 done
 echo "Success!!"
+
+
+
+echo "# --- DATA DASHBOARD BACKEND ---"
+if [ "$test_data_dashboard" = "true" ]; then
+  echo
+  echo "Check whether the questionnaire data can be retrieved from the data dashboard backend"
+  timeout=0
+  current_count=$object_count_data_dashboard_backend
+  while [ $object_count_data_dashboard_backend -eq $current_count ]; do
+    questionnaire_response_data=`curl -s --location "$protocol://$host/api/project/$project_name/subject/$subject_id/topic/questionnaire_response/observations" \
+      --header "Authorization: Bearer $accesstoken"`
+    current_count=`echo $questionnaire_response_data | jq '.observations | length'`
+    timeout=$((timeout+1))
+    if [ $timeout -ge $data_dashboard_storage_timeout ]; then
+      echo "Failure: timeout reached after $s3_storage_timeout seconds"
+      exit 0
+    fi
+    sleep 1
+  done
+  echo "Success!!"
+fi
+
