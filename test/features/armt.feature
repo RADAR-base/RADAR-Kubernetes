@@ -1,7 +1,7 @@
 Feature: aRMT data ingestion and storage
 
+  @fixture.s3
   Scenario: Subject sends questionnaire response data to RADAR-base
-
     Given retrieval of management portal token
     And creation of the aRMT source type
     And creation of the test organization
