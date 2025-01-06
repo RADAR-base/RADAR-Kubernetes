@@ -949,7 +949,7 @@ releases:
     timeout: {{ add .Values.base_timeout .Values.radar_push_endpoint._extra_timeout }}
     needs:
       - management-portal
-    <<: *logFailedRelease    
+    <<: *logFailedRelease
     values:
       - {{ .Values.radar_push_endpoint | toYaml | indent 8 | trim }}
       - {{ .Values.confluent_cloud | toYaml | indent 8 | trim }}
@@ -987,3 +987,22 @@ releases:
         value: {{ dig "local" "accessKey" .Values.s3_access_key .Values.velero }}
       - name: local.secretKey
         value: {{ dig "local" "secretKey" .Values.s3_secret_key .Values.velero }}
+
+  - name: nifi
+    chart: radar/nifi
+    installed: {{ .Values.nifi._install }}
+    version: {{ .Values.nifi._chart_version }}
+    timeout: {{ add .Values.base_timeout .Values.nifi._extra_timeout }}
+    <<: *logFailedRelease
+    values:
+      - "../etc/cp-nifi/values.yaml"
+      - {{ .Values.nifi | toYaml | indent 8 | trim }}
+    set:
+      - name: ingress.hosts
+        values: [{{ .Values.server_name }}]
+      - name: ingress.tls[0].hosts
+        values: ["{{ .Values.server_name }}"]
+      - name: ingress.tls[0].secretName
+        value: nifi-crt-secret
+      - name: properties.webProxyHost
+        value: "{{ .Values.server_name }}"
