@@ -1,15 +1,24 @@
 Feature: aRMT data ingestion and storage
 
-  @fixture.s3
   Scenario: Subject sends questionnaire response data to RADAR-base
     Given retrieval of management portal token
-    And creation of the aRMT source type
-    And creation of the test organization
-    And creation of the test project
-    And creation of the test subject
-    And creation of the aRMT project source
+    And creation of an aRMT source type named "RADAR_aRMT"
+    And creation of an organization named "TEST"
+    And creation of a project named "test"
+    And creation of an aRMT project source named "aRMT-test-source-TEST"
+    And creation of a subject named "test_user"
+    And the current object counts in the s3 storage for questionnaire_response files
+      | bucket                      | filename_pattern        |
+      | radar-intermediate-storage  | questionnaire_response  |
+      | radar-output-storage        | questionnaire_response  |
     And the aRMT application has retrieved an access token
-    Then true
-#    When the subject sends questionnaire response data to RADAR-base
-#    Then the data is stored on the intermediate storage
-#    And the data is transformed and stored on the output storage
+    When the aRMT application sends questionnaire_response data
+    """
+    [
+      {"questionId" : "1", "value": "Some Value", "startTime": 0, "endTime": 0}
+    ]
+    """
+    Then the object counts in the s3 storage for questionnaire_response files have increased by 1
+      | bucket                      | filename_pattern        |
+      | radar-intermediate-storage  | questionnaire_response  |
+      | radar-output-storage        | questionnaire_response  |
