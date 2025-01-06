@@ -6,13 +6,17 @@ ingress:
   path: /nifi
   className: nginx
   annotations:
+    nginx.ingress.kubernetes.io/app-root: /nifi
     nginx.ingress.kubernetes.io/backend-protocol: HTTPS
     nginx.ingress.kubernetes.io/affinity-mode: persistent
     nginx.ingress.kubernetes.io/affinity: "cookie"
-    nginx.ingress.kubernetes.io/session-cookie-name: "http-cookie"
-    nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
-    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/session-cookie-path: "/"
     cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header 'X-ProxyScheme' 'https';
+      proxy_set_header 'X-ProxyPort' '443';
+      proxy_set_header X-ProxyHost $host;
 
 service:
   sessionAffinity: ClientIP
@@ -26,12 +30,9 @@ persistence:
 registry:
     enabled: true
 
-jvmMemory: 4g
+jvmMemory: 2g
 
 resources:
-  limits:
-      cpu: 4
-      memory: 16Gi
   requests:
       cpu: 1
       memory: 4Gi
