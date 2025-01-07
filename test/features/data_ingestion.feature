@@ -1,6 +1,6 @@
-Feature: aRMT data ingestion and storage
+Feature: Data ingestion and storage
 
-  Scenario: Subject sends questionnaire response data to RADAR-base
+  Scenario: Subject sends aRMT questionnaire response data to RADAR-base
     Given retrieval of management portal token
     And creation of an aRMT source type named "RADAR_aRMT"
     And creation of an organization named "TEST"
