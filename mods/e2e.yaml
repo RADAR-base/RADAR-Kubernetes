@@ -20,8 +20,6 @@ radar_output:
     index:
       fullSyncInterval: 5 # seconds
       emptyDirectorySyncInterval: 5 # seconds
-  deduplication:
-    enable: false # turn off deduplication so that re-upload of same data will be visible on storage
 radar_rest_sources_backend:
   _install: true
   restSourceClients:
