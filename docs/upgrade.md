@@ -6,19 +6,77 @@ Run the following instructions to upgrade an existing RADAR-Kubernetes cluster.
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Upgrading the major version of a PostgreSQL image is not supported. If necessary, we propose to use a `pg_dump` to dump the current data and a `pg_restore` to restore that data on a newer version. Please find instructions for this elsewhere. |
 
-## Upgrade to RADAR-Kubernetes version 1.2
+## Upgrade to RADAR-Kubernetes version 1.2.0
 
-### KSQL Server and JDBC Connector service configuration
-In `production.yaml` rename sections:
+### Update `production.yaml` file
 
-| Old Name                 | New Name                           |
-|--------------------------|------------------------------------|
-| radar_jdbc_connector     | radar_jdbc_connector_grafana       |
-| radar_jdbc_connector_agg | radar_jdbc_connector_realtime_dashboard |
+1. Remove any line beginning with `_chart_version:`.
+2. Remove any line beginning with `imageTag:`.
+3. Add email server config to `management_portal` and `radar-appserver` sections analogous to:
 
-### Data dashboard backend secret
-You need to manually create this field in your secrets file: `management_portal.oauth_clients.radar_data_dashboard_backend.client_secret`.
-If you're not using data dashboard backend you can put `null` in the value, otherwise make sure to generate a random secret and put it in that field.
+```yaml
+    management_portal:
+        smtp:
+            enabled: true
+            host: smtp
+            port: 25
+            from: noreply@example.com
+            starttls: false
+            auth: true
+```
+
+```yaml
+    radar_appserver:
+        smtp:
+            enabled: true
+            host: smtp
+            port: 25
+            from: noreply@example.com
+            starttls: false
+            auth: true
+```
+
+4. Update _timescaledb_ database configuration:
+
+- Rename `timescaledb_username` to `grafana_metrics_db_username`
+- Remove `grafana_metrics_username` and `timescaledb_db_name` variables.
+- When using _realtime-dashboard_, add `realtime_dashboard_db_username` that points to the current value of `timescaledb_username`. 
+
+5. For databases where data should persist after the update uncomment the respective `existingClaim` field. Example:
+
+```yaml
+realtime_dashboard_timescaledb:
+  postgresql:
+    primary:
+      persistence:
+        existingClaim: "data-timescaledb-postgresql-0"
+```
+
+### Update `secrets.yaml` file
+
+1. Add the following new secrets to the `secrets.yaml` file to correctponding sections:
+
+```yaml
+management_portal:
+  oauth_clients:
+    radar_data_dashboard_backend:
+      client_secret: <add your own random secret here>
+```
+
+```yaml
+radar_appserver:
+  smtp:
+    username: <your smtp username>
+    password: <your smtp password>
+```
+
+```yaml
+data_dashboard_db_password: <same password as timescaledb_password>
+realtime_dashboard_db_password: <same password as timescaledb_password>
+```
+
+2. Rename the `grafana_metrics_password` secret to `grafana_metrics_db_password` and `timescaledb_password` to `data_dashboard_db_password`.
+
 
 ### MongoDB
 MongoDB has been updated to a new version and it's not compatible with the current version that has been installed in the cluster. There are two pathes forward:

@@ -177,8 +177,6 @@ postgresql:
       extraEnvVars:
         - name: POSTGRES_MULTIPLE_DATABASES
           value: restsourceauthorizer,appconfig,kratos # ... and these databases will be created
-      # Uncomment when upgrading
-      #existingClaim: "data-postgresql-postgresql-0"
 
 management_portal:
   _install: true
@@ -251,8 +249,6 @@ radar_appserver_postgresql:
           value:
     replication:
       applicationName: radarAppserver
-        # Uncomment when upgrading
-        #existingClaim: "data-radar-appserver-postgresql-postgresql-0"
 
 radar_appserver:
   _install: false
@@ -334,8 +330,8 @@ data_dashboard_timescaledb:
     primary:
       persistence:
         size: 8Gi
-        # Uncomment when upgrading
-        #existingClaim: "data-data-dashboard-timescaledb-postgresql-0"
+        # Uncomment when upgrading from version v1.1.3 to v1.2.0
+        #existingClaim: "data-timescaledb-postgresql-0"
 
 # Install when radar_grafana._install is 'true'
 grafana_metrics_timescaledb:
@@ -352,8 +348,8 @@ grafana_metrics_timescaledb:
     primary:
       persistence:
         size: 8Gi
-        # Uncomment when upgrading
-        #existingClaim: "data-grafana-metrics-timescaledb-postgresql-0"
+        # Uncomment when upgrading from version v1.1.3 to v1.2.0
+        #existingClaim: "data-timescaledb-postgresql-0"
 
 # Install when using realtime analysis
 realtime_dashboard_timescaledb:
@@ -370,8 +366,8 @@ realtime_dashboard_timescaledb:
     primary:
       persistence:
         size: 8Gi
-        # Uncomment when upgrading
-        #existingClaim: "data-realtime-dashboard-timescaledb-postgresql-0"
+        # Uncomment when upgrading from version v1.1.3 to v1.2.0
+        #existingClaim: "data-timescaledb-postgresql-0"
 
 # Make sure to set:
 #- grafana_metrics_timescaledb._install to true
@@ -491,7 +487,6 @@ minio:
       enabled: true
   provisioning:
     ## @param provisioning.users MinIO&reg; users provisioning. Can be used in addition to provisioning.usersExistingSecrets.
-    ## @param provisioning.users MinIO&reg; users provisioning. Can be used in addition to provisioning.usersExistingSecrets.
     ## https://docs.min.io/docs/minio-admin-complete-guide.html#user
     ## e.g.
     ## users:
@@ -554,8 +549,6 @@ radar_upload_postgresql:
           value:
     replication:
       applicationName: radar_uploadconnector
-        # Uncomment when upgrading
-        #existingClaim: "data-radar-upload-postgresql-postgresql-0"
 
 radar_upload_connect_backend:
   _install: false
