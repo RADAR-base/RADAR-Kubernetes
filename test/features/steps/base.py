@@ -311,10 +311,9 @@ def get_current_s3_object_modified_time(minio_client, bucket, pattern):
     return [ {"object": object.object_name, "timestamp_updated": object.last_modified } for object in objects ]
 
 # number = 0 means any increase is good.
-def wait_s3_object_counts_increased_or_updated(context, number=0):
+def wait_s3_object_counts_increased_or_updated(context):
     minio_client = _get_minio_client(context)
-    desired_change = int(number)
-    for (bucket, filename_pattern) in context.table:
+    for (bucket, filename_pattern, change_type) in context.table:
         timeout = int(context.config.userdata["timeout_s"])
         while True:
             if timeout < 0:
@@ -322,36 +321,18 @@ def wait_s3_object_counts_increased_or_updated(context, number=0):
             current_timestamp_dict = get_current_s3_object_modified_time(context, minio_client, bucket, filename_pattern)
             stored_timestamp_dict = _get_or_set_timestamps(context, bucket)
             difference = len(current_timestamp_dict) - len(stored_timestamp_dict)
-            if desired_change is not None and desired_change is not 0:
-                if difference == desired_change:
-                    break
-            if desired_change is not None and desired_change is 0:
-                if difference > 0:
-                    break
-            # check change in timestamps (needed for check out output storage)
-            for object_name, timestamp in current_timestamp_dict.items():
-                if timestamp > stored_timestamp_dict[object_name]:
-                    break
+            if not change_type in ["count", "timestamp"]:
+                raise Exception(f'Invalid change type {change_type}')
+            if change_type == 'count' and difference != 0:
+                break
+            if change_type == 'timestamp':
+                for object_name, timestamp in current_timestamp_dict.items():
+                    if timestamp > stored_timestamp_dict[object_name]:
+                        # If any timestamp is updated, we consider it as an update.
+                        break
             time.sleep(1)
             timeout -= 1
         _get_or_set_timestamps(context, bucket, current_timestamp_dict)
-
-# def wait_s3_object_modified_time_increased(context):
-#     minio_client = _get_minio_client(context)
-#     for (bucket, filename_pattern) in context.table:
-#         timeout = int(context.config.userdata["timeout_s"])
-#         while True:
-#             if timeout < 0:
-#                 raise Exception(f'{bucket} s3 object modified time did not increase in time')
-#             current_timestamp_dict = get_current_s3_object_modified_time(context, minio_client, bucket, filename_pattern)
-#             stored_timestamp_dict = _get_or_set_timestamps(context, bucket)
-#             for object_name, timestamp in current_timestamp_dict.items():
-#                 if (object_name not in stored_timestamp_dict
-#                         or timestamp > stored_timestamp_dict[object_name]):
-#                     break
-#             time.sleep(1)
-#             timeout -= 1
-#         _get_or_set_timestamps(context, bucket, current_timestamp_dict)
 
 def _get_minio_client(context):
     global minio_client

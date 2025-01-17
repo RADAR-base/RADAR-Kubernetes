@@ -6,10 +6,10 @@ Feature: aRMT data ingestion and storage
     And creation of a project named "test"
     And creation of an aRMT project source named "aRMT-test-source-TEST"
     And creation of a subject named "test_user"
-    And the current object counts in the s3 storage for files
-      | bucket                      | filename_pattern        |
-      | radar-intermediate-storage  | questionnaire_response  |
-      | radar-output-storage        | questionnaire_response  |
+    And the state of objects in the s3 storage
+      | bucket                      | filename_pattern        | change_type |
+      | radar-intermediate-storage  | questionnaire_response  | count       |
+      | radar-output-storage        | questionnaire_response  | timestamp   |
     And the aRMT application has retrieved an access token
     When the aRMT application sends questionnaire_response data
     """
@@ -17,7 +17,7 @@ Feature: aRMT data ingestion and storage
       {"questionId" : "1", "value": "Some Value", "startTime": 0, "endTime": 0}
     ]
     """
-    Then the object counts in the s3 storage for files have increased by 1
-      | bucket                      | filename_pattern        |
-      | radar-intermediate-storage  | questionnaire_response  |
-      | radar-output-storage        | questionnaire_response  |
+    Then the object state in the s3 storage changes
+      | bucket                      | filename_pattern        | change_type |
+      | radar-intermediate-storage  | questionnaire_response  | count       |
+      | radar-output-storage        | questionnaire_response  | timestamp   |
