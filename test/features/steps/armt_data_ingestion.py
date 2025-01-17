@@ -3,7 +3,7 @@ from behave import *
 from base import create_armt_source_type, create_organization, create_project, create_subject, \
     create_armt_project_source, get_armt_meta_token, get_armt_refresh_token, get_armt_access_token, \
     check_armt_source_type_exists, check_organization_exists, check_project_exists, check_subject_exists, \
-    check_armt_project_source_exists, get_current_s3_object_counts, wait_s3_object_counts_increased, \
+    check_armt_project_source_exists, get_current_s3_object_counts, wait_s3_object_counts_increased_or_updated, \
     push_questionnaire_response_data
 
 
@@ -38,7 +38,7 @@ def step_impl(context):
     get_armt_refresh_token(context)
     get_armt_access_token(context)
 
-@given('the current object counts in the s3 storage for questionnaire_response files')
+@given('the current object counts in the s3 storage for files')
 def step_impl(context):
     get_current_s3_object_counts(context)
 
@@ -46,8 +46,8 @@ def step_impl(context):
 def step_impl(context):
     push_questionnaire_response_data(context)
 
-@then('the object counts in the s3 storage for questionnaire_response files have increased by {increase}')
+@then('the object counts in the s3 storage for files have increased by {increase}')
 def step_impl(context, increase):
-    wait_s3_object_counts_increased(context, increase)
+    wait_s3_object_counts_increased_or_updated(context, increase)
 
 

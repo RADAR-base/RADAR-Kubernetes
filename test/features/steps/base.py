@@ -1,4 +1,5 @@
 import base64
+import random
 
 import yaml
 from functools import reduce
@@ -7,6 +8,7 @@ import requests
 import json
 from minio import Minio
 import time
+import datetime
 
 minio_client = None
 
@@ -159,7 +161,6 @@ def create_project(context, project):
         "endDate": None
     }
     response = requests.post(f'{context.config.userdata["url"]}/managementportal/api/projects', headers=headers, data=json.dumps(data))
-    # 200 means that the project already exists
     assert response.status_code == 200 or response.status_code == 201
     if response.status_code == 201:
         test_project_json = response.json()
@@ -256,7 +257,6 @@ def get_armt_meta_token(context):
     context.cache["armt_meta_token"] = meta_token
     return meta_token
 
-
 def get_armt_refresh_token(context):
     if context.cache["armt_refresh_token"] is not None:
         return context.cache["armt_refresh_token"]
@@ -292,18 +292,26 @@ def get_armt_access_token(context):
 def get_current_s3_object_counts(context):
     minio_client = _get_minio_client(context)
     for (bucket, filename_pattern) in context.table:
-        count = get_current_s3_object_count(minio_client, bucket, filename_pattern)
+        count = _get_current_s3_object_count(minio_client, bucket, filename_pattern)
         _get_or_set_count(context, bucket, filename_pattern, count)
 
-def get_current_s3_object_count(minio_client, bucket, pattern):
+def _get_current_s3_objects(minio_client, bucket, pattern):
     objects = minio_client.list_objects(
         bucket_name=bucket,
         recursive=True
     )
     filtered_objects = [ object for object in objects if pattern in object.object_name ]
-    return len(filtered_objects)
+    return filtered_objects
 
-def wait_s3_object_counts_increased(context, number):
+def _get_current_s3_object_count(minio_client, bucket, pattern):
+    return len(_get_current_s3_objects(minio_client, bucket, pattern))
+
+def get_current_s3_object_modified_time(minio_client, bucket, pattern):
+    objects = _get_current_s3_objects(minio_client, bucket, pattern)
+    return [ {"object": object.object_name, "timestamp_updated": object.last_modified } for object in objects ]
+
+# number = 0 means any increase is good.
+def wait_s3_object_counts_increased_or_updated(context, number=0):
     minio_client = _get_minio_client(context)
     desired_change = int(number)
     for (bucket, filename_pattern) in context.table:
@@ -311,16 +319,39 @@ def wait_s3_object_counts_increased(context, number):
         while True:
             if timeout < 0:
                 raise Exception(f'{bucket} s3 object count did not increase in time')
-            current_count = get_current_s3_object_count(minio_client, bucket, filename_pattern)
-            stored_count = _get_or_set_count(context, bucket, filename_pattern)
-            difference = current_count - stored_count
-            if difference == desired_change:
-                break
-            if difference != 0 and (difference < desired_change or difference > desired_change):
-                raise Exception(f'S3 object count changed but not by desired number ({desired_change})')
+            current_timestamp_dict = get_current_s3_object_modified_time(context, minio_client, bucket, filename_pattern)
+            stored_timestamp_dict = _get_or_set_timestamps(context, bucket)
+            difference = len(current_timestamp_dict) - len(stored_timestamp_dict)
+            if desired_change is not None and desired_change is not 0:
+                if difference == desired_change:
+                    break
+            if desired_change is not None and desired_change is 0:
+                if difference > 0:
+                    break
+            # check change in timestamps (needed for check out output storage)
+            for object_name, timestamp in current_timestamp_dict.items():
+                if timestamp > stored_timestamp_dict[object_name]:
+                    break
             time.sleep(1)
             timeout -= 1
-        _get_or_set_count(context, bucket, filename_pattern, current_count)
+        _get_or_set_timestamps(context, bucket, current_timestamp_dict)
+
+# def wait_s3_object_modified_time_increased(context):
+#     minio_client = _get_minio_client(context)
+#     for (bucket, filename_pattern) in context.table:
+#         timeout = int(context.config.userdata["timeout_s"])
+#         while True:
+#             if timeout < 0:
+#                 raise Exception(f'{bucket} s3 object modified time did not increase in time')
+#             current_timestamp_dict = get_current_s3_object_modified_time(context, minio_client, bucket, filename_pattern)
+#             stored_timestamp_dict = _get_or_set_timestamps(context, bucket)
+#             for object_name, timestamp in current_timestamp_dict.items():
+#                 if (object_name not in stored_timestamp_dict
+#                         or timestamp > stored_timestamp_dict[object_name]):
+#                     break
+#             time.sleep(1)
+#             timeout -= 1
+#         _get_or_set_timestamps(context, bucket, current_timestamp_dict)
 
 def _get_minio_client(context):
     global minio_client
@@ -340,6 +371,13 @@ def _get_or_set_count(context, bucket, pattern, count: int=None):
     else:
         return context.counts[key]
 
+def _get_or_set_timestamps(context, bucket, timestamp_dict: dict=None):
+    if timestamp_dict is not None:
+        for object_name, timestamp in timestamp_dict.items():
+            context.timestamps[bucket][object_name] = timestamp
+    else:
+        return context.timestamps[bucket]
+
 def push_questionnaire_response_data(context):
     key_id, value_id  = _get_kafka_topic_key_value_ids(context, "questionnaire_response")
     headers = {
@@ -352,14 +390,17 @@ def push_questionnaire_response_data(context):
     source_id = context.cache["armt_project_source_json"]["sourceId"]
     assert context.text is not None
     answers = json.loads(context.text)
+    # Send data with random timestamp so that different files will be created
+    # on the output storage (not removed by data deduplication).
+    timestamp = _random_timestamp()
     data = {
         "key_schema_id": key_id,
         "value_schema_id": value_id,
         "records": [
             {
                 "value": {
-                    "time": 1707657463.9095526,
-                    "timeCompleted": 1707657463.9095526,
+                    "time":  timestamp,
+                    "timeCompleted": timestamp,
                     "timeNotification": 0,
                     "name": "QuestionnaireName",
                     "version": "1",
@@ -376,6 +417,12 @@ def push_questionnaire_response_data(context):
     response = requests.post(f'{context.config.userdata["url"]}/kafka/topics/questionnaire_response', headers=headers, data=json.dumps(data))
     assert response.status_code == 200
 
+def _random_timestamp():
+    days = random.randint(1, 100000)
+    now = datetime.datetime.now()
+    random_date = now - datetime.timedelta(days=days)
+    return random_date.timestamp()
+
 def _get_kafka_topic_key_value_ids(context, topic_name):
     response = requests.get(f'{context.config.userdata["url"]}/schema/subjects/{topic_name}-key/versions/latest')
     assert response.status_code == 200
@@ -384,3 +431,81 @@ def _get_kafka_topic_key_value_ids(context, topic_name):
     assert response.status_code == 200
     value_id = response.json()['id']
     return key_id, value_id
+
+def register_fitbit_user(context):
+    # Here the study manager enrolls a subject for Fitbit data collection.
+    headers = {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {get_mp_token(context)}'
+    }
+    data = {
+        "userId": context.cache["fitbit_user_json"]["id"],
+        "persistent": True
+    }
+    response = requests.post(f'{context.config.userdata["url"]}/rest-sources/backend/registrations', headers=headers, data=json.dumps(data))
+    assert response.status_code == 200 or response.status_code == 201
+    registration_json = response.json()
+    assert registration_json is not None
+    registration_token = registration_json['token']
+
+    # At this moment the user is redirected to Fitbi7t authorization page (or clicks this link sent via email).
+    # The user is redirected to RADAR-base frontend URL callback with the 'code' (of authorization_code grant).
+    # The frontend redirects to the backend with the 'code' and the 'state' (registration_token).
+    headers = {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+    }
+    data = {
+        "code": "mycode"
+    }
+    response = requests.post(f'{context.config.userdata["url"]}/rest-sources/backend/registrations/{registration_token}/authorize', headers=headers, data=json.dumps(data))
+    assert response.status_code == 200 or response.status_code == 201
+
+    # The rest source backend will exchange the code for an access token and refresh token.
+    # This happens in the back chanel and is not part of the e2e test.
+    # the call will be to $fitbit_url/oauth2/token?client_id=$client;client_secret=some_secret;redirect_uri=$protocol://$host/rest-sources/backend/users:new;grant_type=authorization_code
+    # And body: '{"code":"'$code'"}'
+    # The response is provided by the mock server.
+
+def check_fitbit_user_exists(context):
+    headers = {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {get_mp_token(context)}'
+    }
+    project_name = context.cache["project_json"]["projectName"]
+    user_id = context.cache["test_subject_id"]
+    response = requests.get(f'{context.config.userdata["url"]}/rest-sources/backend/users?project-id={project_name}&authorized=all', headers=headers)
+    assert response.status_code == 200
+    users_json = response.json()
+    user_json = next((item for item in users_json['users'] if item["userId"] == user_id), None)
+    if not context.config.userdata["dev_mode"] and user_json is not None:
+        raise Exception('Fitbit user already exists')
+    elif user_json is not None:
+        context.cache["fitbit_user_json"] = user_json
+    else:
+        _create_fitbit_user(context)
+
+def _create_fitbit_user(context):
+    if context.cache["fitbit_user_json"] is not None:
+        return
+    headers = {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {get_mp_token(context)}'
+    }
+    project_name = context.cache["project_json"]["projectName"]
+    user_id = context.cache["test_subject_id"]
+    data = {
+        "projectId": project_name,
+        "userId": user_id,
+        "startDate": "2020-11-18T23:00:00.000Z",
+        "endDate": "3000-11-29T23:00:00.000Z",
+        "sourceType": "FitBit"
+    }
+    response = requests.post(f'{context.config.userdata["url"]}/rest-sources/backend/users', headers=headers, data=json.dumps(data))
+    assert response.status_code == 200 or response.status_code == 201
+    user_json = response.json()
+    assert user_json is not None
+    context.cache["fitbit_user_json"] = user_json
