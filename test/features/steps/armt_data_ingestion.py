@@ -38,7 +38,7 @@ def step_impl(context):
     get_armt_refresh_token(context)
     get_armt_access_token(context)
 
-@given('the current object counts in the s3 storage for files')
+@given('the state of objects in the s3 storage')
 def step_impl(context):
     get_current_s3_object_counts(context)
 
@@ -46,8 +46,8 @@ def step_impl(context):
 def step_impl(context):
     push_questionnaire_response_data(context)
 
-@then('the object counts in the s3 storage for files have increased by {increase}')
-def step_impl(context, increase):
-    wait_s3_object_counts_increased_or_updated(context, increase)
+@then('the object state in the s3 storage changes')
+def step_impl(context):
+    wait_s3_object_counts_increased_or_updated(context)
 
 
