@@ -8,7 +8,7 @@ ingress:
     hosts:
       - host: localhost
         paths:
-          - path: "/admin/hydra(/|$)(.*)" 
+          - path: "/admin/hydra(/|$)(.*)"
             pathType: ImplementationSpecific
     tls:
       - secretName: radar-base-tls
@@ -52,6 +52,8 @@ hydra:
     oauth2:
       allowed_top_level_claims: [scope,roles,authorities,sources,user_name]
       mirror_top_level_claims: false
+      client_credentials:
+        default_grant_allowed_scope: true
     
     serve:
       public:
