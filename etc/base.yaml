@@ -288,13 +288,13 @@ radar_oura_connector:
 
 radar_rest_sources_authorizer:
   _install: false
-  _chart_version: 2.0.1
+  _chart_version: 2.0.2
   _extra_timeout: 0
   replicaCount: 1
 
 radar_rest_sources_backend:
   _install: false
-  _chart_version: 1.1.5
+  _chart_version: 1.1.6
   _extra_timeout: 0
   replicaCount: 1
   postgres:
@@ -564,3 +564,12 @@ velero:
         bucket: radar-base-backups
         config:
           s3Url: https://s3.amazon.com # protocol should be specified
+
+nifi:
+  _install: false
+  _chart_version: 1.2.1
+  _extra_timeout: 300
+  zookeeper:
+    enabled: false
+    url: cp-zookeeper-headless
+    port: 2181
