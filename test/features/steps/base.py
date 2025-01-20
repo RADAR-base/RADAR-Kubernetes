@@ -291,7 +291,7 @@ def get_armt_access_token(context):
 
 def get_current_s3_object_counts(context):
     minio_client = _get_minio_client(context)
-    for (bucket, filename_pattern) in context.table:
+    for (bucket, filename_pattern, change_type) in context.table:
         count = _get_current_s3_object_count(minio_client, bucket, filename_pattern)
         _get_or_set_count(context, bucket, filename_pattern, count)
 
@@ -318,7 +318,7 @@ def wait_s3_object_counts_increased_or_updated(context):
         while True:
             if timeout < 0:
                 raise Exception(f'{bucket} s3 object count did not increase in time')
-            current_timestamp_dict = get_current_s3_object_modified_time(context, minio_client, bucket, filename_pattern)
+            current_timestamp_dict = get_current_s3_object_modified_time(minio_client, bucket, filename_pattern)
             stored_timestamp_dict = _get_or_set_timestamps(context, bucket)
             difference = len(current_timestamp_dict) - len(stored_timestamp_dict)
             if not change_type in ["count", "timestamp"]:
