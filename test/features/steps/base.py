@@ -9,6 +9,7 @@ import json
 from minio import Minio
 import time
 import datetime
+import os
 
 minio_client = None
 
@@ -341,9 +342,9 @@ def wait_s3_object_counts_state_changed(context):
 def _cache_bucket_object_state(context, bucket, pattern, state_dict: dict=None):
     key = f'{bucket}_{pattern}'
     if state_dict is not None:
-        context.state[key] = state_dict
+        context.state["storage"][key] = state_dict
     else:
-        return context.state[key]
+        return context.state["storage"][key]
 
 def _get_minio_client(context):
     global minio_client
@@ -487,3 +488,42 @@ def _create_fitbit_user(context):
     user_json = response.json()
     assert user_json is not None
     context.cache["fitbit_user_json"] = user_json
+
+def check_service_states(context):
+    for (service_name, state) in context.table:
+        stream = os.popen(f'kubectl get pods | grep {service_name} | grep {state}')
+        output = stream.read()
+        if service_name not in output:
+            raise Exception(f'{service_name} is not running')
+
+def count_rows_in_postgresql(context):
+    for (service, database, table) in context.table:
+        count = _get_postgres_table_state(context, service, database, table)
+        _cache_database_table_state(context, service, database, table, count)
+
+def _get_postgres_table_state(context, service, database, table):
+    password = get_secret('data_dashboard_db_password', context = context)
+    stream = os.popen(f'kubectl exec {service} -c postgresql -- psql postgresql://postgres:{password}@localhost/{database} -t -c "SELECT COUNT(*) FROM {table}"')
+    count = int(stream.read().strip())
+    return count
+
+def wait_for_postgresql_table_state_change(context):
+    for (service, database, table) in context.table:
+        timeout = int(context.config.userdata["timeout_s"])
+        while True:
+            if timeout < 0:
+                raise Exception(f'{service} {database} {table} table state did not change in time')
+            current_count = _get_postgres_table_state(context, service, database, table)
+            stored_count = _cache_database_table_state(context, service, database, table)
+            if stored_count is not None and current_count > stored_count:
+                break
+            time.sleep(1)
+            timeout -= 1
+        _cache_database_table_state(context, service, database, table, current_count)
+
+def _cache_database_table_state(context, service, database, table, count: int=None):
+    key = f'{service}_{database}_{table}'
+    if count is not None:
+        context.state["database"][key] = count
+    else:
+        return context.state["database"][key]

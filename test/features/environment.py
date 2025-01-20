@@ -16,7 +16,11 @@ def before_all(context):
         "rest_auth_registration_json": None,
         "fitbit_user_json": None,
     }
-    context.state = {}
+    context.state = {
+        "database": {},
+        "storage": {},
+    }
+
 
 def before_tag(context, tag):
     if tag == "fixture.s3":
