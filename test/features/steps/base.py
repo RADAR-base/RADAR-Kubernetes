@@ -527,3 +527,17 @@ def _cache_database_table_state(context, service, database, table, count: int=No
         context.state["database"][key] = count
     else:
         return context.state["database"][key]
+
+def wait_for_postgresql_record_count(context):
+    for (service, database, table, count) in context.table:
+        timeout = int(context.config.userdata["timeout_s"])
+        while True:
+            if timeout < 0:
+                raise Exception(f'{service} {database} {table} row counts did not change in time')
+            current_count = _get_postgres_table_state(context, service, database, table)
+            if current_count == int(count):
+                break
+            time.sleep(1)
+            timeout -= 1
+        current_count = _get_postgres_table_state(context, service, database, table)
+        assert current_count == int(count)
