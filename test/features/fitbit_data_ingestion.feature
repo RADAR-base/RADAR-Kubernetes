@@ -4,6 +4,10 @@ e3)
     Given creation of an organization named "TEST"
     And creation of a project named "test"
     And creation of a subject named "test_user"
+    And these service states
+      | service_name            | state   |
+      | fitbit-connector        | Running |
+      | rest-sources-backend    | Running |
     And the state of objects in the s3 storage
       | bucket                      | filename_pattern        | change_type |
       | radar-intermediate-storage  | fitbit                  | count       |
