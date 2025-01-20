@@ -16,7 +16,7 @@ def before_all(context):
         "rest_auth_registration_json": None,
         "fitbit_user_json": None,
     }
-    context.counts = {}
+    context.state = {}
 
 def before_tag(context, tag):
     if tag == "fixture.s3":

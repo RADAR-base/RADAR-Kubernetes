@@ -289,11 +289,11 @@ def get_armt_access_token(context):
     context.cache["armt_access_token"] = access_token
     return access_token
 
-def get_current_s3_object_counts(context):
+def get_current_s3_object_state(context):
     minio_client = _get_minio_client(context)
     for (bucket, filename_pattern, change_type) in context.table:
-        count = _get_current_s3_object_count(minio_client, bucket, filename_pattern)
-        _get_or_set_count(context, bucket, filename_pattern, count)
+        state_dict = _get_bucket_object_state(minio_client, bucket, filename_pattern)
+        _cache_bucket_object_state(context, bucket, filename_pattern, state_dict)
 
 def _get_current_s3_objects(minio_client, bucket, pattern):
     objects = minio_client.list_objects(
@@ -303,36 +303,47 @@ def _get_current_s3_objects(minio_client, bucket, pattern):
     filtered_objects = [ object for object in objects if pattern in object.object_name ]
     return filtered_objects
 
-def _get_current_s3_object_count(minio_client, bucket, pattern):
-    return len(_get_current_s3_objects(minio_client, bucket, pattern))
-
-def get_current_s3_object_modified_time(minio_client, bucket, pattern):
+def _get_bucket_object_state(minio_client, bucket, pattern):
     objects = _get_current_s3_objects(minio_client, bucket, pattern)
-    return [ {"object": object.object_name, "timestamp_updated": object.last_modified } for object in objects ]
+    return { object.object_name: object.last_modified for object in objects }
 
 # number = 0 means any increase is good.
-def wait_s3_object_counts_increased_or_updated(context):
+def wait_s3_object_counts_state_changed(context):
     minio_client = _get_minio_client(context)
     for (bucket, filename_pattern, change_type) in context.table:
         timeout = int(context.config.userdata["timeout_s"])
-        while True:
+        found = False
+        while not found:
             if timeout < 0:
                 raise Exception(f'{bucket} s3 object count did not increase in time')
-            current_timestamp_dict = get_current_s3_object_modified_time(minio_client, bucket, filename_pattern)
-            stored_timestamp_dict = _get_or_set_timestamps(context, bucket)
+            current_timestamp_dict = _get_bucket_object_state(minio_client, bucket, filename_pattern)
+            stored_timestamp_dict = _cache_bucket_object_state(context, bucket, filename_pattern)
             difference = len(current_timestamp_dict) - len(stored_timestamp_dict)
-            if not change_type in ["count", "timestamp"]:
-                raise Exception(f'Invalid change type {change_type}')
-            if change_type == 'count' and difference != 0:
-                break
-            if change_type == 'timestamp':
-                for object_name, timestamp in current_timestamp_dict.items():
-                    if timestamp > stored_timestamp_dict[object_name]:
-                        # If any timestamp is updated, we consider it as an update.
-                        break
+            match change_type:
+                case "count":
+                    if difference != 0:
+                        found = True
+                        print(f'{bucket} s3 object count increased by {difference}')
+                case "timestamp":
+                    for object_name, stored_timestamp in stored_timestamp_dict.items():
+                        current_timestamp = current_timestamp_dict.get(object_name)
+                        if current_timestamp > stored_timestamp:
+                            # If any timestamp is updated, we consider it as an update.
+                            found = True
+                            print(f'Object {object_name} timestamp updated to {current_timestamp}')
+                            break
+                case _:
+                    raise Exception(f'Invalid change type {change_type}')
             time.sleep(1)
             timeout -= 1
-        _get_or_set_timestamps(context, bucket, current_timestamp_dict)
+        _cache_bucket_object_state(context, bucket, filename_pattern, current_timestamp_dict)
+
+def _cache_bucket_object_state(context, bucket, pattern, state_dict: dict=None):
+    key = f'{bucket}_{pattern}'
+    if state_dict is not None:
+        context.state[key] = state_dict
+    else:
+        return context.state[key]
 
 def _get_minio_client(context):
     global minio_client
@@ -344,20 +355,6 @@ def _get_minio_client(context):
         secure=False
     )
     return minio_client
-
-def _get_or_set_count(context, bucket, pattern, count: int=None):
-    key = f'{bucket}{pattern}'
-    if count is not None:
-        context.counts[key] = count
-    else:
-        return context.counts[key]
-
-def _get_or_set_timestamps(context, bucket, timestamp_dict: dict=None):
-    if timestamp_dict is not None:
-        for object_name, timestamp in timestamp_dict.items():
-            context.timestamps[bucket][object_name] = timestamp
-    else:
-        return context.timestamps[bucket]
 
 def push_questionnaire_response_data(context):
     key_id, value_id  = _get_kafka_topic_key_value_ids(context, "questionnaire_response")

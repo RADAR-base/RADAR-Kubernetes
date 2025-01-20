@@ -9,7 +9,7 @@ Feature: aRMT data ingestion and storage
     And the state of objects in the s3 storage
       | bucket                      | filename_pattern        | change_type |
       | radar-intermediate-storage  | questionnaire_response  | count       |
-      | radar-output-storage        | questionnaire_response  | timestamp   |
+      | radar-output-storage        | questionnaire_response  | count       |
     And the aRMT application has retrieved an access token
     When the aRMT application sends questionnaire_response data
     """
@@ -17,7 +17,7 @@ Feature: aRMT data ingestion and storage
       {"questionId" : "1", "value": "Some Value", "startTime": 0, "endTime": 0}
     ]
     """
-    Then the object state in the s3 storage changes
+    Then the state of objects in the s3 storage changes
       | bucket                      | filename_pattern        | change_type |
       | radar-intermediate-storage  | questionnaire_response  | count       |
-      | radar-output-storage        | questionnaire_response  | timestamp   |
+      | radar-output-storage        | questionnaire_response  | count       |
