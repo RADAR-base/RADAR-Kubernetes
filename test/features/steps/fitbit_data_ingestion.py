@@ -1,10 +1,6 @@
 from behave import *
 
-from base import create_armt_source_type, create_organization, create_project, create_subject, \
-    create_armt_project_source, get_armt_meta_token, get_armt_refresh_token, get_armt_access_token, \
-    check_armt_source_type_exists, check_organization_exists, check_project_exists, check_subject_exists, \
-    check_armt_project_source_exists, get_current_s3_object_counts, wait_s3_object_counts_increased_or_updated, \
-    push_questionnaire_response_data, register_fitbit_user, check_fitbit_user_exists
+from base import register_fitbit_user, check_fitbit_user_exists, wait_s3_object_counts_increased_or_updated
 
 
 @given('registration of the subject with Fitbit authorization service')

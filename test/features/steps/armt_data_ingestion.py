@@ -40,7 +40,7 @@ def step_impl(context):
 
 @given('the state of objects in the s3 storage')
 def step_impl(context):
-    get_current_s3_object_counts(context)
+    wait_s3_object_counts_increased_or_updated(context)
 
 @when('the aRMT application sends questionnaire_response data')
 def step_impl(context):
