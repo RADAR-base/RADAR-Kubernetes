@@ -81,7 +81,7 @@ jobs:
       - name: Run end-to-end tests
         run: |
           cd test/features
-          behave
+          behave -D secrets_file=/home/ubuntu/actions-runner/_work/RADAR-Kubernetes/RADAR-Kubernetes/etc/secrets.yaml
 
       # Enable tmate debugging of manually-triggered workflows if the input option was provided
       - name: Manually triggered tmate session
