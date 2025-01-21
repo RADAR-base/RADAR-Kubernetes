@@ -1,6 +1,3 @@
-from behave import use_fixture
-from fixtures import s3
-
 def before_all(context):
     context.cache = {
         "management_portal_token": None,
@@ -20,8 +17,3 @@ def before_all(context):
         "database": {},
         "storage": {},
     }
-
-
-def before_tag(context, tag):
-    if tag == "fixture.s3":
-        use_fixture(s3, context)

@@ -1,5 +1,5 @@
 Feature: Fitbit registration, data ingestion and storage
-e3)
+
   Scenario: Subject sends aRMT questionnaire response data to RADAR-base
     Given creation of an organization named "TEST"
     And creation of a project named "test"
