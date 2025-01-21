@@ -351,8 +351,8 @@ def _get_minio_client(context):
     if minio_client is not None:
         return minio_client
     minio_client = Minio(context.config.userdata["s3_connection_url"],
-        access_key=context.config.userdata["s3_key"],
-        secret_key=context.config.userdata["s3_secret"],
+        access_key=get_secret("s3_access_key", context = context),
+        secret_key=get_secret("s3_secret_key", context = context),
         secure=False
     )
     return minio_client
