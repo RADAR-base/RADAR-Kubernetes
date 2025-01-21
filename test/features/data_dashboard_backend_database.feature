@@ -1,5 +1,5 @@
 Feature: Data-dashboard-backend data transformation and ingestion
-e3)
+
   Scenario: Questionnaire response data is stored in data dashboard backend database
     Given creation of an organization named "TEST"
     And creation of a project named "test"
