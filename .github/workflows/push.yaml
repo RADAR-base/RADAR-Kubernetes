@@ -75,7 +75,7 @@ jobs:
         run: |
           echo "kubeconfig: $KUBECONFIG"
           kubectl get pods --all-namespaces
-          helmfile sync
+          helmfile sync --concurrency 1
 
       - name: Run end-to-end tests
         run: |
