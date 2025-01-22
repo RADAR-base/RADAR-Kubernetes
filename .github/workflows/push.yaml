@@ -83,8 +83,8 @@ jobs:
           - KUBECTL_VERSION: "v1.31.0"
             K3S_VERSION: "v1.31.2+k3s1"
         exclude:
-          - KUBECTL_VERSION: ${{ github.base_ref != 'refs/heads/main' && "v1.30.0" }}
-            K3S_VERSION: ${{ github.base_ref != 'refs/heads/main' && "v1.30.6+k3s1" }}
+          - KUBECTL_VERSION: ${{ github.base_ref != 'refs/heads/main' && 'v1.30.0' }}
+            K3S_VERSION: ${{ github.base_ref != 'refs/heads/main' && 'v1.30.6+k3s1' }}
     steps:
       - uses: nolar/setup-k3d-k3s@v1
         with:
