@@ -1,0 +1,54 @@
+atomicInstall: false
+base_timeout: 180
+
+elasticsearch:
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "500Mi"
+
+confluent_cloud:
+  enabled: false
+
+cp_kafka:
+  persistence:
+    size: 1Gi
+
+postgresql:
+  primary:
+    resources:
+      requests:
+        cpu: 50m
+    persistence:
+      size: 1Gi
+
+radar_appserver_postgresql:
+  primary:
+    resources:
+      requests:
+        cpu: 50m
+    persistence:
+      size: 1Gi
+
+timescaledb:
+  primary:
+    resources:
+      requests:
+        cpu: 50m
+    persistence:
+      size: 1Gi
+
+minio:
+  persistence:
+    size: 1Gi
+
+radar_upload_postgresql:
+  primary:
+    resources:
+      requests:
+        cpu: 50m
+    persistence:
+      size: 1Gi
+
+ccSchemaRegistryProxy:
+  _install: false

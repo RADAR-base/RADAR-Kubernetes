@@ -1,7 +1,7 @@
 name: Install applications on Kubernets
 
 on:
-  push:
+  pull_request:
   workflow_dispatch:
     inputs:
       debug_enabled:
@@ -9,21 +9,14 @@ on:
         description: "Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)"
         required: false
         default: false
-
+ 
 jobs:
   install:
     strategy:
       matrix:
-        KUBECTL_VERSION: ["v1.23.0", "v1.24.0", "v1.25.0", "v1.26.0"]
-        include:
-          - KUBECTL_VERSION: "v1.23.0"
-            K3S_VERSION: "v1.23.17+k3s1"
-          - KUBECTL_VERSION: "v1.24.0"
-            K3S_VERSION: "v1.24.12+k3s1"
-          - KUBECTL_VERSION: "v1.25.0"
-            K3S_VERSION: "v1.25.8+k3s1"
-          - KUBECTL_VERSION: "v1.26.0"
-            K3S_VERSION: "v1.26.3+k3s1"
+        K3S_VERSION: ["v1.30.6+k3s1", "v1.31.2+k3s1"]
+        exclude:
+          - K3S_VERSION: ${{ github.base_ref != 'refs/heads/main' && 'v1.30.6+k3s1' }}
     runs-on: self-hosted
     steps:
       - name: Cleanup
@@ -33,24 +26,26 @@ jobs:
           rm -rf ./* || true
           rm -rf ./.??* || true
           ls -la ./
-          /usr/local/bin/k3s-uninstall.sh
 
       - uses: actions/checkout@v3
 
       - name: Install dependencies
         env:
-          KUBECTL_VERSION: ${{ matrix.KUBECTL_VERSION }}
-          HELM_VERSION: "v3.11.3"
-          HELM_DIFF_VERSION: "3.6.0"
-          HELMFILE_VERSION: "v0.152.0"
-          YQ_VERSION: "v4.33.3"
+          HELM_VERSION: "v3.16.3"
+          HELM_DIFF_VERSION: "3.9.12"
+          HELMFILE_VERSION: "v0.169.1"
+          YQ_VERSION: "v4.44.3"
         run: |
           ./.github/ci_config/bin/install-dependencies
 
-      - name: Prepare the environment
+      - name: Prepare the environment (add secrets and enable installation of all components)
         run: |
           DNAME='CN=CI,O=TheHyve,L=Utrecht,C=NL' ./bin/init
-          yq -i -f process '.environments.default.values += ["../.github/ci_config/install-all.yaml", "../.github/ci_config/secrets.yaml.gotmpl"]' environments.yaml
+          helmfile_mods='\ \ \ \ \ \ - ../.github/ci_config/ci-config.yaml\n'
+          helmfile_mods+='\ \ \ \ \ \ - ../.github/ci_config/secrets.yaml.gotmpl'
+          sed -i "/secrets.yaml/a $helmfile_mods" environments.yaml
+          sed -i '/_install: /s/false/true/' etc/production.yaml
+          sed -i '/enable_logging_monitoring: /s/false/true/' etc/production.yaml
 
       - name: Run helmfile template
         env:
@@ -58,12 +53,12 @@ jobs:
         run: |
           helmfile template
 
-      - name: Install K3S
+      - name: Reinstall K3S
         env:
           INSTALL_K3S_VERSION: ${{ matrix.K3S_VERSION }}
-          INSTALL_K3S_SYMLINK: "skip"
           K3S_KUBECONFIG_MODE: "644"
         run: |
+          /usr/local/bin/k3s-uninstall.sh || true
           curl -sfL https://get.k3s.io | sh -s - --disable traefik --disable-helm-controller
           cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
 
@@ -83,6 +78,18 @@ jobs:
         with:
           limit-access-to-actor: true
 
+      - name: Slack Notification
+        if: ${{ failure() }}
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_CHANNEL: ci-notifications
+          SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
+          SLACK_ICON: https://github.com/rtCamp.png?size=48
+          SLACK_MESSAGE: 'The job has failed, go to https://github.com/RADAR-base/RADAR-Kubernetes/actions and use SSH for more information'
+          SLACK_TITLE: Post Title
+          SLACK_USERNAME: rtCamp
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
       - name: Setup tmate session if jobs have failed
         if: ${{ failure() }}
         uses: mxschmitt/action-tmate@v3
@@ -94,6 +101,13 @@ jobs:
         if: always()
         run: |
           kubectl get pods --all-namespaces
+
+      # TODO We can remove the k3s uninstallation once the k3d PR is merged.
+      - name: Delete clusters when job was canceled
+        if: cancelled()
+        run: |
+          k3d cluster delete --all || true
+          k3s-uninstall.sh || true
 
   check-gitignore:
     runs-on: ubuntu-latest

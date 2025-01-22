@@ -1,0 +1,79 @@
+# must be localhost for session cookies to work in 'secure' mode
+server_name: localhost
+
+base_timeout: 360
+atomicInstall: false
+
+app_config_frontend:
+  advertised_protocol: http
+management_portal:
+  advertised_protocol: http
+  oauth_clients:
+    radar_rest_sources_authorizer:
+      redirect_uri:
+        - http://localhost/rest-sources/authorizer/login
+    radar_upload_frontend:
+      redirect_uri:
+        - http://localhost/upload/login
+    radar_app_config_frontend:
+      redirect_uri:
+        - http://localhost/appconfig/login
+    grafana_dashboard:
+      redirect_uri:
+        - http://dashboard.localhost/login/generic_oauth
+radar_appserver:
+  advertised_protocol: http
+radar_rest_sources_authorizer:
+  advertised_protocol: http
+radar_rest_sources_backend:
+  advertised_protocol: http
+radar_upload_connect_frontend:
+  advertised_protocol: http
+radar_upload_connect_backend:
+  advertised_protocol: http
+radar_home:
+  s3:
+    url: http://s3.localhost/login
+  dashboard:
+    url: http://grafana.localhost
+  logging:
+    enabled: true # either logging or monitoring must be enabled or radar-home crashes
+    url: http://graylog.localhost
+  monitoring:
+    enabled: true # either logging or monitoring must be enabled or radar-home crashes
+    url: http://grafana.localhost/login
+kratos:
+  config:
+    serve:
+      public:
+        base_url: http://localhost/kratos/
+        cors:
+          allowed_origins:
+            - http://localhost/kratos-ui/
+      admin:
+        base_url: http://localhost/admin/kratos/
+    selfservice:
+      default_browser_return_url: http://localhost/managementportal
+      allowed_return_urls:
+        - "http://localhost/"
+      flows:
+        error:
+          ui_url: http://localhost/kratos-ui/
+        recovery:
+          ui_url: http://localhost/kratos-ui/recovery
+        registration:
+          ui_url: http://localhost/kratos-ui/registration
+        login:
+          ui_url: http://localhost/kratos-ui/login
+        logout:
+          after:
+            default_browser_return_url: http://localhost/kratos-ui/login
+        verification:
+          ui_url: http://localhost/kratos-ui/verification
+          after:
+            default_browser_return_url: http://localhost/kratos-ui
+        settings:
+          ui_url: http://localhost/kratos-ui/settings
+kratos_ui:
+  kratosPublicUrl: http://localhost/kratos
+  kratosBrowserUrl: http://localhost/kratos

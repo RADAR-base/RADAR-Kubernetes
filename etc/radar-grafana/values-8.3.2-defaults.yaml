@@ -269,14 +269,14 @@ hostAliases: []
   #     - "my.host.com"
 
 ingress:
-  enabled: true
+  enabled: false
   # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
   # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
   # ingressClassName: nginx
   # Values can be templated
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
   labels: {}
   path: /
 
@@ -301,10 +301,10 @@ ingress:
   #         name: use-annotation
 
 
-  tls:
-   - secretName: radar-base-tls-dashboard
-     hosts:
-       - localhost
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
 
 resources: {}
 #  limits:
@@ -370,7 +370,7 @@ extraContainerVolumes: []
 ##
 persistence:
   type: pvc
-  enabled: true
+  enabled: false
   # storageClassName: default
   accessModes:
     - ReadWriteOnce
@@ -439,7 +439,7 @@ initChownData:
 
 # Administrator credentials when not using an existing secret (see below)
 adminUser: admin
-#adminPassword: strongpassword
+# adminPassword: strongpassword
 
 # Use an existing secret for the admin user.
 admin:
@@ -485,11 +485,7 @@ admin:
 ## 6. uncomment the annotation section in the serviceAccount: above
 ## make sure to replace arn:aws:iam::123456789000:role/iam-role-name-here with your role arn
 
-env:
-  POSTGRES_USER: postgres
-  POSTGRES_DB: postgres
-  POSTGRES_HOST: timescaledb-postgresql-hl
-  GF_USERS_DEFAULT_THEME: light
+env: {}
 
 ## "valueFrom" environment variable references that will be added to deployment pods. Name is templated.
 ## ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.19/#envvarsource-v1-core
@@ -513,8 +509,7 @@ envFromSecret: ""
 ## This can be useful for auth tokens, etc.
 ## If the secret values contains "{{", they'll need to be properly escaped so that they are not interpreted by Helm
 ## ref: https://helm.sh/docs/howto/charts_tips_and_tricks/#using-the-tpl-function
-envRenderSecret:
-  POSTGRES_PASSWORD: pass
+envRenderSecret: {}
 
 ## The names of secrets in the same kubernetes namespace which contain values to be added to the environment
 ## Each entry should contain a name key, and can optionally specify whether the secret must be defined with an optional key.
@@ -615,29 +610,7 @@ plugins: []
 ## Configure grafana datasources
 ## ref: http://docs.grafana.org/administration/provisioning/#datasources
 ##
-datasources:
-  datasources.yaml:
-    apiVersion: 1
-    datasources:
-      - id: 1
-        orgId: 1
-        name: PostgreSQL
-        type: postgres
-        typeLogoUrl: public/app/plugins/datasource/postgres/img/postgresql_logo.svg
-        access: proxy
-        url: ${POSTGRES_HOST}
-        secureJsonData:
-          password: ${POSTGRES_PASSWORD}
-        user: ${POSTGRES_USER}
-        database: ${POSTGRES_DB}
-        basicAuth: false
-        isDefault: true
-        jsonData:
-          postgresVersion: 1200
-          timescaledb: true
-          sslmode: disable
-        readOnly: true
-
+datasources: {}
 #  datasources.yaml:
 #    apiVersion: 1
 #    datasources:
@@ -746,18 +719,7 @@ notifiers: {}
 ##
 ## `path` must be /var/lib/grafana/dashboards/<provider_name>
 ##
-dashboardProviders:
-  dashboardproviders.yaml:
-    apiVersion: 1
-    providers:
-    - name: 'allprojects'
-      orgId: 1
-      folder: 'All Projects'
-      type: file
-      disableDeletion: false
-      editable: true
-      options:
-        path: /var/lib/grafana/dashboards/allprojects
+dashboardProviders: {}
 #  dashboardproviders.yaml:
 #    apiVersion: 1
 #    providers:
@@ -834,21 +796,6 @@ grafana.ini:
     url: https://grafana.net
   server:
     domain: "{{ if (and .Values.ingress.enabled .Values.ingress.hosts) }}{{ .Values.ingress.hosts | first }}{{ else }}''{{ end }}"
-  users:
-    auto_assign_org: true
-    auto_assign_org_role: Editor
-  auth.generic_oauth:
-    name: managementportal
-    enabled: true
-    auth_url: http://localhost/managementportal/oauth/authorize
-    token_url: https://localhost/managementportal/oauth/token
-    api_url: http://management-portal:8080/managementportal/api/account
-    client_id: grafana_dashboard
-    # Fix for https://github.com/grafana/grafana/issues/70203#issuecomment-1798601871
-    oauth_allow_insecure_email_lookup: true
-    #client_secret: ""
-    empty_scopes: true
-
 ## grafana Authentication can be enabled with the following values on grafana.ini
  # server:
       # The full public facing url you use in browser, used for redirects and emails
@@ -1430,4 +1377,4 @@ extraObjects: []
 #
 # Alternatively, if you wish to allow secret values to be exposed in the rendered grafana.ini configmap,
 # you can disable this check by setting assertNoLeakedSecrets to false.
-assertNoLeakedSecrets: false
+assertNoLeakedSecrets: true

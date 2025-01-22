@@ -1,0 +1,28 @@
+kafka_num_brokers: 1
+catalog_server:
+  kafka_num_replication: 1
+  kafka_num_partitions: 1
+cp_kafka:
+  configurationOverrides:
+    "offsets.topic.replication.factor": 1
+    "default.replication.factor": 1
+    "transaction.state.log.replication.factor": 1
+    "confluent.license.topic.replication.factor": 1
+    "confluent.tier.metadata.replication.factor": 1
+    "confluent.durability.topic.replication.factor": 1
+    "confluent.balancer.topic.replication.factor": 1
+    "confluent.monitoring.interceptor.topic.replication.factor": 1
+    "transaction.state.log.replication.factor": 1
+cp_zookeeper:
+  servers: 1
+ksql_server:
+  ksql:
+    # Needed to reduce the number of partitions (hard-coded in these SQL files) to 1.
+    queries: |
+      {{- readFile "ksql-queries/_base_observations_stream.sql"             | nindent 8 }}
+      {{- readFile "ksql-queries/questionnaire_response_observations.sql"   | nindent 8 }}
+      {{- readFile "ksql-queries/questionnaire_app_event_observations.sql"  | nindent 8 }}
+  configurationOverrides:
+    "ksql.internal.topic.replicas": 1
+radar_jdbc_connector_data_dashboard_backend:
+  kafka: PLAINTEXT://cp-kafka:9092

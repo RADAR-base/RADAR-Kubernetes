@@ -1,0 +1,84 @@
+# disables logging (in graylog) and monitoring (with prometheus)
+
+kube_prometheus_stack:
+  _install: false
+mongodb:
+  _install: false
+elasticsearch:
+  _install: false
+graylog:
+  _install: false
+fluent_bit:
+  _install: false
+
+cert_manager:
+  prometheus:
+    servicemonitor:
+      enabled: false
+postgresql:
+  postgresql:
+    metrics:
+      enabled: false
+    primary:
+      sidecars: []
+data_dashboard_timescaledb:
+  postgresql:
+    metrics:
+      enabled: false
+    primary:
+      sidecars: []
+grafana_metrics_timescaledb:
+  postgresql:
+    metrics:
+      enabled: false
+    primary:
+      sidecars: []
+realtime_dashboard_timescaledb:
+  postgresql:
+    metrics:
+      enabled: false
+    primary:
+      sidecars: []
+nginx_ingress:
+  controller:
+    metrics:
+      enabled: false
+      serviceMonitor:
+        enabled: false
+catalog_server:
+  prometheus:
+    jmx:
+      enabled: false
+cp_kafka:
+  prometheus:
+    jmx:
+      enabled: false
+cp_zookeeper:
+  prometheus:
+    jmx:
+      enabled: false
+cp_schema_registry:
+  prometheus:
+    jmx:
+      enabled: false
+redis:
+  metrics:
+    enabled: false
+minio:
+  metrics:
+    serviceMonitor:
+      enabled: false
+    prometheusRule:
+      enabled: false
+radar_appserver_postgresql:
+  postgresql:
+    metrics:
+      enabled: false
+    primary:
+      sidecars: []
+radar_upload_postgresql:
+  postgresql:
+    metrics:
+      enabled: false
+    primary:
+      sidecars: []
