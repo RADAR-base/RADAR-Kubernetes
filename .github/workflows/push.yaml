@@ -73,18 +73,25 @@ jobs:
         run: |
           k3d cluster delete --all || true
 
-  test-k8s-versions:
+  matrix-prep:
+    runs-on: self-hosted
     needs: delete-old-clusters
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: nelonoel/branch-name@v1.0.1
+      - id: set-matrix
+        uses: JoshuaTheMiller/conditional-build-matrix@main
+        with:
+          # inputFile: '.github/workflows/matrix_includes.json' # Default input file path
+          filter: '[?runOnBranch==`${{ env.BRANCH_NAME }}` || runOnBranch==`always`]'
+          addInclude: true
+
+  test-k8s-versions:
+    needs: matrix-prep
     runs-on: self-hosted
     strategy:
-      matrix:
-        KUBECTL_VERSION: [ "v1.30.0", "v1.31.0" ]
-        include:
-          - KUBECTL_VERSION: "v1.31.0"
-            K3S_VERSION: "v1.31.2+k3s1"
-        exclude:
-          - KUBECTL_VERSION: ${{ github.base_ref != 'refs/heads/main' && 'v1.30.0' }}
-            K3S_VERSION: ${{ github.base_ref != 'refs/heads/main' && 'v1.30.6+k3s1' }}
+      matrix: ${{ fromJson(needs.matrix-prep.outputs.matrix) }}
     steps:
       - uses: nolar/setup-k3d-k3s@v1
         with:
