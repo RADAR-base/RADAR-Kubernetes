@@ -12,11 +12,6 @@ on:
 
 jobs:
   install:
-    strategy:
-      matrix:
-        K3S_VERSION: ["v1.30.6+k3s1", "v1.31.2+k3s1"]
-        exclude:
-          - K3S_VERSION: ${{ github.base_ref != 'refs/heads/main' && 'v1.30.6+k3s1' }}
     runs-on: self-hosted
     steps:
       - name: Cleanup
@@ -54,11 +49,15 @@ jobs:
           sed -i '/enable_logging_monitoring: /s/false/true/' etc/production.yaml
           sed -i '/e2e_test: /s/false/true/' etc/production.yaml
 
-      - name: Run helmfile template
-        env:
-          FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
-        run: |
-          helmfile template
+  test-helmfile-template:
+    needs: install
+    runs-on: self-hosted
+    steps:
+    - name: Test helmfile template
+      env:
+        FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
+      run: |
+        helmfile template > /tmp/helmfile.yaml
 
   delete-old-clusters:
     runs-on: self-hosted
@@ -68,12 +67,26 @@ jobs:
         run: |
           k3d cluster delete --all || true
 
+  test-k8s-versions:
+    needs: delete-old-clusters
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        K3S_VERSION: ["v1.30.6+k3s1", "v1.31.2+k3s1"]
+        exclude:
+          - K3S_VERSION: ${{ github.base_ref != 'refs/heads/main' && 'v1.30.6+k3s1' }}
+    steps:
       - uses: nolar/setup-k3d-k3s@v1
         with:
           version: ${{ matrix.K3S_VERSION }}
-          k3d-args: --k3s-arg --disable=traefik@server:0 --k3s-arg --disable-helm-controller@server:0 --config .github/ci_config/k3d-local-image-repo.yaml
+          k3d-args: --k3s-arg --disable=traefik@server:0 --k3s-arg --disable-helm-controller@server:0 --config .github/ci_config/k3d-config.yaml
           # Note: k3d adds a 'k3d-' prefix to this name
           k3d-name: ${{ matrix.KUBECTL_VERSION }}
+
+      # TODO would be better to do this with a command line parameter. I have been unable to get this to work.
+      - name: Set kubeContext
+        run: |
+          sed -i "s/kubeContext: .*/kubeContext: k3d-${{ matrix.KUBECTL_VERSION }}/" etc/production.yaml
 
       - name: Install RADAR-Kubernetes
         env:
@@ -81,7 +94,7 @@ jobs:
         run: |
           echo "kubeconfig: $KUBECONFIG"
           kubectl get pods --all-namespaces --context k3d-${{ matrix.KUBECTL_VERSION }}
-          helmfile sync --concurrency 1
+          helmfile sync
 
       - name: Run end-to-end tests
         run: |
