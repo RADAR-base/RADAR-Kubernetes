@@ -51,6 +51,10 @@ jobs:
           sed -i '/dev_deployment: /s/false/true/' etc/production.yaml
           sed -i '/e2e_test: /s/false/true/' etc/production.yaml
 
+      - name: Ensure k3d cache directory exists
+        run: |
+          mkdir -p $HOME/k3d-containerd
+
   test-helmfile-template:
     needs: install
     runs-on: self-hosted
