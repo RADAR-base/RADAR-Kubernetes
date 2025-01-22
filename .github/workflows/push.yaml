@@ -46,7 +46,9 @@ jobs:
           helmfile_mods+='\ \ \ \ \ \ - ../.github/ci_config/secrets.yaml.gotmpl'
           sed -i "/secrets.yaml/a $helmfile_mods" environments.yaml
           sed -i '/_install: /s/false/true/' etc/production.yaml
+          # Deploy a minimal deployment accessible on 'localhost:80' with monitoring enabled
           sed -i '/enable_logging_monitoring: /s/false/true/' etc/production.yaml
+          sed -i '/dev_deployment: /s/false/true/' etc/production.yaml
           sed -i '/e2e_test: /s/false/true/' etc/production.yaml
 
   test-helmfile-template:
@@ -99,9 +101,7 @@ jobs:
       - name: Run end-to-end tests
         run: |
           cd test/features
-          behave -D secrets_file=$GITHUB_WORKSPACE/etc/secrets.yaml -D url=https://example.com
-
-      # Enable tmate debugging of manually-triggered workflows if the input option was provided
+          behave -D secrets_file=$GITHUB_WORKSPACE/etc/secrets.yaml -D url=http://localhost:80     # Enable tmate debugging of manually-triggered workflows if the input option was provided
       - name: Manually triggered tmate session
         uses: mxschmitt/action-tmate@v3
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
