@@ -110,6 +110,41 @@ Then you can make a new fork or branch and make your changes there and after you
 If you're changing an existing code, make sure that it is either backwards compatible or the documentation shows a clear path of applying the changes without breaking the existing installations.
 
 
+#### Development automation
+
+This repository can be used for development automation for instance on a k3s or k3d (dockerized k3s) cluster. The example below shows how to deploy on a k3d cluster.
+
+1. Install k3d (see [here](https://github.com/k3d-io/k3d#get))
+2. Create a k3d cluster that is configured to run RADAR-base
+
+```shell
+k3d cluster create my-test-cluster --port '80:80@loadbalancer' --config=.github/ci_config/k3d-config.yaml
+```
+
+This example creates a cluster named `my-test-cluster` with a load balancer that forwards local port 80 to the cluster. The
+configuration file `.github/ci_config/k3d-config.yaml` is used to configure the cluster. This cluster will be accessible
+in _kubectl_ with context name _k3d-my-test-cluster_.
+
+3. Initialize the RADAR-Kubernetes deployment. Run:
+
+```shell
+./bin/init
+```
+
+4. In file _etc/production.yaml_:
+
+- set _kubeContext_ to _k3d-my-test-cluster_
+- set _dev_deployment_ to _true_
+- (optional) enable/disable components as needed with the __install_ fields
+
+5. Install RADAR-Kubernetes on the k3d cluster:
+
+```shell
+helmfile sync
+```
+
+When installation is complete, you can access the applications at `http://localhost`.
+
 #### Adding a new component to RADAR-Kuberentes
 In order to add a new component you first need to add its helm chart to [radar-helm-charts)](https://github.com/RADAR-base/radar-helm-charts) repository. Refer to contributing guidelines of that repository for more information. Once the chart has been added you need to:
 - Add a helmfile for it in `helmfile.d` directory. The helmfiles are seperated in a modular way in order to avoid having a huge file and also installing certain components in order. Have a look at the current helmfiles and if your component is related to one of them add your component in that file other file create a new file. If your component is a dependency to other components, like Kafka or PostgreSQL prefix the file name with a smaller number so it will be installed first, but if it's a standalone component, the prefix number can be higher.

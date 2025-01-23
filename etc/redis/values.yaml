@@ -17,6 +17,8 @@ auth:
 ##
 
 master:
+  resources:
+    limits: {}
   ## @param master.podAnnotations Annotations for Redis&trade; master pods
   ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
   ##

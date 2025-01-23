@@ -16,15 +16,29 @@ cert_manager:
     servicemonitor:
       enabled: false
 postgresql:
-  metrics:
-    enabled: false
-  primary:
-    sidecars: []
-timescaledb:
-  metrics:
-    enabled: false
-  primary:
-    sidecars: []
+  postgresql:
+    metrics:
+      enabled: false
+    primary:
+      sidecars: []
+data_dashboard_timescaledb:
+  postgresql:
+    metrics:
+      enabled: false
+    primary:
+      sidecars: []
+grafana_metrics_timescaledb:
+  postgresql:
+    metrics:
+      enabled: false
+    primary:
+      sidecars: []
+realtime_dashboard_timescaledb:
+  postgresql:
+    metrics:
+      enabled: false
+    primary:
+      sidecars: []
 nginx_ingress:
   controller:
     metrics:
@@ -56,8 +70,15 @@ minio:
       enabled: false
     prometheusRule:
       enabled: false
+radar_appserver_postgresql:
+  postgresql:
+    metrics:
+      enabled: false
+    primary:
+      sidecars: []
 radar_upload_postgresql:
-  metrics:
-    enabled: false
-  primary:
-    sidecars: []
+  postgresql:
+    metrics:
+      enabled: false
+    primary:
+      sidecars: []

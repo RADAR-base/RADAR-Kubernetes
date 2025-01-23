@@ -4,10 +4,4 @@ sink:
   tableNameFormat: observation
   insertMode: insert
   primaryKeys:
-    fields:
-      - PROJECT
-      - SUBJECT
-      - SOURCE
-      - TOPIC_NAME
-      - VARIABLE
-      - OBSERVATION_TIME
+    mode: none

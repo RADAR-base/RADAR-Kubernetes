@@ -14,11 +14,9 @@ jobs:
   install:
     strategy:
       matrix:
-        K3S_VERSION: ["v1.27.14+k3s1", "v1.28.10+k3s1", "v1.29.5+k3s1", "v1.30.1+k3s1"]
+        K3S_VERSION: ["v1.30.6+k3s1", "v1.31.2+k3s1"]
         exclude:
-          - K3S_VERSION: ${{ github.base_ref != 'refs/heads/main' && 'v1.27.14+k3s1' }}
-          - K3S_VERSION: ${{ github.base_ref != 'refs/heads/main' && 'v1.28.10+k3s1' }}
-          - K3S_VERSION: ${{ github.base_ref != 'refs/heads/main' && 'v1.29.5+k3s1' }}
+          - K3S_VERSION: ${{ github.base_ref != 'refs/heads/main' && 'v1.30.6+k3s1' }}
     runs-on: self-hosted
     steps:
       - name: Cleanup
@@ -33,10 +31,10 @@ jobs:
 
       - name: Install dependencies
         env:
-          HELM_VERSION: "v3.11.3"
-          HELM_DIFF_VERSION: "3.6.0"
-          HELMFILE_VERSION: "v0.152.0"
-          YQ_VERSION: "v4.33.3"
+          HELM_VERSION: "v3.16.3"
+          HELM_DIFF_VERSION: "3.9.12"
+          HELMFILE_VERSION: "v0.169.1"
+          YQ_VERSION: "v4.44.3"
         run: |
           ./.github/ci_config/bin/install-dependencies
 

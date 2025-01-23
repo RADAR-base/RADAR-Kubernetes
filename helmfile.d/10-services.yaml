@@ -204,13 +204,12 @@ releases:
       {{ end }}
 
   - name: postgresql
-    chart: radar/postgresql
+    chart: radar/radar-postgresql
     version: {{ .Values.postgresql._chart_version }}
     installed: {{ .Values.postgresql._install }}
     timeout: {{ add .Values.base_timeout .Values.postgresql._extra_timeout }}
     <<: *logFailedRelease
     values:
-      - "../etc/postgresql/values.yaml"
       - {{ .Values.postgresql | toYaml | indent 8 | trim }}
 
   - name: management-portal
@@ -218,14 +217,16 @@ releases:
     version: {{ .Values.management_portal._chart_version }}
     installed: {{ .Values.management_portal._install }}
     timeout: {{ add .Values.base_timeout .Values.management_portal._extra_timeout }}
-    {{ if .Values.postgresql._install }}needs: [postgresql]{{ end }}
+    {{ if or .Values.postgresql._install .Values.catalog_server._install }}
+    needs:
+      {{ if .Values.postgresql._install }}- postgresql{{ end }}
+      {{ if .Values.catalog_server._install }}- catalog-server{{ end }}
+    {{ end }}
     <<: *logFailedRelease
     values:
       - {{ .Values.management_portal | toYaml | indent 8 | trim }}
     set:
       - name: ingress.hosts
-        values: [{{ .Values.server_name }}]
-      - name: ingress_rate_limited.hosts
         values: [{{ .Values.server_name }}]
       - name: server_name
         value: {{ .Values.server_name }}
@@ -251,6 +252,8 @@ releases:
         value: {{ .Values.radar_grafana._install }}
       - name: oauth_clients.radar_push_endpoint.enable
         value: {{ .Values.radar_push_endpoint._install }}
+      - name: oauth_clients.radar_data_dashboard_backend.enable
+        value: {{ .Values.data_dashboard_backend._install }}
       - name: oauth_clients.grafana_dashboard.redirect_uri
         values:
           - "https://dashboard.{{ .Values.server_name }}/login/generic_oauth"
@@ -410,13 +413,12 @@ releases:
           - {{ .Values.server_name }}
 
   - name: radar-appserver-postgresql
-    chart: radar/postgresql
+    chart: radar/radar-postgresql
     version: {{ .Values.radar_appserver_postgresql._chart_version }}
     installed: {{ .Values.radar_appserver_postgresql._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_appserver_postgresql._extra_timeout }}
     <<: *logFailedRelease
     values:
-      - "../etc/radar-appserver-postgresql/values.yaml"
       - {{ .Values.radar_appserver_postgresql | toYaml | indent 8 | trim }}
 
   - name: radar-appserver
@@ -433,37 +435,78 @@ releases:
         values: [{{ .Values.server_name }}]
       - name: serverName
         value: {{ .Values.server_name }}
+    {{ if and .Values.radar_appserver.upload.enabled (eq .Values.radar_appserver.upload.storage.type "s3") }}
+      - name: upload.storage.access_key
+        value: {{ dig "s3" "identity" .Values.s3_access_key .Values.s3_proxy }}
+      - name: upload.storage.secret_key
+        value: {{ dig "s3" "credential" .Values.s3_secret_key .Values.s3_proxy }}
+    {{ end }}
 
-  - name: timescaledb
-    chart: radar/postgresql
-    version: {{ .Values.timescaledb._chart_version }}
-    installed: {{ .Values.timescaledb._install }}
-    timeout: {{ add .Values.base_timeout .Values.timescaledb._extra_timeout }}
+  - name: data-dashboard-timescaledb
+    chart: radar/radar-timescaledb
+    version: {{ .Values.data_dashboard_timescaledb._chart_version }}
+    installed: {{ .Values.data_dashboard_timescaledb._install }}
+    timeout: {{ add .Values.base_timeout .Values.data_dashboard_timescaledb._extra_timeout }}
     <<: *logFailedRelease
     values:
-      - "../etc/timescaledb/values.yaml"
-      - {{ .Values.timescaledb | toYaml | indent 8 | trim }}
+      - {{ .Values.data_dashboard_timescaledb | toYaml | indent 8 | trim }}
     set:
-      {{- if eq .Values.timescaledb_username "postgres" }}
-      - name: global.postgresql.auth.postgresPassword
-        value: {{ .Values.timescaledb_password }}
+      {{- if eq .Values.data_dashboard_db_username "postgres" }}
+      - name: postgresql.global.postgresql.auth.postgresPassword
+        value: {{ .Values.data_dashboard_db_password }}
       {{- else }}
-      - name: global.postgresql.auth.username
-        value: {{ .Values.timescaledb_username }}
-      - name: global.postgresql.auth.password
-        value: {{ .Values.timescaledb_password }}
+      - name: postgresql.global.postgresql.auth.username
+        value: {{ .Values.data_dashboard_db_username }}
+      - name: postgresql.global.postgresql.auth.password
+        value: {{ .Values.data_dashboard_db_password }}
       {{- end }}
-      - name: auth.database
-        value: {{ .Values.timescaledb_db_name }}
+
+  - name: grafana-metrics-timescaledb
+    chart: radar/radar-timescaledb
+    version: {{ .Values.grafana_metrics_timescaledb._chart_version }}
+    installed: {{ .Values.grafana_metrics_timescaledb._install }}
+    timeout: {{ add .Values.base_timeout .Values.grafana_metrics_timescaledb._extra_timeout }}
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.grafana_metrics_timescaledb | toYaml | indent 8 | trim }}
+    set:
+      {{- if eq .Values.grafana_metrics_db_username "postgres" }}
+      - name: postgresql.global.postgresql.auth.postgresPassword
+        value: {{ .Values.grafana_metrics_db_password }}
+      {{- else }}
+      - name: postgresql.global.postgresql.auth.username
+        value: {{ .Values.grafana_metrics_db_username }}
+      - name: postgresql.global.postgresql.auth.password
+        value: {{ .Values.grafana_metrics_db_password }}
+      {{- end }}
+
+  - name: realtime-dashboard-timescaledb
+    chart: radar/radar-timescaledb
+    version: {{ .Values.realtime_dashboard_timescaledb._chart_version }}
+    installed: {{ .Values.realtime_dashboard_timescaledb._install }}
+    timeout: {{ add .Values.base_timeout .Values.realtime_dashboard_timescaledb._extra_timeout }}
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.realtime_dashboard_timescaledb | toYaml | indent 8 | trim }}
+    set:
+      {{- if eq .Values.realtime_dashboard_db_username "postgres" }}
+      - name: postgresql.global.postgresql.auth.postgresPassword
+        value: {{ .Values.realtime_dashboard_db_password }}
+      {{- else }}
+      - name: postgresql.global.postgresql.auth.username
+        value: {{ .Values.realtime_dashboard_db_username }}
+      - name: postgresql.global.postgresql.auth.password
+        value: {{ .Values.realtime_dashboard_db_password }}
+      {{- end }}
 
   - name: radar-grafana
     chart: radar/grafana
     version: {{ .Values.radar_grafana._chart_version }}
     installed: {{ .Values.radar_grafana._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_grafana._extra_timeout }}
-    {{ if .Values.timescaledb._install }}
+    {{ if .Values.grafana_metrics_timescaledb._install }}
     needs:
-      - timescaledb
+      - grafana-metrics-timescaledb
     {{ end }}
     <<: *logFailedRelease
     values:
@@ -473,9 +516,9 @@ releases:
       - name: adminPassword
         value: {{ .Values.grafana_password }}
       - name: env.POSTGRES_DB
-        value: {{ .Values.timescaledb_db_name | quote }}
+        value: {{ .Values.grafana_metrics_timescaledb.postgresql.auth.database | quote }}
       - name: envRenderSecret.POSTGRES_PASSWORD
-        value: {{ .Values.timescaledb_password }}
+        value: {{ .Values.grafana_metrics_db_password }}
       - name: ingress.hosts
         values: ["dashboard.{{ .Values.server_name }}"]
       - name: "grafana\\.ini.server.root_url"
@@ -485,9 +528,9 @@ releases:
       - name: ingress.tls[0].hosts
         values: ["dashboard.{{ .Values.server_name }}"]
       - name: "grafana\\.ini.metrics.basic_auth_username"
-        value: {{ .Values.grafana_metrics_username }}
+        value: {{ .Values.grafana_metrics_db_username }}
       - name: "grafana\\.ini.metrics.basic_auth_password"
-        value: {{ .Values.grafana_metrics_password }}
+        value: {{ .Values.grafana_metrics_db_password }}
       - name: "grafana\\.ini.auth\\.generic_oauth.auth_url"
         value: "https://{{ .Values.server_name }}/managementportal/oauth/authorize"
       - name: "grafana\\.ini.auth\\.generic_oauth.token_url"
@@ -498,7 +541,10 @@ releases:
     version: {{ .Values.data_dashboard_backend._chart_version }}
     installed: {{ .Values.data_dashboard_backend._install }}
     timeout: {{ add .Values.base_timeout .Values.data_dashboard_backend._extra_timeout }}
-    {{ if .Values.timescaledb._install }}needs: [timescaledb]{{ end }}
+    {{ if .Values.data_dashboard_timescaledb._install }}
+    needs:
+      - data-dashboard-timescaledb
+    {{ end }}
     <<: *logFailedRelease
     values:
       - {{ .Values.data_dashboard_backend | toYaml | indent 8 | trim }}
@@ -509,11 +555,11 @@ releases:
         values:
           - {{ .Values.server_name }}
       - name: jdbc.user
-        value: {{ .Values.timescaledb_username }}
+        value: {{ .Values.data_dashboard_db_username }}
       - name: jdbc.password
-        value: {{ .Values.timescaledb_password }}
+        value: {{ .Values.data_dashboard_db_password }}
       - name: jdbc.url
-        value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://timescaledb-postgresql-hl:5432/%s" .Values.data_dashboard_backend_db_name) .Values.data_dashboard_backend }}
+        value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://data-dashboard-timescaledb-postgresql-hl:5432/%s" .Values.data_dashboard_timescaledb.postgresql.auth.database) .Values.data_dashboard_backend }}
       - name: managementPortal.clientSecret
         value: {{ .Values.management_portal.oauth_clients.radar_data_dashboard_backend.client_secret }}
 
@@ -538,7 +584,9 @@ releases:
     needs:
       # When catalog server is 'ready', kafka can be used.
       - catalog-server
-      {{ if .Values.timescaledb._install }}- timescaledb{{ end }}
+      {{ if .Values.grafana_metrics_timescaledb._install }}
+      - grafana-metrics-timescaledb
+      {{ end }}
     <<: *logFailedRelease
     values:
       - {{ .Values.radar_jdbc_connector_grafana | toYaml | indent 8 | trim }}
@@ -546,11 +594,11 @@ releases:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
       - name: jdbc.user
-        value: {{ .Values.timescaledb_username }}
+        value: {{ .Values.grafana_metrics_db_username }}
       - name: jdbc.password
-        value: {{ .Values.timescaledb_password }}
+        value: {{ .Values.grafana_metrics_db_password }}
       - name: jdbc.url
-        value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://timescaledb-postgresql-hl:5432/%s" .Values.timescaledb_db_name) .Values.radar_jdbc_connector_realtime_dashboard }}
+        value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://grafana-metrics-timescaledb-postgresql-hl:5432/%s" .Values.grafana_metrics_timescaledb.postgresql.auth.database) .Values.radar_jdbc_connector_realtime_dashboard }}
 
   - name: radar-jdbc-connector-data-dashboard-backend
     chart: radar/radar-jdbc-connector
@@ -560,7 +608,9 @@ releases:
     needs:
       # When catalog server is 'ready', kafka can be used.
       - catalog-server
-      {{ if .Values.timescaledb._install }}- timescaledb{{ end }}
+      {{ if .Values.data_dashboard_timescaledb._install }}
+      - data-dashboard-timescaledb
+      {{ end }}
     <<: *logFailedRelease
     values:
       - "../etc/radar-jdbc-connector-data-dashboard-backend/values.yaml"
@@ -569,11 +619,11 @@ releases:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
       - name: jdbc.user
-        value: {{ .Values.timescaledb_username }}
+        value: {{ .Values.data_dashboard_db_username }}
       - name: jdbc.password
-        value: {{ .Values.timescaledb_password }}
+        value: {{ .Values.data_dashboard_db_password }}
       - name: jdbc.url
-        value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://timescaledb-postgresql-hl:5432/%s" .Values.data_dashboard_backend_db_name) .Values.radar_jdbc_connector_data_dashboard_backend }}
+        value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://data-dashboard-timescaledb-postgresql-hl:5432/%s" .Values.data_dashboard_timescaledb.postgresql.auth.database) .Values.radar_jdbc_connector_data_dashboard_backend }}
 
   - name: radar-jdbc-connector-realtime-dashboard
     chart: radar/radar-jdbc-connector
@@ -583,7 +633,9 @@ releases:
     needs:
       # When catalog server is 'ready', kafka can be used.
       - catalog-server
-      {{ if .Values.timescaledb._install }}- timescaledb{{ end }}
+      {{ if .Values.realtime_dashboard_timescaledb._install }}
+      - realtime-dashboard-timescaledb
+      {{ end }}
     <<: *logFailedRelease
     values:
       - "../etc/radar-jdbc-connector-realtime-dashboard/values.yaml"
@@ -592,11 +644,11 @@ releases:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
       - name: jdbc.user
-        value: {{ .Values.timescaledb_username }}
+        value: {{ .Values.realtime_dashboard_db_username }}
       - name: jdbc.password
-        value: {{ .Values.timescaledb_password }}
+        value: {{ .Values.realtime_dashboard_db_password }}
       - name: jdbc.url
-        value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://timescaledb-postgresql-hl:5432/%s" .Values.timescaledb_db_name) .Values.radar_jdbc_connector_realtime_dashboard }}
+        value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://realtime-dashboard-timescaledb-postgresql-hl:5432/%s" .Values.realtime_dashboard_timescaledb.postgresql.auth.database) .Values.radar_jdbc_connector_realtime_dashboard }}
 
   - name: radar-fitbit-connector
     chart: radar/radar-fitbit-connector
@@ -857,18 +909,17 @@ releases:
         value: {{ dig "target" "s3" "secretKey" .Values.s3_secret_key .Values.radar_output }}
 
   - name: radar-upload-postgresql
-    chart: radar/postgresql
+    chart: radar/radar-postgresql
     version: {{ .Values.radar_upload_postgresql._chart_version }}
     installed: {{ .Values.radar_upload_postgresql._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_upload_postgresql._extra_timeout }}
     <<: *logFailedRelease
     values:
-      - "../etc/radar-upload-postgresql/values.yaml"
       - {{ .Values.radar_upload_postgresql | toYaml | indent 8 | trim }}
     set:
-      - name: global.postgresql.auth.postgresPassword
+      - name: postgresql.global.postgresql.auth.postgresPassword
         value: {{ .Values.radar_upload_postgres_password }}
-      - name: auth.replicationPassword
+      - name: postgresql.auth.replicationPassword
         value: {{ .Values.radar_upload_postgres_password }}
 
   - name: radar-upload-connect-backend
@@ -876,8 +927,12 @@ releases:
     version: {{ .Values.radar_upload_connect_backend._chart_version }}
     installed: {{ .Values.radar_upload_connect_backend._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_upload_connect_backend._extra_timeout }}
-    {{ if .Values.radar_upload_postgresql._install }}needs: [radar-upload-postgresql]{{ end }}
     <<: *logFailedRelease
+    {{ if .Values.management_portal._install }}
+    needs:
+      - management-portal
+      {{ if .Values.radar_upload_postgresql._install }}- radar-upload-postgresql{{ end }}
+    {{ end }}
     values:
       - {{ .Values.radar_upload_connect_backend | toYaml | indent 8 | trim }}
     set:
@@ -910,10 +965,10 @@ releases:
     installed: {{ .Values.radar_upload_source_connector._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_upload_source_connector._extra_timeout }}
     <<: *logFailedRelease
+    {{ if .Values.radar_upload_connect_backend._install }}
     needs:
       - radar-upload-connect-backend
-    {{ if .Values.cp_schema_registry._install }}
-      - cp-schema-registry
+      {{ if .Values.cp_schema_registry._install }}- cp-schema-registry{{ end }}
     {{ end }}
     values:
       - {{ .Values.radar_upload_source_connector | toYaml | indent 8 | trim }}
