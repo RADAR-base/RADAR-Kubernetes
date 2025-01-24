@@ -176,7 +176,7 @@ postgresql:
         size: 10Gi
       extraEnvVars:
         - name: POSTGRES_MULTIPLE_DATABASES
-          value: restsourceauthorizer,appconfig,kratos # ... and these databases will be created
+          value: restsourceauthorizer,appconfig,kratos,hydra # ... and these databases will be created
 
 management_portal:
   _install: true
