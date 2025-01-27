@@ -393,11 +393,11 @@ releases:
       - name: hydra.config.urls.self.issuer
         value: https://{{ .Values.server_name }}/hydra/
       - name: hydra.config.urls.login
-        value: https://{{ .Values.server_name }}/kratos-ui/login
+        value: https://{{ .Values.server_name }}/kratos-ui/auth/oauth-login
       - name: hydra.config.urls.logout
-        value: https://{{ .Values.server_name }}/kratos-ui/logout
+        value: https://{{ .Values.server_name }}/kratos-ui/auth/logout
       - name: hydra.config.urls.consent
-        value: https://{{ .Values.server_name }}/kratos-ui/consent
+        value: https://{{ .Values.server_name }}/kratos-ui/auth/consent
       - name: ingress.public.hosts[0].host
         value: {{ .Values.server_name }}
       - name: ingress.admin.tls[0].hosts
