@@ -353,7 +353,6 @@ releases:
       - name: kratos.config.selfservice.flows.verification.after.hooks[0].config.url
         value: https://{{ .Values.server_name }}/managementportal/api/kratos/subjects/activate
 
-
   - name: radar-self-enrolment-ui
     chart: radar/radar-self-enrolment-ui
     version: {{ .Values.radar_self_enrolment_ui._chart_version }}
