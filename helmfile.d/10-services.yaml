@@ -353,24 +353,20 @@ releases:
       - name: kratos.config.selfservice.flows.verification.after.hooks[0].config.url
         value: https://{{ .Values.server_name }}/managementportal/api/kratos/subjects/activate
 
-
-  - name: kratos-selfservice-ui-node
+  - name: radar-self-enrolment-ui
     chart: radar/radar-self-enrolment-ui
-    version: {{ .Values.kratos_ui._chart_version }}
-    installed: {{ .Values.kratos_ui._install }}
-    timeout: {{ add .Values.base_timeout .Values.kratos_ui._extra_timeout }}
+    version: {{ .Values.radar_self_enrolment_ui._chart_version }}
+    installed: {{ .Values.radar_self_enrolment_ui._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_self_enrolment_ui._extra_timeout }}
     <<: *logFailedRelease
     values:
-      - "../etc/kratos-ui/values.yaml"
-      - {{ .Values.kratos_ui | toYaml | indent 8 | trim }}
+      - "../etc/radar-self-enrolment-ui/values.yaml"
+      - {{ .Values.radar_self_enrolment_ui | toYaml | indent 8 | trim }}
     set:
       - name: serverName
         value: {{ .Values.server_name }}
-      - name: ingress.hosts[0].host
+      - name: ingress.hosts[0]
         value: {{ .Values.server_name }}
-      - name: ingress.tls[0].hosts
-        values:
-          - {{ .Values.server_name }}
       - name: kratosPublicUrl
         value: https://{{ .Values.server_name }}/kratos
       - name: kratosBrowserUrl
