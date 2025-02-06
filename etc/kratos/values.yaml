@@ -4,11 +4,10 @@ ingress:
     className: "nginx"
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-prod
-      nginx.ingress.kubernetes.io/rewrite-target: /admin/$2
     hosts:
       - host: localhost
         paths:
-          - path: "/admin/kratos(/|$)(.*)"
+          - path: "/admin/kratos/?(.*)"
             pathType: ImplementationSpecific
     tls:
       - secretName: radar-base-tls
@@ -37,11 +36,11 @@ kratos:
 
   # -- You can add multiple identity schemas here. You can pass JSON schema using `--set-file` Helm CLI argument.
   identitySchemas:
-    "identity.schema.admin.json": |
+    "identity.user.schema.json": |
       {
         "$schema": "http://json-schema.org/draft-07/schema#",
-        "$id": "admin",
-        "title": "admin",
+        "$id": "user",
+        "title": "user",
         "type": "object",
         "properties": {
           "traits": {
@@ -70,16 +69,16 @@ kratos:
                 }
               }
             },
-            "required": ["email"]
+            "required": [ "email" ]
           }
         },
         "additionalProperties": false
       }
-    "identity.schema.researcher.json": |
+    "identity.default.schema.json": |
       {
         "$schema": "http://json-schema.org/draft-07/schema#",
-        "$id": "researcher",
-        "title": "researcher",
+        "$id": "default",
+        "title": "user",
         "type": "object",
         "properties": {
           "traits": {
@@ -108,49 +107,12 @@ kratos:
                 }
               }
             },
-            "required": ["email"]
+            "required": [ "email" ]
           }
         },
         "additionalProperties": false
       }
-    "identity.schema.subject.json": |
-      {
-        "$schema": "http://json-schema.org/draft-07/schema#",
-        "$id": "subject",
-        "title": "subject",
-        "type": "object",
-        "properties": {
-          "traits": {
-            "type": "object",
-            "properties": {
-              "email": {
-                "type": "string",
-                "format": "email",
-                "title": "E-Mail",
-                "minLength": 5,
-                "ory.sh/kratos": {
-                  "credentials": {
-                    "password": {
-                      "identifier": true
-                    },
-                    "totp": {
-                      "account_name": true
-                    }
-                  },
-                  "verification": {
-                    "via": "email"
-                  },
-                  "recovery": {
-                    "via": "email"
-                  }
-                }
-              }
-            },
-            "required": ["email"]
-          }
-        },
-        "additionalProperties": false
-      }
+
   config:
 
     session:
@@ -234,14 +196,6 @@ kratos:
           use: link
           after:
             default_browser_return_url: https://localhost/kratos-ui
-            hooks:
-              -   hook: web_hook
-                  config:
-                    method: POST
-                    url: http://management-portal:8080/managementportal/api/kratos/subjects/activate
-                    body: base64://ZnVuY3Rpb24oY3R4KSB7CiAgICBpZGVudGl0eTogaWYgc3RkLm9iamVjdEhhcyhjdHgsICJpZGVudGl0eSIpIHRoZW4gY3R4LmlkZW50aXR5IGVsc2UgbnVsbCwKICAgIHBheWxvYWQ6IGlmIHN0ZC5vYmplY3RIYXMoY3R4LCAiZmxvdyIpICYmIHN0ZC5vYmplY3RIYXMoY3R4LmZsb3csICJ0cmFuc2llbnRfcGF5bG9hZCIpIHRoZW4gY3R4LmZsb3cudHJhbnNpZW50X3BheWxvYWQgZWxzZSBudWxsLAogICAgY29va2llczogY3R4LnJlcXVlc3RfY29va2llcwp9Cg==
-                    response:
-                      ignore: true
 
         logout:
           after:
@@ -255,32 +209,19 @@ kratos:
           after:
             password:
               hooks:
-                -   hook: web_hook
-                    config:
-                      method: POST
-                      url: http://management-portal:8080/managementportal/api/kratos/subjects
-                      body: base64://ZnVuY3Rpb24oY3R4KSB7CiAgICBpZGVudGl0eTogaWYgc3RkLm9iamVjdEhhcyhjdHgsICJpZGVudGl0eSIpIHRoZW4gY3R4LmlkZW50aXR5IGVsc2UgbnVsbCwKICAgIHBheWxvYWQ6IGlmIHN0ZC5vYmplY3RIYXMoY3R4LCAiZmxvdyIpICYmIHN0ZC5vYmplY3RIYXMoY3R4LmZsb3csICJ0cmFuc2llbnRfcGF5bG9hZCIpIHRoZW4gY3R4LmZsb3cudHJhbnNpZW50X3BheWxvYWQgZWxzZSBudWxsLAogICAgY29va2llczogY3R4LnJlcXVlc3RfY29va2llcwp9Cg==
-                      response:
-                        ignore: true
                 -   hook: session
             oidc:
               hooks:
                 -   hook: session
 
     identity:
-      default_schema_id: subject
+      default_schema_id: user
       schemas:
-        - id: subject
-          url: file:///etc/config/identity.schema.subject.json
-        - id: researcher
-          url: file:///etc/config/identity.schema.researcher.json
-        - id: admin
-          url: file:///etc/config/identity.schema.admin.json
+        # identitySchemas:
+        -   id: user
+            url: file:///etc/config/identity.user.schema.json
 
     log:
       level: debug
       format: text
       leak_sensitive_values: true
-
-    oauth2_provider:
-      url: http://hydra-admin
