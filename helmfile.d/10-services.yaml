@@ -610,7 +610,7 @@ releases:
       - name: jdbc.password
         value: {{ .Values.grafana_metrics_db_password }}
       - name: jdbc.url
-        value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://grafana-metrics-timescaledb-postgresql-hl:5432/%s" .Values.grafana_metrics_timescaledb.postgresql.auth.database) .Values.radar_jdbc_connector_realtime_dashboard }}
+        value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://grafana-metrics-timescaledb-postgresql-hl:5432/%s" .Values.grafana_metrics_timescaledb.postgresql.auth.database) .Values.radar_jdbc_connector_grafana }}
 
   - name: radar-jdbc-connector-data-dashboard-backend
     chart: radar/radar-jdbc-connector
