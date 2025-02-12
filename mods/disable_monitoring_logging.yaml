@@ -82,3 +82,10 @@ radar_upload_postgresql:
       enabled: false
     primary:
       sidecars: []
+gateway:
+  serviceMonitor:
+    enabled: false
+ksql_server:
+  prometheus:
+    jmx:
+      enabled: false

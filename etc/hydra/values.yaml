@@ -1,0 +1,64 @@
+ingress:
+  admin:
+    enabled: true
+    className: "nginx"
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/rewrite-target: /admin/$2
+    hosts:
+      - host: localhost
+        paths:
+          - path: "/admin/hydra(/|$)(.*)"
+            pathType: ImplementationSpecific
+    tls:
+      - secretName: radar-base-tls
+        hosts:
+          - localhost
+  public:
+    enabled: true
+    className: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /$1
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    hosts:
+      - host: localhost
+        paths:
+          - path: "/hydra/?(.*)"
+            pathType: ImplementationSpecific
+    tls:
+      - secretName: radar-base-tls
+        hosts:
+          - localhost
+hydra:
+  automigration:
+    enabled: true
+  config:
+    urls:
+      self:
+        issuer: https://localhost/hydra/
+      login: https://localhost/login
+      consent: https://localhost/hydra-ui/consent
+
+    log:
+      level: debug
+      format: text
+      leak_sensitive_values: false
+
+    strategies:
+      access_token: jwt
+      jwt:
+        scope_claim: both
+
+    oauth2:
+      allowed_top_level_claims: [scope,roles,authorities,sources,user_name]
+      mirror_top_level_claims: false
+      client_credentials:
+        default_grant_allowed_scope: true
+    
+    serve:
+      public:
+        cors:
+          enabled: true
+      admin:
+        cors:
+          enabled: true

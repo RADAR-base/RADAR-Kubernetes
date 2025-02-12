@@ -29,6 +29,11 @@ jobs:
 
       - uses: actions/checkout@v3
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+
       - name: Install dependencies
         env:
           HELM_VERSION: "v3.16.3"
@@ -38,6 +43,9 @@ jobs:
         run: |
           ./.github/ci_config/bin/install-dependencies
 
+      - name: Install Python dependencies
+        run: pip install -r test/features/requirements.txt
+
       - name: Prepare the environment (add secrets and enable installation of all components)
         run: |
           DNAME='CN=CI,O=TheHyve,L=Utrecht,C=NL' ./bin/init
@@ -46,6 +54,7 @@ jobs:
           sed -i "/secrets.yaml/a $helmfile_mods" environments.yaml
           sed -i '/_install: /s/false/true/' etc/production.yaml
           sed -i '/enable_logging_monitoring: /s/false/true/' etc/production.yaml
+          sed -i '/e2e_test: /s/false/true/' etc/production.yaml
 
       - name: Run helmfile template
         env:
@@ -68,8 +77,12 @@ jobs:
         run: |
           echo "kubeconfig: $KUBECONFIG"
           kubectl get pods --all-namespaces
-
           helmfile sync --concurrency 1
+
+      - name: Run end-to-end tests
+        run: |
+          cd test/features
+          behave -D secrets_file=$GITHUB_WORKSPACE/etc/secrets.yaml -D url=https://example.com
 
       # Enable tmate debugging of manually-triggered workflows if the input option was provided
       - name: Manually triggered tmate session
