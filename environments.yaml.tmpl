@@ -13,11 +13,13 @@ environments:
     {{ end }}
     {{ if .Values.dev_deployment }}
       - ../mods/disable_tls.yaml
-      - ../mods/disable_monitoring_logging.yaml
       - ../mods/localdev.yaml
       - ../mods/minimal.yaml
       - ../mods/minimal_kafka.yaml.gotmpl
       - ../mods/fast_deploy.yaml
+    {{ end }}
+    {{ if .Values.e2e_test }}
+      - ../mods/e2e.yaml
     {{ end }}
 
 ---

@@ -16,9 +16,10 @@ enable_logging_monitoring: false
 # Can be disabled when TLS termination is handled upstream of the on-cluster Nginx reverse proxy.
 enable_tls: true
 
-# Minimal deployment for development (disables TLS, monitoring and logging, sets kafka and minio brokers to 1).
+# Minimal deployment for development (disables TLS, sets kafka and minio brokers to 1 and uses minimal RAM footprint).
 dev_deployment: false
-
+# E2e test deployment (applies very fast application loop timings for tests).
+e2e_test: false
 
 # --------------------------------------------------------- 00-init.yaml ---------------------------------------------------------
 
@@ -382,7 +383,6 @@ realtime_dashboard_timescaledb:
 # Make sure to set:
 #- grafana_metrics_timescaledb._install to true
 #- radar_jdbc_connector_grafana._install to true
-#- ksql_server._install to true
 radar_grafana:
   _install: false
   _chart_version: 8.3.7
@@ -615,6 +615,11 @@ velero:
         config:
           s3Url: https://s3.amazon.com # protocol should be specified
 
+radar_mockserver:
+  _install: false
+  _chart_version: 0.1.0
+  _extra_timeout: 0
+
 nifi:
   _install: false
   _chart_version: 1.2.1
@@ -623,3 +628,4 @@ nifi:
     enabled: false
     url: cp-zookeeper-headless
     port: 2181
+
