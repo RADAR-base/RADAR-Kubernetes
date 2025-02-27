@@ -733,6 +733,16 @@ releases:
         value: {{ dig "restSourceClients" "garmin" "clientSecret" (dig "garmin" "consumerSecret" "" .Values.radar_push_endpoint) .Values.radar_rest_sources_backend }}
       - name: client_secret
         value: {{ dig "client_secret" (dig "oauth_clients" "radar_rest_sources_auth_backend" "client_secret" "" .Values.management_portal) .Values.radar_rest_sources_backend }}
+      - name: restSourceClients.oura.enable
+        value: {{ .Values.radar_oura_connector._install }}
+      {{- if hasKey .Values "oura_api_client" }}
+      - name: restSourceClients.oura.clientId
+        value: {{ .Values.oura_api_client }}
+      {{- end }}
+      {{- if hasKey .Values "oura_api_secret" }}
+      - name: restSourceClients.oura.clientSecret
+        value: {{ .Values.oura_api_secret }}
+      {{- end }}
 
   - name: radar-oura-connector
     chart: radar/radar-oura-connector
