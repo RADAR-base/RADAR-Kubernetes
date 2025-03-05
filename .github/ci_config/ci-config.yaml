@@ -52,3 +52,16 @@ radar_upload_postgresql:
 
 ccSchemaRegistryProxy:
   _install: false
+
+# FIXME disabled for deployment test for now REENABLE!!
+nifi:
+  _install: false
+
+kratos:
+  _install: false
+
+kratos_ui:
+  _install: false
+
+hydra:
+  _install: false
