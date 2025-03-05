@@ -9,7 +9,7 @@ volumes:
       - server:0
 registries:
   create:
-    image: ligfx/k3d-registry-dockerd:fix_missing_blobs
+    image: ligfx/k3d-registry-dockerd:v0.8
     proxy:
       remoteURL: "*"
     volumes:
