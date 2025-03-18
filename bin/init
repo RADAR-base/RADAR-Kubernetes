@@ -10,8 +10,8 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
 fi
 
 copy_template_if_absent environments.yaml environments.yaml.tmpl
-copy_template_if_absent etc/production.yaml etc/base.yaml
 copy_template_if_absent etc/production.yaml.gotmpl etc/base.yaml.gotmpl
+create_production_yaml
 
 DNAME="$DNAME" bin/keystore-init
 bin/generate-secrets

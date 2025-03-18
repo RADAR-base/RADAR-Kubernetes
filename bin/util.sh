@@ -45,6 +45,14 @@ copy_template_if_absent() {
   fi
 }
 
+create_production_yaml() {
+  copy_template_if_absent etc/production.yaml etc/base.yaml
+  tempfile=$(mktemp)
+  mv etc/production.yaml $tempfile
+  # remove all '_chart_version' fields
+  cat $tempfile | grep -v _chart_version > etc/production.yaml
+}
+
 # Copies the template (defined by the given config file with suffix
 # ".template") to intended configuration file.
 copy_template() {
