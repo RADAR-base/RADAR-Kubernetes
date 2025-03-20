@@ -1,0 +1,34 @@
+config:
+  csrfCookieName: "radar_csrf"
+
+ingress:
+  enabled: true
+  path: "/kratos-ui(/|$)(.*)"
+
+# -- Set this to ORY Kratos's Admin URL
+kratosAdminUrl: "kratos-admin"
+
+# -- Set this to ORY Kratos's public URL
+kratosPublicUrl: "https://localhost/kratos"
+
+# -- Set this to ORY Kratos's public URL accessible from the outside world.
+kratosBrowserUrl: "https://localhost/kratos"
+
+# -- The basePath
+basePath: "/kratos-ui"
+
+# -- The jwksUrl
+jwksUrl: ""
+
+projectName: "SecureApp"
+
+deployment:
+  extraEnv:
+    - name: HYDRA_ADMIN_URL
+      value: http://hydra-admin
+
+livenessProbe:
+  enabled: false
+
+readinessProbe:
+  enabled: false
