@@ -292,6 +292,7 @@ releases:
     version: {{ .Values.kratos._chart_version }}
     installed: {{ .Values.kratos._install }}
     timeout: {{ add .Values.base_timeout .Values.kratos._extra_timeout }}
+    {{ if .Values.postgresql._install }}needs: [postgresql]{{ end }}
     <<: *logFailedRelease
     values:
       - "../etc/kratos/values.yaml"
@@ -393,6 +394,7 @@ releases:
     version: {{ .Values.hydra._chart_version }}
     installed: {{ .Values.hydra._install }}
     timeout: {{ add .Values.base_timeout .Values.hydra._extra_timeout }}
+    {{ if .Values.postgresql._install }}needs: [postgresql]{{ end }}
     values:
       - "../etc/hydra/values.yaml"
       - {{ .Values.hydra | toYaml | indent 8 | trim }}
