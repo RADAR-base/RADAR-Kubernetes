@@ -1,5 +1,12 @@
 # disables logging (in graylog) and monitoring (with prometheus)
 
+nginx_ingress:
+  controller:
+    metrics:
+      enabled: false
+      serviceMonitor:
+        enabled: false
+
 kube_prometheus_stack:
   _install: false
 mongodb:
