@@ -97,16 +97,16 @@ kube_prometheus_stack:
 
 # Always needed
 nginx_ingress:
-  _install: false
+  _install: true
   _chart_version: 4.10.1
   _extra_timeout: 0
   controller:
     replicaCount: 1
     # Prometheus metrics exporter
     metrics:
-      enabled: true
+      enabled: false
       serviceMonitor:
-        enabled: true
+        enabled: false
 
 # --------------------------------------------------------- 10-base.yaml ---------------------------------------------------------
 # Use letsencrypt to retrieve SSL certificates.
