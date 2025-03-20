@@ -1,0 +1,618 @@
+# Whether to upgrade process rolls back changes made in case of failed upgrade
+atomicinstall: false
+# time to wait for any individual Kubernetes operation
+base_timeout: 90
+# Context that you use in kubectl to access the Kubernetes cluster. Will be translated to `helm --kube-context <context_name>`
+kubeContext: k3d-test
+# Domain name that RADAR-Base installation will be accessible from
+server_name: example.com
+# This email address will be used to notify for SSL certificate expiration
+maintainer_email: MAINTAINER_EMAIL@example.com
+# Number of Kafka pods that will be installed
+kafka_num_brokers: 3
+# Enable logging and monitoring
+enable_logging_monitoring: false
+# Enable TLS redirection and retrieval of Let's Encrypt certificates.
+# Can be disabled when TLS termination is handled upstream of the on-cluster Nginx reverse proxy.
+enable_tls: true
+
+# Minimal deployment for development (disables TLS, monitoring and logging, sets kafka and minio brokers to 1).
+dev_deployment: true
+
+
+# --------------------------------------------------------- 00-init.yaml ---------------------------------------------------------
+
+# Needed for graylog. If graylog is set not to install, this can be disabled as well.
+mongodb:
+  _install: false
+  _chart_version: 15.6.16
+  _extra_timeout: 60
+  # Use standalone for a leaner installation, replicaset for a distributed one.
+  architecture: replicaset
+
+# Needed for graylog. If graylog is set not to install, this can be disabled as well.
+elasticsearch:
+  _install: false
+  _chart_version: 7.17.3
+  _extra_timeout: 180
+
+graylog:
+  _install: false
+  _chart_version: 2.2.2
+  _extra_timeout: 180
+
+# Needed for graylog. If graylog is set not to install, this can be disabled as well.
+fluent_bit:
+  _install: false
+  _chart_version: 0.19.24
+  _extra_timeout: 0
+
+cert_manager:
+  _install: false
+  _chart_version: v1.14.5
+  _extra_timeout: 0
+  global:
+    # Needed for compatibility with K8S 1.25+
+    podSecurityPolicy:
+      enabled: false
+      useAppArmor: false
+  prometheus:
+    servicemonitor:
+      enabled: true
+
+# Should be installed at least once to get the necessary resource definitions.
+# If disabled, you can still install those definitions with the command:
+# kubectl --context <my-context> apply --force-conflicts --server-side -f etc/kube-prometheus-stack/files/crds.yaml
+kube_prometheus_stack:
+  _install: false
+  _chart_version: 0.4.4
+  _extra_timeout: 0
+  kube-prometheus-stack:
+    prometheus:
+      prometheusSpec:
+        replicas: 1
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              resources:
+                requests:
+                  storage: 10Gi
+    alertmanager:
+      #config:
+      #  receivers:
+      #    - name: default
+      #      slack_configs:
+      #        - api_url: https://hooks.slack.com/services/XXXXXX/XXXXXX/XXXXXXXXXX
+      #          channel: "#radar-ops"
+      alertmanagerSpec:
+        replicas: 1
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              resources:
+                requests:
+                  storage: 1Gi
+    kubeStateMetrics:
+      enabled: true
+
+# Always needed
+nginx_ingress:
+  _install: false
+  _chart_version: 4.10.1
+  _extra_timeout: 0
+  controller:
+    replicaCount: 1
+    # Prometheus metrics exporter
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+
+# --------------------------------------------------------- 10-base.yaml ---------------------------------------------------------
+# Use letsencrypt to retrieve SSL certificates.
+cert_manager_letsencrypt:
+  _install: false
+  _chart_version: 0.1.3
+  _extra_timeout: 0
+
+# Use confluent cloud instead of a local Kafka cluster.
+# If this is enabled, then cp_kafka and cp_zookeeper should be disabled.
+confluent_cloud:
+  enabled: false
+
+cp_zookeeper:
+  _install: false
+  _chart_version: 0.3.4
+  _extra_timeout: 510
+  servers: 3
+
+cp_kafka:
+  _install: false
+  _chart_version: 0.3.5
+  _extra_timeout: 510
+  customEnv:
+    # Set this to 1.1 when upgrading from Kafka 5.x
+    # and do a rolling upgrade as described in
+    # README
+    KAFKA_INTER_BROKER_PROTOCOL_VERSION: "3.2"
+    KAFKA_LOG_MESSAGE_FORMAT_VERSION: "3.2"
+  # Increase for larger installations.
+  persistence:
+    size: 10Gi
+
+cp_schema_registry:
+  _install: false
+  _chart_version: 0.3.2
+  _extra_timeout: 90
+  replicaCount: 1
+
+catalog_server:
+  _install: false
+  _chart_version: 0.6.3
+  _extra_timeout: 90
+  replicaCount: 1
+  schema_registry: http://cp-schema-registry:8081
+
+radar_home:
+  _install: true
+  _chart_version: 0.3.5
+  _extra_timeout: 0
+
+# --------------------------------------------------------- 10-managementportal.yaml ---------------------------------------------------------
+
+# This Postgresql is used for Management Portal and App config, postgres password should be same in them
+postgresql:
+  _install: true
+  _chart_version: 0.1.0
+  _extra_timeout: 0
+  postgresql:
+    replication:
+      enabled: false
+      applicationName: radar
+    auth:
+      database: managementportal # this database will be created...
+    primary:
+      persistence:
+        size: 10Gi
+      extraEnvVars:
+        - name: POSTGRES_MULTIPLE_DATABASES
+          value: restsourceauthorizer,appconfig,kratos,hydra # ... and these databases will be created
+
+management_portal:
+  _install: true
+  _chart_version: 1.4.2
+  _extra_timeout: 210
+  replicaCount: 1  # should be 1
+  image:
+    tag: feature-ory-based-authorization
+  postgres:
+    host: postgresql
+    user: postgres
+    port: 5432
+    ssl:
+      enabled: false
+  managementportal:
+    catalogue_server_enable_auto_import: true
+    common_privacy_policy_url: http://info.thehyve.nl/radar-cns-privacy-policy
+    oauth_checking_key_aliases_0: radarbase-managementportal-ec
+    oauth_checking_key_aliases_1: selfsigned
+  smtp:
+    enabled: true
+    host: smtp
+    port: 25
+    from: noreply@example.com
+    starttls: false
+    auth: true
+
+kratos:
+  _install: true
+  _chart_version: 0.43.1
+  _extra_timeout: 0
+  jdbc:
+    database: kratos
+  kratos:
+    courier:
+      smtp:
+        from_address: radar@thehyve.nl
+
+kratos_ui:
+  _install: false
+  _chart_version: 0.43.1
+  _extra_timeout: 0
+
+radar_self_enrolment_ui:
+  _install: true
+  _chart_version: 0.2.2
+  _extra_timeout: 0
+
+hydra:
+  _install: true
+  _chart_version: 0.48.0
+  _extra_timeout: 0
+
+app_config:
+  _install: false
+  _chart_version: 1.3.4
+  _extra_timeout: 0
+  replicaCount: 1
+  jdbc:
+    url: jdbc:postgresql://postgresql:5432/appconfig
+
+app_config_frontend:
+  _install: false
+  _chart_version: 2.1.1
+  _extra_timeout: 0
+  replicaCount: 1
+
+# --------------------------------------------------------- 20-appserver.yaml ---------------------------------------------------------
+# The charts in 20-appserver.yaml only need to be installed if you have a custom aRMT app.
+radar_appserver_postgresql:
+  _install: false
+  _chart_version: 0.1.0
+  _extra_timeout: 0
+  postgresql:
+    auth:
+      database: appserver # this database will be created
+    primary:
+      persistence:
+        size: 8Gi
+      extraEnvVars:
+        - name: POSTGRES_MULTIPLE_DATABASES
+          value:
+    replication:
+      applicationName: radarAppserver
+
+radar_appserver:
+  _install: false
+  _chart_version: 0.7.2
+  _extra_timeout: 0
+  replicaCount: 1
+  managementportal_resource_name: res_AppServer
+  public_key_endpoints: []
+  smtp:
+    enabled: false # -- set to true, if sending of notifications via email should be enabled.
+    host: smtp
+    port: 25
+    from: noreply@example.com
+    starttls: false
+    auth: true
+  upload:
+    enabled: false
+
+# --------------------------------------------------------- 20-fitbit.yaml ---------------------------------------------------------
+# The charts in 20-fitbit.yaml only need to be installed if you will use a Fitbit, Garmin, or Oura API integration.
+radar_fitbit_connector:
+  _install: false
+  _chart_version: 0.4.0
+  _extra_timeout: 0
+  replicaCount: 1
+  oauthClientId: radar_fitbit_connector
+
+radar_oura_connector:
+  _install: false
+  _chart_version: 0.0.5
+  _extra_timeout: 0
+  replicaCount: 1
+  oauthClientId: radar_oura_connector
+
+radar_rest_sources_authorizer:
+  _install: false
+  _chart_version: 2.1.3
+  _extra_timeout: 0
+  replicaCount: 1
+
+radar_rest_sources_backend:
+  _install: false
+  _chart_version: 1.2.3
+  _extra_timeout: 0
+  replicaCount: 1
+  postgres:
+    host: postgresql
+    user: postgres
+    ssl:
+      enabled: false
+  restSourceClients:
+    fitbit:
+      enable: "false"
+    garmin:
+      enable: "false"
+
+# --------------------------------------------------------- 20-dashboard.yaml ---------------------------------------------------------
+
+data_dashboard_db_username: postgres
+grafana_metrics_db_username: postgres
+realtime_dashboard_db_username: postgres
+
+# Note: because of the way init scripts are handled in the timescaledb dependency chart (postgres), we
+# cannot create multiple databases in the same database service. Therefore, we need to create separate
+# timescaledb services for each component that uses a timescale database.
+
+# Install when data_dashboard_backend._install is 'true'
+data_dashboard_timescaledb:
+  _install: false
+  _chart_version: 0.1.0
+  _extra_timeout: 210
+  replicaCount: 1
+  postgresql:
+    replication:
+      enable: false
+      applicationName: radarDataDashboard
+    auth:
+      database: data-dashboard
+    primary:
+      persistence:
+        size: 8Gi
+        # Uncomment when upgrading from version v1.1.3 to v1.2.0
+        #existingClaim: "data-timescaledb-postgresql-0"
+
+# Install when radar_grafana._install is 'true'
+grafana_metrics_timescaledb:
+  _install: false
+  _chart_version: 0.1.0
+  _extra_timeout: 210
+  replicaCount: 1
+  postgresql:
+    replication:
+      enable: false
+      applicationName: radarGrafanaMetrics
+    auth:
+      database: grafana-metrics
+    primary:
+      persistence:
+        size: 8Gi
+        # Uncomment when upgrading from version v1.1.3 to v1.2.0
+        #existingClaim: "data-timescaledb-postgresql-0"
+
+# Install when using realtime analysis
+realtime_dashboard_timescaledb:
+  _install: false
+  _chart_version: 0.1.0
+  _extra_timeout: 210
+  replicaCount: 1
+  postgresql:
+    replication:
+      enable: false
+      applicationName: radarRealtimeDashboard
+    auth:
+      database: realtime-dashboard
+    primary:
+      persistence:
+        size: 8Gi
+        # Uncomment when upgrading from version v1.1.3 to v1.2.0
+        #existingClaim: "data-timescaledb-postgresql-0"
+
+# Make sure to set:
+#- grafana_metrics_timescaledb._install to true
+#- radar_jdbc_connector_grafana._install to true
+#- ksql_server._install to true
+radar_grafana:
+  _install: false
+  _chart_version: 8.3.7
+  _extra_timeout: 0
+  replicaCount: 1
+  env:
+    GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/allprojects/home.json
+
+# Make sure to set:
+#- data_dashboard_timescaledb._install to true
+#- radar_jdbc_connector_data_dashboard_backend._install to true
+#- ksql_server._install to true
+data_dashboard_backend:
+  _install: false
+  _chart_version: 0.3.7
+  _extra_timeout: 0
+  replicaCount: 1
+
+# Install when radar_grafana._install is 'true'
+radar_jdbc_connector_grafana:
+  _install: false
+  _chart_version: 0.5.5
+  _extra_timeout: 0
+  replicaCount: 1
+  sink:
+    # Change the list of topics if you have dashboards that read other data or if you don't have certain topics available on your cluster.
+    topics: android_phone_relative_location, android_phone_battery_level, connect_fitbit_intraday_heart_rate, connect_fitbit_intraday_steps
+
+# Install when data_dashboard_backend._install is 'true'.
+radar_jdbc_connector_data_dashboard_backend:
+  _install: false
+  _chart_version: 0.5.5
+  _extra_timeout: 0
+  replicaCount: 1
+
+# Install when using realtime analysis
+radar_jdbc_connector_realtime_dashboard:
+  _install: false
+  _chart_version: 0.5.5
+  _extra_timeout: 0
+  replicaCount: 1
+
+# Install when:
+#- radar_grafana._install is 'true'
+#- data_dashboard_backend._install is 'true'
+#- using realtime analysis
+ksql_server:
+  _install: false
+  _chart_version: 0.3.3
+  _extra_timeout: 0
+  # -- Uncomment when using real-time analysis
+  # ksql:
+  #   headless: false
+  # --
+
+# --------------------------------------------------------- 20-ingestion.yaml ---------------------------------------------------------
+
+radar_gateway:
+  _install: false
+  _chart_version: 1.2.9
+  _extra_timeout: 0
+  replicaCount: 1
+
+# --------------------------------------------------------- 20-kafka-analysis.yaml ---------------------------------------------------------
+
+radar_backend_monitor:
+  _install: false
+  _chart_version: 0.3.1
+  _extra_timeout: 0
+  replicaCount: 1
+  smtp:
+    host: smtp.google.com
+    port: 25
+    user: user@gmail.com
+  persistence:
+    size: 1Gi
+
+radar_backend_stream:
+  _install: false
+  _chart_version: 0.3.1
+  _extra_timeout: 0
+  replicaCount: 1
+
+# --------------------------------------------------------- 20-redcap.yaml ---------------------------------------------------------
+
+radar_integration:
+  _install: false
+  _chart_version: 0.7.3
+  _extra_timeout: 0
+  replicaCount: 1
+  oauth_client_id: radar_redcap_integrator
+
+# --------------------------------------------------------- 20-s3-connector.yaml ---------------------------------------------------------
+
+redis:
+  _install: false
+  _chart_version: 19.1.6
+  _extra_timeout: 0
+  metrics:
+    enabled: true
+
+minio:
+  _install: false
+  _chart_version: 14.6.32
+  _extra_timeout: 210
+  persistence:
+    size: 20Gi
+  metrics:
+    serviceMonitor:
+      enabled: true
+    prometheusRule:
+      enabled: true
+  provisioning:
+    ## @param provisioning.users MinIO&reg; users provisioning. Can be used in addition to provisioning.usersExistingSecrets.
+    ## https://docs.min.io/docs/minio-admin-complete-guide.html#user
+    ## e.g.
+    ## users:
+    ##   - username: test-username
+    ##     password: test-password
+    ##     disabled: false
+    ##     policies:
+    ##       - read-output
+    users: []
+
+radar_s3_connector:
+  # set to true if radar-s3-connector should be installed
+  _install: false
+  _chart_version: 0.4.1
+  _extra_timeout: 90
+  replicaCount: 1
+  # The bucket name where intermediate data for cold storage should be written to.
+  bucketName: radar-intermediate-storage
+  s3Endpoint: http://minio:9000/
+
+s3_proxy:
+  _install: false
+  _chart_version: 0.4.2
+  _extra_timeout: 0
+  replicaCount: 1
+  target:
+    provider: azureblob
+
+radar_output:
+  _install: false
+  _chart_version: 1.0.1
+  _extra_timeout: 0
+  replicaCount: 1
+  source:
+    s3:
+      endpoint: http://minio:9000/
+      bucket: radar-intermediate-storage
+  target:
+    s3:
+      endpoint: http://minio:9000/
+      bucket: radar-output-storage
+
+  redis:
+    uri: redis://redis-master:6379
+
+# --------------------------------------------------------- 20-upload.yaml ---------------------------------------------------------
+
+radar_upload_postgresql:
+  _install: false
+  _chart_version: 0.1.0
+  _extra_timeout: 0
+  postgresql:
+    auth:
+      database: uploadconnector
+    primary:
+      persistence:
+        size: 10Gi
+      extraEnvVars:
+        - name: POSTGRES_MULTIPLE_DATABASES
+          value:
+    replication:
+      applicationName: radar_uploadconnector
+
+radar_upload_connect_backend:
+  _install: false
+  _chart_version: 0.5.3
+  _extra_timeout: 0
+  replicaCount: 1
+
+radar_upload_connect_frontend:
+  _install: false
+  _chart_version: 0.5.1
+  _extra_timeout: 0
+  replicaCount: 1
+
+radar_upload_source_connector:
+  _install: false
+  _chart_version: 0.3.4
+  _extra_timeout: 60
+  replicaCount: 1
+  s3Endpoint: http://minio:9000/
+
+# --------------------------------------------------------- 30-confluent-cloud.yaml ---------------------------------------------------------
+
+ccSchemaRegistryProxy:
+  _install: false
+  _chart_version: 0.3.3
+  _extra_timeout: 0
+  externalName: schema-registry-domain
+
+# --------------------------------------------------------- 20-push-endpoint.yaml ---------------------------------------------------------
+
+radar_push_endpoint:
+  _install: false
+  _chart_version: 0.3.6
+  _extra_timeout: 180
+  replicaCount: 1
+  adminProperties: {}
+  garmin:
+    enabled: true
+
+# --------------------------------------------------------- 99-velero.yaml ---------------------------------------------------------
+
+velero:
+  _install: false
+  _chart_version: 0.3.2
+  _extra_timeout: 0
+  objectStorageBackupReplicaCount: 1
+  backup:
+    address: s3.amazon.com  # protocol should not be specified
+    bucket: radar-base-backups
+  velero:
+    configuration:
+      backupStorageLocation:
+        bucket: radar-base-backups
+        config:
+          s3Url: https://s3.amazon.com # protocol should be specified
