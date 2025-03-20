@@ -77,3 +77,5 @@ kratos:
 kratos_ui:
   kratosPublicUrl: http://localhost/kratos
   kratosBrowserUrl: http://localhost/kratos
+radar_kafka_stack:
+  dev_deployment: true
