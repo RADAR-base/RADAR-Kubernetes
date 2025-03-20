@@ -139,15 +139,27 @@ releases:
       - name: ingress.tls[0].hosts
         values: ["{{ .Values.server_name }}"]
 
+  - name: radar-kafka
+    chart: radar/radar-kafka
+    version: {{ .Values.radar_kafka_stack._chart_version }}
+    installed: {{ .Values.radar_kafka_stack._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_kafka_stack._extra_timeout }}
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.radar_kafka_stack | toYaml | indent 8 | trim }}
+    set:
+      - name: dev_deployment
+        value: {{ .Values.dev_deployment | default false }}
+
   - name: catalog-server
     chart: radar/catalog-server
     version: {{ .Values.catalog_server._chart_version }}
     installed: {{ .Values.catalog_server._install }}
     timeout: {{ add .Values.base_timeout .Values.catalog_server._extra_timeout }}
-    {{ if .Values.cp_kafka._install }}
+    {{ if or .Values.radar_kafka_stack._install .Values.cp_schema_registry._install }}
     needs:
-      - cp-kafka
-      - cp-schema-registry
+      {{ if .Values.radar_kafka_stack._install }}- radar-kafka{{ end }}
+      {{ if .Values.cp_schema_registry._install }}- cp-schema-registry{{ end }}
     {{ end }}
     <<: *logFailedRelease
     values:
@@ -853,6 +865,8 @@ releases:
       - management-portal
       - radar-upload-connect-backend
       {{ if .Values.cp_schema_registry._install }}- cp-schema-registry{{ end }}
+      {{ if .Values.radar_kafka_stack._install }}- radar-kafka{{ end }}
+    {{ end }}
     values:
       - {{ .Values.radar_upload_source_connector | toYaml | indent 8 | trim }}
     set:

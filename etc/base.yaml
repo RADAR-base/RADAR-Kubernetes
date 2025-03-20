@@ -124,13 +124,13 @@ confluent_cloud:
   enabled: false
 
 cp_zookeeper:
-  _install: true
-  _chart_version: 0.3.5
+  _install: false
+  _chart_version: 0.3.4
   _extra_timeout: 510
   servers: 3
 
 cp_kafka:
-  _install: true
+  _install: false
   _chart_version: 0.3.6
   _extra_timeout: 510
   customEnv:
@@ -144,17 +144,22 @@ cp_kafka:
     size: 10Gi
 
 cp_schema_registry:
-  _install: true
-  _chart_version: 0.3.3
+  _install: false
+  _chart_version: 0.3.2
   _extra_timeout: 90
   replicaCount: 1
+
+radar_kafka_stack:
+  _install: true
+  _chart_version: 0.0.2
+  _extra_timeout: 0
 
 catalog_server:
   _install: true
   _chart_version: 0.7.1
   _extra_timeout: 90
   replicaCount: 1
-  schema_registry: http://cp-schema-registry:8081
+  schema_registry: http://confluent-schema-registry:8081
 
 radar_home:
   _install: true

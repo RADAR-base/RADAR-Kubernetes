@@ -1,10 +1,17 @@
 # KSQL configuration options
 ## ref: https://docs.confluent.io/current/ksql/docs/installation/server-config/config-reference.html
+## ref: https://docs.confluent.io/platform/current/ksqldb/operate-and-deploy/installation/security.html#configure-kafka-authentication
 kafka:
-    bootstrapServers: PLAINTEXT://cp-kafka:9092
+    bootstrapServers: radar-kafka-brokers:9094
 cp-schema-registry:
-    url: http://cp-schema-registry:8081
+    url: http://confluent-schema-registry:8081
+secret:
+    jaas:
+        name: shared-service-user
+        key: sasl.jaas.config
 configurationOverrides:
+    "security.protocol": SASL_PLAINTEXT
+    "sasl.mechanism": SCRAM-SHA-512
     "ksql.server.url": "http://0.0.0.0:8088"
     "ksql.advertised.listener": "http://ksql-server:8088"
     "ksql.logging.processing.topic.auto.create": true
