@@ -209,13 +209,14 @@ kratos:
   jdbc:
     database: kratos
   kratos:
-    courier:
-      smtp:
-        from_address: radar@thehyve.nl
+        config:
+            courier:
+                smtp:
+                    from_address: radar@thehyve.nl
 
 radar_self_enrolment_ui:
   _install: true
-  _chart_version: 0.2.0
+  _chart_version: 0.2.3
   _extra_timeout: 0
 
 hydra:

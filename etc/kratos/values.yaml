@@ -230,8 +230,8 @@ kratos:
           # our current flow necessitates that users reset their password after they activate an account in managementportal,
           # this works as verification
           ui_url: https://localhost/kratos-ui/verification
-          enabled: false
-          use: link
+          enabled: true
+          use: code
           after:
             default_browser_return_url: https://localhost/kratos-ui
             hooks:

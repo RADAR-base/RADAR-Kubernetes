@@ -360,17 +360,16 @@ releases:
     timeout: {{ add .Values.base_timeout .Values.radar_self_enrolment_ui._extra_timeout }}
     <<: *logFailedRelease
     values:
-      - "../etc/radar-self-enrolment-ui/values.yaml"
       - {{ .Values.radar_self_enrolment_ui | toYaml | indent 8 | trim }}
     set:
       - name: serverName
         value: {{ .Values.server_name }}
       - name: ingress.hosts[0]
         value: {{ .Values.server_name }}
-      - name: kratosPublicUrl
-        value: https://{{ .Values.server_name }}/kratos
       - name: kratosBrowserUrl
         value: https://{{ .Values.server_name }}/kratos
+      - name: hydraPublicUrl
+        value: https://{{ .Values.server_name }}/hydra
 
   - name: hydra
     chart: radar/hydra
