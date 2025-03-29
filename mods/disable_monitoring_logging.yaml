@@ -117,3 +117,6 @@ ksql_server:
 mongodb:
   metrics:
     enabled: false
+radar_kafka_stack:
+  metrics:
+    enabled: false
