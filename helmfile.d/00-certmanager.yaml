@@ -8,7 +8,8 @@ bases:
 releases:
   - name: kube-prometheus-stack
     namespace: monitoring
-    chart: radar/kube-prometheus-stack
+#    chart: radar/kube-prometheus-stack
+    chart: ../../radar-helm-charts/charts/kube-prometheus-stack
     version: {{ .Values.kube_prometheus_stack._chart_version }}
     installed: {{ .Values.kube_prometheus_stack._install }}
     timeout: {{ add .Values.base_timeout .Values.kube_prometheus_stack._extra_timeout }}
@@ -16,9 +17,6 @@ releases:
     <<: *logFailedReleasePrometheus
     values:
       - {{ .Values.kube_prometheus_stack | toYaml | indent 8 | trim }}
-      {{- if or (not .Values.enable_tls) .Values.dev_deployment }}
-      - "../etc/kube-prometheus-stack/disable-tls.yaml"
-      {{- end }}
     set:
       - name: kube-prometheus-stack.prometheus.ingress.hosts
         values: ["prometheus.{{ .Values.server_name }}"]
