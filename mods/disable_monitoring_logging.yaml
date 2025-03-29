@@ -61,6 +61,10 @@ cp_schema_registry:
   prometheus:
     jmx:
       enabled: false
+ksql_server:
+  prometheus:
+    jmx:
+      enabled: false
 redis:
   metrics:
     enabled: false
@@ -82,3 +86,6 @@ radar_upload_postgresql:
       enabled: false
     primary:
       sidecars: []
+radar_kafka_stack:
+  metrics:
+    enabled: false
