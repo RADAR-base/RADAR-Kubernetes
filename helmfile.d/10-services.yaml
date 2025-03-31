@@ -257,6 +257,8 @@ releases:
       - name: oauth_clients.grafana_dashboard.redirect_uri
         values:
           - "https://dashboard.{{ .Values.server_name }}/login/generic_oauth"
+      - name: identity_server.server_url
+        value: https:// {{ .Values.server_name }}/kratos
       - name: authserver.server_url
         value: https:// {{ .Values.server_name }}/hydra
       - name: authserver.login_url
