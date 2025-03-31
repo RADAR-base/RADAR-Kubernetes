@@ -257,6 +257,10 @@ releases:
       - name: oauth_clients.grafana_dashboard.redirect_uri
         values:
           - "https://dashboard.{{ .Values.server_name }}/login/generic_oauth"
+      - name: authserver.server_url
+        value: https:// {{ .Values.server_name }}/hydra
+      - name: authserver.login_url
+        value: https:// {{ .Values.server_name }}/hydra
 
   - name: app-config
     chart: radar/app-config

@@ -183,6 +183,8 @@ management_portal:
   _chart_version: 1.4.0
   _extra_timeout: 210
   replicaCount: 1  # should be 1
+  image:
+    tag: feature-ory-based-authorization
   postgres:
     host: postgresql
     user: postgres
@@ -201,6 +203,8 @@ management_portal:
     from: noreply@example.com
     starttls: false
     auth: true
+  authserver:
+    server_admin_url: http://hydra-admin:4445
 
 kratos:
   _install: false
