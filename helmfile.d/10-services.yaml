@@ -150,6 +150,8 @@ releases:
     set:
       - name: kafka.replicas
         value: {{ .Values.kafka_num_brokers }}
+      - name: kafka.partitions
+        value: {{ .Values.kafka_num_topic_partitions }}
       - name: dev_deployment
         value: {{ .Values.dev_deployment | default false }}
 
