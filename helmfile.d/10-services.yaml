@@ -148,6 +148,8 @@ releases:
     values:
       - {{ .Values.radar_kafka_stack | toYaml | indent 8 | trim }}
     set:
+      - name: kafka.replicas
+        value: {{ .Values.kafka_num_brokers }}
       - name: dev_deployment
         value: {{ .Values.dev_deployment | default false }}
 
