@@ -10,6 +10,8 @@ server_name: example.com
 maintainer_email: MAINTAINER_EMAIL@example.com
 # Number of Kafka pods that will be installed
 kafka_num_brokers: 3
+# Number of partitions for Kafka topics
+kafka_num_topic_partitions: 9
 # Enable logging and monitoring
 enable_logging_monitoring: false
 # Enable TLS redirection and retrieval of Let's Encrypt certificates.
