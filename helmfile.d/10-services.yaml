@@ -376,6 +376,8 @@ releases:
         value: https://{{ .Values.server_name }}/kratos
       - name: hydraPublicUrl
         value: https://{{ .Values.server_name }}/hydra
+      - name: server_name
+        value: "{{ .Values.server_name }}"
 
   - name: hydra
     chart: radar/hydra
