@@ -258,11 +258,11 @@ releases:
         values:
           - "https://dashboard.{{ .Values.server_name }}/login/generic_oauth"
       - name: identity_server.server_url
-        value: https:// {{ .Values.server_name }}/kratos
+        value: https://{{ .Values.server_name }}/kratos
       - name: authserver.server_url
-        value: https:// {{ .Values.server_name }}/hydra
+        value: https://{{ .Values.server_name }}/hydra
       - name: authserver.login_url
-        value: https:// {{ .Values.server_name }}/hydra
+        value: https://{{ .Values.server_name }}/hydra
 
   - name: app-config
     chart: radar/app-config
