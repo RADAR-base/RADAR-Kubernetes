@@ -98,7 +98,7 @@ kube_prometheus_stack:
 # Always needed
 nginx_ingress:
   _install: true
-  _chart_version: 4.10.1
+  _chart_version: 4.12.1
   _extra_timeout: 0
   controller:
     replicaCount: 1
