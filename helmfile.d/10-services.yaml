@@ -328,6 +328,47 @@ releases:
         #  Note: encoding of "/" in password is necessary for the smtp connection_uri because kratos is not able to handle this.
         value: smtp://{{ .Values.management_portal.smtp.username }}:{{ replace "/" "%2F" .Values.management_portal.smtp.password }}@{{ .Values.management_portal.smtp.host }}:{{ .Values | get "management_portal.smtp.port" 587 }}
 
+  - name: radar-hydra
+    chart: radar/radar-hydra
+    version: {{ .Values.radar_hydra._chart_version }}
+    installed: {{ .Values.radar_hydra._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_hydra._extra_timeout }}
+    {{ if or .Values.postgresql._install .Values.cloudnative_postgresql._install }}
+    needs:
+    {{ if .Values.postgresql._install }}- postgresql{{ end }}
+    {{ if .Values.cloudnative_postgresql._install }}- radar-cloudnative-postgresql{{ end }}
+    {{ end }}
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.radar_hydra | toYaml | indent 8 | trim }}
+    set:
+      - name: hydra.server_name
+        value: {{ .Values.server_name }}
+      # Remove properties below when this PR at upstream is merged and the helm chart is updated.
+      # PR: https://github.com/ory/k8s/pull/764
+      - name: hydra.ingress.public.hosts[0].host
+        value: {{ .Values.server_name }}
+      - name: hydra.ingress.public.hosts[0].paths[0].path
+        value: "/hydra/?(.*)"
+      - name: hydra.ingress.public.hosts[0].paths[0].pathType
+        value: ImplementationSpecific
+      - name: hydra.ingress.admin.tls[0].hosts
+        values: [{{ .Values.server_name }}]
+      - name: hydra.ingress.admin.tls[0].secretName
+        value: radar-base-tls
+      - name: hydra.ingress.admin.hosts[0].host
+        value: {{ .Values.server_name }}
+      - name: hydra.ingress.admin.hosts[0].paths[0].path
+        value: "/admin/hydra(/|$)(.*)"
+      - name: hydra.ingress.admin.hosts[0].paths[0].pathType
+        value: ImplementationSpecific
+      - name: hydra.ingress.public.tls[0].hosts
+        values: [{{ .Values.server_name }}]
+      - name: hydra.ingress.public.tls[0].secretName
+        value: radar-base-tls
+      - name: hydra.hydra.config.urls.self.issuer
+        value: https://{{ .Values.server_name }}/hydra/
+
   - name: kratos-selfservice-ui-node
     chart: radar/kratos-selfservice-ui-node
     version: {{ .Values.kratos_ui._chart_version }}

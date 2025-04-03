@@ -45,6 +45,9 @@ radar_home:
 kratos:
   kratos:
     advertised_protocol: http
+hydra:
+  hydra:
+    advertised_protocol: http
 radar_jdbc_connector_data_dashboard_backend:
   timescaledb:
     cluster:
