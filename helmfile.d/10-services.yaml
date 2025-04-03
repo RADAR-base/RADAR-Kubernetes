@@ -369,23 +369,17 @@ releases:
       - name: hydra.hydra.config.urls.self.issuer
         value: https://{{ .Values.server_name }}/hydra/
 
-  - name: kratos-selfservice-ui-node
-    chart: radar/kratos-selfservice-ui-node
-    version: {{ .Values.kratos_ui._chart_version }}
-    installed: {{ .Values.kratos_ui._install }}
-    timeout: {{ add .Values.base_timeout .Values.kratos_ui._extra_timeout }}
+  - name: radar-self-enrolment-ui
+    chart: radar/radar-self-enrolment-ui
+    version: {{ .Values.radar_self_enrolment_ui._chart_version }}
+    installed: {{ .Values.radar_self_enrolment_ui._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_self_enrolment_ui._extra_timeout }}
     <<: *logFailedRelease
     values:
-      - "../etc/kratos_ui/values.yaml"
-      - {{ .Values.kratos_ui | toYaml | indent 8 | trim }}
+      - {{ .Values.radar_self_enrolment_ui | toYaml | indent 8 | trim }}
     set:
       - name: serverName
         value: {{ .Values.server_name }}
-      - name: ingress.hosts[0].host
-        value: {{ .Values.server_name }}
-      - name: ingress.tls[0].hosts
-        values:
-          - {{ .Values.server_name }}
       - name: kratosPublicUrl
         value: https://{{ .Values.server_name }}/kratos
       - name: kratosBrowserUrl
