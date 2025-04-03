@@ -34,7 +34,6 @@ radar_self_enrolment_ui:
   disable_tls: true
 radar_kratos:
   kratos:
-    dev: true
     ingress:
       public:
         tls: []

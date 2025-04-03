@@ -10,7 +10,7 @@ ccSchemaRegistryProxy:
 nifi:
   _install: false
 
-kratos:
+radar_kratos:
   _install: false
 
 kratos_ui:
