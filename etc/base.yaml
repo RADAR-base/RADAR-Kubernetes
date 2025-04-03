@@ -214,14 +214,15 @@ management_portal:
     starttls: false
     auth: true
 
-kratos:
+radar_kratos:
   _install: false
   _chart_version: 0.43.1
   _extra_timeout: 0
   kratos:
-    courier:
-      smtp:
-        from_address: radar@thehyve.nl
+    kratos:
+      courier:
+        smtp:
+          from_address: radar@thehyve.nl
 
 kratos_ui:
   _install: false
