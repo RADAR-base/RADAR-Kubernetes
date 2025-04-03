@@ -1,5 +1,12 @@
 # disables logging (in graylog) and monitoring (with prometheus)
 
+nginx_ingress:
+  controller:
+    metrics:
+      enabled: false
+      serviceMonitor:
+        enabled: false
+
 kube_prometheus_stack:
   _install: false
 mongodb:
@@ -21,6 +28,11 @@ postgresql:
       enabled: false
     primary:
       sidecars: []
+cloudnative_postgresql:
+  cluster:
+    cluster:
+      monitoring:
+        enabled: false
 data_dashboard_timescaledb:
   postgresql:
     metrics:
@@ -61,6 +73,10 @@ cp_schema_registry:
   prometheus:
     jmx:
       enabled: false
+ksql_server:
+  prometheus:
+    jmx:
+      enabled: false
 redis:
   metrics:
     enabled: false
@@ -76,9 +92,30 @@ radar_appserver_postgresql:
       enabled: false
     primary:
       sidecars: []
+gateway:
+  serviceMonitor:
+    enabled: false
 radar_upload_postgresql:
   postgresql:
     metrics:
       enabled: false
     primary:
       sidecars: []
+radar_jdbc_connector_realtime_dashboard:
+  radar-cloudnative-timescaledb:
+    cluster:
+      cluster:
+        monitoring:
+          enabled: false
+radar_jdbc_connector_data_dashboard_backend:
+  radar-cloudnative-timescaledb:
+    cluster:
+      cluster:
+        monitoring:
+          enabled: false
+radar_jdbc_connector_grafana:
+  radar-cloudnative-timescaledb:
+    cluster:
+      cluster:
+        monitoring:
+          enabled: false
