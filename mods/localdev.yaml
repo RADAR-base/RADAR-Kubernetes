@@ -48,3 +48,6 @@ kratos:
 hydra:
   hydra:
     advertised_protocol: http
+radar_grafana:
+  grafana:
+    advertised_protocol: http
