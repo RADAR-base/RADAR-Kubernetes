@@ -13,7 +13,7 @@ nifi:
 radar_kratos:
   _install: false
 
-kratos_ui:
+radar_self_enrolment_ui:
   _install: false
 
 radar_hydra:
