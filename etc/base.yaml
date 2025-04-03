@@ -224,9 +224,9 @@ radar_kratos:
         smtp:
           from_address: radar@thehyve.nl
 
-kratos_ui:
+radar_self_enrolment_ui:
   _install: false
-  _chart_version: 0.43.1
+  _chart_version: 0.2.3
   _extra_timeout: 0
 
 radar_hydra:

@@ -70,3 +70,5 @@ radar_jdbc_connector_realtime_dashboard:
 radar_grafana:
   grafana:
     advertised_protocol: http
+radar_self_enrolment_ui:
+  advertised_protocol: http
