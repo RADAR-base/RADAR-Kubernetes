@@ -70,7 +70,7 @@ releases:
       - name: server_name
         value: {{ .Values.server_name }}
 
-  - name: nginx-ingress
+  - name: ingress-nginx
     chart: radar/ingress-nginx
     version: {{ .Values.nginx_ingress._chart_version }}
     installed: {{ .Values.nginx_ingress._install }}
