@@ -327,6 +327,12 @@ releases:
       - name: kratos.kratos.config.courier.smtp.connection_uri
         #  Note: encoding of "/" in password is necessary for the smtp connection_uri because kratos is not able to handle this.
         value: smtp://{{ .Values.management_portal.smtp.username }}:{{ replace "/" "%2F" .Values.management_portal.smtp.password }}@{{ .Values.management_portal.smtp.host }}:{{ .Values | get "management_portal.smtp.port" 587 }}
+      - name: kratos.kratos.config.secrets.default[0]
+        value: {{ .Values.radar_kratos.secrets.default }}
+      - name: kratos.kratos.config.secrets.cookie[0]
+        value: {{ .Values.radar_kratos.secrets.cookie }}
+      - name: kratos.kratos.config.secrets.cipher[0]
+        value: {{ .Values.radar_kratos.secrets.cipher }}
 
   - name: radar-hydra
     chart: radar/radar-hydra
@@ -344,6 +350,10 @@ releases:
     set:
       - name: hydra.server_name
         value: {{ .Values.server_name }}
+      - name: hydra.hydra.secrets.system[0]
+        value: {{ .Values.radar_hydra.secrets.system }}
+      - name: hydra.hydra.secrets.cookie[0]
+        value: {{ .Values.radar_hydra.secrets.cookie }}
 
   - name: radar-self-enrolment-ui
     chart: radar/radar-self-enrolment-ui
