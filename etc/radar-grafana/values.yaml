@@ -513,8 +513,7 @@ envFromSecret: ""
 ## This can be useful for auth tokens, etc.
 ## If the secret values contains "{{", they'll need to be properly escaped so that they are not interpreted by Helm
 ## ref: https://helm.sh/docs/howto/charts_tips_and_tricks/#using-the-tpl-function
-envRenderSecret:
-  POSTGRES_PASSWORD: pass
+envRenderSecret: {}
 
 ## The names of secrets in the same kubernetes namespace which contain values to be added to the environment
 ## Each entry should contain a name key, and can optionally specify whether the secret must be defined with an optional key.
@@ -990,7 +989,23 @@ sidecar:
     ##     - name: <key>
     ##       valueFrom:
     ##         <value rendered as YAML>
-    envValueFrom: {}
+    envValueFrom:
+      POSTGRES_USER:
+        secretKeyRef:
+          name: grafana-timescaledb-app
+          key: username
+      POSTGRES_PASSWORD:
+        secretKeyRef:
+          name: grafana-timescaledb-app
+          key: password
+      POSTGRES_DB:
+        secretKeyRef:
+          name: grafana-timescaledb-app
+          key: dbname
+      POSTGRES_HOST:
+        secretKeyRef:
+          name: grafana-timescaledb-app
+          key: host
     #  ENV_NAME:
     #    configMapKeyRef:
     #      name: configmap-name
