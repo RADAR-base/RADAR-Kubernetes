@@ -225,7 +225,7 @@ radar_self_enrolment_ui:
 
 hydra:
   _install: true
-  _chart_version: 0.48.0
+  _chart_version: 0.52.1
   _extra_timeout: 0
 
 app_config:
