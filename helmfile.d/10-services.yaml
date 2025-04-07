@@ -443,16 +443,6 @@ releases:
     <<: *logFailedRelease
     values:
       - {{ .Values.data_dashboard_timescaledb | toYaml | indent 8 | trim }}
-    set:
-      {{- if eq .Values.data_dashboard_db_username "postgres" }}
-      - name: postgresql.global.postgresql.auth.postgresPassword
-        value: {{ .Values.data_dashboard_db_password }}
-      {{- else }}
-      - name: postgresql.global.postgresql.auth.username
-        value: {{ .Values.data_dashboard_db_username }}
-      - name: postgresql.global.postgresql.auth.password
-        value: {{ .Values.data_dashboard_db_password }}
-      {{- end }}
 
   - name: grafana-metrics-timescaledb
     chart: radar/radar-timescaledb
@@ -462,16 +452,6 @@ releases:
     <<: *logFailedRelease
     values:
       - {{ .Values.grafana_metrics_timescaledb | toYaml | indent 8 | trim }}
-    set:
-      {{- if eq .Values.grafana_metrics_db_username "postgres" }}
-      - name: postgresql.global.postgresql.auth.postgresPassword
-        value: {{ .Values.grafana_metrics_db_password }}
-      {{- else }}
-      - name: postgresql.global.postgresql.auth.username
-        value: {{ .Values.grafana_metrics_db_username }}
-      - name: postgresql.global.postgresql.auth.password
-        value: {{ .Values.grafana_metrics_db_password }}
-      {{- end }}
 
   - name: realtime-dashboard-timescaledb
     chart: radar/radar-timescaledb
@@ -481,16 +461,6 @@ releases:
     <<: *logFailedRelease
     values:
       - {{ .Values.realtime_dashboard_timescaledb | toYaml | indent 8 | trim }}
-    set:
-      {{- if eq .Values.realtime_dashboard_db_username "postgres" }}
-      - name: postgresql.global.postgresql.auth.postgresPassword
-        value: {{ .Values.realtime_dashboard_db_password }}
-      {{- else }}
-      - name: postgresql.global.postgresql.auth.username
-        value: {{ .Values.realtime_dashboard_db_username }}
-      - name: postgresql.global.postgresql.auth.password
-        value: {{ .Values.realtime_dashboard_db_password }}
-      {{- end }}
 
   - name: radar-grafana
     chart: radar/grafana
