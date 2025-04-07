@@ -485,9 +485,9 @@ releases:
       - name: ingress.tls[0].hosts
         values: ["dashboard.{{ .Values.server_name }}"]
       - name: "grafana\\.ini.metrics.basic_auth_username"
-        value: {{ .Values.grafana_metrics_db_username }}
+        value: {{ .Values.grafana_username }}
       - name: "grafana\\.ini.metrics.basic_auth_password"
-        value: {{ .Values.grafana_metrics_db_password }}
+        value: {{ .Values.grafana_metrics_endpoint_password }}
       - name: "grafana\\.ini.auth\\.generic_oauth.auth_url"
         value: "https://{{ .Values.server_name }}/managementportal/oauth/authorize"
       - name: "grafana\\.ini.auth\\.generic_oauth.token_url"
