@@ -611,3 +611,8 @@ velero:
         bucket: radar-base-backups
         config:
           s3Url: https://s3.amazon.com # protocol should be specified
+
+radar_mockserver:
+  _install: false
+  _chart_version: 0.1.0
+  _extra_timeout: 0
