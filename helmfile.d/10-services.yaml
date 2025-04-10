@@ -140,7 +140,8 @@ releases:
         values: ["{{ .Values.server_name }}"]
 
   - name: radar-kafka
-    chart: radar/radar-kafka
+#   chart: radar/radar-kafka
+    chart: ../../radar-helm-charts/charts/radar-kafka
     version: {{ .Values.radar_kafka_stack._chart_version }}
     installed: {{ .Values.radar_kafka_stack._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_kafka_stack._extra_timeout }}
@@ -156,7 +157,8 @@ releases:
         value: {{ .Values.dev_deployment | default false }}
 
   - name: catalog-server
-    chart: radar/catalog-server
+#    chart: radar/catalog-server
+    chart: ../../radar-helm-charts/charts/catalog-server
     version: {{ .Values.catalog_server._chart_version }}
     installed: {{ .Values.catalog_server._install }}
     timeout: {{ add .Values.base_timeout .Values.catalog_server._extra_timeout }}
@@ -180,7 +182,8 @@ releases:
       {{ end }}
 
   - name: radar-home
-    chart: radar/radar-home
+#    chart: radar/radar-home
+    chart: ../../radar-helm-charts/charts/radar-home
     version: {{ .Values.radar_home._chart_version }}
     installed: {{ .Values.radar_home._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_home._extra_timeout }}
@@ -537,7 +540,8 @@ releases:
         value: {{ .Values.management_portal.oauth_clients.radar_data_dashboard_backend.client_secret }}
 
   - name: ksql-server
-    chart: cp-radar/cp-ksql-server
+#    chart: cp-radar/cp-ksql-server
+    chart: ../../cp-helm-charts/charts/cp-ksql-server
     installed: {{ .Values.ksql_server._install }}
     version: {{ .Values.ksql_server._chart_version }}
     timeout: {{ add .Values.base_timeout .Values.ksql_server._extra_timeout }}
@@ -550,7 +554,8 @@ releases:
       - {{ .Values.ksql_server | toYaml | indent 8 | trim }}
 
   - name: radar-jdbc-connector-grafana
-    chart: radar/radar-jdbc-connector
+#    chart: radar/radar-jdbc-connector
+    chart: ../../radar-helm-charts/charts/radar-jdbc-connector
     version: {{ .Values.radar_jdbc_connector_grafana._chart_version }}
     installed: {{ .Values.radar_jdbc_connector_grafana._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_jdbc_connector_grafana._extra_timeout }}
@@ -574,7 +579,8 @@ releases:
         value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://grafana-metrics-timescaledb-postgresql-hl:5432/%s" .Values.grafana_metrics_timescaledb.postgresql.auth.database) .Values.radar_jdbc_connector_realtime_dashboard }}
 
   - name: radar-jdbc-connector-data-dashboard-backend
-    chart: radar/radar-jdbc-connector
+#    chart: radar/radar-jdbc-connector
+    chart: ../../radar-helm-charts/charts/radar-jdbc-connector
     version: {{ .Values.radar_jdbc_connector_data_dashboard_backend._chart_version }}
     installed: {{ .Values.radar_jdbc_connector_data_dashboard_backend._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_jdbc_connector_data_dashboard_backend._extra_timeout }}
@@ -599,7 +605,8 @@ releases:
         value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://data-dashboard-timescaledb-postgresql-hl:5432/%s" .Values.data_dashboard_timescaledb.postgresql.auth.database) .Values.radar_jdbc_connector_data_dashboard_backend }}
 
   - name: radar-jdbc-connector-realtime-dashboard
-    chart: radar/radar-jdbc-connector
+#    chart: radar/radar-jdbc-connector
+    chart: ../../radar-helm-charts/charts/radar-jdbc-connector
     version: {{ .Values.radar_jdbc_connector_realtime_dashboard._chart_version }}
     installed: {{ .Values.radar_jdbc_connector_realtime_dashboard._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_jdbc_connector_realtime_dashboard._extra_timeout }}
@@ -624,7 +631,8 @@ releases:
         value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://realtime-dashboard-timescaledb-postgresql-hl:5432/%s" .Values.realtime_dashboard_timescaledb.postgresql.auth.database) .Values.radar_jdbc_connector_realtime_dashboard }}
 
   - name: radar-fitbit-connector
-    chart: radar/radar-fitbit-connector
+#    chart: radar/radar-fitbit-connector
+    chart: ../../radar-helm-charts/charts/radar-fitbit-connector
     version: {{ .Values.radar_fitbit_connector._chart_version }}
     installed: {{ .Values.radar_fitbit_connector._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_fitbit_connector._extra_timeout }}
@@ -696,7 +704,8 @@ releases:
         value: {{ dig "client_secret" (dig "oauth_clients" "radar_rest_sources_auth_backend" "client_secret" "" .Values.management_portal) .Values.radar_rest_sources_backend }}
 
   - name: radar-oura-connector
-    chart: radar/radar-oura-connector
+#    chart: radar/radar-oura-connector
+    chart: ../../radar-helm-charts/charts/radar-oura-connector
     version: {{ .Values.radar_oura_connector._chart_version }}
     installed: {{ .Values.radar_oura_connector._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_oura_connector._extra_timeout }}
@@ -721,7 +730,8 @@ releases:
         value: {{ dig "radar_oura_connector" "client_secret" "" .Values.management_portal.oauth_clients }}
 
   - name: radar-gateway
-    chart: radar/radar-gateway
+#    chart: radar/radar-gateway
+    chart: ../../radar-helm-charts/charts/radar-gateway
     version: {{ .Values.radar_gateway._chart_version }}
     installed: {{ .Values.radar_gateway._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_gateway._extra_timeout }}
@@ -745,7 +755,8 @@ releases:
       {{ end }}
 
   - name: radar-backend-monitor
-    chart: radar/radar-backend
+#    chart: radar/radar-backend
+    chart: ../../radar-helm-charts/charts/radar-backend
     version: {{ .Values.radar_backend_monitor._chart_version }}
     installed: {{ .Values.radar_backend_monitor._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_backend_monitor._extra_timeout }}
@@ -760,7 +771,8 @@ releases:
         value: {{ .Values.kafka_num_brokers }}
 
   - name: radar-backend-stream
-    chart: radar/radar-backend
+#    chart: radar/radar-backend
+    chart: ../../radar-helm-charts/charts/radar-backend
     version: {{ .Values.radar_backend_monitor._chart_version }}
     installed: {{ .Values.radar_backend_stream._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_backend_stream._extra_timeout }}
@@ -823,7 +835,8 @@ releases:
         value: {{ .Values.kube_prometheus_stack._install }}
 
   - name: radar-s3-connector
-    chart: radar/radar-s3-connector
+#    chart: radar/radar-s3-connector
+    chart: ../../radar-helm-charts/charts/radar-s3-connector
     version: {{ .Values.radar_s3_connector._chart_version }}
     installed: {{ .Values.radar_s3_connector._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_s3_connector._extra_timeout }}
@@ -933,7 +946,8 @@ releases:
         values: [{{ .Values.server_name }}]
 
   - name: radar-upload-source-connector
-    chart: radar/radar-upload-source-connector
+#    chart: radar/radar-upload-source-connector
+    chart: ../../radar-helm-charts/charts/radar-upload-source-connector
     version: {{ .Values.radar_upload_source_connector._chart_version }}
     installed: {{ .Values.radar_upload_source_connector._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_upload_source_connector._extra_timeout }}
@@ -973,7 +987,8 @@ releases:
         values: [{{ .Values.server_name }}]
 
   - name: radar-push-endpoint
-    chart: radar/radar-push-endpoint
+#    chart: radar/radar-push-endpoint
+    chart: ../../radar-helm-charts/charts/radar-push-endpoint
     version: {{ .Values.radar_push_endpoint._chart_version }}
     installed: {{ .Values.radar_push_endpoint._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_push_endpoint._extra_timeout }}

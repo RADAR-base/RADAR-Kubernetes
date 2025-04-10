@@ -4,7 +4,7 @@ management_portal:
     ci_test_client:
       enable: true
 app_server:
-  _install: true
+  _install: false
   upload:
     enabled: true
 radar_s3_connector:
