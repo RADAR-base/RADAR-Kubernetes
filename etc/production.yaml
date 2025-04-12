@@ -160,7 +160,6 @@ catalog_server:
   _chart_version: 0.6.3
   _extra_timeout: 90
   replicaCount: 1
-  schema_registry: http://confluent-schema-registry:8081
 
 radar_home:
   _install: false
