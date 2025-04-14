@@ -224,6 +224,8 @@ management_portal:
   _chart_version: 1.5.0
   _extra_timeout: 210
   replicaCount: 1  # should be 1
+  image:
+    tag: feature-ory-based-authorization
   managementportal:
     catalogue_server_enable_auto_import: true
     common_privacy_policy_url: http://info.thehyve.nl/radar-cns-privacy-policy
@@ -236,6 +238,8 @@ management_portal:
     from: noreply@example.com
     starttls: false
     auth: true
+  authserver:
+    server_admin_url: http://hydra-admin:4445
 
 radar_kratos:
   _install: false
@@ -248,13 +252,13 @@ radar_kratos:
           from_address: radar@thehyve.nl
 
 radar_self_enrolment_ui:
-  _install: false
+  _install: true
   _chart_version: 0.2.3
   _extra_timeout: 0
 
 radar_hydra:
-  _install: false
-  _chart_version: 0.1.0
+  _install: true
+  _chart_version: 0.48.0
   _extra_timeout: 0
 
 app_config:
@@ -676,3 +680,12 @@ velero:
         bucket: radar-base-backups
         config:
           s3Url: https://s3.amazon.com # protocol should be specified
+
+nifi:
+  _install: false
+  _chart_version: 1.2.1
+  _extra_timeout: 300
+  zookeeper:
+    enabled: false
+    url: cp-zookeeper-headless
+    port: 2181
