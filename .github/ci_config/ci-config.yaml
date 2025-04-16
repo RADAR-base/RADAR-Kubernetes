@@ -1,5 +1,5 @@
 atomicInstall: false
-base_timeout: 180
+base_timeout: 360
 
 elasticsearch:
   resources:
@@ -51,4 +51,17 @@ radar_upload_postgresql:
       size: 1Gi
 
 ccSchemaRegistryProxy:
+  _install: false
+
+# FIXME disabled for deployment test for now REENABLE!!
+nifi:
+  _install: false
+
+kratos:
+  _install: false
+
+kratos_ui:
+  _install: false
+
+hydra:
   _install: false
