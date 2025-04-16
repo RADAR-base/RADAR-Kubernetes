@@ -1,6 +1,6 @@
 ingress:
   admin:
-    enabled: true
+    enabled: false
     className: "nginx"
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-prod
@@ -42,7 +42,7 @@ hydra:
     log:
       level: debug
       format: text
-      leak_sensitive_values: false
+      leak_sensitive_values: true
 
     strategies:
       access_token: jwt
@@ -50,11 +50,14 @@ hydra:
         scope_claim: both
 
     oauth2:
-      allowed_top_level_claims: [scope,roles,authorities,sources,user_name]
+      allowed_top_level_claims: [scope, roles, authorities, sources, user_name, email]
       mirror_top_level_claims: false
       client_credentials:
         default_grant_allowed_scope: true
-    
+      grant:
+        refresh_token:
+          rotation_grace_period: 60s # Set grace period. Omit this line to disable.
+
     serve:
       public:
         cors:
