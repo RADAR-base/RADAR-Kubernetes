@@ -164,6 +164,13 @@ kratos:
     courier:
       smtp:
         from_address: radar@thehyve.nl
+      templates:
+        verification_code:
+          valid:
+            email:
+              body: 
+                html: base64://SGksPGJyPjxicj5QbGVhc2XCoHZlcmlmecKgeW91csKgYWNjb3VudMKgYnnCoGVudGVyaW5nwqB0aGXCoGZvbGxvd2luZ8KgY29kZTo8YnI+PGgyPnt7IC5WZXJpZmljYXRpb25Db2RlIH19PC9oMj4=
+                plaintext: base64://SGksIFBsZWFzZcKgdmVyaWZ5wqB5b3VywqBhY2NvdW50wqBiecKgZW50ZXJpbmfCoHRoZcKgZm9sbG93aW5nwqBjb2RlOiB7eyAuVmVyaWZpY2F0aW9uQ29kZSB9fQ==
 
     serve:
       public:
