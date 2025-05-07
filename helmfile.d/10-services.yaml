@@ -427,7 +427,7 @@ releases:
       - name: serverName
         value: {{ .Values.server_name }}
       - name: kratosPublicUrl
-        value: http://{{ .Values.server_name }}/kratos
+        value: http://radar-self-enrolment-ui:80
       - name: kratosBrowserUrl
         value: http://{{ .Values.server_name }}/kratos
 
