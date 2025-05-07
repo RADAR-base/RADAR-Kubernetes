@@ -19,6 +19,14 @@ environments:
       - ../mods/minimal_kafka.yaml.gotmpl
       - ../mods/fast_deploy.yaml
     {{ end }}
+    {{ if .Values.github_installation_test }}
+      - ../mods/disable_monitoring_logging.yaml
+      - ../mods/localdev.yaml
+      - ../mods/minimal.yaml
+      - ../mods/minimal_kafka.yaml.gotmpl
+      - ../mods/fast_deploy.yaml
+    {{ end }}
+
 
 ---
 
