@@ -8,6 +8,7 @@ controller:
   config:
     ssl-redirect: "true"
     server-tokens: "false"
+    annotations-risk-level: "Critical"
   addHeaders:
     X-Frame-Options: Deny
     X-Xss-Protection: 1; mode=block

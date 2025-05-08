@@ -46,6 +46,7 @@ jobs:
           sed -i "/secrets.yaml/a $helmfile_mods" environments.yaml
           sed -i '/_install: /s/false/true/' etc/production.yaml
           sed -i '/enable_logging_monitoring: /s/false/true/' etc/production.yaml
+          echo "github_installation_test: true" >> etc/production.yaml
 
       - name: Run helmfile template
         env:
