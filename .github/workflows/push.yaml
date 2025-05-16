@@ -1,4 +1,4 @@
-name: Install applications on Kubernets
+name: Install applications on Kubernetes
 
 on:
   pull_request:
@@ -9,14 +9,9 @@ on:
         description: "Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)"
         required: false
         default: false
- 
+
 jobs:
   install:
-    strategy:
-      matrix:
-        K3S_VERSION: ["v1.30.6+k3s1", "v1.31.2+k3s1"]
-        exclude:
-          - K3S_VERSION: ${{ github.base_ref != 'refs/heads/main' && 'v1.30.6+k3s1' }}
     runs-on: self-hosted
     steps:
       - name: Cleanup
@@ -45,32 +40,71 @@ jobs:
           helmfile_mods+='\ \ \ \ \ \ - ../.github/ci_config/secrets.yaml.gotmpl'
           sed -i "/secrets.yaml/a $helmfile_mods" environments.yaml
           sed -i '/_install: /s/false/true/' etc/production.yaml
+          # Deploy a minimal deployment accessible on 'localhost:80' with monitoring enabled
           sed -i '/enable_logging_monitoring: /s/false/true/' etc/production.yaml
           echo "github_installation_test: true" >> etc/production.yaml
 
-      - name: Run helmfile template
-        env:
-          FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
+      - name: Ensure k3d cache directory exists
         run: |
-          helmfile template
+          mkdir -p $HOME/k3d-containerd
 
-      - name: Reinstall K3S
-        env:
-          INSTALL_K3S_VERSION: ${{ matrix.K3S_VERSION }}
-          K3S_KUBECONFIG_MODE: "644"
+  test-helmfile-template:
+    needs: install
+    runs-on: self-hosted
+    steps:
+    - name: Test helmfile template
+      env:
+        FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
+      run: |
+        helmfile template > /tmp/helmfile.yaml
+
+  delete-old-clusters:
+    runs-on: self-hosted
+    needs: test-helmfile-template
+    steps:
+      - name: Delete old clusters
         run: |
-          /usr/local/bin/k3s-uninstall.sh || true
-          curl -sfL https://get.k3s.io | sh -s - --disable traefik --disable-helm-controller
-          cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+          k3d cluster delete --all || true
+
+  matrix-prep:
+    runs-on: self-hosted
+    needs: delete-old-clusters
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: nelonoel/branch-name@v1.0.1
+      - id: set-matrix
+        uses: JoshuaTheMiller/conditional-build-matrix@main
+        with:
+          # inputFile: '.github/workflows/matrix_includes.json' # Default input file path
+          filter: '[?runOnBranch==`${{ env.BRANCH_NAME }}` || runOnBranch==`always`]'
+          addInclude: true
+
+  test-k8s-versions:
+    needs: matrix-prep
+    runs-on: self-hosted
+    strategy:
+      matrix: ${{ fromJson(needs.matrix-prep.outputs.matrix) }}
+    steps:
+      - uses: nolar/setup-k3d-k3s@v1
+        with:
+          version: ${{ matrix.K3S_VERSION }}
+          k3d-args: --k3s-arg --disable=traefik@server:0 --k3s-arg --disable-helm-controller@server:0 --config .github/ci_config/k3d-config.yaml
+          # Note: k3d adds a 'k3d-' prefix to this name
+          k3d-name: ${{ matrix.KUBECTL_VERSION }}
+
+      # TODO would be better to do this with a command line parameter. I have been unable to get this to work.
+      - name: Set kubeContext
+        run: |
+          sed -i "s/kubeContext: .*/kubeContext: k3d-${{ matrix.KUBECTL_VERSION }}/" etc/production.yaml
 
       - name: Install RADAR-Kubernetes
         env:
           FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
         run: |
           echo "kubeconfig: $KUBECONFIG"
-          kubectl get pods --all-namespaces
-
-          helmfile sync --concurrency 1
+          kubectl get pods --all-namespaces --context k3d-${{ matrix.KUBECTL_VERSION }}
+          helmfile sync
 
       # Enable tmate debugging of manually-triggered workflows if the input option was provided
       - name: Manually triggered tmate session
@@ -103,8 +137,12 @@ jobs:
         run: |
           kubectl get pods --all-namespaces
 
+      - name: Remove cluster when the job succeeded
+        run: |
+          k3d cluster delete ${{ matrix.KUBECTL_VERSION }}
+
       # TODO We can remove the k3s uninstallation once the k3d PR is merged.
-      - name: Delete clusters when job was canceled
+      - name: Delete all clusters when job was canceled
         if: cancelled()
         run: |
           k3d cluster delete --all || true
