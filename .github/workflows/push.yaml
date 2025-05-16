@@ -137,8 +137,12 @@ jobs:
         run: |
           kubectl get pods --all-namespaces
 
+      - name: Remove cluster when the job succeeded
+        run: |
+          k3d cluster delete ${{ matrix.KUBECTL_VERSION }}
+
       # TODO We can remove the k3s uninstallation once the k3d PR is merged.
-      - name: Delete clusters when job was canceled
+      - name: Delete all clusters when job was canceled
         if: cancelled()
         run: |
           k3d cluster delete --all || true
