@@ -4,7 +4,20 @@ mkdir /tmp/dependencies
 cd /tmp/dependencies
 
 sudo apt update
-sudo apt install -y openjdk-11-jre-headless curl coreutils
+sudo apt install -y openjdk-11-jre-headless curl coreutils unzip
+sudo apt install -y --no-install-recommends make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+
+if [[ -f ~/.pyenv/bin/pyenv ]]; then
+  echo "pyenv already installed"
+else
+  echo "Installing pyenv"
+  rm -rf ~/.pyenv
+  curl https://pyenv.run | bash
+fi
+source ~/.profile
+pyenv install 3.13 -s
+pyenv global 3.13
+source ~/.profile
 
 OS="$(uname | tr '[:upper:]' '[:lower:]')"
 ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')"

@@ -24,12 +24,6 @@ jobs:
 
       - uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-          cache: 'pip'
-      - run: pip install -r test/features/requirements.txt
-
       - name: Install dependencies
         env:
           HELM_VERSION: "v3.16.3"
@@ -38,6 +32,12 @@ jobs:
           YQ_VERSION: "v4.44.3"
         run: |
           ./.github/ci_config/bin/install-dependencies
+
+      - name: Source .profile to activate Python version
+        run: source $HOME/.profile
+
+      - name: Install Python dependencies
+        run: pip install -r test/features/requirements.txt
 
       - name: Prepare the environment (add secrets and enable installation of all components)
         run: |
@@ -48,9 +48,9 @@ jobs:
           sed -i '/_install: /s/false/true/' etc/production.yaml
           # Deploy a minimal deployment accessible on 'localhost:80' with monitoring enabled
           sed -i '/enable_logging_monitoring: /s/false/true/' etc/production.yaml
-          echo "\ngithub_installation_test: true" >> etc/production.yaml
           sed -i '/e2e_test: /s/false/true/' etc/production.yaml
           sed -i '/server_name: /s/example.com/localhost/' etc/production.yaml
+          echo "" >> etc/production.yaml && echo "github_installation_test: true" >> etc/production.yaml
 
       - name: Ensure k3d cache directory exists
         run: |
@@ -65,6 +65,14 @@ jobs:
         FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
       run: |
         helmfile template > /tmp/helmfile.yaml
+
+    - name: Show production.yaml and environment.yaml
+      if: ${{ failure() }}
+      run: |
+        echo "Production.yaml"
+        cat etc/production.yaml
+        echo "Environment.yaml"
+        cat environments.yaml
 
   delete-old-clusters:
     runs-on: self-hosted
