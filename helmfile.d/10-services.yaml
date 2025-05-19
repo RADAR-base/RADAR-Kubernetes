@@ -615,6 +615,8 @@ releases:
     needs:
       # When catalog server is 'ready', kafka can be used.
       - catalog-server
+      - radar-rest-sources-backend
+      - management-portal
     <<: *logFailedRelease
     values:
       - {{ .Values.radar_fitbit_connector | toYaml | indent 8 | trim }}

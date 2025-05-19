@@ -1,0 +1,372 @@
+management_portal:
+  _install: true
+  oauth_clients:
+    ci_test_client:
+      enable: true
+app_server:
+  _install: false
+  upload:
+    enabled: true
+radar_s3_connector:
+  _install: true
+  rotateInterval: 5000 # milliseconds
+  flushSize: 1 # number of records
+radar_output:
+  _install: true
+  worker:
+    interval: 5 # seconds
+    minimumFileAge: 1 # seconds
+  source:
+    index:
+      fullSyncInterval: 5 # seconds
+      emptyDirectorySyncInterval: 5 # seconds
+radar_rest_sources_backend:
+  _install: true
+  restSourceClients:
+    fitbit:
+      enable: true
+      authorizationEndpoint: http://mockserver.mockserver:1080/fitbit/oauth2/authorize
+      tokenEndpoint: http://mockserver.mockserver:1080/fitbit/oauth2/token
+      scope: hartrate
+radar_fitbit_connector:
+  _install: true
+  fitbit_api_url: http://mockserver.mockserver:1080/fitbit
+  rest_source_poll_interval_ms: 5000
+  fitbit_user_poll_interval: 5
+  application_loop_interval_ms: 5000
+  user_cache_refresh_interval_ms: 5000
+ksql_server:
+  _install: true
+data_dashboard_timescaledb:
+  _install: true
+data_dashboard_backend:
+  _install: true
+radar_jdbc_connector_data_dashboard_backend:
+  _install: true
+grafana_metrics_timescaledb:
+  _install: true
+radar_jdbc_connector_grafana:
+  _install: true
+  sink:
+    topics: connect_fitbit_intraday_steps
+radar_mockserver:
+  _install: true
+  expectations:
+    - httpRequest:
+        path: /fitbit/oauth2/token
+      httpResponse:
+        headers:
+          Content-Type: application/json
+        body:
+          access_token: some-access-token
+          token_type: Bearer
+          expires_in: 3600
+          refresh_token: some-refresh-token
+          user_id: someUserId
+    - httpRequest:
+        path: /fitbit/oauth2/authorize
+      httpResponse:
+        body: some first response
+    # Fitbit API responses are derived from the Fitbit API documentation
+    - httpRequest:
+        path: /fitbit/1/user/someUserId/temp/skin/.*
+      httpResponse:
+          headers:
+              Content-Type: application/json
+          body:
+            tempSkin:
+              - dateTime: 2019-12-10
+                value:
+                  nightlyRelative: 0.3
+                logType: dedicated_temp_sensor
+    - httpRequest:
+        path: /fitbit/1/user/someUserId/activities/steps/.*
+      httpResponse:
+          headers:
+              Content-Type: application/json
+          body:
+            activities-steps-intraday:
+              dataset:
+                - time: 08:00:00
+                  value: 0
+                - time: 08:01:00
+                  value: 0
+                - time: 08:02:00
+                  value: 0
+                - time: 08:30:00
+                  value: 0
+    - httpRequest:
+        path: /fitbit/1/user/someUserId/br/.*
+      httpResponse:
+          headers:
+              Content-Type: application/json
+          body:
+            br:
+              - value:
+                  deepSleepSummary:
+                    breathingRate: 16.8
+                  remSleepSummary:
+                    breathingRate: -1.0
+                  fullSleepSummary:
+                    breathingRate: 17.8
+                  lightSleepSummary:
+                    breathingRate: 16.8
+                dateTime: 2021-10-25
+    - httpRequest:
+        path: /fitbit/1/user/someUserId/activities/calories/.*
+      httpResponse:
+          headers:
+              Content-Type: application/json
+          body:
+            activities-calories-intraday:
+              dataset:
+                - time: 00:00:00
+                  value: 100
+                  level: 0
+                  mets: 1
+                - time: 00:01:00
+                  value: 200
+                  level: 0
+                  mets: 1
+    - httpRequest:
+        path: /fitbit/1/user/someUserId/hrv/.*
+      httpResponse:
+          headers:
+              Content-Type: application/json
+          body:
+            hrv:
+              - value:
+                  dailyRmssd: 34.938
+                  deepRmssd: 31.567
+                dateTime: 2021-10-25
+    - httpRequest:
+        path: /fitbit/1/user/someUserId/spo2/.*
+      httpResponse:
+          headers:
+              Content-Type: application/json
+          body:
+            dateTime: 2021-10-04
+            value:
+              avg: 97.5
+              min: 94.0
+              max: 100.0
+    - httpRequest:
+        path: /fitbit/1/user/someUserId/profile.json.*
+      httpResponse:
+          headers:
+              Content-Type: application/json
+          body:
+            user:
+              aboutMe: <value>
+              age: <value>
+              ambassador: <value>
+              autoStrideEnabled: <value>
+              avatar: <value>
+              avatar150: <value>
+              avatar640: <value>
+              averageDailySteps: <value>
+              challengesBeta: <value>
+              clockTimeDisplayFormat: <value>
+              country: <value>
+              corporate: <value>
+              corporateAdmin: <value>
+              dateOfBirth: <value>
+              displayName: <value>
+              displayNameSetting: <value>
+              distanceUnit: <value>
+              encodedId: <value>
+              features:
+                exerciseGoal: <value>
+              firstName: <value>
+              foodsLocale: <value>
+              fullName: <value>
+              gender: <value>
+              glucoseUnit: <value>
+              height: <value>
+              heightUnit: <value>
+              isBugReportEnabled: <value>
+              isChild: <value>
+              isCoach: <value>
+              languageLocale: <value>
+              lastName: <value>
+              legalTermsAcceptRequired: <value>
+              locale: <value>
+              memberSince: <value>
+              mfaEnabled: <value>
+              offsetFromUTCMillis: <value>
+              sdkDeveloper: <value>
+              sleepTracking: <value>
+              startDayOfWeek: <value>
+              state: <value>
+              strideLengthRunning: <value>
+              strideLengthRunningType: <value>
+              strideLengthWalking: <value>
+              strideLengthWalkingType: <value>
+              swimUnit: <value>
+              temperatureUnit: <value>
+              timezone: <value>
+              topBadges: []
+              waterUnit: <value>
+              waterUnitName: <value>
+              weight: <value>
+    - httpRequest:
+        path: /fitbit/1/user/someUserId/activities/heart/.*
+      httpResponse:
+          headers:
+              Content-Type: application/json
+          body:
+            activities-heart:
+              - dateTime: 2019-05-08
+                value:
+                  customHeartRateZones:
+                    - caloriesOut: 1164.09312
+                      max: 90
+                      min: 30
+                      minutes: 718
+                      name: Below
+                    - caloriesOut: 203.65344
+                      max: 110
+                      min: 90
+                      minutes: 74
+                      name: Custom Zone
+                    - caloriesOut: 330.76224
+                      max: 220
+                      min: 110
+                      minutes: 42
+                      name: Above
+                  heartRateZones:
+                    - caloriesOut: 979.43616
+                      max: 86
+                      min: 30
+                      minutes: 626
+                      name: Out of Range
+                    - caloriesOut: 514.16208
+                      max: 121
+                      min: 86
+                      minutes: 185
+                      name: Fat Burn
+                    - caloriesOut: 197.92656
+                      max: 147
+                      min: 121
+                      minutes: 18
+                      name: Cardio
+                    - caloriesOut: 6.984
+                      max: 220
+                      min: 147
+                      minutes: 5
+                      name: Peak
+                  restingHeartRate: 76
+    - httpRequest:
+        path: /fitbit/1.2/user/someUserId/sleep/.*
+      httpResponse:
+          headers:
+              Content-Type: application/json
+          body:
+            sleep:
+              - dateOfSleep: 2020-02-21
+                duration: 27720000
+                efficiency: 96
+                endTime: 2020-02-21T07:03:30.000
+                infoCode: 0
+                isMainSleep: true
+                levels:
+                  data:
+                    - dateTime: 2020-02-20T23:21:30.000
+                      level: wake
+                      seconds: 630
+                    - dateTime: 2020-02-20T23:32:00.000
+                      level: light
+                      seconds: 30
+                    - dateTime: 2020-02-20T23:32:30.000
+                      level: deep
+                      seconds: 870
+                    - dateTime: 2020-02-21T06:32:30.000
+                      level: light
+                      seconds: 1860
+                  shortData:
+                    - dateTime: 2020-02-21T00:10:30.000
+                      level: wake
+                      seconds: 30
+                    - dateTime: 2020-02-21T00:15:00.000
+                      level: wake
+                      seconds: 30
+                    - dateTime: 2020-02-21T06:18:00.000
+                      level: wake
+                      seconds: 60
+                  summary:
+                    deep:
+                      count: 5
+                      minutes: 104
+                      thirtyDayAvgMinutes: 69
+                    light:
+                      count: 32
+                      minutes: 205
+                      thirtyDayAvgMinutes: 202
+                    rem:
+                      count: 11
+                      minutes: 75
+                      thirtyDayAvgMinutes: 87
+                    wake:
+                      count: 30
+                      minutes: 78
+                      thirtyDayAvgMinutes: 55
+                logId: 26013218219
+                minutesAfterWakeup: 0
+                minutesAsleep: 384
+                minutesAwake: 78
+                minutesToFallAsleep: 0
+                logType: auto_detected
+                startTime: 2020-02-20T23:21:30.000
+                timeInBed: 462
+                type: stages
+            summary:
+              stages:
+                deep: 104
+                light: 205
+                rem: 75
+                wake: 78
+              totalMinutesAsleep: 384
+              totalSleepRecords: 1
+              totalTimeInBed: 462
+    - httpRequest:
+        path: /fitbit/1/user/someUserId/activities/list.json
+      httpResponse:
+          headers:
+              Content-Type: application/json
+          body:
+            activities:
+              - activeDuration: 1536000
+                activityLevel:
+                  - minutes: 3
+                    name: sedentary
+                  - minutes: 9
+                    name: lightly
+                  - minutes: 2
+                    name: fairly
+                  - minutes: 11
+                    name: very
+                activityName: Walk
+                activityTypeId: 90013
+                calories: 204
+                caloriesLink: "https://api.fitbit.com/1/user/-/activities/calories/date/2019-01-03/2019-01-03/1min/time/12:08/12:34.json"
+                duration: 1536000
+                elevationGain: 0
+                lastModified: "2019-01-04T19:31:15.000Z"
+                logId: 19018673358
+                logType: auto_detected
+                manualValuesSpecified:
+                  calories: false
+                  distance: false
+                  steps: false
+                originalDuration: 1536000
+                originalStartTime: "2019-01-03T12:08:29.000-08:00"
+                startTime: "2019-01-03T12:08:29.000-08:00"
+                steps: 1799
+                tcxLink: "https://api.fitbit.com/1/user/-/activities/19018673358.tcx"
+            pagination:
+              afterDate: "2019-01-01"
+              limit: 1
+              next: "https://api.fitbit.com/1/user/-/activities/list.json?offset=0&limit=1&sort=asc&afterDate=2019-01-01"
+              offset: 0
+              previous: ""
+              sort: asc

@@ -1,7 +1,3 @@
-cert_manager:
-  _install: false
-cert_manager_letsencrypt:
-  _install: false
 nginx_ingress:
   controller:
     config:
