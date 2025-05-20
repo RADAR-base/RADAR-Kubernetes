@@ -922,11 +922,10 @@ releases:
     installed: {{ .Values.radar_upload_source_connector._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_upload_source_connector._extra_timeout }}
     <<: *logFailedRelease
-    {{ if .Values.radar_upload_connect_backend._install }}
     needs:
+      - management-portal
       - radar-upload-connect-backend
       {{ if .Values.cp_schema_registry._install }}- cp-schema-registry{{ end }}
-    {{ end }}
     values:
       - {{ .Values.radar_upload_source_connector | toYaml | indent 8 | trim }}
     set:
