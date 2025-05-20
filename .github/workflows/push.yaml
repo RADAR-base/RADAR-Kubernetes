@@ -39,6 +39,7 @@ jobs:
       - name: Prepare the environment (add secrets and enable installation of all components)
         run: |
           DNAME='CN=CI,O=TheHyve,L=Utrecht,C=NL' ./bin/init
+          cp etc/base-secrets.yaml etc/secrets.yaml
           helmfile_mods='\ \ \ \ \ \ - ../.github/ci_config/ci-config.yaml\n'
           helmfile_mods+='\ \ \ \ \ \ - ../.github/ci_config/secrets.yaml.gotmpl'
           sed -i "/secrets.yaml/a $helmfile_mods" environments.yaml

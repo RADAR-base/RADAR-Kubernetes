@@ -30,8 +30,10 @@ def wait_for_management_portal(context):
 def get_secret(*path_elements, context):
     if context.cache["secrets"] is None or len(context.cache["secrets"].keys()) == 0:
         secrets_file = context.config.userdata["secrets_file"]
+        print("reading secrets from file...", secrets_file)
         with open(secrets_file, 'r') as file:
             context.cache["secrets"] = yaml.safe_load(file)
+        print("secrets loaded:", context.cache["secrets"])
     return reduce(operator.getitem, path_elements, context.cache["secrets"])
 
 def format_url(path, context):
