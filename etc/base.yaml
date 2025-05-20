@@ -196,28 +196,6 @@ cloudnative_postgresql:
       instances: 1
       storage:
         size: 10Gi
-#   --  Uncomment this when migrating from the legacy postgresql databases
-#   mode: recovery
-#   recovery:
-#     method: import
-#     import:
-#       type: monolith
-#       databases:
-#         - managementportal
-#         - appconfig
-#         - appserver
-#         - kratos
-#         - restsourceauthorizer
-#         - uploadconnector
-#       source:
-#         host: postgresql
-#         username: postgres
-#         database: postgres
-#         sslMode: prefer
-#         passwordSecret:
-#           create: false
-#           name: postgresql
-#           key: postgres-password
 
 management_portal:
   _install: true
@@ -406,20 +384,6 @@ radar_jdbc_connector_grafana:
           owner: grafana-metrics
         storage:
           size: 8Gi
-#  --  Uncomment this when migrating from the legacy postgresql databases
-#      mode: recovery
-#      import:
-#        databases:
-#          - grafana-metrics
-#        source:
-#          host: grafana-metrics-timescaledb-postgresql
-#          username: postgres
-#          database: postgres
-#          sslMode: prefer
-#          passwordSecret:
-#            create: false
-#            name: grafana-metrics-timescaledb-postgresql
-#            key: postgres-password
 
 # Install when data_dashboard_backend._install is 'true'.
 radar_jdbc_connector_data_dashboard_backend:
@@ -436,20 +400,6 @@ radar_jdbc_connector_data_dashboard_backend:
           owner: data-dashboard
         storage:
           size: 8Gi
-#  --  Uncomment this when migrating from the legacy postgresql databases
-#      mode: recovery
-#      import:
-#        databases:
-#          - data-dashboard
-#        source:
-#          host: data-dashboard-timescaledb-postgresql
-#          username: postgres
-#          database: postgres
-#          sslMode: prefer
-#          passwordSecret:
-#            create: false
-#            name: data-dashboard-timescaledb-postgresql
-#            key: postgres-password
 
 # Install when using realtime analysis
 radar_jdbc_connector_realtime_dashboard:
@@ -466,20 +416,6 @@ radar_jdbc_connector_realtime_dashboard:
           owner: realtime-dashboard
         storage:
           size: 8Gi
-#  --  Uncomment this when migrating from the legacy postgresql databases
-#      mode: recovery
-#      import:
-#        databases:
-#          - realtime-dashboard
-#        source:
-#          host: realtime-dashboard-timescaledb-postgresql
-#          username: postgres
-#          database: postgres
-#          sslMode: prefer
-#          passwordSecret:
-#            create: false
-#            name: realtime-dashboard-timescaledb-postgresql
-#            key: postgres-password
 
 # Install when:
 #- radar_grafana._install is 'true'
