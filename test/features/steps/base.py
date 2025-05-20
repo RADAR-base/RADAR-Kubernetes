@@ -10,6 +10,9 @@ from minio import Minio
 import time
 import datetime
 import os
+import urllib3
+
+urllib3.disable_warnings(category=urllib3.exceptions.InsecureRequestWarning)
 
 minio_client = None
 
@@ -18,7 +21,7 @@ def wait_for_management_portal(context):
     while True:
         if time < 0:
             raise Exception('Management portal did not start in time')
-        response = requests.get(f'{context.config.userdata["url"]}/managementportal')
+        response = requests.get(f'{context.config.userdata["url"]}/managementportal', verify=False)
         if response.status_code == 200:
             break
         time.sleep(1)
@@ -48,7 +51,7 @@ def get_mp_token(context):
         'password': mp_admin_password,
         'grant_type': 'password',
     }
-    response = requests.post(f'{context.config.userdata["url"]}/managementportal/oauth/token', headers=headers, data=data)
+    response = requests.post(f'{context.config.userdata["url"]}/managementportal/oauth/token', headers=headers, data=data, verify=False)
     assert response.status_code == 200
     management_portal_json = response.json()
     token = management_portal_json['access_token']
@@ -62,7 +65,7 @@ def get_source_types(context):
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {get_mp_token(context)}'
     }
-    response = requests.get(f'{context.config.userdata["url"]}/managementportal/api/source-types', headers=headers)
+    response = requests.get(f'{context.config.userdata["url"]}/managementportal/api/source-types', headers=headers, verify=False)
     assert response.status_code == 200
     return response.json()
 
@@ -90,7 +93,7 @@ def create_armt_source_type(context, source_type):
         "canRegisterDynamically": True,
         "name": armt_source_type_id
     }
-    response = requests.post(f'{context.config.userdata["url"]}/managementportal/api/source-types', headers=headers, data=json.dumps(data))
+    response = requests.post(f'{context.config.userdata["url"]}/managementportal/api/source-types', headers=headers, data=json.dumps(data), verify=False)
     # 409 means that the armt source already exists.
     assert response.status_code == 201 or response.status_code == 409
     if response.status_code == 201:
@@ -104,7 +107,7 @@ def check_organization_exists(context, organization):
         'Content-Type': 'application /json',
         'Authorization': f'Bearer {get_mp_token(context)}'
     }
-    response = requests.get(f'{context.config.userdata["url"]}/managementportal/api/organizations', headers=headers)
+    response = requests.get(f'{context.config.userdata["url"]}/managementportal/api/organizations', headers=headers, verify=False)
     assert response.status_code == 200
     test_organization_json = next((item for item in response.json() if item["name"] == organization), None)
     if not context.config.userdata["dev_mode"] and test_organization_json is not None:
@@ -123,7 +126,7 @@ def create_organization(context, organization):
         "description": "TEST",
         "location": "TEST"
     }
-    response = requests.post(f'{context.config.userdata["url"]}/managementportal/api/organizations', headers=headers, data=json.dumps(data))
+    response = requests.post(f'{context.config.userdata["url"]}/managementportal/api/organizations', headers=headers, data=json.dumps(data), verify=False)
     # 409 means that the organization already exists
     assert response.status_code == 201 or response.status_code == 409
     if response.status_code == 201:
@@ -137,7 +140,7 @@ def check_project_exists(context, project):
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {get_mp_token(context)}'
     }
-    response = requests.get(f'{context.config.userdata["url"]}/managementportal/api/projects', headers=headers)
+    response = requests.get(f'{context.config.userdata["url"]}/managementportal/api/projects', headers=headers, verify=False)
     assert response.status_code == 200
     test_project_json = next((item for item in response.json() if item["projectName"] == project), None)
     if context.config.userdata["dev_mode"] and test_project_json is not None:
@@ -161,7 +164,7 @@ def create_project(context, project):
         "startDate": None,
         "endDate": None
     }
-    response = requests.post(f'{context.config.userdata["url"]}/managementportal/api/projects', headers=headers, data=json.dumps(data))
+    response = requests.post(f'{context.config.userdata["url"]}/managementportal/api/projects', headers=headers, data=json.dumps(data), verify=False)
     assert response.status_code == 200 or response.status_code == 201
     if response.status_code == 201:
         test_project_json = response.json()
@@ -175,7 +178,7 @@ def check_armt_project_source_exists(context, source):
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {get_mp_token(context)}'
     }
-    response = requests.get(f'{context.config.userdata["url"]}/managementportal/api/projects/{context.config.userdata["project_name"]}/sources', headers=headers)
+    response = requests.get(f'{context.config.userdata["url"]}/managementportal/api/projects/{context.config.userdata["project_name"]}/sources', headers=headers, verify=False)
     assert response.status_code == 200
     armt_project_source_json = next((item for item in response.json() if item["sourceType"]["name"] == "RADAR_aRMT"), None)
     if context.config.userdata["dev_mode"] and armt_project_source_json is not None:
@@ -196,7 +199,7 @@ def create_armt_project_source(context, source):
         "sourceType": context.cache["armt_source_type_json"],
         "project": context.cache["project_json"]
     }
-    response = requests.post(f'{context.config.userdata["url"]}/managementportal/api/sources', headers=headers, data=json.dumps(data))
+    response = requests.post(f'{context.config.userdata["url"]}/managementportal/api/sources', headers=headers, data=json.dumps(data), verify=False)
     assert response.status_code == 200 or response.status_code == 201
     armt_project_source_json = response.json()
     assert armt_project_source_json['sourceId'] is not None
@@ -210,7 +213,7 @@ def check_subject_exists(context, subject):
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {get_mp_token(context)}'
     }
-    response = requests.get(f'{context.config.userdata["url"]}/managementportal/api/projects/{project}/subjects', headers=headers)
+    response = requests.get(f'{context.config.userdata["url"]}/managementportal/api/projects/{project}/subjects', headers=headers, verify=False)
     assert response.status_code == 200
     test_subject_json = next((item for item in response.json() if item["externalId"] == subject), None)
     if context.config.userdata["dev_mode"] and test_subject_json is not None:
@@ -232,7 +235,7 @@ def create_subject(context, subject):
         "externalId": subject,
         "group": None
     }
-    response = requests.post(f'{context.config.userdata["url"]}/managementportal/api/subjects', headers=headers, data=json.dumps(data))
+    response = requests.post(f'{context.config.userdata["url"]}/managementportal/api/subjects', headers=headers, data=json.dumps(data), verify=False)
     assert response.status_code == 200 or response.status_code == 201
     test_subject_json = response.json()
     assert test_subject_json['login'] is not None
@@ -251,7 +254,7 @@ def get_armt_meta_token(context):
         'login': context.cache["test_subject_id"],
         'persistent': True
     }
-    response = requests.get(f'{context.config.userdata["url"]}/managementportal/api/oauth-clients/pair', headers=headers, params=params)
+    response = requests.get(f'{context.config.userdata["url"]}/managementportal/api/oauth-clients/pair', headers=headers, params=params, verify=False)
     assert response.status_code == 200
     meta_token = response.json()['tokenName']
     assert meta_token is not None
@@ -264,7 +267,7 @@ def get_armt_refresh_token(context):
     headers = {
         'Authorization': f'Bearer {get_mp_token(context)}'
     }
-    response = requests.get(f'{context.config.userdata["url"]}/managementportal/api/meta-token/{get_armt_meta_token(context)}', headers=headers)
+    response = requests.get(f'{context.config.userdata["url"]}/managementportal/api/meta-token/{get_armt_meta_token(context)}', headers=headers, verify=False)
     assert response.status_code == 200
     refresh_token = response.json()['refreshToken']
     assert refresh_token is not None
@@ -283,7 +286,7 @@ def get_armt_access_token(context):
         'grant_type': 'refresh_token',
         'refresh_token': token
     }
-    response = requests.post(f'{context.config.userdata["url"]}/managementportal/oauth/token', headers=headers, data=data)
+    response = requests.post(f'{context.config.userdata["url"]}/managementportal/oauth/token', headers=headers, data=data, verify=False)
     assert response.status_code == 200
     access_token = response.json()['access_token']
     assert access_token is not None
@@ -353,7 +356,7 @@ def _get_minio_client(context):
         access_key=get_secret("s3_access_key", context = context),
         secret_key=get_secret("s3_secret_key", context = context),
         secure=False
-    )
+)
     return minio_client
 
 def push_questionnaire_response_data(context):
@@ -392,7 +395,7 @@ def push_questionnaire_response_data(context):
             }
         ]
     }
-    response = requests.post(f'{context.config.userdata["url"]}/kafka/topics/questionnaire_response', headers=headers, data=json.dumps(data))
+    response = requests.post(f'{context.config.userdata["url"]}/kafka/topics/questionnaire_response', headers=headers, data=json.dumps(data), verify=False)
     assert response.status_code == 200
 
 def _random_timestamp():
@@ -402,10 +405,10 @@ def _random_timestamp():
     return random_date.timestamp()
 
 def _get_kafka_topic_key_value_ids(context, topic_name):
-    response = requests.get(f'{context.config.userdata["url"]}/schema/subjects/{topic_name}-key/versions/latest')
+    response = requests.get(f'{context.config.userdata["url"]}/schema/subjects/{topic_name}-key/versions/latest', verify=False)
     assert response.status_code == 200
     key_id = response.json()['id']
-    response = requests.get(f'{context.config.userdata["url"]}/schema/subjects/{topic_name}-value/versions/latest')
+    response = requests.get(f'{context.config.userdata["url"]}/schema/subjects/{topic_name}-value/versions/latest', verify=False)
     assert response.status_code == 200
     value_id = response.json()['id']
     return key_id, value_id
@@ -421,7 +424,7 @@ def register_fitbit_user(context):
         "userId": context.cache["fitbit_user_json"]["id"],
         "persistent": True
     }
-    response = requests.post(f'{context.config.userdata["url"]}/rest-sources/backend/registrations', headers=headers, data=json.dumps(data))
+    response = requests.post(f'{context.config.userdata["url"]}/rest-sources/backend/registrations', headers=headers, data=json.dumps(data), verify=False)
     assert response.status_code == 200 or response.status_code == 201
     registration_json = response.json()
     assert registration_json is not None
@@ -437,7 +440,7 @@ def register_fitbit_user(context):
     data = {
         "code": "mycode"
     }
-    response = requests.post(f'{context.config.userdata["url"]}/rest-sources/backend/registrations/{registration_token}/authorize', headers=headers, data=json.dumps(data))
+    response = requests.post(f'{context.config.userdata["url"]}/rest-sources/backend/registrations/{registration_token}/authorize', headers=headers, data=json.dumps(data), verify=False)
     assert response.status_code == 200 or response.status_code == 201
 
     # The rest source backend will exchange the code for an access token and refresh token.
@@ -454,7 +457,7 @@ def check_fitbit_user_exists(context):
     }
     project_name = context.cache["project_json"]["projectName"]
     user_id = context.cache["test_subject_id"]
-    response = requests.get(f'{context.config.userdata["url"]}/rest-sources/backend/users?project-id={project_name}&authorized=all', headers=headers)
+    response = requests.get(f'{context.config.userdata["url"]}/rest-sources/backend/users?project-id={project_name}&authorized=all', headers=headers, verify=False)
     assert response.status_code == 200
     users_json = response.json()
     user_json = next((item for item in users_json['users'] if item["userId"] == user_id), None)
@@ -482,7 +485,7 @@ def _create_fitbit_user(context):
         "endDate": "3000-11-29T23:00:00.000Z",
         "sourceType": "FitBit"
     }
-    response = requests.post(f'{context.config.userdata["url"]}/rest-sources/backend/users', headers=headers, data=json.dumps(data))
+    response = requests.post(f'{context.config.userdata["url"]}/rest-sources/backend/users', headers=headers, data=json.dumps(data), verify=False)
     assert response.status_code == 200 or response.status_code == 201
     user_json = response.json()
     assert user_json is not None
