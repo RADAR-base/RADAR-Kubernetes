@@ -320,21 +320,20 @@ def wait_s3_object_counts_state_changed(context):
             current_timestamp_dict = _get_bucket_object_state(minio_client, bucket, filename_pattern)
             stored_timestamp_dict = _cache_bucket_object_state(context, bucket, filename_pattern)
             difference = len(current_timestamp_dict) - len(stored_timestamp_dict)
-            match change_type:
-                case "count":
-                    if difference != 0:
+            if change_type == "count":
+               if difference != 0:
+                   found = True
+                   print(f'{bucket} s3 object count increased by {difference}')
+            elif change_type == "timestamp":
+                for object_name, stored_timestamp in stored_timestamp_dict.items():
+                    current_timestamp = current_timestamp_dict.get(object_name)
+                    if current_timestamp > stored_timestamp:
+                        # If any timestamp is updated, we consider it as an update.
                         found = True
-                        print(f'{bucket} s3 object count increased by {difference}')
-                case "timestamp":
-                    for object_name, stored_timestamp in stored_timestamp_dict.items():
-                        current_timestamp = current_timestamp_dict.get(object_name)
-                        if current_timestamp > stored_timestamp:
-                            # If any timestamp is updated, we consider it as an update.
-                            found = True
-                            print(f'Object {object_name} timestamp updated to {current_timestamp}')
-                            break
-                case _:
-                    raise Exception(f'Invalid change type {change_type}')
+                        print(f'Object {object_name} timestamp updated to {current_timestamp}')
+                        break
+            else:
+                raise Exception(f'Invalid change type {change_type}')
             time.sleep(1)
             timeout -= 1
         _cache_bucket_object_state(context, bucket, filename_pattern, current_timestamp_dict)
