@@ -24,7 +24,10 @@ options:
         nodeFilters:
           - server:*
 # Same as CLI parameter `--port '80:80@loadbalancer'`
-#ports:
-#  - port: 80:80
-#    nodeFilters:
-#      - loadbalancer
+ports:
+  - port: 80:80
+    nodeFilters:
+      - loadbalancer
+  - port: 443:443
+    nodeFilters:
+      - loadbalancer

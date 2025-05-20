@@ -4,7 +4,7 @@ mkdir /tmp/dependencies
 cd /tmp/dependencies
 
 sudo apt update
-sudo apt install -y openjdk-11-jre-headless curl coreutils
+sudo apt install -y openjdk-11-jre-headless curl coreutils unzip
 
 OS="$(uname | tr '[:upper:]' '[:lower:]')"
 ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')"

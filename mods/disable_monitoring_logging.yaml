@@ -89,3 +89,10 @@ ksql_server:
   prometheus:
     jmx:
       enabled: false
+gateway:
+  serviceMonitor:
+    enabled: false
+ksql_server:
+  prometheus:
+    jmx:
+      enabled: false
