@@ -323,30 +323,54 @@ data_dashboard_timescaledb:
   _install: false
   _chart_version: 0.1.1
   _extra_timeout: 210
-  cluster:
-    cluster:
-      instances: 1
-      storage: 8Gi
+  replicaCount: 1
+  postgresql:
+    replication:
+      enable: false
+      applicationName: radarDataDashboard
+    auth:
+      database: data-dashboard
+    primary:
+      persistence:
+        size: 8Gi
+        # Uncomment when upgrading from version v1.1.3 to v1.2.0
+        #existingClaim: "data-timescaledb-postgresql-0"
 
 # DEPRECATED: timescaledb instance is created automatically with the radar-jdbc-connector for grafana metrics
 grafana_timescaledb:
   _install: false
   _chart_version: 0.1.1
   _extra_timeout: 210
-  cluster:
-    cluster:
-      instances: 1
-      storage: 8Gi
+  replicaCount: 1
+  postgresql:
+    replication:
+      enable: false
+      applicationName: radarGrafanaMetrics
+    auth:
+      database: grafana-metrics
+    primary:
+      persistence:
+        size: 8Gi
+        # Uncomment when upgrading from version v1.1.3 to v1.2.0
+        #existingClaim: "data-timescaledb-postgresql-0"
 
 # DEPRECATED: timescaledb instance is created automatically with the radar-jdbc-connector for realtime dashboard
 realtime_dashboard_timescaledb:
   _install: false
   _chart_version: 0.1.1
   _extra_timeout: 210
-  cluster:
-    cluster:
-      instances: 1
-      storage: 8Gi
+  replicaCount: 1
+  postgresql:
+    replication:
+      enable: false
+      applicationName: radarRealtimeDashboard
+    auth:
+      database: realtime-dashboard
+    primary:
+      persistence:
+        size: 8Gi
+        # Uncomment when upgrading from version v1.1.3 to v1.2.0
+        #existingClaim: "data-timescaledb-postgresql-0"
 
 # Make sure to set:
 #- radar_jdbc_connector_grafana._install to true
