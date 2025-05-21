@@ -35,7 +35,7 @@ postgres_num_replicates: 2
 timescaledb_num_replicates: 2
 ```
 
-2. If desired, change the default storage size of the _PostgreSQL_ database by adding a `cloudnative_postgresql:` section like so:
+2. If desired, add a section that changes the default storage size of the _PostgreSQL_ database:
 
 ```yaml
 cloudnative_postgresql:
@@ -45,7 +45,7 @@ cloudnative_postgresql:
         size: 10Gi
 ```
 
-3. If desired, change the default storage size of the _TimescaleDB_ databases by adding these respective sections:
+3. If desired, add sections that change the default storage size of the _TimescaleDB_ respective databases:
 
 ```yaml
 radar_jdbc_connector_grafana:
@@ -74,6 +74,12 @@ radar_jdbc_connector_realtime_dashboard:
         storage:
           size: 50Gi
 ```
+ 
+4. Duplicate entry `grafana_metrics_db_user` ane rename to `grafana_metrics_endpoint_user` (keep the same value).
+
+### Update `secrets.yaml` file
+
+Duplicate secret `grafana_metrics_db_password` and rename to `grafana_metrics_endpoint_password` (keep the same value).
 
 ### Database migration
 
@@ -81,11 +87,11 @@ Important: before database migration the steps in the sections above must be com
 
 The database migration process involves:
 
-1. A manual import of existing _upload-connect-backend_, _kratos_ or _app-server_ databases into the CloudNativePG postgres cluster.
+1. A manual import of existing _upload-connect-backend_ or _app-server_ databases into the CloudNativePG postgres cluster.
 2. An automated import of the _management_portal_, _app-config_ and _rest-sources-authorizer_ databases into the CloudNativePG postgres cluster.
 3. Post-migration cleanup.
 
-#### 1. Manual import of _upload-connector_, _kratos_ or _app-server_ databases
+#### 1. Manual import of _upload-connector_ and/or _app-server_ databases
 
 Notes:
 - Database passwords can be found in the `etc/secrets.yaml` file.
@@ -113,15 +119,19 @@ kubectl exec -i postgresql-0 -- bash -c "PGPASSWORD=<mp-password> psql -U <mp-us
 cat uploadconnector.sql | kubectl exec -i postgresql-0 -- bash -c "PGPASSWORD=<mp-password> psql -U <mp-user> -d uploadconnector"
 ```
 
-##### Kratos database import
+#### Update `environments.yaml` file
 
-Perform when using the _kratos_ service. The username and password for the _app-server_ database are indicated with `<user>` and `<password>`, respectively.
-The username and password for the _management_portal_ database are indicated with `<mp-user>` and `<mp-password>`, respectively.
+Add the _mods/migration/1.3.0.yaml_ file to the `values:` section, like so:
 
-```shell
-kubectl exec radar-kratos-postgresql-0 -- bash -c "PGPASSWORD=<password> pg_dump -U <user> kratos" > kratos.sql
-kubectl exec -i postgresql-0 -- bash -c "PGPASSWORD=<mp-password> psql -U <mp-user> -t -c 'CREATE DATABASE kratos'"
-cat kratos.sql | kubectl exec -i postgresql-0 -- bash -c "PGPASSWORD=<mp-password> psql -U <mp-user> -d kratos"
+```yaml
+environments:
+  default:
+    values:
+      - ../etc/base.yaml
+      - ../etc/production.yaml
+      - ../etc/production.yaml.gotmpl
+      - ../etc/secrets.yaml
+      - ../mods/migration/1.3.0.yaml
 ```
 
 #### 2. Automated import databases
@@ -130,7 +140,7 @@ Start the database migration of _management_portal_ and _TimescaleDB_ databases 
 the CloudNativePG operator. Run the _helmfile_ command once with the `mods/migration/1.3.0.yaml` modification file.
 
 ```shell
-helmfile sync --file mods/migration/1.3.0.yaml
+helmfile sync 
 ```
 
 ### 3. Post migration cleanup
@@ -168,13 +178,14 @@ radar_upload_postgresql:
 ...
 ```
 
-and run:
+3. Remove the _mods/migration/1.3.0.yaml_ file from the `environments.yaml` file.
+4. Update the deployment:
 
 ```shell
 helmfile sync
 ```
 
-3. Remove any _pvc_ resource on the Kubernetes cluster associated with the old databases. Important: this step will permanently delete the data! Only perform this step when sure the migration completed successfully.
+5. Remove any _pvc_ resource on the Kubernetes cluster associated with the old databases. Important: this step will permanently delete the data! Only perform this step when sure the migration completed successfully.
    The relevant _pvc_ names are:
 
 - `data-postgresql-0`
