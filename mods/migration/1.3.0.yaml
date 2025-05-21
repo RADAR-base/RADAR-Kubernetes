@@ -1,11 +1,11 @@
 cloudnative_postgresql:
-  _install: true
   mode: recovery
   recovery:
     method: import
     import:
       type: monolith
       databases:
+        # Remove any database that is not needed.
         - managementportal
         - appconfig
         - appserver
@@ -23,7 +23,6 @@ cloudnative_postgresql:
           key: postgres-password
 
 radar_jdbc_connector_grafana:
-  _install: false
   radar-cloudnative-timescaledb:
     enabled: true
     cluster:
@@ -32,18 +31,16 @@ radar_jdbc_connector_grafana:
         databases:
           - grafana-metrics
       source:
-        host: grafana-metrics-timescaledb-postgresql
+        host: grafana-timescaledb-postgresql
         username: postgres
         database: postgres
         sslMode: prefer
         passwordSecret:
           create: false
-          name: grafana-metrics-timescaledb-postgresql
+          name: grafana-timescaledb-postgresql
           key: postgres-password
 
-# Install when data_dashboard_backend._install is 'true'.
 radar_jdbc_connector_data_dashboard_backend:
-  _install: false
   radar-cloudnative-timescaledb:
     enabled: true
     cluster:
@@ -61,9 +58,7 @@ radar_jdbc_connector_data_dashboard_backend:
             name: data-dashboard-timescaledb-postgresql
             key: postgres-password
 
-# Install when using realtime analysis
 radar_jdbc_connector_realtime_dashboard:
-  _install: false
   radar-cloudnative-timescaledb:
     enabled: true
     cluster:

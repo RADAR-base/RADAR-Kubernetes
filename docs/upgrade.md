@@ -6,6 +6,24 @@ Run the following instructions to upgrade an existing RADAR-Kubernetes cluster.
 
 This version introduces postgresql and TimescaleDB clusters managed by the CloudNativePG operator.
 
+### Update `mods/migration/1.3.0.yaml` mods file
+
+This file provides configuration for database migration. In the `cloundnative_postgresql` section, remove any database from the
+`databases` list that is not needed. For instance:
+
+```yaml
+            ...
+            databases:
+              - managementportal
+              # - appconfig
+              # - appserver
+              # - kratos
+              - restsourceauthorizer
+              # - uploadconnector
+            source:
+              ...
+```
+
 ### Update `production.yaml` file
 
 1. Add values for the number of Postgresql and TimescaleDB replicas. Change the number of replicas if desired:
@@ -17,145 +35,44 @@ postgres_num_replicates: 2
 timescaledb_num_replicates: 2
 ```
 
-2. Add the CloudNativePG section. Note that the `_install` flag is set to `false`. Change the following:
-
-- Change the disk size in `cloudnative.cluster.cluster.storage.size` if desired.
-- Remove databases that are not needed in the `cloudnative.cluster.cluster.recovery.import.databases` section.
+2. If desired, change the default storage size of the _PostgreSQL_ database by adding a `cloudnative_postgresql:` section like so:
 
 ```yaml
 cloudnative_postgresql:
-  _install: false
-  _extra_timeout: 0
   cluster:
     cluster:
       storage:
-        # Change this to the desired size
         size: 10Gi
-      cluster:
-        mode: recovery
-        recovery:
-          method: import
-          import:
-            type: monolith
-            # Update this list with the databases that need to be imported
-            databases:
-              - managementportal
-              - appconfig
-              - appserver
-              - kratos
-              - restsourceauthorizer
-              - uploadconnector
-            source:
-              host: postgresql
-              username: postgres
-              database: postgres
-              sslMode: prefer
-              passwordSecret:
-                create: false
-                name: postgresql
-                key: postgres-password
 ```
 
-3. Update JDBC-connector sections to use the new CloudNativePG operator. Note that the `_install` flag is set to
-   `false`. Change the disk size in `cloudnative.cluster.cluster.storage.size` if desired.
+3. If desired, change the default storage size of the _TimescaleDB_ databases by adding these respective sections:
 
 ```yaml
 radar_jdbc_connector_grafana:
-  ...
   radar-cloudnative-timescaledb:
-    enabled: false
     cluster:
       cluster:
         storage:
           # Change this to the desired size
-          size: 8Gi
-          mode: recovery
-        import:
-          databases:
-            - grafana-metrics
-          source:
-            host: grafana-metrics-timescaledb-postgresql
-            username: postgres
-            database: postgres
-            sslMode: prefer
-            passwordSecret:
-              create: false
-              name: grafana-metrics-timescaledb-postgresql
-              key: postgres-password
+          size: 50Gi
 ```
 
 ```yaml
 radar_jdbc_connector_data_dashboard_backend:
-  ...
   radar-cloudnative-timescaledb:
-    enabled: false
     cluster:
       cluster:
-        initdb:
-          database: data-dashboard
-          owner: data-dashboard
         storage:
-          # Change this to the desired size
-          size: 8Gi
-        mode: recovery
-        import:: recovery
-        databases:
-          - data-dashboard
-        source:
-          host: data-dashboard-timescaledb-postgresql
-          username: postgres
-          database: postgres
-          sslMode: prefer
-          passwordSecret:
-            create: false
-            name: data-dashboard-timescaledb-postgresql
-            key: postgres-password
+          size: 508Gi
 ```
 
 ```yaml
 radar_jdbc_connector_realtime_dashboard:
-  ...
   radar-cloudnative-timescaledb:
-    enabled: false
     cluster:
       cluster:
-        initdb:
-          database: realtime-dashboard
-          owner: realtime-dashboard
         storage:
-          # Change this to the desired size
-          size: 8Gi
-        mode: recovery
-        import:
-          databases:
-            - realtime-dashboard
-          source:
-            host: realtime-dashboard-timescaledb-postgresql
-            username: postgres
-            database: postgres
-            sslMode: prefer
-            passwordSecret:
-              create: false
-              name: realtime-dashboard-timescaledb-postgresql
-              key: postgres-password
-```
-
-4. Add a `grafana_username` entry. When you use a `grafana_metrics_db_username` username different from `postgres` duplicate (!)
-   `grafana_metrics_db_username` to `grafana_metrics_endpoint_username` like so:
-
-```yaml
-grafana_username: grafana
-grafana_metrics_db_username: my-username
-grafana_metrics_endpoint_username: my-username
-```
-
-### Update `secrets.yaml` file
-
-1. Duplicate (!) the `grafana_metrics_db_password` to a new `grafana_metrics_endpoint_password` entry similar to :
-
-```yaml
-grafana_metrics_db_password: my-password
-grafana_metrics_endpoint_password: my-password
+          size: 50Gi
 ```
 
 ### Database migration
@@ -164,76 +81,56 @@ Important: before database migration the steps in the sections above must be com
 
 The database migration process involves:
 
-1. (optional) When using _upload-connect-backend_ , _kratos_ or _appserver_ services, perform a manual import of
-   existing databases into the _management_portal_ postgres database.
-2. Automated import of the _management_portal_ database into the new CloudNativePG postgres cluster(s).
+1. A manual import of existing _upload-connect-backend_, _kratos_ or _app-server_ databases into the CloudNativePG postgres cluster.
+2. An automated import of the _management_portal_, _app-config_ and _rest-sources-authorizer_ databases into the CloudNativePG postgres cluster.
 3. Post-migration cleanup.
 
-#### 1. Manual import of _upload-connect-backend_ , _kratos_ or _appserver_ databases
+#### 1. Manual import of _upload-connector_, _kratos_ or _app-server_ databases
 
-Note: the database passwords can be found in the `secrets.yaml` file.
+Notes:
+- Database passwords can be found in the `etc/secrets.yaml` file.
+- Unless customized the username for all databases is `postgres`.
 
 ##### App-server database import
 
-Perform when using the _appserver_ service.
+Perform when using the _app-server_ service. The username and password for the _app-server_ database are indicated with `<user>` and `<password>`, respectively. 
+The username and password for the _management_portal_ database are indicated with `<mp-user>` and `<mp-password>`, respectively.
 
 ```shell
-kubectl exec radar-appserver-postgresql-0 -- bash -c "PGPASSWORD=<appserver database password> pg_dump -U postgres appserver" > appserver.sql
-kubectl exec -i postgresql-0 -- bash -c "PGPASSWORD=<management-portal database password> psql -U postgres -t -c 'CREATE DATABASE appserver'" 
-cat appserver.sql | kubectl exec -i postgresql-0 -- bash -c "PGPASSWORD=<management-portal database password> psql -U postgres -d appserver" 
-````
+kubectl exec radar-appserver-postgresql-0 -- bash -c "PGPASSWORD=<password> pg_dump -U <user> appserver" > appserver.sql
+kubectl exec -i postgresql-0 -- bash -c "PGPASSWORD=<mp-password> psql -U <mp-user> -t -c 'CREATE DATABASE appserver'" 
+cat appserver.sql | kubectl exec -i postgresql-0 -- bash -c "PGPASSWORD=<mp-password> psql -U <mp-user> -d appserver" 
+```
 
-##### Upload-connect-backend database import
+##### Upload-connector database import
 
-Perform when using the _upload-connect-backend_ service.
+Perform when using the _upload-connector_ service. The username and password for the _upload-connector_ database are indicated with `<user>` and `<password>`, respectively.
+The username and password for the _management_portal_ database are indicated with `<mp-user>` and `<mp-password>`, respectively.
 
 ```shell
-kubectl exec radar-upload-postgresql-0 -- bash -c "PGPASSWORD=<upload-connect-backend database password> pg_dump -U postgres uploadconnector" > uploadconnector.sql
-kubectl exec -i postgresql-0 -- bash -c "PGPASSWORD=<management-portal database password> psql -U postgres -t -c 'CREATE DATABASE uploadconnector'"
-cat uploadconnector.sql | kubectl exec -i postgresql-0 -- bash -c "PGPASSWORD=<management-portal database password> psql -U postgres -d uploadconnector"
+kubectl exec radar-upload-postgresql-0 -- bash -c "PGPASSWORD=<password> pg_dump -U <user> uploadconnector" > uploadconnector.sql
+kubectl exec -i postgresql-0 -- bash -c "PGPASSWORD=<mp-password> psql -U <mp-user> -t -c 'CREATE DATABASE uploadconnector'"
+cat uploadconnector.sql | kubectl exec -i postgresql-0 -- bash -c "PGPASSWORD=<mp-password> psql -U <mp-user> -d uploadconnector"
 ```
 
 ##### Kratos database import
 
-Perform when using the _kratos_ service.
+Perform when using the _kratos_ service. The username and password for the _app-server_ database are indicated with `<user>` and `<password>`, respectively.
+The username and password for the _management_portal_ database are indicated with `<mp-user>` and `<mp-password>`, respectively.
 
 ```shell
-kubectl exec radar-kratos-postgresql-0 -- bash -c "PGPASSWORD=<kratos database password> pg_dump -U postgres kratos" > kratos.sql
-kubectl exec -i postgresql-0 -- bash -c "PGPASSWORD=<management-portal database password> psql -U postgres -t -c 'CREATE DATABASE kratos'"
-cat kratos.sql | kubectl exec -i postgresql-0 -- bash -c "PGPASSWORD=<management-portal database password> psql -U postgres -d kratos"
+kubectl exec radar-kratos-postgresql-0 -- bash -c "PGPASSWORD=<password> pg_dump -U <user> kratos" > kratos.sql
+kubectl exec -i postgresql-0 -- bash -c "PGPASSWORD=<mp-password> psql -U <mp-user> -t -c 'CREATE DATABASE kratos'"
+cat kratos.sql | kubectl exec -i postgresql-0 -- bash -c "PGPASSWORD=<mp-password> psql -U <mp-user> -d kratos"
 ```
 
 #### 2. Automated import databases
 
-Start the database migration of _management_portal_ and _TimescalreDB_ databases by using the auto-migration featire of
-the CloudNativePG operator. For this, enable the CloudNativePG databases by setting the `_install` flag to `true` in the
-`production.yaml` file:
-
-```yaml
-cloudnative_postgresql:
-  _install: true
-  ...
-
-radar_jdbc_connector_data_dashboard_backend:
-  ...
-  radar-cloudnative-timescaledb:
-    enabled: true
-
-radar_jdbc_connector_grafana:
-  ...
-  radar-cloudnative-timescaledb:
-    enabled: true
-
-radar_jdbc_connector_realtime_dashboard:
-  ...
-  radar-cloudnative-timescaledb:
-    enabled: true
-```
-
-And run:
+Start the database migration of _management_portal_ and _TimescaleDB_ databases by using the auto-migration feature of
+the CloudNativePG operator. Run the _helmfile_ command once with the `mods/migration/1.3.0.yaml` modification file.
 
 ```shell
-helmfile sync
+helmfile sync --file mods/migration/1.3.0.yaml
 ```
 
 ### 3. Post migration cleanup
@@ -243,22 +140,11 @@ Perform these steps when the database migration is successful.
 1. Remove any database passwords from the `secrets.yaml` file. An easy way to do this is to compare your `secrets.yaml`
    file to `base-secrets.yaml` file and remove any entries not present in `base-secrets.yaml`.
 
-2. Remove the following keys in `production.yaml`:
-
-- `cloudnative_postgresql.cluster.cluster.mode`
-- `cloudnative_postgresql.cluster.cluster.recovery`
-- `radar_jdbc_connector_grafana.radar-cloudnative-timescaledb.cluster.cluster.mode`
-- `radar_jdbc_connector_grafana.radar-cloudnative-timescaledb.cluster.cluster.recovery`
-- `radar_jdbc_connector_data_dashboard_backend.radar-cloudnative-timescaledb.cluster.cluster.mode`
-- `radar_jdbc_connector_data_dashboard_backend.radar-cloudnative-timescaledb.cluster.cluster.recovery`
-- `radar_jdbc_connector_realtime_dashboard.radar-cloudnative-timescaledb.cluster.cluster.mode`
-- `radar_jdbc_connector_realtime_dashboard.radar-cloudnative-timescaledb.cluster.cluster.recovery`
-
-3. Turn of legacy database services. For this update the `production.yaml` file like so:
+2. Turn of legacy database services. For this update the `production.yaml` file like so:
 
 ```yaml
 postgresql:
-  _install: true
+  _install: false
 ...
 
 radar_appserver_postgresql:
@@ -278,7 +164,7 @@ realtime_dashboard_timescaledb:
 ...
 
 radar_upload_postgresql:
-  _install: true
+  _install: false
 ...
 ```
 
@@ -288,7 +174,8 @@ and run:
 helmfile sync
 ```
 
-5Remove any _pvc_ resource on the Kubernetes cluster associated with the old databases. The _pvc_ names for these are:
+3. Remove any _pvc_ resource on the Kubernetes cluster associated with the old databases. Important: this step will permanently delete the data! Only perform this step when sure the migration completed successfully.
+   The relevant _pvc_ names are:
 
 - `data-postgresql-0`
 - `data-data-dashboard-timescaledb-postgresql-0`
@@ -296,7 +183,6 @@ helmfile sync
 - `data-radar-appserver-postgresql-0`
 - `data-radar-upload-postgresql-0`
 - `data-realtime-dashboard-timescaledb-postgresql-0`
-
 
 ## Upgrade to RADAR-Kubernetes version 1.2.0
 
@@ -385,7 +271,7 @@ postgresql:
   postgresql:
     replication:
       ...
-    
+
 grafana_metrics_timescaledb:
   _install: true
   ...
@@ -406,14 +292,14 @@ realtime_dashboard_timescaledb:
   postgresql:
     replication:
       ...
-    
+
 radar_appserver_postgresql:
   _install: true
   ...
   postgresql:
     replication:
     ...
-        
+
 radar_upload_postgresql:
   _install: true
   ...
@@ -487,7 +373,7 @@ mongodb:
   # Keep the current version of MongoDB in order to be compatible with the stored data.
   _chart_version: 11.1.10
 ```
-    
+
 - Deleting the MongoDB and its volumes and then installing it and configuring Graylog again. This is the recommended
   approach since usually there is no important data is stored in MongoDB and the Graylog stack will be replaced in the
   next release.
