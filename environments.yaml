@@ -1,0 +1,43 @@
+environments:
+  default:
+    values:
+      - ../etc/base.yaml
+      - ../etc/production.yaml
+      - ../etc/production.yaml.gotmpl
+      - ../etc/secrets.yaml
+      - ../mods/migration/1.3.0.yaml
+    {{ if not .Values.enable_tls }}
+      - ../mods/disable_tls.yaml
+    {{ end }}
+    {{ if not .Values.enable_logging_monitoring }}
+      - ../mods/disable_monitoring_logging.yaml
+    {{ end }}
+    {{ if .Values.dev_deployment }}
+      - ../mods/disable_tls.yaml
+      - ../mods/disable_monitoring_logging.yaml
+      - ../mods/localdev.yaml
+      - ../mods/minimal.yaml
+      - ../mods/minimal_kafka.yaml.gotmpl
+      - ../mods/fast_deploy.yaml
+    {{ end }}
+    {{ if .Values.github_installation_test }}
+      - ../mods/disable_monitoring_logging.yaml
+      - ../mods/localdev.yaml
+      - ../mods/minimal.yaml
+      - ../mods/minimal_kafka.yaml.gotmpl
+      - ../mods/fast_deploy.yaml
+    {{ end }}
+
+
+---
+
+helmDefaults:
+  atomic: {{ .Values.atomicInstall }}
+  kubeContext: {{ .Values.kubeContext }}
+  wait: true
+
+repositories:
+  - name: radar
+    url: https://radar-base.github.io/radar-helm-charts
+  - name: cp-radar
+    url: https://radar-base.github.io/cp-helm-charts
