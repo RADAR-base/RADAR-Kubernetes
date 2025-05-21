@@ -24,7 +24,6 @@ cloudnative_postgresql:
 
 radar_jdbc_connector_grafana:
   radar-cloudnative-timescaledb:
-    enabled: true
     cluster:
       mode: recovery
       recovery:
@@ -45,7 +44,6 @@ radar_jdbc_connector_grafana:
 
 radar_jdbc_connector_data_dashboard_backend:
   radar-cloudnative-timescaledb:
-    enabled: true
     cluster:
       mode: recovery
       recovery:
@@ -66,7 +64,6 @@ radar_jdbc_connector_data_dashboard_backend:
 
 radar_jdbc_connector_realtime_dashboard:
   radar-cloudnative-timescaledb:
-    enabled: true
     cluster:
       mode: recovery
       recovery:
