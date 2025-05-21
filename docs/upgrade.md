@@ -45,7 +45,7 @@ cloudnative_postgresql:
         size: 10Gi
 ```
 
-3. If desired, add sections that change the default storage size of the _TimescaleDB_ respective databases:
+3. If desired, update the sections that change the default storage size of the respective _TimescaleDB_ databases:
 
 ```yaml
 radar_jdbc_connector_grafana:
