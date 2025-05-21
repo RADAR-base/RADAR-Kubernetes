@@ -337,7 +337,7 @@ data_dashboard_timescaledb:
         #existingClaim: "data-timescaledb-postgresql-0"
 
 # DEPRECATED: timescaledb instance is created automatically with the radar-jdbc-connector for grafana metrics
-grafana_timescaledb:
+grafana_metrics_timescaledb:
   _install: false
   _chart_version: 0.1.1
   _extra_timeout: 210

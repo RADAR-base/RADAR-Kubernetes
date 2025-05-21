@@ -29,15 +29,15 @@ radar_jdbc_connector_grafana:
       mode: recovery
       import:
         databases:
-          - grafana-metrics
+          - grafana
       source:
-        host: grafana-timescaledb-postgresql
+        host: grafana-metrics-timescaledb-postgresql
         username: postgres
         database: postgres
         sslMode: prefer
         passwordSecret:
           create: false
-          name: grafana-timescaledb-postgresql
+          name: grafana-metrics-timescaledb-postgresql
           key: postgres-password
 
 radar_jdbc_connector_data_dashboard_backend:

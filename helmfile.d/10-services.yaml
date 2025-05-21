@@ -446,12 +446,12 @@ releases:
 
   - name: grafana-timescaledb
     chart: radar/radar-timescaledb
-    version: {{ .Values.grafana_timescaledb._chart_version }}
-    installed: {{ .Values.grafana_timescaledb._install }}
-    timeout: {{ add .Values.base_timeout .Values.grafana_timescaledb._extra_timeout }}
+    version: {{ .Values.grafana_metrics_timescaledb._chart_version }}
+    installed: {{ .Values.grafana_metrics_timescaledb._install }}
+    timeout: {{ add .Values.base_timeout .Values.grafana_metrics_timescaledb._extra_timeout }}
     <<: *logFailedRelease
     values:
-      - {{ .Values.grafana_timescaledb | toYaml | indent 8 | trim }}
+      - {{ .Values.grafana_metrics_timescaledb | toYaml | indent 8 | trim }}
 
   - name: realtime-dashboard-timescaledb
     chart: radar/radar-timescaledb
