@@ -329,7 +329,7 @@ data_dashboard_timescaledb:
       storage: 8Gi
 
 # DEPRECATED: timescaledb instance is created automatically with the radar-jdbc-connector for grafana metrics
-grafana_metrics_timescaledb:
+grafana_timescaledb:
   _install: false
   _chart_version: 0.1.1
   _extra_timeout: 210
@@ -380,8 +380,8 @@ radar_jdbc_connector_grafana:
     cluster:
       cluster:
         initdb:
-          database: grafana-metrics
-          owner: grafana-metrics
+          database: grafana
+          owner: grafana
         storage:
           size: 8Gi
 
