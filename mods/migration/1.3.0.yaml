@@ -27,51 +27,60 @@ radar_jdbc_connector_grafana:
     enabled: true
     cluster:
       mode: recovery
-      import:
-        databases:
-          - grafana
-      source:
-        host: grafana-metrics-timescaledb-postgresql
-        username: postgres
-        database: postgres
-        sslMode: prefer
-        passwordSecret:
-          create: false
-          name: grafana-metrics-timescaledb-postgresql
-          key: postgres-password
+      recovery:
+        method: import
+        import:
+          type: monolith
+          databases:
+            - grafana
+          source:
+            host: grafana-metrics-timescaledb-postgresql
+            username: postgres
+            database: postgres
+            sslMode: prefer
+            passwordSecret:
+              create: false
+              name: grafana-metrics-timescaledb-postgresql
+              key: postgres-password
 
 radar_jdbc_connector_data_dashboard_backend:
   radar-cloudnative-timescaledb:
     enabled: true
     cluster:
       mode: recovery
-      import:
-        databases:
-          - data-dashboard
-        source:
-          host: data-dashboard-timescaledb-postgresql
-          username: postgres
-          database: postgres
-          sslMode: prefer
-          passwordSecret:
-            create: false
-            name: data-dashboard-timescaledb-postgresql
-            key: postgres-password
+      recovery:
+        method: import
+        import:
+          type: monolith
+          databases:
+            - data-dashboard
+          source:
+            host: data-dashboard-timescaledb-postgresql
+            username: postgres
+            database: postgres
+            sslMode: prefer
+            passwordSecret:
+              create: false
+              name: data-dashboard-timescaledb-postgresql
+              key: postgres-password
 
 radar_jdbc_connector_realtime_dashboard:
   radar-cloudnative-timescaledb:
     enabled: true
     cluster:
       mode: recovery
-      import:
-        databases:
-          - realtime-dashboard
-        source:
-          host: realtime-dashboard-timescaledb-postgresql
-          username: postgres
-          database: postgres
-          sslMode: prefer
-          passwordSecret:
-            create: false
-            name: realtime-dashboard-timescaledb-postgresql
-            key: postgres-password
+      recovery:
+        method: import
+        import:
+          type: monolith
+          databases:
+            - realtime-dashboard
+          source:
+            host: realtime-dashboard-timescaledb-postgresql
+            username: postgres
+            database: postgres
+            sslMode: prefer
+            passwordSecret:
+              create: false
+              name: realtime-dashboard-timescaledb-postgresql
+              key: postgres-password
