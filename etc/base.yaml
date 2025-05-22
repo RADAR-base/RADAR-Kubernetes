@@ -424,6 +424,20 @@ radar_jdbc_connector_data_dashboard_backend:
           owner: data-dashboard
         storage:
           size: 8Gi
+      mode: recovery
+      recovery:
+        import:
+          databases:
+            - data-dashboard
+          source:
+            host: data-dashboard-timescaledb-postgresql
+            username: postgres
+            database: postgres
+            sslMode: prefer
+            passwordSecret:
+              create: false
+              name: data-dashboard-timescaledb-postgresql
+              key: postgres-password
 
 # Install when using realtime analysis
 radar_jdbc_connector_realtime_dashboard:
