@@ -444,7 +444,7 @@ releases:
     values:
       - {{ .Values.data_dashboard_timescaledb | toYaml | indent 8 | trim }}
 
-  - name: grafana-timescaledb
+  - name: grafana-metrics-timescaledb
     chart: radar/radar-timescaledb
     version: {{ .Values.grafana_metrics_timescaledb._chart_version }}
     installed: {{ .Values.grafana_metrics_timescaledb._install }}
