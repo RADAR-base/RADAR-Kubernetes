@@ -45,12 +45,18 @@ cloudnative_postgresql:
         size: 10Gi
 ```
 
-3. If desired, update the sections that change the default storage size of the respective _TimescaleDB_ databases:
+3. Set legacy versions for _TimescaleDB_ in jdbc-connector sections. If desired, change the storage size of the respective databases:
+
+Note: major version upgrades performed by the CloudNativePG operator are currently under development. When v1.26 is released, the
+the _TimescaleDB_ databases can be upgraded to the latest version.
 
 ```yaml
 radar_jdbc_connector_grafana:
   radar-cloudnative-timescaledb:
     cluster:
+      version:
+        postgresql: "12"
+        timescaledb: "2.11"
       cluster:
         storage:
           # Change this to the desired size
@@ -61,6 +67,9 @@ radar_jdbc_connector_grafana:
 radar_jdbc_connector_data_dashboard_backend:
   radar-cloudnative-timescaledb:
     cluster:
+      version:
+        postgresql: "12"
+        timescaledb: "2.11"
       cluster:
         storage:
           size: 508Gi
@@ -70,6 +79,9 @@ radar_jdbc_connector_data_dashboard_backend:
 radar_jdbc_connector_realtime_dashboard:
   radar-cloudnative-timescaledb:
     cluster:
+      version:
+        postgresql: "12"
+        timescaledb: "2.11"
       cluster:
         storage:
           size: 50Gi

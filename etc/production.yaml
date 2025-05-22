@@ -383,6 +383,9 @@ radar_jdbc_connector_grafana:
     topics: android_phone_relative_location, android_phone_battery_level, connect_fitbit_intraday_heart_rate, connect_fitbit_intraday_steps
   radar-cloudnative-timescaledb:
     cluster:
+      version:
+        postgresql: "12"
+        timescaledb: "2.11"
       cluster:
         storage:
           size: 1Gi
@@ -394,6 +397,9 @@ radar_jdbc_connector_data_dashboard_backend:
   replicaCount: 1
   radar-cloudnative-timescaledb:
     cluster:
+      version:
+        postgresql: "12"
+        timescaledb: "2.11"
       cluster:
         storage:
           size: 1Gi
@@ -403,11 +409,14 @@ radar_jdbc_connector_realtime_dashboard:
   _install: true
   _extra_timeout: 0
   replicaCount: 1
-#  radar-cloudnative-timescaledb:
-#    cluster:
-#      cluster:
-#        storage:
-#          size: 1Gi
+  radar-cloudnative-timescaledb:
+    cluster:
+      version:
+        postgresql: "12"
+        timescaledb: "2.11"
+      cluster:
+        storage:
+          size: 1Gi
 
 # Install when:
 #- radar_grafana._install is 'true'

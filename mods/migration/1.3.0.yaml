@@ -31,7 +31,7 @@ radar_jdbc_connector_grafana:
         import:
           type: monolith
           databases:
-            - grafana
+            - grafana-metrics
           source:
             host: grafana-metrics-timescaledb-postgresql
             username: postgres
