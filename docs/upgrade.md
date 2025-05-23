@@ -131,6 +131,15 @@ kubectl exec -i postgresql-0 -- bash -c "PGPASSWORD=<mp-password> psql -U <mp-us
 cat uploadconnector.sql | kubectl exec -i postgresql-0 -- bash -c "PGPASSWORD=<mp-password> psql -U <mp-user> -d uploadconnector"
 ```
 
+#### Rename grafana database
+
+If using the _grafana_ service, rename the _grafana_metrics_ database to _grafana_. For this, use _psql_ utility to log into the _TimescaleDB_ database:
+The username and password for the _grafana_ database user are indicated with `<user>` and `<password>`, respectively.
+
+```shell
+kubectl exec grafana-metrics-timescaledb-postgresql-0 -- bash -c "PGPASSWORD=<password> psql -U <user> -t -c 'ALTER DATABASE \"grafana-metrics\" RENAME TO grafana'" 
+```
+
 #### Update `environments.yaml` file
 
 Add the _mods/migration/1.3.0.yaml_ file to the `values:` section, like so:
