@@ -133,9 +133,10 @@ cat uploadconnector.sql | kubectl exec -i postgresql-0 -- bash -c "PGPASSWORD=<m
 #### 2. Create users in the postgres database
 
 Log into the _PostgreSQL_ database using the _psql_ utility. The username and password for the _PostgreSQL_ database are indicated with `<user>` and `<password>`, respectively.
+Note that the `--pset pager=off` option is used to disable paging in the output to prevent problems with certain statements.
 
 ```shell
-kubectl exec postgresql-0 -it -- sh -c 'PGPASSWORD=<password> psql -U <user>'
+kubectl exec postgresql-0 -it -- sh -c 'PGPASSWORD=<password> psql -U <user> --pset pager=off'
 ```
 
 Create database users and set ownership of the databases (remove any database that is not needed):
@@ -159,7 +160,7 @@ Transfer ownership of all tables in respective databases to the new users. Execu
 
 ```sql
 \c managementportal
-CREATE FUNCTION exec(text) returns text language plpgsql volatile
+CREATE OR REPLACE FUNCTION exec(text) returns text language plpgsql volatile
   AS $f$
     BEGIN
       EXECUTE $1;
@@ -170,26 +171,21 @@ SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
 FROM information_schema.tables WHERE table_schema = 'public';
 SELECT exec( 'ALTER SEQUENCE ' || sequence_name || ' OWNER TO ' || sequence_catalog )
 FROM information_schema.sequences WHERE sequence_schema = 'public';
-```
 
-```sql
 \c restsourceauthorizer
-CREATE FUNCTION exec(text) returns text language plpgsql volatile
+CREATE OR REPLACE FUNCTION exec(text) returns void language plpgsql volatile
   AS $f$
     BEGIN
       EXECUTE $1;
-      RETURN $1;
   END;
 $f$;
 SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
 FROM information_schema.tables WHERE table_schema = 'public';
 SELECT exec( 'ALTER SEQUENCE ' || sequence_name || ' OWNER TO ' || sequence_catalog )
 FROM information_schema.sequences WHERE sequence_schema = 'public';
-```
 
-```sql
 \c appconfig
-CREATE FUNCTION exec(text) returns text language plpgsql volatile
+CREATE OR REPLACE FUNCTION exec(text) returns text language plpgsql volatile
   AS $f$
     BEGIN
       EXECUTE $1;
@@ -200,11 +196,9 @@ SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
 FROM information_schema.tables WHERE table_schema = 'public';
 SELECT exec( 'ALTER SEQUENCE ' || sequence_name || ' OWNER TO ' || sequence_catalog )
 FROM information_schema.sequences WHERE sequence_schema = 'public';
-```
 
-```sql
 \c kratos
-CREATE FUNCTION exec(text) returns text language plpgsql volatile
+CREATE OR REPLACE FUNCTION exec(text) returns text language plpgsql volatile
   AS $f$
     BEGIN
       EXECUTE $1;
@@ -215,11 +209,9 @@ SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
 FROM information_schema.tables WHERE table_schema = 'public';
 SELECT exec( 'ALTER SEQUENCE ' || sequence_name || ' OWNER TO ' || sequence_catalog )
 FROM information_schema.sequences WHERE sequence_schema = 'public';
-```
 
-```sql
 \c appserver
-CREATE FUNCTION exec(text) returns text language plpgsql volatile
+CREATE OR REPLACE FUNCTION exec(text) returns text language plpgsql volatile
   AS $f$
     BEGIN
       EXECUTE $1;
@@ -230,11 +222,9 @@ SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
 FROM information_schema.tables WHERE table_schema = 'public';
 SELECT exec( 'ALTER SEQUENCE ' || sequence_name || ' OWNER TO ' || sequence_catalog )
 FROM information_schema.sequences WHERE sequence_schema = 'public';
-```
 
-```sql
 \c uploadconnector
-CREATE FUNCTION exec(text) returns text language plpgsql volatile
+CREATE OR REPLACE FUNCTION exec(text) returns text language plpgsql volatile
   AS $f$
     BEGIN
       EXECUTE $1;
