@@ -100,8 +100,10 @@ Important: before database migration the steps in the sections above must be com
 The database migration process involves:
 
 1. A manual import of existing _upload-connect-backend_ or _app-server_ databases into the CloudNativePG postgres cluster.
-2. An automated import of the _management_portal_, _app-config_ and _rest-sources-authorizer_ databases into the CloudNativePG postgres cluster.
-3. Post-migration cleanup.
+2. Manual creation of users in the postgres database.
+3. Renaming of the _grafana_metrics_ database.
+4. Automated import of the databases into the CloudNativePG and TimescaleDB postgres clusters.
+5. Post-migration cleanup.
 
 #### 1. Manual import of _upload-connector_ and/or _app-server_ databases
 
@@ -131,7 +133,103 @@ kubectl exec -i postgresql-0 -- bash -c "PGPASSWORD=<mp-password> psql -U <mp-us
 cat uploadconnector.sql | kubectl exec -i postgresql-0 -- bash -c "PGPASSWORD=<mp-password> psql -U <mp-user> -d uploadconnector"
 ```
 
-#### Rename grafana database
+#### 2. Create users in the postgres database
+
+Log into the _PostgreSQL_ database using the _psql_ utility. The username and password for the _PostgreSQL_ database are indicated with `<user>` and `<password>`, respectively.
+
+```shell
+kubectl exec postgresql-0 -it -- sh -c 'PGPASSWORD=<password> psql -U <user>'
+```
+
+Create database users and set ownership of the databases (remove any database that is not needed):
+
+```sql
+CREATE USER managementportal;
+CREATE USER restsourceauthorizer;
+CREATE USER appconfig;
+CREATE USER kratos;
+CREATE USER appserver;
+CREATE USER uploadconnector;
+ALTER DATABASE managementportal OWNER to managementportal;
+ALTER DATABASE restsourceauthorizer OWNER to restsourceauthorizer;
+ALTER DATABASE appconfig OWNER to appconfig;
+ALTER DATABASE kratos OWNER to kratos;
+ALTER DATABASE appserver OWNER to appserver;
+ALTER DATABASE uploadconnector OWNER to uploadconnector;
+```
+
+Transfer ownership of all tables in respective databases to the new users (remove any database that is not needed):
+
+```sql
+\c managementportal
+CREATE FUNCTION exec(text) returns text language plpgsql volatile
+  AS $f$
+    BEGIN
+      EXECUTE $1;
+      RETURN $1;
+    END;
+$f$;
+SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
+FROM information_schema.tables WHERE table_schema = 'public';
+
+\c restsourceauthorizer
+CREATE FUNCTION exec(text) returns text language plpgsql volatile
+  AS $f$
+    BEGIN
+      EXECUTE $1;
+      RETURN $1;
+  END;
+$f$;
+SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
+FROM information_schema.tables WHERE table_schema = 'public';
+
+
+\c appconfig
+CREATE FUNCTION exec(text) returns text language plpgsql volatile
+  AS $f$
+    BEGIN
+      EXECUTE $1;
+      RETURN $1;
+    END;
+$f$;
+SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
+FROM information_schema.tables WHERE table_schema = 'public';
+
+\c kratos
+CREATE FUNCTION exec(text) returns text language plpgsql volatile
+  AS $f$
+    BEGIN
+      EXECUTE $1;
+      RETURN $1;
+    END;
+$f$;
+SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
+FROM information_schema.tables WHERE table_schema = 'public';
+
+\c appserver
+CREATE FUNCTION exec(text) returns text language plpgsql volatile
+  AS $f$
+    BEGIN
+      EXECUTE $1;
+      RETURN $1;
+    END;
+$f$;
+SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
+FROM information_schema.tables WHERE table_schema = 'public';
+
+\c uploadconnector
+CREATE FUNCTION exec(text) returns text language plpgsql volatile
+  AS $f$
+    BEGIN
+      EXECUTE $1;
+      RETURN $1;
+    END;
+$f$;
+SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
+FROM information_schema.tables WHERE table_schema = 'public';
+```
+
+#### 3. Rename grafana database
 
 If using the _grafana_ service, rename the _grafana_metrics_ database to _grafana_. For this, use _psql_ utility to log into the _TimescaleDB_ database:
 The username and password for the _grafana_ database user are indicated with `<user>` and `<password>`, respectively.
@@ -140,7 +238,9 @@ The username and password for the _grafana_ database user are indicated with `<u
 kubectl exec grafana-metrics-timescaledb-postgresql-0 -- bash -c "PGPASSWORD=<password> psql -U <user> -t -c 'ALTER DATABASE \"grafana-metrics\" RENAME TO grafana'" 
 ```
 
-#### Update `environments.yaml` file
+#### 4. Automated import databases
+
+##### Update `environments.yaml` file
 
 Add the _mods/migration/1.3.0.yaml_ file to the `values:` section, like so:
 
@@ -155,8 +255,6 @@ environments:
       - ../mods/migration/1.3.0.yaml
 ```
 
-#### 2. Automated import databases
-
 Start the database migration of _management_portal_ and _TimescaleDB_ databases by using the auto-migration feature of
 the CloudNativePG operator. Run the _helmfile_ command once with the `mods/migration/1.3.0.yaml` modification file.
 
@@ -164,7 +262,7 @@ the CloudNativePG operator. Run the _helmfile_ command once with the `mods/migra
 helmfile sync 
 ```
 
-### 3. Post migration cleanup
+### 5. Post migration cleanup
 
 Perform these steps when the database migration is successful.
 
@@ -199,7 +297,8 @@ radar_upload_postgresql:
 ...
 ```
 
-3. Remove the _mods/migration/1.3.0.yaml_ file from the `environments.yaml` file.
+3. Remove the _mods/migration/1.3.0.yaml_ file reference from the `environments.yaml` file.
+ 
 4. Update the deployment:
 
 ```shell
