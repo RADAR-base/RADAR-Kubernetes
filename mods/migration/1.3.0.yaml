@@ -31,7 +31,7 @@ radar_jdbc_connector_grafana:
         import:
           type: microservice
           databases:
-            - grafana
+            - grafana-metrics
           source:
             host: grafana-metrics-timescaledb-postgresql
             username: postgres
@@ -42,7 +42,10 @@ radar_jdbc_connector_grafana:
               name: grafana-metrics-timescaledb-postgresql
               key: postgres-password
           postImportApplicationSQL:
-            - ALTER DATABASE grafana OWNER TO grafana
+#            - ALTER DATABASE grafana OWNER TO grafana
+            - ALTER DATABASE "grafana-metrics" RENAME TO grafana
+            - CREATE USER grafana
+            - REASSIGN OWNED BY "grafana-metrics" TO grafana
 
 radar_jdbc_connector_data_dashboard_backend:
   radar-cloudnative-timescaledb:
@@ -65,8 +68,6 @@ radar_jdbc_connector_data_dashboard_backend:
               key: postgres-password
           postImportApplicationSQL:
             - ALTER DATABASE "data-dashboard" OWNER TO "data-dashboard"
-            - ALTER TABLE "data-dashboard".databasechangelog OWNER TO "data-dashboard"
-            - ALTER TABLE "data-dashboard".databasechangeloglock OWNER TO "data-dashboard"
 
 radar_jdbc_connector_realtime_dashboard:
   radar-cloudnative-timescaledb:
