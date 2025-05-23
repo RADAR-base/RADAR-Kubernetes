@@ -8,7 +8,7 @@ This version introduces postgresql and TimescaleDB clusters managed by the Cloud
 
 ### Update `mods/migration/1.3.0.yaml` mods file
 
-This file provides configuration for database migration. In the `cloundnative_postgresql` section, remove any database from the
+This file provides configuration for database migration. In the `cloudnative_postgresql` section, remove any database from the
 `databases` list that is not needed. For instance:
 
 ```yaml
@@ -26,7 +26,9 @@ This file provides configuration for database migration. In the `cloundnative_po
 
 ### Update `production.yaml` file
 
-1. Add values for the number of Postgresql and TimescaleDB replicas. Change the number of replicas if desired:
+1. Remove any line beginning with `_chart_version:`.
+
+2. Add values for the number of Postgresql and TimescaleDB replicas. Change the number of replicas if desired:
 
 ```yaml
 # Number of Postgres pods that will be installed
@@ -35,7 +37,7 @@ postgres_num_replicates: 2
 timescaledb_num_replicates: 2
 ```
 
-2. If desired, add a section that changes the default storage size of the _PostgreSQL_ database:
+3. If desired, add a section that changes the default storage size of the _PostgreSQL_ cluster to be create:
 
 ```yaml
 cloudnative_postgresql:
@@ -45,15 +47,16 @@ cloudnative_postgresql:
         size: 10Gi
 ```
 
-3. Set legacy versions for _TimescaleDB_ in jdbc-connector sections. If desired, change the storage size of the respective databases:
+4. Set legacy versions for _TimescaleDB_ in jdbc-connector sections. If desired, change the storage size of the respective databases:
 
 Note: major version upgrades performed by the CloudNativePG operator are currently under development. When v1.26 is released, the
-the _TimescaleDB_ databases can be upgraded to the latest version.
+the _TimescaleDB_ databases can be upgraded to the a newer version.
 
 ```yaml
 radar_jdbc_connector_grafana:
   radar-cloudnative-timescaledb:
     cluster:
+      # Do not remove: needed for legacy version. Can be removed after upgrade to new postgresql version (handled in future RADAR-base update).
       version:
         postgresql: "12"
         timescaledb: "2.11"
@@ -67,6 +70,7 @@ radar_jdbc_connector_grafana:
 radar_jdbc_connector_data_dashboard_backend:
   radar-cloudnative-timescaledb:
     cluster:
+      # Do not remove: needed for legacy version. Can be removed after upgrade to new postgresql version (handled in future RADAR-base update).
       version:
         postgresql: "12"
         timescaledb: "2.11"
@@ -79,6 +83,7 @@ radar_jdbc_connector_data_dashboard_backend:
 radar_jdbc_connector_realtime_dashboard:
   radar-cloudnative-timescaledb:
     cluster:
+      # Do not remove: needed for legacy version. Can be removed after upgrade to new postgresql version (handled in future RADAR-base update).
       version:
         postgresql: "12"
         timescaledb: "2.11"
@@ -87,7 +92,7 @@ radar_jdbc_connector_realtime_dashboard:
           size: 50Gi
 ```
  
-4. Duplicate entry `grafana_metrics_db_user` ane rename to `grafana_metrics_endpoint_user` (keep the same value).
+5. Duplicate entry `grafana_metrics_db_user` ane rename to `grafana_metrics_endpoint_user` (keep the same value).
 
 ### Update `secrets.yaml` file
 
@@ -95,21 +100,13 @@ Duplicate secret `grafana_metrics_db_password` and rename to `grafana_metrics_en
 
 ### Database migration
 
-Important: before database migration the steps in the sections above must be completed.
-
-The database migration process involves:
-
-1. A manual import of existing _upload-connect-backend_ or _app-server_ databases into the CloudNativePG postgres cluster.
-2. Manual creation of users in the postgres database.
-3. Renaming of the _grafana_metrics_ database.
-4. Automated import of the databases into the CloudNativePG and TimescaleDB postgres clusters.
-5. Post-migration cleanup.
-
-#### 1. Manual import of _upload-connector_ and/or _app-server_ databases
+Important: before database migration the steps in the sections above must have been completed successfully.
 
 Notes:
 - Database passwords can be found in the `etc/secrets.yaml` file.
 - Unless customized the username for all databases is `postgres`.
+
+#### 1. Manual import of _upload-connector_ and/or _app-server_ databases
 
 ##### App-server database import
 
@@ -158,7 +155,7 @@ ALTER DATABASE appserver OWNER to appserver;
 ALTER DATABASE uploadconnector OWNER to uploadconnector;
 ```
 
-Transfer ownership of all tables in respective databases to the new users (remove any database that is not needed):
+Transfer ownership of all tables in respective databases to the new users. Execute every command separately (do no copy paste as a batch). Ignore the command for any database that is not used.
 
 ```sql
 \c managementportal
@@ -171,7 +168,9 @@ CREATE FUNCTION exec(text) returns text language plpgsql volatile
 $f$;
 SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
 FROM information_schema.tables WHERE table_schema = 'public';
+```
 
+```sql
 \c restsourceauthorizer
 CREATE FUNCTION exec(text) returns text language plpgsql volatile
   AS $f$
@@ -182,8 +181,9 @@ CREATE FUNCTION exec(text) returns text language plpgsql volatile
 $f$;
 SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
 FROM information_schema.tables WHERE table_schema = 'public';
+```
 
-
+```sql
 \c appconfig
 CREATE FUNCTION exec(text) returns text language plpgsql volatile
   AS $f$
@@ -194,7 +194,9 @@ CREATE FUNCTION exec(text) returns text language plpgsql volatile
 $f$;
 SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
 FROM information_schema.tables WHERE table_schema = 'public';
+```
 
+```sql
 \c kratos
 CREATE FUNCTION exec(text) returns text language plpgsql volatile
   AS $f$
@@ -205,7 +207,9 @@ CREATE FUNCTION exec(text) returns text language plpgsql volatile
 $f$;
 SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
 FROM information_schema.tables WHERE table_schema = 'public';
+```
 
+```sql
 \c appserver
 CREATE FUNCTION exec(text) returns text language plpgsql volatile
   AS $f$
@@ -216,7 +220,9 @@ CREATE FUNCTION exec(text) returns text language plpgsql volatile
 $f$;
 SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
 FROM information_schema.tables WHERE table_schema = 'public';
+```
 
+```sql
 \c uploadconnector
 CREATE FUNCTION exec(text) returns text language plpgsql volatile
   AS $f$
