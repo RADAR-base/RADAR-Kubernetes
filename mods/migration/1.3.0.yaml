@@ -29,9 +29,9 @@ radar_jdbc_connector_grafana:
       recovery:
         method: import
         import:
-          type: monolith
+          type: microservice
           databases:
-            - grafana-metrics
+            - grafana
           source:
             host: grafana-metrics-timescaledb-postgresql
             username: postgres
@@ -41,6 +41,8 @@ radar_jdbc_connector_grafana:
               create: false
               name: grafana-metrics-timescaledb-postgresql
               key: postgres-password
+          postImportApplicationSQL:
+            - ALTER DATABASE grafana OWNER TO grafana
 
 radar_jdbc_connector_data_dashboard_backend:
   radar-cloudnative-timescaledb:
@@ -49,7 +51,7 @@ radar_jdbc_connector_data_dashboard_backend:
       recovery:
         method: import
         import:
-          type: monolith
+          type: microservice
           databases:
             - data-dashboard
           source:
@@ -61,6 +63,10 @@ radar_jdbc_connector_data_dashboard_backend:
               create: false
               name: data-dashboard-timescaledb-postgresql
               key: postgres-password
+          postImportApplicationSQL:
+            - ALTER DATABASE data-dashboard OWNER TO data-dashboard
+            - ALTER TABLE data-dashboard.databasechangelog OWNER TO data-dashboard
+            - ALTER TABLE data-dashboard.databasechangeloglock OWNER TO data-dashboard
 
 radar_jdbc_connector_realtime_dashboard:
   radar-cloudnative-timescaledb:
@@ -81,3 +87,5 @@ radar_jdbc_connector_realtime_dashboard:
               create: false
               name: realtime-dashboard-timescaledb-postgresql
               key: postgres-password
+          postImportApplicationSQL:
+            - ALTER DATABASE realtime-dashboard OWNER TO realtime-dashboard
