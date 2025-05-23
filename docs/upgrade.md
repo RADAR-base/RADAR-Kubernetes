@@ -168,6 +168,8 @@ CREATE FUNCTION exec(text) returns text language plpgsql volatile
 $f$;
 SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
 FROM information_schema.tables WHERE table_schema = 'public';
+SELECT exec( 'ALTER SEQUENCE ' || sequence_name || ' OWNER TO ' || sequence_catalog )
+FROM information_schema.sequences WHERE sequence_schema = 'public';
 ```
 
 ```sql
@@ -181,6 +183,8 @@ CREATE FUNCTION exec(text) returns text language plpgsql volatile
 $f$;
 SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
 FROM information_schema.tables WHERE table_schema = 'public';
+SELECT exec( 'ALTER SEQUENCE ' || sequence_name || ' OWNER TO ' || sequence_catalog )
+FROM information_schema.sequences WHERE sequence_schema = 'public';
 ```
 
 ```sql
@@ -194,6 +198,8 @@ CREATE FUNCTION exec(text) returns text language plpgsql volatile
 $f$;
 SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
 FROM information_schema.tables WHERE table_schema = 'public';
+SELECT exec( 'ALTER SEQUENCE ' || sequence_name || ' OWNER TO ' || sequence_catalog )
+FROM information_schema.sequences WHERE sequence_schema = 'public';
 ```
 
 ```sql
@@ -207,6 +213,8 @@ CREATE FUNCTION exec(text) returns text language plpgsql volatile
 $f$;
 SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
 FROM information_schema.tables WHERE table_schema = 'public';
+SELECT exec( 'ALTER SEQUENCE ' || sequence_name || ' OWNER TO ' || sequence_catalog )
+FROM information_schema.sequences WHERE sequence_schema = 'public';
 ```
 
 ```sql
@@ -220,6 +228,8 @@ CREATE FUNCTION exec(text) returns text language plpgsql volatile
 $f$;
 SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
 FROM information_schema.tables WHERE table_schema = 'public';
+SELECT exec( 'ALTER SEQUENCE ' || sequence_name || ' OWNER TO ' || sequence_catalog )
+FROM information_schema.sequences WHERE sequence_schema = 'public';
 ```
 
 ```sql
@@ -233,18 +243,11 @@ CREATE FUNCTION exec(text) returns text language plpgsql volatile
 $f$;
 SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
 FROM information_schema.tables WHERE table_schema = 'public';
+SELECT exec( 'ALTER SEQUENCE ' || sequence_name || ' OWNER TO ' || sequence_catalog )
+FROM information_schema.sequences WHERE sequence_schema = 'public';
 ```
 
-#### 3. Rename grafana database
-
-If using the _grafana_ service, rename the _grafana_metrics_ database to _grafana_. For this, use _psql_ utility to log into the _TimescaleDB_ database:
-The username and password for the _grafana_ database user are indicated with `<user>` and `<password>`, respectively.
-
-```shell
-kubectl exec grafana-metrics-timescaledb-postgresql-0 -- bash -c "PGPASSWORD=<password> psql -U <user> -t -c 'ALTER DATABASE \"grafana-metrics\" RENAME TO grafana'" 
-```
-
-#### 4. Automated import databases
+#### 3. Automated import databases
 
 ##### Update `environments.yaml` file
 
@@ -268,7 +271,7 @@ the CloudNativePG operator. Run the _helmfile_ command once with the `mods/migra
 helmfile sync 
 ```
 
-### 5. Post migration cleanup
+### 4. Post migration cleanup
 
 Perform these steps when the database migration is successful.
 
