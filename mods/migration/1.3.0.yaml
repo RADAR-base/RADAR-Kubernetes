@@ -64,9 +64,9 @@ radar_jdbc_connector_data_dashboard_backend:
               name: data-dashboard-timescaledb-postgresql
               key: postgres-password
           postImportApplicationSQL:
-            - ALTER DATABASE data-dashboard OWNER TO data-dashboard
-            - ALTER TABLE data-dashboard.databasechangelog OWNER TO data-dashboard
-            - ALTER TABLE data-dashboard.databasechangeloglock OWNER TO data-dashboard
+            - ALTER DATABASE "data-dashboard" OWNER TO "data-dashboard"
+            - ALTER TABLE "data-dashboard".databasechangelog OWNER TO "data-dashboard"
+            - ALTER TABLE "data-dashboard".databasechangeloglock OWNER TO "data-dashboard"
 
 radar_jdbc_connector_realtime_dashboard:
   radar-cloudnative-timescaledb:
@@ -88,4 +88,4 @@ radar_jdbc_connector_realtime_dashboard:
               name: realtime-dashboard-timescaledb-postgresql
               key: postgres-password
           postImportApplicationSQL:
-            - ALTER DATABASE realtime-dashboard OWNER TO realtime-dashboard
+            - ALTER DATABASE "realtime-dashboard" OWNER TO "realtime-dashboard"
