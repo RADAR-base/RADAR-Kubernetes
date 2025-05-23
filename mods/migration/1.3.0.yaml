@@ -41,11 +41,11 @@ radar_jdbc_connector_grafana:
               create: false
               name: grafana-metrics-timescaledb-postgresql
               key: postgres-password
-          postImportApplicationSQL:
+#          postImportApplicationSQL:
 #            - ALTER DATABASE grafana OWNER TO grafana
-            - ALTER DATABASE "grafana-metrics" RENAME TO grafana
-            - CREATE USER grafana
-            - REASSIGN OWNED BY "grafana-metrics" TO grafana
+#            - ALTER DATABASE "grafana-metrics" RENAME TO grafana
+#            - CREATE USER grafana
+#            - REASSIGN OWNED BY "grafana-metrics" TO grafana
 
 radar_jdbc_connector_data_dashboard_backend:
   radar-cloudnative-timescaledb:
@@ -66,8 +66,6 @@ radar_jdbc_connector_data_dashboard_backend:
               create: false
               name: data-dashboard-timescaledb-postgresql
               key: postgres-password
-          postImportApplicationSQL:
-            - ALTER DATABASE "data-dashboard" OWNER TO "data-dashboard"
 
 radar_jdbc_connector_realtime_dashboard:
   radar-cloudnative-timescaledb:
@@ -88,5 +86,3 @@ radar_jdbc_connector_realtime_dashboard:
               create: false
               name: realtime-dashboard-timescaledb-postgresql
               key: postgres-password
-          postImportApplicationSQL:
-            - ALTER DATABASE "realtime-dashboard" OWNER TO "realtime-dashboard"
