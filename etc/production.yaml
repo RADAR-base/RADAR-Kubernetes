@@ -260,7 +260,7 @@ radar_appserver:
 # --------------------------------------------------------- 20-fitbit.yaml ---------------------------------------------------------
 # The charts in 20-fitbit.yaml only need to be installed if you will use a Fitbit, Garmin, or Oura API integration.
 radar_fitbit_connector:
-  _install: false
+  _install: true
   _extra_timeout: 0
   replicaCount: 1
   oauthClientId: radar_fitbit_connector
@@ -578,15 +578,15 @@ radar_push_endpoint:
 # --------------------------------------------------------- 99-velero.yaml ---------------------------------------------------------
 
 velero:
-  _install: false
+  _install: true
   _extra_timeout: 0
   objectStorageBackupReplicaCount: 1
   backup:
-    address: s3.amazon.com  # protocol should not be specified
+    address: s3.localhost  # protocol should not be specified
     bucket: radar-base-backups
   velero:
     configuration:
       backupStorageLocation:
         bucket: radar-base-backups
         config:
-          s3Url: https://s3.amazon.com # protocol should be specified
+          s3Url: https://s3.localhost # protocol should be specified
