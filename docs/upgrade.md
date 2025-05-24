@@ -156,7 +156,7 @@ ALTER DATABASE appserver OWNER to appserver;
 ALTER DATABASE uploadconnector OWNER to uploadconnector;
 ```
 
-Transfer ownership of all tables in respective databases to the new users. Execute every command separately (do no copy paste as a batch). Ignore the command for any database that is not used.
+Transfer ownership of all tables in respective databases to the new users. Ignore sections of the command for any database that is not used.
 
 ```sql
 \c managementportal
@@ -261,14 +261,16 @@ the CloudNativePG operator. Run the _helmfile_ command once with the `mods/migra
 helmfile sync 
 ```
 
-### 4. Post migration cleanup
+Confirm that all database services initialize successfully. If so, the migration is complete. 
+
+### 4. Post-migration cleanup
 
 Perform these steps when the database migration is successful.
 
 1. Remove any database passwords from the `secrets.yaml` file. An easy way to do this is to compare your `secrets.yaml`
    file to `base-secrets.yaml` file and remove any entries not present in `base-secrets.yaml`.
 
-2. Turn of legacy database services. For this update the `production.yaml` file like so:
+2. Turn off any deployed legacy database service. For this update the `production.yaml` file like so:
 
 ```yaml
 postgresql:
@@ -296,6 +298,24 @@ radar_upload_postgresql:
 ...
 ```
 
+For esthetics, you can also remove any configuration passed under any of these sections. For instance, remove any of indicated lines:
+
+```yaml
+grafana_metrics_timescaledb:
+  _install: true
+  _extra_timeout: 210
+  replicaCount: 1
+  postgresql:    <-- remove this section
+    replication:
+      enable: false
+      applicationName: radarGrafanaMetrics 
+    auth:
+      database: grafana-metrics
+    primary:
+      persistence:
+        size: 8Gi
+```
+
 3. Remove the _mods/migration/1.3.0.yaml_ file reference from the `environments.yaml` file.
  
 4. Update the deployment:
@@ -304,7 +324,10 @@ radar_upload_postgresql:
 helmfile sync
 ```
 
-5. Remove any _pvc_ resource on the Kubernetes cluster associated with the old databases. Important: this step will permanently delete the data! Only perform this step when sure the migration completed successfully.
+5. Remove any _pvc_ resource on the Kubernetes cluster associated with the old databases. 
+
+   Important: this step will permanently delete the data! Only perform this step when sure the migration completed successfully.
+
    The relevant _pvc_ names are:
 
 - `data-postgresql-0`
