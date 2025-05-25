@@ -58,7 +58,7 @@ radar_jdbc_connector_grafana:
     cluster:
       # Do not remove: needed for legacy version. Can be removed after upgrade to new postgresql version (handled in future RADAR-base update).
       version:
-        postgresql: "12"
+        postgresql: "15"
         timescaledb: "2.11"
       cluster:
         storage:
@@ -72,7 +72,7 @@ radar_jdbc_connector_data_dashboard_backend:
     cluster:
       # Do not remove: needed for legacy version. Can be removed after upgrade to new postgresql version (handled in future RADAR-base update).
       version:
-        postgresql: "12"
+        postgresql: "15"
         timescaledb: "2.11"
       cluster:
         storage:
@@ -85,7 +85,7 @@ radar_jdbc_connector_realtime_dashboard:
     cluster:
       # Do not remove: needed for legacy version. Can be removed after upgrade to new postgresql version (handled in future RADAR-base update).
       version:
-        postgresql: "12"
+        postgresql: "15"
         timescaledb: "2.11"
       cluster:
         storage:
