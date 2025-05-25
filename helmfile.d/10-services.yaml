@@ -213,7 +213,8 @@ releases:
       - {{ .Values.postgresql | toYaml | indent 8 | trim }}
 
   - name: cloudnativepg-operator
-    chart: radar/cloudnative-pg
+   # chart: radar/cloudnative-pg
+    chart:  ../../radar-helm-charts/external/cloudnativepg-operator
     version: {{ .Values.cloudnativepg_operator._chart_version }}
     # Note: installed when any service that uses cnpg is installed.
     installed: {{ or .Values.cloudnative_postgresql._install .Values.radar_jdbc_connector_grafana._install .Values.radar_jdbc_connector_data_dashboard_backend._install .Values.radar_jdbc_connector_realtime_dashboard._install }}
@@ -223,7 +224,8 @@ releases:
       - {{ .Values.cloudnativepg_operator | toYaml | indent 8 | trim }}
 
   - name: radar-cloudnative-postgresql
-    chart: radar/radar-cloudnative-postgresql
+#    chart: radar/radar-cloudnative-postgresql
+    chart: ../../radar-helm-charts/charts/radar-cloudnative-postgresql
     version: {{ .Values.cloudnative_postgresql._chart_version }}
     installed: {{ .Values.cloudnative_postgresql._install }}
     timeout: {{ add .Values.base_timeout .Values.kube_prometheus_stack._extra_timeout }}
