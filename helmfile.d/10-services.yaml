@@ -715,6 +715,8 @@ releases:
         values: [{{ .Values.server_name }}]
       - name: serverName
         value: {{ .Values.server_name }}
+      - name: restSourceClients.fitbit.enable
+        value: {{ .Values.radar_fitbit_connector._install }}
       {{- if hasKey .Values "fitbit_api_client" }}
       - name: restSourceClients.fitbit.clientId
         value: {{ .Values.fitbit_api_client }}
@@ -723,16 +725,6 @@ releases:
       - name: restSourceClients.fitbit.clientSecret
         value: {{ .Values.fitbit_api_secret }}
       {{- end }}
-      - name: restSourceClients.fitbit.enable
-        value: {{ .Values.radar_fitbit_connector._install }}
-      - name: restSourceClients.garmin.enable
-        value: {{ and .Values.radar_push_endpoint._install .Values.radar_push_endpoint.garmin.enabled }}
-      - name: restSourceClients.garmin.clientId
-        value: {{ dig "restSourceClients" "garmin" "clientId" (dig "garmin" "consumerKey" "" .Values.radar_push_endpoint) .Values.radar_rest_sources_backend }}
-      - name: restSourceClients.garmin.clientSecret
-        value: {{ dig "restSourceClients" "garmin" "clientSecret" (dig "garmin" "consumerSecret" "" .Values.radar_push_endpoint) .Values.radar_rest_sources_backend }}
-      - name: client_secret
-        value: {{ dig "client_secret" (dig "oauth_clients" "radar_rest_sources_auth_backend" "client_secret" "" .Values.management_portal) .Values.radar_rest_sources_backend }}
       - name: restSourceClients.oura.enable
         value: {{ .Values.radar_oura_connector._install }}
       {{- if hasKey .Values "oura_api_client" }}
@@ -743,6 +735,14 @@ releases:
       - name: restSourceClients.oura.clientSecret
         value: {{ .Values.oura_api_secret }}
       {{- end }}
+      - name: restSourceClients.garmin.enable
+        value: {{ and .Values.radar_push_endpoint._install .Values.radar_push_endpoint.garmin.enabled }}
+      - name: restSourceClients.garmin.clientId
+        value: {{ dig "restSourceClients" "garmin" "clientId" (dig "garmin" "consumerKey" "" .Values.radar_push_endpoint) .Values.radar_rest_sources_backend }}
+      - name: restSourceClients.garmin.clientSecret
+        value: {{ dig "restSourceClients" "garmin" "clientSecret" (dig "garmin" "consumerSecret" "" .Values.radar_push_endpoint) .Values.radar_rest_sources_backend }}
+      - name: client_secret
+        value: {{ dig "client_secret" (dig "oauth_clients" "radar_rest_sources_auth_backend" "client_secret" "" .Values.management_portal) .Values.radar_rest_sources_backend }}
 
   - name: radar-oura-connector
     chart: radar/radar-oura-connector
