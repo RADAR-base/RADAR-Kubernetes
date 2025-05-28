@@ -128,33 +128,8 @@ jobs:
           # We silently run the tests twice to work around this issue. We should investigate this further.
           echo "Run 1"
           behave -D secrets_file=$GITHUB_WORKSPACE/etc/secrets.yaml -D url=http://localhost:80 > /dev/null || exit_status=$?
-          echo "Exit status: $exit_status"
-          sleep 5
-          echo "Run 2"
-          behave -D secrets_file=$GITHUB_WORKSPACE/etc/secrets.yaml -D url=http://localhost:80 > /dev/null || exit_status=$?
-          echo "Exit status: $exit_status"
-          sleep 5
-          echo "Run 3"
-          behave -D secrets_file=$GITHUB_WORKSPACE/etc/secrets.yaml -D url=http://localhost:80 > /dev/null || exit_status=$?
-          echo "Exit status: $exit_status"
-          sleep 5
-          echo "Run 4"
-          behave -D secrets_file=$GITHUB_WORKSPACE/etc/secrets.yaml -D url=http://localhost:80 > /dev/null || exit_status=$?
-          echo "Exit status: $exit_status"
-          sleep 5
-          echo "Run 5"
-          behave -D secrets_file=$GITHUB_WORKSPACE/etc/secrets.yaml -D url=http://localhost:80 > /dev/null || exit_status=$?
-          echo "Exit status: $exit_status"
-          sleep 5
-          echo "Run 6"
-          behave -D secrets_file=$GITHUB_WORKSPACE/etc/secrets.yaml -D url=http://localhost:80 > /dev/null || exit_status=$?
-          echo "Exit status: $exit_status"
-          sleep 5
-          echo "Run 7"
-          behave -D secrets_file=$GITHUB_WORKSPACE/etc/secrets.yaml -D url=http://localhost:80 > /dev/null || exit_status=$?
-          echo "Exit status: $exit_status"
-          sleep 5
-          echo "Run 8"
+          behave -D secrets_file=$GITHUB_WORKSPACE/etc/secrets.yaml -D url=http://localhost:80 > /dev/null || true 
+          sleep 30
           behave -D secrets_file=$GITHUB_WORKSPACE/etc/secrets.yaml -D url=http://localhost:80
 
       - name: Manually triggered tmate session
