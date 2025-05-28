@@ -715,6 +715,8 @@ releases:
         values: [{{ .Values.server_name }}]
       - name: serverName
         value: {{ .Values.server_name }}
+      - name: restSourceClients.fitbit.enable
+        value: {{ .Values.radar_fitbit_connector._install }}
       {{- if hasKey .Values "fitbit_api_client" }}
       - name: restSourceClients.fitbit.clientId
         value: {{ .Values.fitbit_api_client }}
@@ -723,8 +725,16 @@ releases:
       - name: restSourceClients.fitbit.clientSecret
         value: {{ .Values.fitbit_api_secret }}
       {{- end }}
-      - name: restSourceClients.fitbit.enable
-        value: {{ .Values.radar_fitbit_connector._install }}
+      - name: restSourceClients.oura.enable
+        value: {{ .Values.radar_oura_connector._install }}
+      {{- if hasKey .Values "oura_api_client" }}
+      - name: restSourceClients.oura.clientId
+        value: {{ .Values.oura_api_client }}
+      {{- end }}
+      {{- if hasKey .Values "oura_api_secret" }}
+      - name: restSourceClients.oura.clientSecret
+        value: {{ .Values.oura_api_secret }}
+      {{- end }}
       - name: restSourceClients.garmin.enable
         value: {{ and .Values.radar_push_endpoint._install .Values.radar_push_endpoint.garmin.enabled }}
       - name: restSourceClients.garmin.clientId
