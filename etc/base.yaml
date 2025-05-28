@@ -10,10 +10,6 @@ server_name: example.com
 maintainer_email: MAINTAINER_EMAIL@example.com
 # Number of Kafka pods that will be installed
 kafka_num_brokers: 3
-# Number of Postgres pods that will be installed
-postgres_num_replicates: 2
-# Number of TimescaleDB pods that will be installed
-timescaledb_num_replicates: 2
 # Enable logging and monitoring
 enable_logging_monitoring: false
 # Enable TLS redirection and retrieval of Let's Encrypt certificates.
@@ -193,7 +189,7 @@ cloudnative_postgresql:
   _extra_timeout: 0
   cluster:
     cluster:
-      instances: 1
+      instances: 2
       storage:
         size: 10Gi
 
@@ -407,6 +403,7 @@ radar_jdbc_connector_grafana:
     #    postgresql: "12"
     #    timescaledb: "2.11"
       cluster:
+        instances: 2
         initdb:
           database: grafana
           owner: grafana
@@ -427,6 +424,7 @@ radar_jdbc_connector_data_dashboard_backend:
     #    postgresql: "12"
     #    timescaledb: "2.11"
       cluster:
+        instances: 2
         initdb:
           database: data-dashboard
           owner: data-dashboard
@@ -447,6 +445,7 @@ radar_jdbc_connector_realtime_dashboard:
     #    postgresql: "12"
     #    timescaledb: "2.11"
       cluster:
+        instances: 2
         initdb:
           database: realtime-dashboard
           owner: realtime-dashboard

@@ -234,9 +234,6 @@ releases:
     <<: *logFailedReleasePrometheus
     values:
       - {{ .Values.cloudnative_postgresql | toYaml | indent 8 | trim }}
-    set:
-      - name: cluster.cluster.instances
-        value: {{ .Values.postgres_num_replicates }}
 
   - name: management-portal
     chart: radar/management-portal
@@ -543,8 +540,6 @@ releases:
         value: {{ .Values.kafka_num_brokers }}
       - name: radar-cloudnative-timescaledb.cluster.fullnameOverride
         value: grafana-timescaledb
-      - name: radar-cloudnative-timescaledb.cluster.cluster.replicates
-        value: {{ .Values.timescaledb_num_replicates }}
 
   - name: radar-jdbc-connector-data-dashboard
     chart: radar/radar-jdbc-connector
@@ -563,8 +558,6 @@ releases:
         value: {{ .Values.kafka_num_brokers }}
       - name: radar-cloudnative-timescaledb.cluster.fullnameOverride
         value: data-dashboard-timescaledb
-      - name: radar-cloudnative-timescaledb.cluster.cluster.replicates
-        value: {{ .Values.timescaledb_num_replicates }}
 
   - name: radar-jdbc-connector-realtime-dashboard
     chart: radar/radar-jdbc-connector
@@ -583,8 +576,6 @@ releases:
         value: {{ .Values.kafka_num_brokers }}
       - name: radar-cloudnative-timescaledb.cluster.fullnameOverride
         value: realtime-dashboard-timescaledb
-      - name: radar-cloudnative-timescaledb.cluster.cluster.replicates
-        value: {{ .Values.timescaledb_num_replicates }}
 
   - name: radar-fitbit-connector
     chart: radar/radar-fitbit-connector
