@@ -123,15 +123,16 @@ jobs:
       - name: Run end-to-end tests
         run: |
           cd test/features
-          exit_status=0
-          # Somehow, tests fail during the first run, but succeed during the second run.
-          # We silently run the tests twice to work around this issue. We should investigate this further.
-          echo "Run 1"
-          behave -D secrets_file=$GITHUB_WORKSPACE/etc/secrets.yaml -D url=http://localhost:80 > /dev/null || exit_status=$?
-          behave -D secrets_file=$GITHUB_WORKSPACE/etc/secrets.yaml -D url=http://localhost:80 > /dev/null || true 
-          sleep 30
-          behave -D secrets_file=$GITHUB_WORKSPACE/etc/secrets.yaml -D url=http://localhost:80
-
+          exit_status=1
+          for i in {1..10}; do
+            echo "Run $i"
+            out=$(behave -D secrets_file=$GITHUB_WORKSPACE/etc/secrets.yaml -D url=http://localhost:80)
+            if [ $? -eq 0 ]; then
+              echo $out
+            fi
+            sleep 10
+          done
+          exit 1
       - name: Manually triggered tmate session
         uses: mxschmitt/action-tmate@v3
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
