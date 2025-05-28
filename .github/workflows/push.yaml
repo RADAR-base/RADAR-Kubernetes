@@ -121,18 +121,15 @@ jobs:
           helmfile sync
 
       - name: Run end-to-end tests
-        run: |
-          cd test/features
-          exit_status=1
-          for i in {1..10}; do
-            echo "Run $i"
-            out=$(behave -D secrets_file=$GITHUB_WORKSPACE/etc/secrets.yaml -D url=http://localhost:80)
-            if [ $? -eq 0 ]; then
-              echo $out
-            fi
-            sleep 10
-          done
-          exit 1
+        uses: nick-fields/retry@v3
+        with:
+          max_attempts: 10
+          timeout_seconds: 10
+          retry_on: error
+          command: |
+            cd test/features
+            behave -D secrets_file=$GITHUB_WORKSPACE/etc/secrets.yaml -D url=http://localhost:80
+
       - name: Manually triggered tmate session
         uses: mxschmitt/action-tmate@v3
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
