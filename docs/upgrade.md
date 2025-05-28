@@ -1,30 +1,33 @@
 # Upgrade instructions
 
 <!-- TOC -->
+
 * [Upgrade instructions](#upgrade-instructions)
-  * [Upgrade to RADAR-Kubernetes version 1.3.0](#upgrade-to-radar-kubernetes-version-130)
-    * [Update `mods/migration/1.3.0.yaml` mods file](#update-modsmigration130yaml-mods-file)
-    * [Update `production.yaml` file](#update-productionyaml-file)
-    * [Update `secrets.yaml` file](#update-secretsyaml-file)
-    * [Database migration](#database-migration)
-      * [1. Disable services that write to the databases](#1-disable-services-that-write-to-the-databases)
-      * [2. Manual import of _upload-connector_ and/or _app-server_ databases](#2-manual-import-of-_upload-connector_-andor-_app-server_-databases)
-        * [App-server database import](#app-server-database-import)
-        * [Upload-connector database import](#upload-connector-database-import)
-      * [3. Create users in the postgres database](#3-create-users-in-the-postgres-database)
-      * [4. Automated import databases](#4-automated-import-databases)
-        * [Update `environments.yaml` file](#update-environmentsyaml-file)
-      * [5. Re-enable services that write to the databases](#5-re-enable-services-that-write-to-the-databases)
-    * [Post-migration cleanup](#post-migration-cleanup)
-  * [Upgrade to RADAR-Kubernetes version 1.2.0](#upgrade-to-radar-kubernetes-version-120)
-    * [Update `production.yaml` file](#update-productionyaml-file-1)
-    * [Update `secrets.yaml` file](#update-secretsyaml-file-1)
-    * [MongoDB](#mongodb)
-  * [Upgrade to RADAR-Kubernetes version 1.1.x](#upgrade-to-radar-kubernetes-version-11x)
-  * [Upgrade to RADAR-Kubernetes version 1.0.0](#upgrade-to-radar-kubernetes-version-100)
-  * [Supporting tasks](#supporting-tasks)
-    * [Disable data ingestion](#disable-data-ingestion)
-    * [Disable database changes](#disable-database-changes)
+    * [Upgrade to RADAR-Kubernetes version 1.3.0](#upgrade-to-radar-kubernetes-version-130)
+        * [Update `mods/migration/1.3.0.yaml` mods file](#update-modsmigration130yaml-mods-file)
+        * [Update `production.yaml` file](#update-productionyaml-file)
+        * [Update `secrets.yaml` file](#update-secretsyaml-file)
+        * [Database migration](#database-migration)
+            * [1. Disable services that write to the databases](#1-disable-services-that-write-to-the-databases)
+            * [2. Manual import of _upload-connector_ and/or
+              _app-server_ databases](#2-manual-import-of-_upload-connector_-andor-_app-server_-databases)
+                * [App-server database import](#app-server-database-import)
+                * [Upload-connector database import](#upload-connector-database-import)
+            * [3. Create users in the postgres database](#3-create-users-in-the-postgres-database)
+            * [4. Automated import databases](#4-automated-import-databases)
+                * [Update `environments.yaml` file](#update-environmentsyaml-file)
+            * [5. Re-enable services that write to the databases](#5-re-enable-services-that-write-to-the-databases)
+        * [Post-migration cleanup](#post-migration-cleanup)
+    * [Upgrade to RADAR-Kubernetes version 1.2.0](#upgrade-to-radar-kubernetes-version-120)
+        * [Update `production.yaml` file](#update-productionyaml-file-1)
+        * [Update `secrets.yaml` file](#update-secretsyaml-file-1)
+        * [MongoDB](#mongodb)
+    * [Upgrade to RADAR-Kubernetes version 1.1.x](#upgrade-to-radar-kubernetes-version-11x)
+    * [Upgrade to RADAR-Kubernetes version 1.0.0](#upgrade-to-radar-kubernetes-version-100)
+    * [Supporting tasks](#supporting-tasks)
+        * [Disable data ingestion](#disable-data-ingestion)
+        * [Disable database changes](#disable-database-changes)
+
 <!-- TOC -->
 
 Run the following instructions to upgrade an existing RADAR-Kubernetes cluster.
@@ -47,7 +50,7 @@ from the
               # - appserver
               # - kratos
               - restsourceauthorizer
-            # - uploadconnector
+              # - uploadconnector
             source:
               ...
 ```
@@ -141,7 +144,8 @@ Notes:
 
 #### 1. Disable services that write to the databases
 
-To prevent any changes to the databases during the migration, disable all services that write to the databases (see [Disable
+To prevent any changes to the databases during the migration, disable all services that write to the databases (
+see [Disable
 database changes](#disable-data-ingestion)).
 
 #### 2. Manual import of _upload-connector_ and/or _app-server_ databases
@@ -324,7 +328,7 @@ FROM information_schema.sequences
 WHERE sequence_schema = 'public';
 ```
 
-#### 4. Automated import databases
+#### 4. Automated import of the _PostgreSQL_ database
 
 ##### Update `environments.yaml` file
 
@@ -348,7 +352,51 @@ the CloudNativePG operator. Run the _helmfile_ command once with the `mods/migra
 helmfile sync 
 ```
 
-Confirm that all database services initialize successfully. If so, the migration is complete.
+Confirm that all database services initialize successfully.
+
+#### 5. Manual import of _TimescaleDB_ databases
+
+For the grafana, data-dashboard and realtime-dashboard databases, the migration is performed manually. Omit any step for a service that is not in use.
+
+For the grafana database migration perform the following steps:
+
+1. Attach shell to grafana-timescaledb pod:
+
+```shell
+kubectl exec grafana-timescaledb-1 -it -- bash
+```
+
+2. Dump the source database, and import it into the new grafana-timescale cluster:
+
+```
+export SOURCE=postgres://<user>:<password>@grafana-metrics-timescaledb-postgresql/grafana-metrics
+pg_dump -d "$SOURCE" -Fc -f /controller/grafana.bak
+psql -d grafana -t -c 'SELECT timescaledb_pre_restore();'
+pg_restore -d grafana -Fc /controller/grafana.bak
+psql -d grafana -t -c 'SELECT timescaledb_post_restore();'
+```
+
+For the data-dashboard and realtime-dashboard databases migrations the equivalent steps are:
+
+```
+kubectl exec data-dashboard-timescaledb-1 -it -- bash
+--
+export SOURCE=postgres://<user>:<password>@data-dashboard-timescaledb-postgresql/data-dashboard
+pg_dump -d "$SOURCE" -Fc -f /controller/data-dashboard.bak
+psql -d data-dashboard -t -c 'SELECT timescaledb_pre_restore();'
+pg_restore -d data-dashboard -Fc /controller/data-dashboard.bak
+psql -d data-dashboard -t -c 'SELECT timescaledb_post_restore();'
+```
+
+```
+kubectl exec realtime-dashboard-timescaledb-1 -it -- bash
+--
+export SOURCE=postgres://<user>:<password>@realtime-dashboard-timescaledb-postgresql/realtime-dashboard
+pg_dump -d "$SOURCE" -Fc -f /controller/realtime-dashboard.bak
+psql -d realtime-dashboard -t -c 'SELECT timescaledb_pre_restore();'
+pg_restore -d realtime-dashboard -Fc /controller/realtime-dashboard.bak
+psql -d realtime-dashboard -t -c 'SELECT timescaledb_post_restore();'
+```
 
 #### 5. Re-enable services that write to the databases
 
