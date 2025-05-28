@@ -1,5 +1,32 @@
 # Upgrade instructions
 
+<!-- TOC -->
+* [Upgrade instructions](#upgrade-instructions)
+  * [Upgrade to RADAR-Kubernetes version 1.3.0](#upgrade-to-radar-kubernetes-version-130)
+    * [Update `mods/migration/1.3.0.yaml` mods file](#update-modsmigration130yaml-mods-file)
+    * [Update `production.yaml` file](#update-productionyaml-file)
+    * [Update `secrets.yaml` file](#update-secretsyaml-file)
+    * [Database migration](#database-migration)
+      * [1. Disable services that write to the databases](#1-disable-services-that-write-to-the-databases)
+      * [2. Manual import of _upload-connector_ and/or _app-server_ databases](#2-manual-import-of-_upload-connector_-andor-_app-server_-databases)
+        * [App-server database import](#app-server-database-import)
+        * [Upload-connector database import](#upload-connector-database-import)
+      * [3. Create users in the postgres database](#3-create-users-in-the-postgres-database)
+      * [4. Automated import databases](#4-automated-import-databases)
+        * [Update `environments.yaml` file](#update-environmentsyaml-file)
+      * [5. Re-enable services that write to the databases](#5-re-enable-services-that-write-to-the-databases)
+    * [Post-migration cleanup](#post-migration-cleanup)
+  * [Upgrade to RADAR-Kubernetes version 1.2.0](#upgrade-to-radar-kubernetes-version-120)
+    * [Update `production.yaml` file](#update-productionyaml-file-1)
+    * [Update `secrets.yaml` file](#update-secretsyaml-file-1)
+    * [MongoDB](#mongodb)
+  * [Upgrade to RADAR-Kubernetes version 1.1.x](#upgrade-to-radar-kubernetes-version-11x)
+  * [Upgrade to RADAR-Kubernetes version 1.0.0](#upgrade-to-radar-kubernetes-version-100)
+  * [Supporting tasks](#supporting-tasks)
+    * [Disable data ingestion](#disable-data-ingestion)
+    * [Disable database changes](#disable-database-changes)
+<!-- TOC -->
+
 Run the following instructions to upgrade an existing RADAR-Kubernetes cluster.
 
 ## Upgrade to RADAR-Kubernetes version 1.3.0
@@ -8,7 +35,8 @@ This version introduces postgresql and TimescaleDB clusters managed by the Cloud
 
 ### Update `mods/migration/1.3.0.yaml` mods file
 
-This file provides configuration for database migration. In the `cloudnative_postgresql` section, remove any database from the
+This file provides configuration for database migration. In the `cloudnative_postgresql` section, remove any database
+from the
 `databases` list that is not needed. For instance:
 
 ```yaml
@@ -19,7 +47,7 @@ This file provides configuration for database migration. In the `cloudnative_pos
               # - appserver
               # - kratos
               - restsourceauthorizer
-              # - uploadconnector
+            # - uploadconnector
             source:
               ...
 ```
@@ -47,9 +75,11 @@ cloudnative_postgresql:
         size: 10Gi
 ```
 
-4. Set legacy versions for _TimescaleDB_ in jdbc-connector sections. If desired, change the storage size of the respective databases:
+4. Set legacy versions for _TimescaleDB_ in jdbc-connector sections. If desired, change the storage size of the
+   respective databases:
 
-Note: major version upgrades performed by the CloudNativePG operator are currently under development. When v1.26 is released, the
+Note: major version upgrades performed by the CloudNativePG operator are currently under development. When v1.26 is
+released, the
 the _TimescaleDB_ databases can be upgraded to the a newer version.
 
 ```yaml
@@ -91,7 +121,7 @@ radar_jdbc_connector_realtime_dashboard:
         storage:
           size: 50Gi
 ```
- 
+
 5. Duplicate entry `grafana_metrics_db_user` ane rename to `grafana_metrics_endpoint_user` (keep the same value).
 
 ### Update `secrets.yaml` file
@@ -100,18 +130,28 @@ Duplicate secret `grafana_metrics_db_password` and rename to `grafana_metrics_en
 
 ### Database migration
 
-Important: before database migration the steps in the sections above must have been completed successfully.
+Important:
+
+- before database migration the steps in the sections above must have been completed successfully.
 
 Notes:
+
 - Database passwords can be found in the `etc/secrets.yaml` file.
 - Unless customized the username for all databases is `postgres`.
 
-#### 1. Manual import of _upload-connector_ and/or _app-server_ databases
+#### 1. Disable services that write to the databases
+
+To prevent any changes to the databases during the migration, disable all services that write to the databases (see [Disable
+database changes](#disable-data-ingestion)).
+
+#### 2. Manual import of _upload-connector_ and/or _app-server_ databases
 
 ##### App-server database import
 
-Perform when using the _app-server_ service. The username and password for the _app-server_ database are indicated with `<user>` and `<password>`, respectively. 
-The username and password for the _management_portal_ database are indicated with `<mp-user>` and `<mp-password>`, respectively.
+Perform when using the _app-server_ service. The username and password for the _app-server_ database are indicated with
+`<user>` and `<password>`, respectively.
+The username and password for the _management_portal_ database are indicated with `<mp-user>` and `<mp-password>`,
+respectively.
 
 ```shell
 kubectl exec radar-appserver-postgresql-0 -- bash -c "PGPASSWORD=<password> pg_dump -U <user> appserver" > appserver.sql
@@ -121,8 +161,10 @@ cat appserver.sql | kubectl exec -i postgresql-0 -- bash -c "PGPASSWORD=<mp-pass
 
 ##### Upload-connector database import
 
-Perform when using the _upload-connector_ service. The username and password for the _upload-connector_ database are indicated with `<user>` and `<password>`, respectively.
-The username and password for the _management_portal_ database are indicated with `<mp-user>` and `<mp-password>`, respectively.
+Perform when using the _upload-connector_ service. The username and password for the _upload-connector_ database are
+indicated with `<user>` and `<password>`, respectively.
+The username and password for the _management_portal_ database are indicated with `<mp-user>` and `<mp-password>`,
+respectively.
 
 ```shell
 kubectl exec radar-upload-postgresql-0 -- bash -c "PGPASSWORD=<password> pg_dump -U <user> uploadconnector" > uploadconnector.sql
@@ -130,10 +172,12 @@ kubectl exec -i postgresql-0 -- bash -c "PGPASSWORD=<mp-password> psql -U <mp-us
 cat uploadconnector.sql | kubectl exec -i postgresql-0 -- bash -c "PGPASSWORD=<mp-password> psql -U <mp-user> -d uploadconnector"
 ```
 
-#### 2. Create users in the postgres database
+#### 3. Create users in the postgres database
 
-Log into the _PostgreSQL_ database using the _psql_ utility. The username and password for the _PostgreSQL_ database are indicated with `<user>` and `<password>`, respectively.
-Note that the `--pset pager=off` option is used to disable paging in the output to prevent problems with certain statements.
+Log into the _PostgreSQL_ database using the _psql_ utility. The username and password for the _PostgreSQL_ database are
+indicated with `<user>` and `<password>`, respectively.
+Note that the `--pset pager=off` option is used to disable paging in the output to prevent problems with certain
+statements.
 
 ```shell
 kubectl exec postgresql-0 -it -- sh -c 'PGPASSWORD=<password> psql -U <user> --pset pager=off'
@@ -142,102 +186,145 @@ kubectl exec postgresql-0 -it -- sh -c 'PGPASSWORD=<password> psql -U <user> --p
 Create database users and set ownership of the databases (remove any database that is not needed):
 
 ```sql
-CREATE USER managementportal;
-CREATE USER restsourceauthorizer;
-CREATE USER appconfig;
-CREATE USER kratos;
-CREATE USER appserver;
-CREATE USER uploadconnector;
-ALTER DATABASE managementportal OWNER to managementportal;
-ALTER DATABASE restsourceauthorizer OWNER to restsourceauthorizer;
-ALTER DATABASE appconfig OWNER to appconfig;
-ALTER DATABASE kratos OWNER to kratos;
-ALTER DATABASE appserver OWNER to appserver;
-ALTER DATABASE uploadconnector OWNER to uploadconnector;
+CREATE
+USER managementportal;
+CREATE
+USER restsourceauthorizer;
+CREATE
+USER appconfig;
+CREATE
+USER kratos;
+CREATE
+USER appserver;
+CREATE
+USER uploadconnector;
+ALTER
+DATABASE managementportal OWNER to managementportal;
+ALTER
+DATABASE restsourceauthorizer OWNER to restsourceauthorizer;
+ALTER
+DATABASE appconfig OWNER to appconfig;
+ALTER
+DATABASE kratos OWNER to kratos;
+ALTER
+DATABASE appserver OWNER to appserver;
+ALTER
+DATABASE uploadconnector OWNER to uploadconnector;
 ```
 
-Transfer ownership of all tables in respective databases to the new users. Ignore sections of the command for any database that is not used.
+Transfer ownership of all tables in respective databases to the new users. Ignore sections of the command for any
+database that is not used.
 
 ```sql
-\c managementportal
-CREATE OR REPLACE FUNCTION exec(text) returns text language plpgsql volatile
-  AS $f$
-    BEGIN
-      EXECUTE $1;
-      RETURN $1;
-    END;
+\c
+managementportal
+CREATE
+OR REPLACE FUNCTION exec(text) returns text language plpgsql volatile
+  AS
+$f$
+BEGIN
+EXECUTE $1;
+RETURN $1;
+END;
 $f$;
-SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
-FROM information_schema.tables WHERE table_schema = 'public';
-SELECT exec( 'ALTER SEQUENCE ' || sequence_name || ' OWNER TO ' || sequence_catalog )
-FROM information_schema.sequences WHERE sequence_schema = 'public';
+SELECT exec ( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
+FROM information_schema.tables
+WHERE table_schema = 'public';
+SELECT exec ( 'ALTER SEQUENCE ' || sequence_name || ' OWNER TO ' || sequence_catalog )
+FROM information_schema.sequences
+WHERE sequence_schema = 'public';
 
-\c restsourceauthorizer
-CREATE OR REPLACE FUNCTION exec(text) returns void language plpgsql volatile
-  AS $f$
-    BEGIN
-      EXECUTE $1;
-  END;
+\c
+restsourceauthorizer
+CREATE
+OR REPLACE FUNCTION exec(text) returns void language plpgsql volatile
+  AS
+$f$
+BEGIN
+EXECUTE $1;
+END;
 $f$;
-SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
-FROM information_schema.tables WHERE table_schema = 'public';
-SELECT exec( 'ALTER SEQUENCE ' || sequence_name || ' OWNER TO ' || sequence_catalog )
-FROM information_schema.sequences WHERE sequence_schema = 'public';
+SELECT exec ( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
+FROM information_schema.tables
+WHERE table_schema = 'public';
+SELECT exec ( 'ALTER SEQUENCE ' || sequence_name || ' OWNER TO ' || sequence_catalog )
+FROM information_schema.sequences
+WHERE sequence_schema = 'public';
 
-\c appconfig
-CREATE OR REPLACE FUNCTION exec(text) returns text language plpgsql volatile
-  AS $f$
-    BEGIN
-      EXECUTE $1;
-      RETURN $1;
-    END;
+\c
+appconfig
+CREATE
+OR REPLACE FUNCTION exec(text) returns text language plpgsql volatile
+  AS
+$f$
+BEGIN
+EXECUTE $1;
+RETURN $1;
+END;
 $f$;
-SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
-FROM information_schema.tables WHERE table_schema = 'public';
-SELECT exec( 'ALTER SEQUENCE ' || sequence_name || ' OWNER TO ' || sequence_catalog )
-FROM information_schema.sequences WHERE sequence_schema = 'public';
+SELECT exec ( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
+FROM information_schema.tables
+WHERE table_schema = 'public';
+SELECT exec ( 'ALTER SEQUENCE ' || sequence_name || ' OWNER TO ' || sequence_catalog )
+FROM information_schema.sequences
+WHERE sequence_schema = 'public';
 
-\c kratos
-CREATE OR REPLACE FUNCTION exec(text) returns text language plpgsql volatile
-  AS $f$
-    BEGIN
-      EXECUTE $1;
-      RETURN $1;
-    END;
+\c
+kratos
+CREATE
+OR REPLACE FUNCTION exec(text) returns text language plpgsql volatile
+  AS
+$f$
+BEGIN
+EXECUTE $1;
+RETURN $1;
+END;
 $f$;
-SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
-FROM information_schema.tables WHERE table_schema = 'public';
-SELECT exec( 'ALTER SEQUENCE ' || sequence_name || ' OWNER TO ' || sequence_catalog )
-FROM information_schema.sequences WHERE sequence_schema = 'public';
+SELECT exec ( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
+FROM information_schema.tables
+WHERE table_schema = 'public';
+SELECT exec ( 'ALTER SEQUENCE ' || sequence_name || ' OWNER TO ' || sequence_catalog )
+FROM information_schema.sequences
+WHERE sequence_schema = 'public';
 
-\c appserver
-CREATE OR REPLACE FUNCTION exec(text) returns text language plpgsql volatile
-  AS $f$
-    BEGIN
-      EXECUTE $1;
-      RETURN $1;
-    END;
+\c
+appserver
+CREATE
+OR REPLACE FUNCTION exec(text) returns text language plpgsql volatile
+  AS
+$f$
+BEGIN
+EXECUTE $1;
+RETURN $1;
+END;
 $f$;
-SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
-FROM information_schema.tables WHERE table_schema = 'public';
-SELECT exec( 'ALTER SEQUENCE ' || sequence_name || ' OWNER TO ' || sequence_catalog )
-FROM information_schema.sequences WHERE sequence_schema = 'public';
+SELECT exec ( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
+FROM information_schema.tables
+WHERE table_schema = 'public';
+SELECT exec ( 'ALTER SEQUENCE ' || sequence_name || ' OWNER TO ' || sequence_catalog )
+FROM information_schema.sequences
+WHERE sequence_schema = 'public';
 
-\c uploadconnector
-CREATE OR REPLACE FUNCTION exec(text) returns text language plpgsql volatile
-  AS $f$
-    BEGIN
-      EXECUTE $1;
-      RETURN $1;
-    END;
+\c
+uploadconnector
+CREATE
+OR REPLACE FUNCTION exec(text) returns text language plpgsql volatile
+  AS
+$f$
+BEGIN
+EXECUTE $1;
+RETURN $1;
+END;
 $f$;
-SELECT exec( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
-FROM information_schema.tables WHERE table_schema = 'public';
-SELECT exec( 'ALTER SEQUENCE ' || sequence_name || ' OWNER TO ' || sequence_catalog )
-FROM information_schema.sequences WHERE sequence_schema = 'public';
+SELECT exec ( 'ALTER TABLE ' || table_name || ' OWNER TO ' || table_catalog )
+FROM information_schema.tables
+WHERE table_schema = 'public';
+SELECT exec ( 'ALTER SEQUENCE ' || sequence_name || ' OWNER TO ' || sequence_catalog )
+FROM information_schema.sequences
+WHERE sequence_schema = 'public';
 ```
 
-#### 3. Automated import databases
+#### 4. Automated import databases
 
 ##### Update `environments.yaml` file
 
@@ -261,9 +348,14 @@ the CloudNativePG operator. Run the _helmfile_ command once with the `mods/migra
 helmfile sync 
 ```
 
-Confirm that all database services initialize successfully. If so, the migration is complete. 
+Confirm that all database services initialize successfully. If so, the migration is complete.
 
-### 4. Post-migration cleanup
+#### 5. Re-enable services that write to the databases
+
+Re-enable all services that were disabled in the _Disable services that write to databases_ section above (see [Disable
+database changes](#disable-data-ingestion)).
+
+### Post-migration cleanup
 
 Perform these steps when the database migration is successful.
 
@@ -298,17 +390,18 @@ radar_upload_postgresql:
 ...
 ```
 
-For esthetics, you can also remove any configuration passed under any of these sections. For instance, remove any of indicated lines:
+For esthetics, you can also remove any configuration passed under any of these sections. For instance, remove any of
+indicated lines:
 
 ```yaml
 grafana_metrics_timescaledb:
   _install: true
   _extra_timeout: 210
   replicaCount: 1
-  postgresql:    <-- remove this section
+  postgresql: <-- remove this section
     replication:
       enable: false
-      applicationName: radarGrafanaMetrics 
+      applicationName: radarGrafanaMetrics
     auth:
       database: grafana-metrics
     primary:
@@ -317,16 +410,17 @@ grafana_metrics_timescaledb:
 ```
 
 3. Remove the _mods/migration/1.3.0.yaml_ file reference from the `environments.yaml` file.
- 
+
 4. Update the deployment:
 
 ```shell
 helmfile sync
 ```
 
-5. Remove any _pvc_ resource on the Kubernetes cluster associated with the old databases. 
+5. Remove any _pvc_ resource on the Kubernetes cluster associated with the old databases.
 
-   Important: this step will permanently delete the data! Only perform this step when sure the migration completed successfully.
+   Important: this step will permanently delete the data! Only perform this step when sure the migration completed
+   successfully.
 
    The relevant _pvc_ names are:
 
@@ -670,3 +764,90 @@ kubectl delete statefulset redis-master
 helmfile -f helmfile.d/20-s3.yaml sync --concurrency 1
 ```
 
+## Supporting tasks
+
+### Disable data ingestion
+
+To disable data ingestion, temporarily disable _gateway_, _rest-connector_ (Fitit, Garmin, Oura, ...) and
+_upload-connector_ services in the `production.yaml` file:
+This is accomplished by redeploying while setting the `replicaCount` to `0` for these services. For instance:
+
+```yaml
+radar_gateway:
+  replicaCount: 0
+...
+radar_fitbit_connector:
+  replicaCount: 0
+...
+radar_oura_connector:
+  replicaCount: 0
+...
+radar_upload_source_connector:
+  replicaCount: 0
+...
+```
+
+Followed by:
+
+```shell
+helmfile sync
+```
+
+BEWARE: the list of services that is scaled down in this way may vary depending on the services that are used in your
+RADAR-Kubernetes deployment.The example above is not exhaustive and will not be updated with future versions of
+RADAR-Kubernetes.
+
+In order to re-enable data ingestion, set the `replicaCount` back to the original value and redeploy.
+
+### Disable database changes
+
+In prevent databases from receiving any updates (e.g., when performing an _off-line_ database update), we should disable
+all services that perform write operations.
+This is accomplished by redeploying while setting the `replicaCount` to `0` for these services. For instance:
+
+```yaml
+management_portal:
+  replicaCount: 0
+...
+radar_appserver:
+  replicaCount: 0
+...
+data_dashboard_backend:
+  replicaCount: 0
+...
+radar_grafana:
+  replicaCount: 0
+...
+radar_rest_sources_backend:
+  replicaCount: 0
+...
+radar_upload_connect_backend:
+  replicaCount: 0
+kratos:
+  replicaCount: 0
+...
+hydra:
+  replicaCount: 0
+...
+radar_jdbc_connector_grafana:
+  replicaCount: 0
+...
+radar_jdbc_connector_data_dashboard:
+  replicaCount: 0
+...
+radar_jdbc_connector_realtime_dashboard:
+  replicaCount: 0
+...
+```
+
+followed by:
+
+```shell
+helmfile sync
+```
+
+BEWARE: the list of services that is scaled down in this way may vary depending on the services that are used in your
+RADAR-Kubernetes deployment.The example above is not exhaustive and will not be updated with future versions of
+RADAR-Kubernetes.
+
+In order to re-enable services, set the `replicaCount` back to the original value and redeploy.
