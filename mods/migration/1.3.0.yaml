@@ -1,0 +1,24 @@
+cloudnative_postgresql:
+  cluster:
+    mode: recovery
+    recovery:
+      method: import
+      import:
+        type: monolith
+        databases:
+          # Remove any database that is not needed.
+          - managementportal
+          - appconfig
+          - appserver
+          - kratos
+          - restsourceauthorizer
+          - uploadconnector
+        source:
+          host: postgresql
+          username: postgres
+          database: postgres
+          sslMode: prefer
+          passwordSecret:
+            create: false
+            name: postgresql
+            key: postgres-password
