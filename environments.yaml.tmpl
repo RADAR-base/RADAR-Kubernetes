@@ -21,6 +21,7 @@ environments:
       - ../mods/fast_deploy.yaml
     {{ end }}
     {{ if .Values.github_installation_test }}
+      - ../mods/github_installation_test.yaml
       - ../mods/disable_tls.yaml
       - ../mods/localdev.yaml
       - ../mods/minimal.yaml
