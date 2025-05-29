@@ -1,0 +1,6 @@
+enable_logging_monitoring: true
+e2e_test: true
+graylog:
+  _extra_timeout: 400
+radar_s3_connector:
+  _extra_timeout: 400
