@@ -18,7 +18,10 @@ enable_tls: true
 
 # Minimal deployment for development (disables TLS, monitoring and logging, sets kafka and minio brokers to 1).
 dev_deployment: false
-
+# E2e test deployment (applies very fast application loop timings for tests).
+e2e_test: false
+# Enable GitHub installation test
+github_installation_test: false
 
 # --------------------------------------------------------- 00-init.yaml ---------------------------------------------------------
 
@@ -604,3 +607,8 @@ velero:
         bucket: radar-base-backups
         config:
           s3Url: https://s3.amazon.com # protocol should be specified
+
+radar_mockserver:
+  _install: false
+  _chart_version: 0.1.0
+  _extra_timeout: 0

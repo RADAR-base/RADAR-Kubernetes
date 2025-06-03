@@ -1,0 +1,20 @@
+atomicInstall: false
+base_timeout: 360
+
+confluent_cloud:
+  enabled: false
+
+ccSchemaRegistryProxy:
+  _install: false
+
+nifi:
+  _install: false
+
+kratos:
+  _install: false
+
+kratos_ui:
+  _install: false
+
+hydra:
+  _install: false

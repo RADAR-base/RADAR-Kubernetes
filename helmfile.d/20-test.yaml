@@ -1,0 +1,17 @@
+bases:
+- ../environments.yaml
+
+---
+
+{{ readFile "../etc/helmfile-templates.yaml" }}
+
+releases:
+  - name: mockserver
+    namespace: mockserver
+    chart: radar/radar-mockserver
+    version: {{ .Values.radar_mockserver._chart_version }}
+    installed: {{ .Values.radar_mockserver._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_mockserver._extra_timeout }}
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.radar_mockserver | toYaml | indent 8 | trim }}
