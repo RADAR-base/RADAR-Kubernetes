@@ -23,8 +23,7 @@ options:
       - arg: --disable=traefik
         nodeFilters:
           - server:*
-# Same as CLI parameter `--port '80:80@loadbalancer'`
-#ports:
-#  - port: 80:80
-#    nodeFilters:
-#      - loadbalancer
+ports:
+  - port: 80:80
+    nodeFilters:
+      - loadbalancer

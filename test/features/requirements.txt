@@ -1,0 +1,17 @@
+argon2-cffi==23.1.0
+argon2-cffi-bindings==21.2.0
+behave==1.2.6
+certifi==2024.12.14
+cffi==1.17.1
+charset-normalizer==3.4.1
+config==0.5.1
+idna==3.10
+minio
+parse==1.20.2
+parse_type==0.6.4
+pycparser==2.22
+pycryptodome==3.21.0
+PyYAML==6.0.2
+requests==2.32.3
+six==1.17.0
+typing_extensions==4.12.2

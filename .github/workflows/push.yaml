@@ -33,16 +33,20 @@ jobs:
         run: |
           ./.github/ci_config/bin/install-dependencies
 
+      - name: Install Python dependencies
+        run: pip install -r test/features/requirements.txt
+
       - name: Prepare the environment (add secrets and enable installation of all components)
         run: |
           DNAME='CN=CI,O=TheHyve,L=Utrecht,C=NL' ./bin/init
-          helmfile_mods='\ \ \ \ \ \ - ../.github/ci_config/ci-config.yaml\n'
+          cp etc/base-secrets.yaml etc/secrets.yaml
           helmfile_mods+='\ \ \ \ \ \ - ../.github/ci_config/secrets.yaml.gotmpl'
           sed -i "/secrets.yaml/a $helmfile_mods" environments.yaml
           sed -i '/_install: /s/false/true/' etc/production.yaml
           # Deploy a minimal deployment accessible on 'localhost:80' with monitoring enabled
           sed -i '/enable_logging_monitoring: /s/false/true/' etc/production.yaml
-          echo "github_installation_test: true" >> etc/production.yaml
+          sed -i '/server_name: /s/example.com/localhost/' etc/production.yaml
+          sed -i '/github_installation_test: /s/false/true/' etc/production.yaml
 
       - name: Ensure k3d cache directory exists
         run: |
@@ -57,6 +61,14 @@ jobs:
         FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
       run: |
         helmfile template > /tmp/helmfile.yaml
+
+    - name: Show production.yaml and environment.yaml
+      if: ${{ failure() }}
+      run: |
+        echo "Production.yaml"
+        cat etc/production.yaml
+        echo "Environment.yaml"
+        cat environments.yaml
 
   delete-old-clusters:
     runs-on: self-hosted
@@ -106,7 +118,16 @@ jobs:
           kubectl get pods --all-namespaces --context k3d-${{ matrix.KUBECTL_VERSION }}
           helmfile sync
 
-      # Enable tmate debugging of manually-triggered workflows if the input option was provided
+      - name: Run end-to-end tests
+        uses: nick-fields/retry@v3
+        with:
+          max_attempts: 10
+          timeout_seconds: 60
+          retry_on: error
+          command: |
+            cd test/features
+            behave -D secrets_file=$GITHUB_WORKSPACE/etc/secrets.yaml -D url=http://localhost:80
+
       - name: Manually triggered tmate session
         uses: mxschmitt/action-tmate@v3
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
