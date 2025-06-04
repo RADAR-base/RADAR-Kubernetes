@@ -45,6 +45,11 @@ copy_template_if_absent() {
   fi
 }
 
+create_production_yaml() {
+  copy_template_if_absent etc/production.yaml etc/base.yaml
+  sed -i "/_chart_version/d" etc/production.yaml
+}
+
 # Copies the template (defined by the given config file with suffix
 # ".template") to intended configuration file.
 copy_template() {
