@@ -1,3 +1,22 @@
+cloudnative_postgresql:
+  cluster:
+    cluster:
+      instances: 1
+radar_jdbc_connector_data_dashboard_backend:
+  timescaledb:
+    cluster:
+      cluster:
+        instances: 1
+radar_jdbc_connector_grafana:
+  timescaledb:
+    cluster:
+      cluster:
+        instances: 1
+radar_jdbc_connector_realtime_dashboard:
+  timescaledb:
+    cluster:
+      cluster:
+        instances: 1
 radar_gateway:
   hpa:
     enabled: false
@@ -19,10 +38,21 @@ minio:
   persistence:
     size: 1Gi
 elasticsearch:
+  replicas: 1
+  minimumMasterNodes: 1
+  esJavaOpts: "-Xmx128m -Xms128m"
   resources:
     requests:
       cpu: "100m"
       memory: "500Mi"
+  volumeClaimTemplate:
+    resources:
+      requests:
+        storage: 1Gi
+mongodb:
+  persistence:
+    size: 1Gi
+  replicaCount: 1
 postgresql:
   postgresql:
     primary:

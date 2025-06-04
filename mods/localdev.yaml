@@ -77,3 +77,21 @@ kratos:
 kratos_ui:
   kratosPublicUrl: http://localhost/kratos
   kratosBrowserUrl: http://localhost/kratos
+radar_jdbc_connector_data_dashboard_backend:
+  timescaledb:
+    cluster:
+      cluster:
+        monitoring:
+          enabled: false
+radar_jdbc_connector_grafana:
+  timescaledb:
+    cluster:
+      cluster:
+        monitoring:
+          enabled: false
+radar_jdbc_connector_realtime_dashboard:
+  timescaledb:
+    cluster:
+      cluster:
+        monitoring:
+          enabled: false

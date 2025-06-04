@@ -502,8 +502,7 @@ def count_rows_in_postgresql(context):
         _cache_database_table_state(context, service, database, table, count)
 
 def _get_postgres_table_state(context, service, database, table):
-    password = get_secret('data_dashboard_db_password', context = context)
-    stream = os.popen(f'kubectl exec {service} -c postgresql -- psql postgresql://postgres:{password}@localhost/{database} -t -c "SELECT COUNT(*) FROM {table}"')
+    stream = os.popen(f'kubectl exec {service} -c postgres -- psql {database} -t -c "SELECT COUNT(*) FROM {table}"')
     try:
         count = int(stream.read().strip())
     except ValueError:

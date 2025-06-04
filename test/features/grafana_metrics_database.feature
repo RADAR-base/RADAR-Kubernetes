@@ -9,9 +9,9 @@ e3)
       | service_name                                | state   |
       | ksql-server                                 | Running |
       | radar-jdbc-connector-grafana                | Running |
-      | grafana-metrics-timescaledb-postgresql      | Running |
+      | grafana-timescaledb                         | Running |
     And registration of the subject with Fitbit authorization service
     Then Fitbit records are present in the database
       # 'count' matches the number of unique records returned by mockserver
-      | service                                  | database         | table                         | count |
-      | grafana-metrics-timescaledb-postgresql-0 | grafana-metrics  | connect_fitbit_intraday_steps | 4     |
+      | service                     | database     | table                         | count |
+      | grafana-timescaledb-1       | grafana      | connect_fitbit_intraday_steps | 4     |

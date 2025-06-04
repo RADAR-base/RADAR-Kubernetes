@@ -9,11 +9,11 @@ Feature: Data-dashboard-backend data transformation and ingestion
     And these service states
       | service_name                                | state   |
       | ksql-server                                 | Running |
-      | radar-jdbc-connector-data-dashboard-backend | Running |
-      | data-dashboard-timescaledb-postgresql       | Running |
+      | radar-jdbc-connector-data-dashboard         | Running |
+      | data-dashboard-timescaledb                  | Running |
     And the number of rows in the database
-      | service                                  | database        | table        |
-      | data-dashboard-timescaledb-postgresql-0  | data-dashboard  | observation  |
+      | service                       | database        | table        |
+      | data-dashboard-timescaledb-1  | data-dashboard  | observation  |
     When the aRMT application sends questionnaire_response data
     """
     [
@@ -21,5 +21,5 @@ Feature: Data-dashboard-backend data transformation and ingestion
     ]
     """
     Then the number of rows in the database changes
-      | service                                  | database        | table        |
-      | data-dashboard-timescaledb-postgresql-0  | data-dashboard  | observation  |
+      | service                       | database        | table        |
+      | data-dashboard-timescaledb-1  | data-dashboard  | observation  |
