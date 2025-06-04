@@ -47,3 +47,8 @@ cert_manager:
 minio:
   readinessProbe:
     periodSeconds: 5
+graylog:
+  graylog:
+    startupProbe:
+      periodSeconds: 10
+      failureThreshold: 60

@@ -114,6 +114,8 @@ kratos:
       }
 
   config:
+    # Leave empty to use the DSN environmental variable.
+    dsn:
 
     session:
       # Defines how long a session is active. Once that lifespan has been reached, the user needs to sign in again.
@@ -225,3 +227,34 @@ kratos:
       level: debug
       format: text
       leak_sensitive_values: true
+
+# Register cloudnativepg secret to be used by Kratos.
+deployment:
+  extraEnv:
+    - name: DSN
+      valueFrom:
+        secretKeyRef:
+          name: radar-cloudnative-postgresql-kratos
+          key: uri
+statefulSet:
+  extraEnv:
+    - name: DSN
+      valueFrom:
+        secretKeyRef:
+          name: radar-cloudnative-postgresql-kratos
+          key: uri
+job:
+  extraEnv:
+    - name: DSN
+      valueFrom:
+        secretKeyRef:
+          name: radar-cloudnative-postgresql-kratos
+          key: uri
+cronjob:
+  cleanup:
+    extraEnv:
+      - name: DSN
+        valueFrom:
+          secretKeyRef:
+            name: radar-cloudnative-postgresql-kratos
+            key: uri

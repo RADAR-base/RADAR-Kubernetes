@@ -96,3 +96,6 @@ ksql_server:
   prometheus:
     jmx:
       enabled: false
+mongodb:
+  metrics:
+    enabled: false
