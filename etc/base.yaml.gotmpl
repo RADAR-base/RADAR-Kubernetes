@@ -13,10 +13,11 @@ management_portal:
   #    {{/* keystore: {{ readFile "certificate.pem" | b64enc | quote }}  */}}
 
 radar_grafana:
-  dashboards:
-    allprojects:
-      home:
-        json: {{ readFile "radar-grafana/dashboards/allprojects/home.json" | quote }}
+  grafana:
+    dashboards:
+      allprojects:
+        home:
+          json: {{ readFile "radar-grafana/dashboards/allprojects/home.json" | quote }}
 
 # If appserver is used, please remove the Go template comments and yaml comments.
 # Again, like with management_portal, if you want to store the credentials in a
