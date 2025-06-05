@@ -854,6 +854,7 @@ releases:
     timeout: {{ add .Values.base_timeout .Values.radar_upload_connect_backend._extra_timeout }}
     {{ if or .Values.radar_upload_postgresql._install .Values.cloudnative_postgresql._install }}
     needs:
+      - management-portal
     {{ if .Values.radar_upload_postgresql._install }}- radar-upload-postgresql{{ end }}
     {{ if .Values.cloudnative_postgresql._install }}- radar-cloudnative-postgresql{{ end }}
     {{ end }}
