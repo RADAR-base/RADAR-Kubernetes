@@ -30,3 +30,26 @@ radar_push_endpoint:
   disable_tls: true
 ccSchemaRegistryProxy:
   disable_tls: true
+radar_self_enrolment_ui:
+  disable_tls: true
+radar_kratos:
+  kratos:
+    dev: true
+    ingress:
+      public:
+        tls: []
+      admin:
+        tls: []
+radar_hydra:
+  hydra:
+    ingress:
+      public:
+        tls: []
+      admin:
+        tls: []
+    hydra:
+      dev: true
+      config:
+        urls:
+          self:
+            issuer: http://{{ .Values.server_name }}/hydra/
