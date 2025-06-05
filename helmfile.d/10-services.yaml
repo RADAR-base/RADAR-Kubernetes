@@ -429,7 +429,7 @@ releases:
       - {{ .Values.realtime_dashboard_timescaledb | toYaml | indent 8 | trim }}
 
   - name: radar-grafana
-    chart: radar/grafana
+    chart: radar/radar-grafana
     version: {{ .Values.radar_grafana._chart_version }}
     installed: {{ .Values.radar_grafana._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_grafana._extra_timeout }}
@@ -437,27 +437,16 @@ releases:
       - radar-jdbc-connector-grafana
     <<: *logFailedRelease
     values:
-      - "../etc/radar-grafana/values.yaml"
       - {{ .Values.radar_grafana | toYaml | indent 8 | trim }}
     set:
-      - name: adminPassword
+      - name: grafana.server_name
+        value: {{ .Values.server_name }}
+      - name: grafana.adminPassword
         value: {{ .Values.grafana_password }}
-      - name: ingress.hosts
-        values: ["dashboard.{{ .Values.server_name }}"]
-      - name: "grafana\\.ini.server.root_url"
-        value: "https://dashboard.{{ .Values.server_name }}/"
-      - name: ingress.tls[0].secretName
-        value: radar-base-tls-dashboard
-      - name: ingress.tls[0].hosts
-        values: ["dashboard.{{ .Values.server_name }}"]
-      - name: "grafana\\.ini.metrics.basic_auth_username"
-        value: {{ .Values.grafana_username }}
-      - name: "grafana\\.ini.metrics.basic_auth_password"
+      - name: "grafana.grafana\\.ini.metrics.basic_auth_username"
+        value: {{ .Values.grafana_metrics_endpoint_username }}
+      - name: "grafana.grafana\\.ini.metrics.basic_auth_password"
         value: {{ .Values.grafana_metrics_endpoint_password }}
-      - name: "grafana\\.ini.auth\\.generic_oauth.auth_url"
-        value: "https://{{ .Values.server_name }}/managementportal/oauth/authorize"
-      - name: "grafana\\.ini.auth\\.generic_oauth.token_url"
-        value: "https://{{ .Values.server_name }}/managementportal/oauth/token"
 
   - name: data-dashboard-backend
     chart: radar/data-dashboard-backend
