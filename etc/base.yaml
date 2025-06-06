@@ -198,7 +198,7 @@ cloudnative_postgresql:
 
 management_portal:
   _install: true
-  _chart_version: 1.5.0
+  _chart_version: 1.5.2
   _extra_timeout: 210
   replicaCount: 1  # should be 1
   managementportal:
@@ -216,7 +216,7 @@ management_portal:
 
 radar_kratos:
   _install: false
-  _chart_version: 0.43.1
+  _chart_version: 0.1.1
   _extra_timeout: 0
   kratos:
     kratos:
@@ -225,13 +225,13 @@ radar_kratos:
           from_address: radar@thehyve.nl
 
 radar_self_enrolment_ui:
-  _install: false
-  _chart_version: 0.2.3
+  _install: true
+  _chart_version: 0.3.0
   _extra_timeout: 0
 
 radar_hydra:
-  _install: false
-  _chart_version: 0.1.0
+  _install: true
+  _chart_version: 0.2.2
   _extra_timeout: 0
 
 app_config:
