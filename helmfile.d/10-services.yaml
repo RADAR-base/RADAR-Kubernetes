@@ -232,8 +232,6 @@ releases:
     values:
       - {{ .Values.management_portal | toYaml | indent 8 | trim }}
     set:
-      - name: ingress.hosts
-        values: [{{ .Values.server_name }}]
       - name: server_name
         value: {{ .Values.server_name }}
       - name: oauth_clients.radar_redcap_integrator.enable
@@ -260,9 +258,6 @@ releases:
         value: {{ .Values.radar_push_endpoint._install }}
       - name: oauth_clients.radar_data_dashboard_backend.enable
         value: {{ .Values.data_dashboard_backend._install }}
-      - name: oauth_clients.grafana_dashboard.redirect_uri
-        values:
-          - "https://dashboard.{{ .Values.server_name }}/login/generic_oauth"
 
   - name: app-config
     chart: radar/app-config
@@ -302,6 +297,11 @@ releases:
     version: {{ .Values.radar_kratos._chart_version }}
     installed: {{ .Values.radar_kratos._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_kratos._extra_timeout }}
+    {{ if or .Values.postgresql._install .Values.cloudnative_postgresql._install }}
+    needs:
+    {{ if .Values.postgresql._install }}- postgresql{{ end }}
+    {{ if .Values.cloudnative_postgresql._install }}- radar-cloudnative-postgresql{{ end }}
+    {{ end }}
     <<: *logFailedRelease
     values:
       - {{ .Values.radar_kratos | toYaml | indent 8 | trim }}
@@ -338,30 +338,6 @@ releases:
         value: {{ .Values.radar_hydra.secrets.system }}
       - name: hydra.hydra.secrets.cookie[0]
         value: {{ .Values.radar_hydra.secrets.cookie }}
-      # Remove properties below when this PR at upstream is merged and the helm chart is updated.
-      # PR: https://github.com/ory/k8s/pull/764
-      - name: hydra.ingress.public.hosts[0].host
-        value: {{ .Values.server_name }}
-      - name: hydra.ingress.public.hosts[0].paths[0].path
-        value: "/hydra/?(.*)"
-      - name: hydra.ingress.public.hosts[0].paths[0].pathType
-        value: ImplementationSpecific
-      - name: hydra.ingress.admin.tls[0].hosts
-        values: [{{ .Values.server_name }}]
-      - name: hydra.ingress.admin.tls[0].secretName
-        value: radar-base-tls
-      - name: hydra.ingress.admin.hosts[0].host
-        value: {{ .Values.server_name }}
-      - name: hydra.ingress.admin.hosts[0].paths[0].path
-        value: "/admin/hydra(/|$)(.*)"
-      - name: hydra.ingress.admin.hosts[0].paths[0].pathType
-        value: ImplementationSpecific
-      - name: hydra.ingress.public.tls[0].hosts
-        values: [{{ .Values.server_name }}]
-      - name: hydra.ingress.public.tls[0].secretName
-        value: radar-base-tls
-      - name: hydra.hydra.config.urls.self.issuer
-        value: https://{{ .Values.server_name }}/hydra/
 
   - name: radar-self-enrolment-ui
     chart: radar/radar-self-enrolment-ui
@@ -374,10 +350,6 @@ releases:
     set:
       - name: serverName
         value: {{ .Values.server_name }}
-      - name: kratosPublicUrl
-        value: https://{{ .Values.server_name }}/kratos
-      - name: kratosBrowserUrl
-        value: https://{{ .Values.server_name }}/kratos
 
   - name: radar-appserver-postgresql
     chart: radar/radar-postgresql
@@ -822,12 +794,10 @@ releases:
     version: {{ .Values.radar_upload_connect_backend._chart_version }}
     installed: {{ .Values.radar_upload_connect_backend._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_upload_connect_backend._extra_timeout }}
-    {{ if or .Values.radar_upload_postgresql._install .Values.cloudnative_postgresql._install }}
     needs:
       - management-portal
-    {{ if .Values.radar_upload_postgresql._install }}- radar-upload-postgresql{{ end }}
-    {{ if .Values.cloudnative_postgresql._install }}- radar-cloudnative-postgresql{{ end }}
-    {{ end }}
+      {{ if .Values.cloudnative_postgresql._install }}- radar-cloudnative-postgresql{{ end }}
+      {{ if .Values.radar_upload_postgresql._install }}- radar-upload-postgresql{{ end }}
     <<: *logFailedRelease
     values:
       - {{ .Values.radar_upload_connect_backend | toYaml | indent 8 | trim }}
