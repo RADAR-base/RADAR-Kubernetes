@@ -42,10 +42,10 @@ radar_home:
   monitoring:
     enabled: true # either logging or monitoring must be enabled or radar-home crashes
     url: http://grafana.localhost/login
-kratos:
+radar_kratos:
   kratos:
     advertised_protocol: http
-hydra:
+radar_hydra:
   hydra:
     advertised_protocol: http
 radar_jdbc_connector_data_dashboard_backend:
