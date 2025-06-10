@@ -12,6 +12,6 @@ parse_type==0.6.4
 pycparser==2.22
 pycryptodome==3.21.0
 PyYAML==6.0.2
-requests==2.32.3
+requests==2.32.4
 six==1.17.0
 typing_extensions==4.12.2
