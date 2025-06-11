@@ -183,6 +183,8 @@ management_portal:
   _chart_version: 1.4.0
   _extra_timeout: 210
   replicaCount: 1  # should be 1
+  image:
+    tag: feature-ory-based-authorization
   postgres:
     host: postgresql
     user: postgres
@@ -201,6 +203,8 @@ management_portal:
     from: noreply@example.com
     starttls: false
     auth: true
+  authserver:
+    server_admin_url: http://hydra-admin:4445
 
 kratos:
   _install: false
@@ -209,24 +213,23 @@ kratos:
   jdbc:
     database: kratos
   kratos:
-    courier:
-      smtp:
-        from_address: radar@thehyve.nl
-
-kratos_ui:
-  _install: false
-  _chart_version: 0.43.1
-  _extra_timeout: 0
+        config:
+            courier:
+                smtp:
+                    from_address: radar@thehyve.nl
 
 radar_self_enrolment_ui:
-  _install: false
-  _chart_version: 0.2.0
+  _install: true
+  _chart_version: 0.2.3
   _extra_timeout: 0
 
 hydra:
-  _install: false
+  _install: true
   _chart_version: 0.48.0
   _extra_timeout: 0
+  image:
+      # Remove when chart v0.52.1 is available
+      tag: v2.3.0
 
 app_config:
   _install: true
