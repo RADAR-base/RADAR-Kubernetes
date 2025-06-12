@@ -55,7 +55,7 @@ cert_manager:
   _chart_version: v1.14.5
   _extra_timeout: 0
   global:
-    # Needed for compatibility with K8S 1.25+
+    # Needed for compatibility with K8S 1.25
     podSecurityPolicy:
       enabled: false
       useAppArmor: false
@@ -192,7 +192,7 @@ cloudnative_postgresql:
   _extra_timeout: 0
   cluster:
     cluster:
-      instances: 2
+      instances: 1
       storage:
         size: 10Gi
 
@@ -402,7 +402,7 @@ radar_jdbc_connector_grafana:
     enabled: true
     cluster:
       cluster:
-        instances: 2
+        instances: 1
         initdb:
           database: grafana
           owner: grafana
@@ -419,7 +419,7 @@ radar_jdbc_connector_data_dashboard_backend:
     enabled: true
     cluster:
       cluster:
-        instances: 2
+        instances: 1
         initdb:
           database: data-dashboard
           owner: data-dashboard
@@ -436,7 +436,7 @@ radar_jdbc_connector_realtime_dashboard:
     enabled: true
     cluster:
       cluster:
-        instances: 2
+        instances: 1
         initdb:
           database: realtime-dashboard
           owner: realtime-dashboard
