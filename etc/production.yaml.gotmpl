@@ -1,0 +1,42 @@
+# Remove below Go comment to enable management_portal reading
+management_portal:
+  # read unencrypted keystore
+  keystore: {{ readFile "../etc/management-portal/keystore.p12" | b64enc | quote }}
+  # read encrypted keystore
+  # {{/* keystore: {{ exec "sops" (list "-d" "../secrets/management-portal/keystore.sops.p12") | b64enc | quote }}  */}}
+  #
+  # In case a certificate is needed to connect to PostgreSQL
+  # postgres:
+  #   ssl:
+  #    # With helmfile, this can be set in a production.yaml.gotmpl
+  #    # file by setting
+  #    {{/* keystore: {{ readFile "certificate.pem" | b64enc | quote }}  */}}
+
+radar_grafana:
+  grafana:
+    dashboards:
+      allprojects:
+        home:
+          json: {{ readFile "radar-grafana/dashboards/allprojects/home.json" | quote }}
+
+# If appserver is used, please remove the Go template comments and yaml comments.
+# Again, like with management_portal, if you want to store the credentials in a
+# less secure location, please encrypt the JSON file it and read it with sops,
+# for example.
+#{{/*
+#radar_appserver:
+#  google_application_credentials: {{ readFile "../etc/radar-appserver/firebase-adminsdk.json" | quote }}
+#*/}}
+
+# If data transformation of kafka topic data is needed, include the Go template comments and yaml comments below.
+# Make sure to reference a ksql transformation file that contains the required transformation logic.
+# The files below are transform the data from the questionnaire_response and questionnaire_app_events topics to the
+# ksql_observations topic, used by the data-dashboard-backend. If using the data-dashboard-backend, please make sure
+# to uncomment the relevant ksql transformer files.
+# Note: never remove the _base_observations_stream.sql file.
+ksql_server:
+ ksql:
+   queries: |
+     {{- readFile "../etc/cp-ksql-server/_base_observations_stream.sql"             | nindent 8 }}
+     {{- readFile "../etc/cp-ksql-server/questionnaire_response_observations.sql"   | nindent 8 }}
+     {{- readFile "../etc/cp-ksql-server/questionnaire_app_event_observations.sql"  | nindent 8 }}
