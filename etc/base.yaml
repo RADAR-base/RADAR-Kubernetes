@@ -229,6 +229,11 @@ kratos_ui:
   _chart_version: 0.43.1
   _extra_timeout: 0
 
+radar_hydra:
+  _install: false
+  _chart_version: 0.2.2
+  _extra_timeout: 0
+
 app_config:
   _install: true
   _chart_version: 1.5.0
@@ -377,7 +382,7 @@ realtime_dashboard_timescaledb:
 #- ksql_server._install to true
 radar_grafana:
   _install: false
-  _chart_version: 8.3.7
+  _chart_version: 0.1.1
   _extra_timeout: 0
   replicaCount: 1
 

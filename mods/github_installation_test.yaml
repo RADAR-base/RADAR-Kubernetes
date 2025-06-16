@@ -16,7 +16,7 @@ radar_kratos:
 kratos_ui:
   _install: false
 
-hydra:
+radar_hydra:
   _install: false
 
 postgresql:

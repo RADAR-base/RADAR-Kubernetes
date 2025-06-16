@@ -46,9 +46,3 @@ radar_hydra:
         tls: []
       admin:
         tls: []
-    hydra:
-      dev: true
-      config:
-        urls:
-          self:
-            issuer: http://{{ .Values.server_name }}/hydra/
