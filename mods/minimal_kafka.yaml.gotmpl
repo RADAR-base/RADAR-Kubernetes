@@ -24,5 +24,3 @@ ksql_server:
       {{- readFile "ksql-queries/questionnaire_app_event_observations.sql"  | nindent 8 }}
   configurationOverrides:
     "ksql.internal.topic.replicas": 1
-radar_jdbc_connector_data_dashboard_backend:
-  kafka: PLAINTEXT://cp-kafka:9092
