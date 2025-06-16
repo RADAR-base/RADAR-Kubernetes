@@ -10,13 +10,13 @@ ccSchemaRegistryProxy:
 nifi:
   _install: false
 
-kratos:
+radar_kratos:
   _install: false
 
-kratos_ui:
+radar_self_enrolment_ui:
   _install: false
 
-hydra:
+radar_hydra:
   _install: false
 
 postgresql:

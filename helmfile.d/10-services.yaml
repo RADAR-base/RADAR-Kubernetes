@@ -70,7 +70,7 @@ releases:
       - name: server_name
         value: {{ .Values.server_name }}
 
-  - name: nginx-ingress
+  - name: ingress-nginx
     chart: radar/ingress-nginx
     version: {{ .Values.nginx_ingress._chart_version }}
     installed: {{ .Values.nginx_ingress._install }}
@@ -313,11 +313,32 @@ releases:
       - name: serverName
         value: {{ .Values.server_name }}
 
-  - name: kratos
-    chart: radar/kratos
-    version: {{ .Values.kratos._chart_version }}
-    installed: {{ .Values.kratos._install }}
-    timeout: {{ add .Values.base_timeout .Values.kratos._extra_timeout }}
+  - name: radar-kratos
+    chart: radar/radar-kratos
+    version: {{ .Values.radar_kratos._chart_version }}
+    installed: {{ .Values.radar_kratos._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_kratos._extra_timeout }}
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.radar_kratos | toYaml | indent 8 | trim }}
+    set:
+      - name: kratos.server_name
+        value: {{ .Values.server_name }}
+      - name: kratos.kratos.config.courier.smtp.connection_uri
+        #  Note: encoding of "/" in password is necessary for the smtp connection_uri because kratos is not able to handle this.
+        value: smtp://{{ .Values.management_portal.smtp.username }}:{{ replace "/" "%2F" .Values.management_portal.smtp.password }}@{{ .Values.management_portal.smtp.host }}:{{ .Values | get "management_portal.smtp.port" 587 }}
+      - name: kratos.kratos.config.secrets.default[0]
+        value: {{ .Values.radar_kratos.secrets.default }}
+      - name: kratos.kratos.config.secrets.cookie[0]
+        value: {{ .Values.radar_kratos.secrets.cookie }}
+      - name: kratos.kratos.config.secrets.cipher[0]
+        value: {{ .Values.radar_kratos.secrets.cipher }}
+
+  - name: radar-hydra
+    chart: radar/radar-hydra
+    version: {{ .Values.radar_hydra._chart_version }}
+    installed: {{ .Values.radar_hydra._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_hydra._extra_timeout }}
     {{ if or .Values.postgresql._install .Values.cloudnative_postgresql._install }}
     needs:
     {{ if .Values.postgresql._install }}- postgresql{{ end }}
@@ -325,74 +346,26 @@ releases:
     {{ end }}
     <<: *logFailedRelease
     values:
-      - "../etc/kratos/values.yaml"
-      - {{ .Values.kratos | toYaml | indent 8 | trim }}
+      - {{ .Values.radar_hydra | toYaml | indent 8 | trim }}
     set:
-      - name: serverName
+      - name: hydra.server_name
         value: {{ .Values.server_name }}
-      - name: kratos.config.courier.smtp.connection_uri
-        #  Note: encoding of "/" in password is necessary for the smtp connection_uri because kratos is not able to handle this.
-        value: smtp://{{ .Values.management_portal.smtp.username }}:{{ replace "/" "%2F" .Values.management_portal.smtp.password }}@{{ .Values.management_portal.smtp.host }}:{{ .Values | get "management_portal.smtp.port" 587 }}
-      - name: kratos.config.serve.public.base_url
-        value: https://{{ .Values.server_name }}/kratos/
-      - name: kratos.config.serve.admin.base_url
-        value: https://{{ .Values.server_name }}/admin/kratos/
-      - name: kratos.config.serve.public.cors.allowed_origins
-        values:
-          - https://{{ .Values.server_name }}/kratos-ui/
-      - name: kratos.config.selfservice.default_browser_return_url
-        value: https://{{ .Values.server_name }}/managementportal
-      - name: kratos.config.selfservice.allowed_return_urls
-        values:
-          - https://{{ .Values.server_name }}/
-          # FIXME: http://localhost/ is not a valid return URL for production
-          - http://{{ .Values.server_name }}/
-      - name: kratos.config.selfservice.flows.error.ui_url
-        value: https://{{ .Values.server_name }}/kratos-ui/error
-      - name: kratos.config.selfservice.flows.settings.ui_url
-        value: https://{{ .Values.server_name }}/kratos-ui/settings
-      - name: kratos.config.selfservice.flows.recovery.ui_url
-        value: https://{{ .Values.server_name }}/kratos-ui/recovery
-      - name: kratos.config.selfservice.flows.registration.ui_url
-        value: https://{{ .Values.server_name }}/kratos-ui/registration
-      - name: kratos.config.selfservice.flows.login.ui_url
-        value: https://{{ .Values.server_name }}/kratos-ui/login
-      - name: kratos.config.selfservice.flows.logout.after.default_browser_return_url
-        value: https://{{ .Values.server_name }}/kratos-ui/login
-      - name: kratos.config.selfservice.flows.verification.ui_url
-        value: https://{{ .Values.server_name }}/kratos-ui/verification
-      - name: kratos.config.selfservice.flows.verification.after.default_browser_return_url
-        value: https://{{ .Values.server_name }}/kratos-ui
-      - name: kratos.config.selfservice.flows.settings.ui_url
-        value: https://{{ .Values.server_name }}/kratos-ui/settings
-      - name: ingress.public.hosts[0].host
-        value: {{ .Values.server_name }}
-      - name: ingress.admin.tls[0].hosts
-        values:
-          - {{ .Values.server_name }}
-      - name: ingress.admin.hosts[0].host
-        value: {{ .Values.server_name }}
-      - name: ingress.public.tls[0].hosts
-        values:
-          - {{ .Values.server_name }}
+      - name: hydra.hydra.secrets.system[0]
+        value: {{ .Values.radar_hydra.secrets.system }}
+      - name: hydra.hydra.secrets.cookie[0]
+        value: {{ .Values.radar_hydra.secrets.cookie }}
 
-  - name: kratos-selfservice-ui-node
-    chart: radar/kratos-selfservice-ui-node
-    version: {{ .Values.kratos_ui._chart_version }}
-    installed: {{ .Values.kratos_ui._install }}
-    timeout: {{ add .Values.base_timeout .Values.kratos_ui._extra_timeout }}
+  - name: radar-self-enrolment-ui
+    chart: radar/radar-self-enrolment-ui
+    version: {{ .Values.radar_self_enrolment_ui._chart_version }}
+    installed: {{ .Values.radar_self_enrolment_ui._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_self_enrolment_ui._extra_timeout }}
     <<: *logFailedRelease
     values:
-      - "../etc/kratos_ui/values.yaml"
-      - {{ .Values.kratos_ui | toYaml | indent 8 | trim }}
+      - {{ .Values.radar_self_enrolment_ui | toYaml | indent 8 | trim }}
     set:
       - name: serverName
         value: {{ .Values.server_name }}
-      - name: ingress.hosts[0].host
-        value: {{ .Values.server_name }}
-      - name: ingress.tls[0].hosts
-        values:
-          - {{ .Values.server_name }}
       - name: kratosPublicUrl
         value: https://{{ .Values.server_name }}/kratos
       - name: kratosBrowserUrl
@@ -460,7 +433,7 @@ releases:
       - {{ .Values.realtime_dashboard_timescaledb | toYaml | indent 8 | trim }}
 
   - name: radar-grafana
-    chart: radar/grafana
+    chart: radar/radar-grafana
     version: {{ .Values.radar_grafana._chart_version }}
     installed: {{ .Values.radar_grafana._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_grafana._extra_timeout }}
@@ -468,27 +441,16 @@ releases:
       - radar-jdbc-connector-grafana
     <<: *logFailedRelease
     values:
-      - "../etc/radar-grafana/values.yaml"
       - {{ .Values.radar_grafana | toYaml | indent 8 | trim }}
     set:
-      - name: adminPassword
+      - name: grafana.server_name
+        value: {{ .Values.server_name }}
+      - name: grafana.adminPassword
         value: {{ .Values.grafana_password }}
-      - name: ingress.hosts
-        values: ["dashboard.{{ .Values.server_name }}"]
-      - name: "grafana\\.ini.server.root_url"
-        value: "https://dashboard.{{ .Values.server_name }}/"
-      - name: ingress.tls[0].secretName
-        value: radar-base-tls-dashboard
-      - name: ingress.tls[0].hosts
-        values: ["dashboard.{{ .Values.server_name }}"]
-      - name: "grafana\\.ini.metrics.basic_auth_username"
-        value: {{ .Values.grafana_username }}
-      - name: "grafana\\.ini.metrics.basic_auth_password"
+      - name: "grafana.grafana\\.ini.metrics.basic_auth_username"
+        value: {{ .Values.grafana_metrics_endpoint_username }}
+      - name: "grafana.grafana\\.ini.metrics.basic_auth_password"
         value: {{ .Values.grafana_metrics_endpoint_password }}
-      - name: "grafana\\.ini.auth\\.generic_oauth.auth_url"
-        value: "https://{{ .Values.server_name }}/managementportal/oauth/authorize"
-      - name: "grafana\\.ini.auth\\.generic_oauth.token_url"
-        value: "https://{{ .Values.server_name }}/managementportal/oauth/token"
 
   - name: data-dashboard-backend
     chart: radar/data-dashboard-backend
@@ -852,11 +814,10 @@ releases:
     version: {{ .Values.radar_upload_connect_backend._chart_version }}
     installed: {{ .Values.radar_upload_connect_backend._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_upload_connect_backend._extra_timeout }}
-    {{ if or .Values.radar_upload_postgresql._install .Values.cloudnative_postgresql._install }}
     needs:
-    {{ if .Values.radar_upload_postgresql._install }}- radar-upload-postgresql{{ end }}
-    {{ if .Values.cloudnative_postgresql._install }}- radar-cloudnative-postgresql{{ end }}
-    {{ end }}
+      - management-portal
+      {{ if .Values.radar_upload_postgresql._install }}- radar-upload-postgresql{{ end }}
+      {{ if .Values.cloudnative_postgresql._install }}- radar-cloudnative-postgresql{{ end }}
     <<: *logFailedRelease
     values:
       - {{ .Values.radar_upload_connect_backend | toYaml | indent 8 | trim }}

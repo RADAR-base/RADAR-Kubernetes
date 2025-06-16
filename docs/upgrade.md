@@ -1,33 +1,32 @@
 # Upgrade instructions
 
 <!-- TOC -->
-
 * [Upgrade instructions](#upgrade-instructions)
-    * [Upgrade to RADAR-Kubernetes version 1.3.0](#upgrade-to-radar-kubernetes-version-130)
-        * [Update `mods/migration/1.3.0.yaml` mods file](#update-modsmigration130yaml-mods-file)
-        * [Update `production.yaml` file](#update-productionyaml-file)
-        * [Update `secrets.yaml` file](#update-secretsyaml-file)
-        * [Database migration](#database-migration)
-            * [1. Disable services that write to the databases](#1-disable-services-that-write-to-the-databases)
-            * [2. Manual import of _upload-connector_ and/or
-              _app-server_ databases](#2-manual-import-of-_upload-connector_-andor-_app-server_-databases)
-                * [App-server database import](#app-server-database-import)
-                * [Upload-connector database import](#upload-connector-database-import)
-            * [3. Create users in the postgres database](#3-create-users-in-the-postgres-database)
-            * [4. Automated import databases](#4-automated-import-databases)
-                * [Update `environments.yaml` file](#update-environmentsyaml-file)
-            * [5. Re-enable services that write to the databases](#5-re-enable-services-that-write-to-the-databases)
-        * [Post-migration cleanup](#post-migration-cleanup)
-    * [Upgrade to RADAR-Kubernetes version 1.2.0](#upgrade-to-radar-kubernetes-version-120)
-        * [Update `production.yaml` file](#update-productionyaml-file-1)
-        * [Update `secrets.yaml` file](#update-secretsyaml-file-1)
-        * [MongoDB](#mongodb)
-    * [Upgrade to RADAR-Kubernetes version 1.1.x](#upgrade-to-radar-kubernetes-version-11x)
-    * [Upgrade to RADAR-Kubernetes version 1.0.0](#upgrade-to-radar-kubernetes-version-100)
-    * [Supporting tasks](#supporting-tasks)
-        * [Disable data ingestion](#disable-data-ingestion)
-        * [Disable database changes](#disable-database-changes)
-
+  * [Upgrade to RADAR-Kubernetes version 1.3.0](#upgrade-to-radar-kubernetes-version-130)
+    * [Update `mods/migration/1.3.0.yaml` mods file](#update-modsmigration130yaml-mods-file)
+    * [Update `production.yaml` file](#update-productionyaml-file)
+    * [Update `production.yaml.gotmpl` file](#update-productionyamlgotmpl-file)
+    * [Update `secrets.yaml` file](#update-secretsyaml-file)
+    * [Database migration](#database-migration)
+      * [1. Disable services that write to the databases](#1-disable-services-that-write-to-the-databases)
+      * [2. Manual import of _upload-connector_ and/or _app-server_ databases](#2-manual-import-of-_upload-connector_-andor-_app-server_-databases)
+        * [App-server database import](#app-server-database-import)
+        * [Upload-connector database import](#upload-connector-database-import)
+      * [3. Create users in the postgres database](#3-create-users-in-the-postgres-database)
+      * [4. Automated import of the Postgresql database](#4-automated-import-of-the-postgresql-database)
+        * [Update `environments.yaml` file](#update-environmentsyaml-file)
+      * [5. Manual import of Timescaledb databases](#5-manual-import-of-timescaledb-databases)
+      * [5. Re-enable services that write to the databases](#5-re-enable-services-that-write-to-the-databases)
+    * [Post-migration cleanup](#post-migration-cleanup)
+  * [Upgrade to RADAR-Kubernetes version 1.2.0](#upgrade-to-radar-kubernetes-version-120)
+    * [Update `production.yaml` file](#update-productionyaml-file-1)
+    * [Update `secrets.yaml` file](#update-secretsyaml-file-1)
+    * [MongoDB](#mongodb)
+  * [Upgrade to RADAR-Kubernetes version 1.1.x](#upgrade-to-radar-kubernetes-version-11x)
+  * [Upgrade to RADAR-Kubernetes version 1.0.0](#upgrade-to-radar-kubernetes-version-100)
+  * [Supporting tasks](#supporting-tasks)
+    * [Disable data ingestion](#disable-data-ingestion)
+    * [Disable database changes](#disable-database-changes)
 <!-- TOC -->
 
 Run the following instructions to upgrade an existing RADAR-Kubernetes cluster.
@@ -123,9 +122,49 @@ radar_jdbc_connector_realtime_dashboard:
 
 5. Duplicate entry `grafana_metrics_db_user` ane rename to `grafana_metrics_endpoint_user` (keep the same value).
 
+6. Rename `kratos:` to `radar_kratos:` and add a `kratos:` indent to the `radar_kratos:` section like so:
+
+```yaml
+radar_kratos:
+  ...
+  kratos: <- new indent
+    kratos:
+      courier:
+        ...
+```
+
+7. Rename `kratos_ui:` to `radar_self_enrolment_ui:`.
+
+
+### Update `production.yaml.gotmpl` file
+
+For the `radar_grafana:` section add a `grafana:` indent like so:
+
+```yaml
+radar_grafana:
+  grafana: <- new indent
+    dashboards:
+      ...
+```
+
+
 ### Update `secrets.yaml` file
 
-Duplicate secret `grafana_metrics_db_password` and rename to `grafana_metrics_endpoint_password` (keep the same value).
+1. Duplicate secret `grafana_metrics_db_password` and rename to `grafana_metrics_endpoint_password` (keep the same value).
+2. Add the following secrets and replace _secret_ with strong passwords:
+
+```yaml
+radar_kratos:
+  secrets:
+    default: secret
+    cookie: secret
+    cipher: secret (must be 32 characters long)
+
+radar_hydra:
+  secrets:
+    system: secret
+    cookie: secret
+```
 
 ### Database migration
 

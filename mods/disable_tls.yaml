@@ -30,3 +30,19 @@ radar_push_endpoint:
   disable_tls: true
 ccSchemaRegistryProxy:
   disable_tls: true
+radar_self_enrolment_ui:
+  disable_tls: true
+radar_kratos:
+  kratos:
+    ingress:
+      public:
+        tls: []
+      admin:
+        tls: []
+radar_hydra:
+  hydra:
+    ingress:
+      public:
+        tls: []
+      admin:
+        tls: []

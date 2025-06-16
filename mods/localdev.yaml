@@ -42,41 +42,12 @@ radar_home:
   monitoring:
     enabled: true # either logging or monitoring must be enabled or radar-home crashes
     url: http://grafana.localhost/login
-kratos:
-  config:
-    serve:
-      public:
-        base_url: http://localhost/kratos/
-        cors:
-          allowed_origins:
-            - http://localhost/kratos-ui/
-      admin:
-        base_url: http://localhost/admin/kratos/
-    selfservice:
-      default_browser_return_url: http://localhost/managementportal
-      allowed_return_urls:
-        - "http://localhost/"
-      flows:
-        error:
-          ui_url: http://localhost/kratos-ui/
-        recovery:
-          ui_url: http://localhost/kratos-ui/recovery
-        registration:
-          ui_url: http://localhost/kratos-ui/registration
-        login:
-          ui_url: http://localhost/kratos-ui/login
-        logout:
-          after:
-            default_browser_return_url: http://localhost/kratos-ui/login
-        verification:
-          ui_url: http://localhost/kratos-ui/verification
-          after:
-            default_browser_return_url: http://localhost/kratos-ui
-        settings:
-          ui_url: http://localhost/kratos-ui/settings
-kratos_ui:
-  kratosPublicUrl: http://localhost/kratos
-  kratosBrowserUrl: http://localhost/kratos
+radar_kratos:
+  kratos:
+    advertised_protocol: http
+radar_hydra:
+  hydra:
+    advertised_protocol: http
 radar_jdbc_connector_data_dashboard_backend:
   timescaledb:
     cluster:
@@ -95,3 +66,9 @@ radar_jdbc_connector_realtime_dashboard:
       cluster:
         monitoring:
           enabled: false
+
+radar_grafana:
+  grafana:
+    advertised_protocol: http
+radar_self_enrolment_ui:
+  advertised_protocol: http
