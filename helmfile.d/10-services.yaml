@@ -212,14 +212,36 @@ releases:
     values:
       - {{ .Values.postgresql | toYaml | indent 8 | trim }}
 
+  - name: cloudnativepg-operator
+    chart: radar/cloudnative-pg
+    version: {{ .Values.cloudnativepg_operator._chart_version }}
+    # Note: installed when any service that uses cnpg is installed.
+    installed: {{ or .Values.cloudnative_postgresql._install .Values.radar_jdbc_connector_grafana._install .Values.radar_jdbc_connector_data_dashboard_backend._install .Values.radar_jdbc_connector_realtime_dashboard._install }}
+    timeout: {{ add .Values.base_timeout .Values.cloudnativepg_operator._extra_timeout }}
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.cloudnativepg_operator | toYaml | indent 8 | trim }}
+
+  - name: radar-cloudnative-postgresql
+    chart: radar/radar-cloudnative-postgresql
+    version: {{ .Values.cloudnative_postgresql._chart_version }}
+    installed: {{ .Values.cloudnative_postgresql._install }}
+    timeout: {{ add .Values.base_timeout .Values.kube_prometheus_stack._extra_timeout }}
+    needs:
+      - cloudnativepg-operator
+    <<: *logFailedReleasePrometheus
+    values:
+      - {{ .Values.cloudnative_postgresql | toYaml | indent 8 | trim }}
+
   - name: management-portal
     chart: radar/management-portal
     version: {{ .Values.management_portal._chart_version }}
     installed: {{ .Values.management_portal._install }}
     timeout: {{ add .Values.base_timeout .Values.management_portal._extra_timeout }}
-    {{ if or .Values.postgresql._install .Values.catalog_server._install }}
+    {{ if or .Values.postgresql._install .Values.catalog_server._install .Values.cloudnative_postgresql._install }}
     needs:
       {{ if .Values.postgresql._install }}- postgresql{{ end }}
+      {{ if .Values.cloudnative_postgresql._install }}- radar-cloudnative-postgresql{{ end }}
       {{ if .Values.catalog_server._install }}- catalog-server{{ end }}
     {{ end }}
     <<: *logFailedRelease
@@ -263,7 +285,11 @@ releases:
     version: {{ .Values.app_config._chart_version }}
     installed: {{ .Values.app_config._install }}
     timeout: {{ add .Values.base_timeout .Values.app_config._extra_timeout }}
-    {{ if .Values.postgresql._install }}needs: [postgresql]{{ end }}
+    {{ if or .Values.postgresql._install .Values.cloudnative_postgresql._install }}
+    needs:
+    {{ if .Values.postgresql._install }}- postgresql{{ end }}
+    {{ if .Values.cloudnative_postgresql._install }}- radar-cloudnative-postgresql{{ end }}
+    {{ end }}
     <<: *logFailedRelease
     values:
       - {{ .Values.app_config | toYaml | indent 8 | trim }}
@@ -292,6 +318,11 @@ releases:
     version: {{ .Values.kratos._chart_version }}
     installed: {{ .Values.kratos._install }}
     timeout: {{ add .Values.base_timeout .Values.kratos._extra_timeout }}
+    {{ if or .Values.postgresql._install .Values.cloudnative_postgresql._install }}
+    needs:
+    {{ if .Values.postgresql._install }}- postgresql{{ end }}
+    {{ if .Values.cloudnative_postgresql._install }}- radar-cloudnative-postgresql{{ end }}
+    {{ end }}
     <<: *logFailedRelease
     values:
       - "../etc/kratos/values.yaml"
@@ -299,8 +330,6 @@ releases:
     set:
       - name: serverName
         value: {{ .Values.server_name }}
-      - name: kratos.config.dsn
-        value: postgres://{{ .Values.management_portal.postgres.user }}:{{ .Values.management_portal.postgres.password }}@{{ .Values.management_portal.postgres.host }}:{{ .Values.management_portal.postgres.port }}/{{ .Values | get "kratos.jdbc.database" "kratos" }}
       - name: kratos.config.courier.smtp.connection_uri
         #  Note: encoding of "/" in password is necessary for the smtp connection_uri because kratos is not able to handle this.
         value: smtp://{{ .Values.management_portal.smtp.username }}:{{ replace "/" "%2F" .Values.management_portal.smtp.password }}@{{ .Values.management_portal.smtp.host }}:{{ .Values | get "management_portal.smtp.port" 587 }}
@@ -310,7 +339,7 @@ releases:
         value: https://{{ .Values.server_name }}/admin/kratos/
       - name: kratos.config.serve.public.cors.allowed_origins
         values:
-        - https://{{ .Values.server_name }}/kratos-ui/
+          - https://{{ .Values.server_name }}/kratos-ui/
       - name: kratos.config.selfservice.default_browser_return_url
         value: https://{{ .Values.server_name }}/managementportal
       - name: kratos.config.selfservice.allowed_return_urls
@@ -383,8 +412,12 @@ releases:
     version: {{ .Values.radar_appserver._chart_version }}
     installed: {{ .Values.radar_appserver._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_appserver._extra_timeout }}
-    {{ if .Values.radar_appserver_postgresql._install }}needs: [radar-appserver-postgresql]{{ end }}
-    <<: *logFailedRelease    
+    {{ if or .Values.radar_appserver_postgresql._install .Values.cloudnative_postgresql._install }}
+    needs:
+    {{ if .Values.radar_appserver_postgresql._install }}- radar-appserver-postgresql{{ end }}
+    {{ if .Values.cloudnative_postgresql._install }}- radar-cloudnative-postgresql{{ end }}
+    {{ end }}
+    <<: *logFailedRelease
     values:
       - {{ .Values.radar_appserver | toYaml | indent 8 | trim }}
     set:
@@ -407,16 +440,6 @@ releases:
     <<: *logFailedRelease
     values:
       - {{ .Values.data_dashboard_timescaledb | toYaml | indent 8 | trim }}
-    set:
-      {{- if eq .Values.data_dashboard_db_username "postgres" }}
-      - name: postgresql.global.postgresql.auth.postgresPassword
-        value: {{ .Values.data_dashboard_db_password }}
-      {{- else }}
-      - name: postgresql.global.postgresql.auth.username
-        value: {{ .Values.data_dashboard_db_username }}
-      - name: postgresql.global.postgresql.auth.password
-        value: {{ .Values.data_dashboard_db_password }}
-      {{- end }}
 
   - name: grafana-metrics-timescaledb
     chart: radar/radar-timescaledb
@@ -426,16 +449,6 @@ releases:
     <<: *logFailedRelease
     values:
       - {{ .Values.grafana_metrics_timescaledb | toYaml | indent 8 | trim }}
-    set:
-      {{- if eq .Values.grafana_metrics_db_username "postgres" }}
-      - name: postgresql.global.postgresql.auth.postgresPassword
-        value: {{ .Values.grafana_metrics_db_password }}
-      {{- else }}
-      - name: postgresql.global.postgresql.auth.username
-        value: {{ .Values.grafana_metrics_db_username }}
-      - name: postgresql.global.postgresql.auth.password
-        value: {{ .Values.grafana_metrics_db_password }}
-      {{- end }}
 
   - name: realtime-dashboard-timescaledb
     chart: radar/radar-timescaledb
@@ -445,26 +458,14 @@ releases:
     <<: *logFailedRelease
     values:
       - {{ .Values.realtime_dashboard_timescaledb | toYaml | indent 8 | trim }}
-    set:
-      {{- if eq .Values.realtime_dashboard_db_username "postgres" }}
-      - name: postgresql.global.postgresql.auth.postgresPassword
-        value: {{ .Values.realtime_dashboard_db_password }}
-      {{- else }}
-      - name: postgresql.global.postgresql.auth.username
-        value: {{ .Values.realtime_dashboard_db_username }}
-      - name: postgresql.global.postgresql.auth.password
-        value: {{ .Values.realtime_dashboard_db_password }}
-      {{- end }}
 
   - name: radar-grafana
     chart: radar/grafana
     version: {{ .Values.radar_grafana._chart_version }}
     installed: {{ .Values.radar_grafana._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_grafana._extra_timeout }}
-    {{ if .Values.grafana_metrics_timescaledb._install }}
     needs:
-      - grafana-metrics-timescaledb
-    {{ end }}
+      - radar-jdbc-connector-grafana
     <<: *logFailedRelease
     values:
       - "../etc/radar-grafana/values.yaml"
@@ -472,10 +473,6 @@ releases:
     set:
       - name: adminPassword
         value: {{ .Values.grafana_password }}
-      - name: env.POSTGRES_DB
-        value: {{ .Values.grafana_metrics_timescaledb.postgresql.auth.database | quote }}
-      - name: envRenderSecret.POSTGRES_PASSWORD
-        value: {{ .Values.grafana_metrics_db_password }}
       - name: ingress.hosts
         values: ["dashboard.{{ .Values.server_name }}"]
       - name: "grafana\\.ini.server.root_url"
@@ -485,9 +482,9 @@ releases:
       - name: ingress.tls[0].hosts
         values: ["dashboard.{{ .Values.server_name }}"]
       - name: "grafana\\.ini.metrics.basic_auth_username"
-        value: {{ .Values.grafana_metrics_db_username }}
+        value: {{ .Values.grafana_username }}
       - name: "grafana\\.ini.metrics.basic_auth_password"
-        value: {{ .Values.grafana_metrics_db_password }}
+        value: {{ .Values.grafana_metrics_endpoint_password }}
       - name: "grafana\\.ini.auth\\.generic_oauth.auth_url"
         value: "https://{{ .Values.server_name }}/managementportal/oauth/authorize"
       - name: "grafana\\.ini.auth\\.generic_oauth.token_url"
@@ -498,10 +495,8 @@ releases:
     version: {{ .Values.data_dashboard_backend._chart_version }}
     installed: {{ .Values.data_dashboard_backend._install }}
     timeout: {{ add .Values.base_timeout .Values.data_dashboard_backend._extra_timeout }}
-    {{ if .Values.data_dashboard_timescaledb._install }}
     needs:
-      - data-dashboard-timescaledb
-    {{ end }}
+      - radar-jdbc-connector-data-dashboard
     <<: *logFailedRelease
     values:
       - {{ .Values.data_dashboard_backend | toYaml | indent 8 | trim }}
@@ -511,12 +506,6 @@ releases:
       - name: ingress.hosts
         values:
           - {{ .Values.server_name }}
-      - name: jdbc.user
-        value: {{ .Values.data_dashboard_db_username }}
-      - name: jdbc.password
-        value: {{ .Values.data_dashboard_db_password }}
-      - name: jdbc.url
-        value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://data-dashboard-timescaledb-postgresql-hl:5432/%s" .Values.data_dashboard_timescaledb.postgresql.auth.database) .Values.data_dashboard_backend }}
       - name: managementPortal.clientSecret
         value: {{ .Values.management_portal.oauth_clients.radar_data_dashboard_backend.client_secret }}
 
@@ -539,48 +528,34 @@ releases:
     installed: {{ .Values.radar_jdbc_connector_grafana._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_jdbc_connector_grafana._extra_timeout }}
     needs:
-      # When catalog server is 'ready', kafka can be used.
-      - catalog-server
-      {{ if .Values.grafana_metrics_timescaledb._install }}
-      - grafana-metrics-timescaledb
-      {{ end }}
+      - cp-kafka
+      {{ if index .Values "radar_jdbc_connector_grafana" "timescaledb" "enabled" }}- cloudnativepg-operator{{ end }}
     <<: *logFailedRelease
     values:
       - {{ .Values.radar_jdbc_connector_grafana | toYaml | indent 8 | trim }}
     set:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
-      - name: jdbc.user
-        value: {{ .Values.grafana_metrics_db_username }}
-      - name: jdbc.password
-        value: {{ .Values.grafana_metrics_db_password }}
-      - name: jdbc.url
-        value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://grafana-metrics-timescaledb-postgresql-hl:5432/%s" .Values.grafana_metrics_timescaledb.postgresql.auth.database) .Values.radar_jdbc_connector_realtime_dashboard }}
+      - name: timescaledb.cluster.fullnameOverride
+        value: grafana-timescaledb
 
-  - name: radar-jdbc-connector-data-dashboard-backend
+  - name: radar-jdbc-connector-data-dashboard
     chart: radar/radar-jdbc-connector
     version: {{ .Values.radar_jdbc_connector_data_dashboard_backend._chart_version }}
     installed: {{ .Values.radar_jdbc_connector_data_dashboard_backend._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_jdbc_connector_data_dashboard_backend._extra_timeout }}
     needs:
-      # When catalog server is 'ready', kafka can be used.
-      - catalog-server
-      {{ if .Values.data_dashboard_timescaledb._install }}
-      - data-dashboard-timescaledb
-      {{ end }}
+      - cp-kafka
+      {{ if index .Values "radar_jdbc_connector_data_dashboard_backend" "timescaledb" "enabled" }}- cloudnativepg-operator{{ end }}
     <<: *logFailedRelease
     values:
-      - "../etc/radar-jdbc-connector-data-dashboard-backend/values.yaml"
+      - "../etc/radar-jdbc-connector-data-dashboard/values.yaml"
       - {{ .Values.radar_jdbc_connector_data_dashboard_backend | toYaml | indent 8 | trim }}
     set:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
-      - name: jdbc.user
-        value: {{ .Values.data_dashboard_db_username }}
-      - name: jdbc.password
-        value: {{ .Values.data_dashboard_db_password }}
-      - name: jdbc.url
-        value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://data-dashboard-timescaledb-postgresql-hl:5432/%s" .Values.data_dashboard_timescaledb.postgresql.auth.database) .Values.radar_jdbc_connector_data_dashboard_backend }}
+      - name: timescaledb.cluster.fullnameOverride
+        value: data-dashboard-timescaledb
 
   - name: radar-jdbc-connector-realtime-dashboard
     chart: radar/radar-jdbc-connector
@@ -588,11 +563,8 @@ releases:
     installed: {{ .Values.radar_jdbc_connector_realtime_dashboard._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_jdbc_connector_realtime_dashboard._extra_timeout }}
     needs:
-      # When catalog server is 'ready', kafka can be used.
-      - catalog-server
-      {{ if .Values.realtime_dashboard_timescaledb._install }}
-      - realtime-dashboard-timescaledb
-      {{ end }}
+      - cp-kafka
+      {{ if index .Values "radar_jdbc_connector_realtime_dashboard" "timescaledb" "enabled" }}- cloudnativepg-operator{{ end }}
     <<: *logFailedRelease
     values:
       - "../etc/radar-jdbc-connector-realtime-dashboard/values.yaml"
@@ -600,12 +572,8 @@ releases:
     set:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
-      - name: jdbc.user
-        value: {{ .Values.realtime_dashboard_db_username }}
-      - name: jdbc.password
-        value: {{ .Values.realtime_dashboard_db_password }}
-      - name: jdbc.url
-        value: {{ dig "jdbc" "url" (printf "jdbc:postgresql://realtime-dashboard-timescaledb-postgresql-hl:5432/%s" .Values.realtime_dashboard_timescaledb.postgresql.auth.database) .Values.radar_jdbc_connector_realtime_dashboard }}
+      - name: timescaledb.cluster.fullnameOverride
+        value: realtime-dashboard-timescaledb
 
   - name: radar-fitbit-connector
     chart: radar/radar-fitbit-connector
@@ -613,8 +581,7 @@ releases:
     installed: {{ .Values.radar_fitbit_connector._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_fitbit_connector._extra_timeout }}
     needs:
-      # When catalog server is 'ready', kafka can be used.
-      - catalog-server
+      - cp-kafka
       - radar-rest-sources-backend
       - management-portal
     <<: *logFailedRelease
@@ -653,8 +620,12 @@ releases:
     version: {{ .Values.radar_rest_sources_backend._chart_version }}
     installed: {{ .Values.radar_rest_sources_backend._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_rest_sources_backend._extra_timeout }}
-    {{ if .Values.postgresql._install }}needs: [postgresql]{{ end }}
-    <<: *logFailedRelease    
+    {{ if or .Values.postgresql._install .Values.cloudnative_postgresql._install }}
+    needs:
+    {{ if .Values.postgresql._install }}- postgresql{{ end }}
+    {{ if .Values.cloudnative_postgresql._install }}- radar-cloudnative-postgresql{{ end }}
+    {{ end }}
+    <<: *logFailedRelease
     values:
       - {{ .Values.radar_rest_sources_backend | toYaml | indent 8 | trim }}
     set:
@@ -712,7 +683,7 @@ releases:
     installed: {{ .Values.radar_gateway._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_gateway._extra_timeout }}
     {{ if .Values.cp_schema_registry._install }}needs: [cp-schema-registry]{{ end }}
-    <<: *logFailedRelease    
+    <<: *logFailedRelease
     values:
       - {{ .Values.radar_gateway | toYaml | indent 8 | trim }}
       - {{ .Values.confluent_cloud | toYaml | indent 8 | trim }}
@@ -753,7 +724,7 @@ releases:
     needs:
       # When catalog server is 'ready', kafka can be used.
       - catalog-server
-    <<: *logFailedRelease    
+    <<: *logFailedRelease
     values:
       - "../etc/radar-backend-stream/values.yaml"
       - {{ .Values.radar_backend_stream | toYaml | indent 8 | trim }}
@@ -766,7 +737,7 @@ releases:
     version: {{ .Values.radar_integration._chart_version }}
     installed: {{ .Values.radar_integration._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_integration._extra_timeout }}
-    <<: *logFailedRelease    
+    <<: *logFailedRelease
     values:
       - {{ .Values.radar_integration | toYaml | indent 8 | trim }}
     set:
@@ -875,23 +846,18 @@ releases:
     <<: *logFailedRelease
     values:
       - {{ .Values.radar_upload_postgresql | toYaml | indent 8 | trim }}
-    set:
-      - name: postgresql.global.postgresql.auth.postgresPassword
-        value: {{ .Values.radar_upload_postgres_password }}
-      - name: postgresql.auth.replicationPassword
-        value: {{ .Values.radar_upload_postgres_password }}
 
   - name: radar-upload-connect-backend
     chart: radar/radar-upload-connect-backend
     version: {{ .Values.radar_upload_connect_backend._chart_version }}
     installed: {{ .Values.radar_upload_connect_backend._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_upload_connect_backend._extra_timeout }}
-    <<: *logFailedRelease
-    {{ if .Values.management_portal._install }}
+    {{ if or .Values.radar_upload_postgresql._install .Values.cloudnative_postgresql._install }}
     needs:
-      - management-portal
-      {{ if .Values.radar_upload_postgresql._install }}- radar-upload-postgresql{{ end }}
+    {{ if .Values.radar_upload_postgresql._install }}- radar-upload-postgresql{{ end }}
+    {{ if .Values.cloudnative_postgresql._install }}- radar-cloudnative-postgresql{{ end }}
     {{ end }}
+    <<: *logFailedRelease
     values:
       - {{ .Values.radar_upload_connect_backend | toYaml | indent 8 | trim }}
     set:
@@ -899,8 +865,6 @@ releases:
         values: [{{ .Values.server_name }}]
       - name: serverName
         value: {{ .Values.server_name }}
-      - name: postgres.password
-        value: {{ .Values.radar_upload_postgres_password }}
       - name: client_secret
         value: {{ dig "client_secret" (dig "oauth_clients" "radar_upload_backend" "client_secret" "" .Values.management_portal) .Values.radar_upload_connect_backend }}
 
@@ -945,7 +909,7 @@ releases:
     version: {{ .Values.ccSchemaRegistryProxy._chart_version }}
     installed: {{ .Values.ccSchemaRegistryProxy._install }}
     timeout: {{ add .Values.base_timeout .Values.ccSchemaRegistryProxy._extra_timeout }}
-    <<: *logFailedRelease    
+    <<: *logFailedRelease
     values:
       - {{ .Values.ccSchemaRegistryProxy | toYaml | indent 8 | trim }}
       - {{ .Values.confluent_cloud| toYaml | indent 8 | trim }}
@@ -962,7 +926,7 @@ releases:
     timeout: {{ add .Values.base_timeout .Values.radar_push_endpoint._extra_timeout }}
     needs:
       - management-portal
-    <<: *logFailedRelease    
+    <<: *logFailedRelease
     values:
       - {{ .Values.radar_push_endpoint | toYaml | indent 8 | trim }}
       - {{ .Values.confluent_cloud | toYaml | indent 8 | trim }}

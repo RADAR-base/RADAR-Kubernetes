@@ -1,0 +1,47 @@
+cloudnative_postgresql:
+  cluster:
+    mode: recovery
+    recovery:
+      method: import
+      import:
+        type: monolith
+        databases:
+          # Remove any database that is not needed.
+          - managementportal
+          - appconfig
+          - appserver
+          - kratos
+          - restsourceauthorizer
+          - uploadconnector
+        source:
+          host: postgresql
+          username: postgres
+          database: postgres
+          sslMode: prefer
+          passwordSecret:
+            create: false
+            name: postgresql
+            key: postgres-password
+
+# From v1.2.1 to v1.3.0 data dashboard backend can be mirated automatically (as
+# opposed to the other timescaledb services; see upgrade.md) because somehow the
+# Timescaledb extension was not installed for data dashboard backend Timescaledb.
+radar_jdbc_connector_data_dashboard_backend:
+  timescaledb:
+    cluster:
+      mode: recovery
+      recovery:
+        method: import
+        import:
+          type: microservice
+          databases:
+            - data-dashboard
+          source:
+            host: data-dashboard-timescaledb-postgresql
+            username: postgres
+            database: postgres
+            sslMode: prefer
+            passwordSecret:
+              create: false
+              name: data-dashboard-timescaledb-postgresql
+              key: postgres-password

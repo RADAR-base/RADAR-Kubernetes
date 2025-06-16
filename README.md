@@ -330,6 +330,7 @@ Now you can head over to the [Management Portal](https://radar-base.atlassian.ne
 
 ## Service-specific documentation
 
+- [Configuration of external PostgreSQL and TimescaleDB databases](docs/external_postgresql_databases.md)
 - [Data Dashboard Backend data transformation](docs/ksql-server_for_data-dashboard-backend.md)
 
 ## Troubleshooting

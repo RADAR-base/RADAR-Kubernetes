@@ -1,5 +1,5 @@
 atomicInstall: false
-base_timeout: 360
+base_timeout: 420
 
 confluent_cloud:
   enabled: false
@@ -17,4 +17,22 @@ kratos_ui:
   _install: false
 
 hydra:
+  _install: false
+
+postgresql:
+  _install: false
+
+realtime_dashboard_timescaledb:
+  _install: false
+
+grafana_metrics_timescaledb:
+  _install: false
+
+data_dashboard_timescaledb:
+  _install: false
+
+radar_backend_monitor:
+  _install: false
+
+radar_backend_stream:
   _install: false
