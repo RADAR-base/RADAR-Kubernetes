@@ -4,7 +4,7 @@
 kafka:
     bootstrapServers: radar-kafka-brokers:9094
 cp-schema-registry:
-    url: http://confluent-schema-registry:8081
+    url: http://radar-schema-registry:8081
 secret:
     jaas:
         name: shared-service-user
