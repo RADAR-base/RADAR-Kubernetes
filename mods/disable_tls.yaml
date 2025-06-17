@@ -2,6 +2,8 @@ nginx_ingress:
   controller:
     config:
       ssl-redirect: "false"
+radar_kafka_stack:
+  disable_tls: true
 radar_home:
   disable_tls: true
 app_config:
