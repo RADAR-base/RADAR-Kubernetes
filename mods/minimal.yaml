@@ -17,6 +17,11 @@ radar_jdbc_connector_realtime_dashboard:
     cluster:
       cluster:
         instances: 1
+radar_kafka_stack:
+  kafka:
+    extraEnvs:
+      - name: KAFKA_HEAP_OPTS
+        value: "-Xms128m -Xmx512m"
 radar_gateway:
   hpa:
     enabled: false
@@ -24,14 +29,6 @@ radar_s3_connector:
   kafkaHeapOpts: "-Xms128m -Xmx256m"
 radar_output:
   javaOpts: "-Xms128m -Xmx128m"
-cp_kafka:
-  heapOptions: "-Xms128M -Xmx512M"
-  persistence:
-    size: 1Gi
-cp_zookeeper:
-  heapOptions: "-Xms128M -Xmx128M"
-cp_schema_registry:
-  heapOptions: "-Xms128M -Xmx128M"
 minio:
   # Turn off distributed mode for minio
   mode: standalone
