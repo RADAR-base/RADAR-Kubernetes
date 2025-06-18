@@ -154,6 +154,10 @@ releases:
         value: {{ .Values.kafka_num_topic_replicas }}
       - name: kafka.partitions
         value: {{ .Values.kafka_num_topic_partitions }}
+      - name: schema_registry.topic.replicationFactor
+        value: {{ .Values.kafka_num_topic_replicas }}
+      - name: schema_registry.topic.partitions
+        value: {{ .Values.kafka_num_topic_partitions }}
       - name: dev_deployment
         value: {{ .Values.dev_deployment | default false }}
 
