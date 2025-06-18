@@ -10,9 +10,11 @@ server_name: example.com
 maintainer_email: MAINTAINER_EMAIL@example.com
 # Number of Kafka pods that will be installed
 kafka_num_brokers: 3
-# Number of replicas for Kafka topics
+# Number of replicas for Kafka topics. Should be min 2, max 4, and is normally 3, but can not be larger than kafka_num_brokers.
+# Ref: https://learn.conduktor.io/kafka/kafka-topics-choosing-the-replication-factor-and-partitions-count/
 kafka_num_topic_replicas: 3
-# Number of partitions for Kafka topics
+# Number of partitions for Kafka topics. Rule of thumb: 3 times the number of brokers. Headroom is used for future upscale
+# of brokers. Ref: https://learn.conduktor.io/kafka/kafka-topics-choosing-the-replication-factor-and-partitions-count/
 kafka_num_topic_partitions: 9
 # Enable logging and monitoring
 enable_logging_monitoring: false
