@@ -136,7 +136,7 @@ cp_zookeeper:
   servers: 3
 
 cp_kafka:
-  _install: true
+  _install: false
   _chart_version: 0.3.6
   _extra_timeout: 510
   customEnv:
