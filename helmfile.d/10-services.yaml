@@ -676,7 +676,11 @@ releases:
     version: {{ .Values.radar_gateway._chart_version }}
     installed: {{ .Values.radar_gateway._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_gateway._extra_timeout }}
-    {{ if .Values.cp_schema_registry._install }}needs: [cp-schema-registry]{{ end }}
+    {{ if or .Values.cp_schema_registry._install .Values.radar_kafka_stack._install }}
+    needs:
+      {{ if .Values.cp_schema_registry._install }}- cp-schema-registry{{ end }}
+      {{ if .Values.radar_kafka_stack._install }}- radar-kafka{{ end }}
+    {{ end }}
     <<: *logFailedRelease
     values:
       - {{ .Values.radar_gateway | toYaml | indent 8 | trim }}
