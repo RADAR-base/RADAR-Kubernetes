@@ -890,7 +890,6 @@ releases:
       - radar-upload-connect-backend
       {{ if .Values.cp_schema_registry._install }}- cp-schema-registry{{ end }}
       {{ if .Values.radar_kafka_stack._install }}- radar-kafka{{ end }}
-    {{ end }}
     values:
       - {{ .Values.radar_upload_source_connector | toYaml | indent 8 | trim }}
     set:
