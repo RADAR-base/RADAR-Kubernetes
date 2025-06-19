@@ -165,7 +165,6 @@ catalog_server:
   _chart_version: 0.7.1
   _extra_timeout: 90
   replicaCount: 1
-  schema_registry: http://radar-schema-registry:8081
 
 radar_home:
   _install: true
