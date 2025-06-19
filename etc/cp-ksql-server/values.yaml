@@ -2,9 +2,9 @@
 ## ref: https://docs.confluent.io/current/ksql/docs/installation/server-config/config-reference.html
 ## ref: https://docs.confluent.io/platform/current/ksqldb/operate-and-deploy/installation/security.html#configure-kafka-authentication
 kafka:
-    bootstrapServers: radar-kafka-brokers:9094
+    bootstrapServers: radar-kafka-kafka-brokers:9094
 cp-schema-registry:
-    url: http://radar-schema-registry:8081
+    url: http://radar-kafka-schema-registry:8081
 secret:
     jaas:
         name: shared-service-user
