@@ -74,7 +74,7 @@ cert_manager:
 # kubectl --context <my-context> apply --force-conflicts --server-side -f etc/kube-prometheus-stack/files/crds.yaml
 kube_prometheus_stack:
   _install: true
-  _chart_version: 0.4.6
+  _chart_version: 0.5.0
   _extra_timeout: 0
   kube-prometheus-stack:
     prometheus:
@@ -121,7 +121,7 @@ nginx_ingress:
 # Use letsencrypt to retrieve SSL certificates.
 cert_manager_letsencrypt:
   _install: true
-  _chart_version: 0.2.0
+  _chart_version: 0.2.1
   _extra_timeout: 0
 
 # Use confluent cloud instead of a local Kafka cluster.
@@ -131,7 +131,7 @@ confluent_cloud:
 
 cp_zookeeper:
   _install: false
-  _chart_version: 0.3.4
+  _chart_version: 0.3.5
   _extra_timeout: 510
   servers: 3
 
@@ -151,7 +151,7 @@ cp_kafka:
 
 cp_schema_registry:
   _install: false
-  _chart_version: 0.3.2
+  _chart_version: 0.3.3
   _extra_timeout: 90
   replicaCount: 1
 
@@ -162,13 +162,13 @@ radar_kafka_stack:
 
 catalog_server:
   _install: true
-  _chart_version: 0.7.1
+  _chart_version: 0.9.0
   _extra_timeout: 90
   replicaCount: 1
 
 radar_home:
   _install: true
-  _chart_version: 0.4.2
+  _chart_version: 0.5.0
   _extra_timeout: 0
 
 # --------------------------------------------------------- 10-managementportal.yaml ---------------------------------------------------------
@@ -177,7 +177,7 @@ radar_home:
 # DEPRECATED: Use cloudnative_postgresql instead
 postgresql:
   _install: false
-  _chart_version: 0.1.2
+  _chart_version: 0.1.3
   _extra_timeout: 0
   postgresql:
     replication:
@@ -198,7 +198,7 @@ cloudnativepg_operator:
 
 cloudnative_postgresql:
   _install: true
-  _chart_version: 0.2.2
+  _chart_version: 0.3.0
   _extra_timeout: 0
   cluster:
     cluster:
@@ -208,7 +208,7 @@ cloudnative_postgresql:
 
 management_portal:
   _install: true
-  _chart_version: 1.5.0
+  _chart_version: 1.6.0
   _extra_timeout: 210
   replicaCount: 1  # should be 1
   managementportal:
@@ -246,13 +246,13 @@ radar_hydra:
 
 app_config:
   _install: true
-  _chart_version: 1.5.0
+  _chart_version: 1.6.0
   _extra_timeout: 0
   replicaCount: 1
 
 app_config_frontend:
   _install: true
-  _chart_version: 2.2.1
+  _chart_version: 2.3.0
   _extra_timeout: 0
   replicaCount: 1
 
@@ -260,7 +260,7 @@ app_config_frontend:
 # radar-appserver only need to be installed if you have a custom aRMT app.
 radar_appserver_postgresql:
   _install: false
-  _chart_version: 0.1.2
+  _chart_version: 0.1.3
   _extra_timeout: 0
   postgresql:
     auth:
@@ -276,7 +276,7 @@ radar_appserver_postgresql:
 
 radar_appserver:
   _install: false
-  _chart_version: 0.9.0
+  _chart_version: 0.10.0
   _extra_timeout: 0
   replicaCount: 1
   managementportal_resource_name: res_AppServer
@@ -295,14 +295,14 @@ radar_appserver:
 # The charts in 20-fitbit.yaml only need to be installed if you will use a Fitbit, Garmin, or Oura API integration.
 radar_fitbit_connector:
   _install: false
-  _chart_version: 0.7.2
+  _chart_version: 0.9.1
   _extra_timeout: 0
   replicaCount: 1
   oauthClientId: radar_fitbit_connector
 
 radar_oura_connector:
   _install: false
-  _chart_version: 0.2.2
+  _chart_version: 0.4.1
   _extra_timeout: 0
   replicaCount: 1
   oauthClientId: radar_oura_connector
@@ -336,7 +336,7 @@ grafana_metrics_endpoint_username: grafana-metrics
 # DEPRECATED: timescaledb instance is created automatically with the radar-jdbc-connector for data dashboard backend
 data_dashboard_timescaledb:
   _install: false
-  _chart_version: 0.1.1
+  _chart_version: 0.1.4
   _extra_timeout: 210
   replicaCount: 1
   postgresql:
@@ -354,7 +354,7 @@ data_dashboard_timescaledb:
 # DEPRECATED: timescaledb instance is created automatically with the radar-jdbc-connector for grafana metrics
 grafana_metrics_timescaledb:
   _install: false
-  _chart_version: 0.1.1
+  _chart_version: 0.1.4
   _extra_timeout: 210
   replicaCount: 1
   postgresql:
@@ -372,7 +372,7 @@ grafana_metrics_timescaledb:
 # DEPRECATED: timescaledb instance is created automatically with the radar-jdbc-connector for realtime dashboard
 realtime_dashboard_timescaledb:
   _install: false
-  _chart_version: 0.1.1
+  _chart_version: 0.1.4
   _extra_timeout: 210
   replicaCount: 1
   postgresql:
@@ -401,14 +401,14 @@ radar_grafana:
 #- ksql_server._install to true
 data_dashboard_backend:
   _install: false
-  _chart_version: 0.5.0
+  _chart_version: 0.6.0
   _extra_timeout: 0
   replicaCount: 1
 
 # Install when radar_grafana._install is 'true'
 radar_jdbc_connector_grafana:
   _install: false
-  _chart_version: 0.9.1
+  _chart_version: 0.10.0
   _extra_timeout: 0
   replicaCount: 1
   sink:
@@ -428,7 +428,7 @@ radar_jdbc_connector_grafana:
 # Install when data_dashboard_backend._install is 'true'.
 radar_jdbc_connector_data_dashboard_backend:
   _install: false
-  _chart_version: 0.9.1
+  _chart_version: 0.10.0
   _extra_timeout: 0
   replicaCount: 1
   timescaledb:
@@ -445,7 +445,7 @@ radar_jdbc_connector_data_dashboard_backend:
 # Install when using realtime analysis
 radar_jdbc_connector_realtime_dashboard:
   _install: false
-  _chart_version: 0.9.1
+  _chart_version: 0.10.0
   _extra_timeout: 0
   replicaCount: 1
   timescaledb:
@@ -465,7 +465,7 @@ radar_jdbc_connector_realtime_dashboard:
 #- using realtime analysis
 ksql_server:
   _install: false
-  _chart_version: 0.3.4
+  _chart_version: 0.4.1
   _extra_timeout: 0
   # -- Uncomment when using real-time analysis
   # ksql:
@@ -476,7 +476,7 @@ ksql_server:
 
 radar_gateway:
   _install: true
-  _chart_version: 1.4.4
+  _chart_version: 1.7.0
   _extra_timeout: 0
   replicaCount: 1
 
@@ -484,7 +484,7 @@ radar_gateway:
 
 radar_backend_monitor:
   _install: false
-  _chart_version: 0.4.0
+  _chart_version: 0.5.0
   _extra_timeout: 0
   replicaCount: 1
   smtp:
@@ -496,7 +496,7 @@ radar_backend_monitor:
 
 radar_backend_stream:
   _install: false
-  _chart_version: 0.4.0
+  _chart_version: 0.5.0
   _extra_timeout: 0
   replicaCount: 1
 
@@ -504,7 +504,7 @@ radar_backend_stream:
 
 radar_integration:
   _install: false
-  _chart_version: 0.8.1
+  _chart_version: 0.9.0
   _extra_timeout: 0
   replicaCount: 1
   oauth_client_id: radar_redcap_integrator
@@ -544,7 +544,7 @@ minio:
 radar_s3_connector:
   # set to true if radar-s3-connector should be installed
   _install: true
-  _chart_version: 0.5.2
+  _chart_version: 0.7.0
   _extra_timeout: 90
   replicaCount: 1
   # The bucket name where intermediate data for cold storage should be written to.
@@ -553,7 +553,7 @@ radar_s3_connector:
 
 s3_proxy:
   _install: false
-  _chart_version: 0.5.1
+  _chart_version: 0.6.0
   _extra_timeout: 0
   replicaCount: 1
   target:
@@ -561,7 +561,7 @@ s3_proxy:
 
 radar_output:
   _install: true
-  _chart_version: 1.2.1
+  _chart_version: 1.2.2
   _extra_timeout: 0
   replicaCount: 1
   source:
@@ -580,7 +580,7 @@ radar_output:
 
 radar_upload_postgresql:
   _install: true
-  _chart_version: 0.1.2
+  _chart_version: 0.1.3
   _extra_timeout: 0
   postgresql:
     auth:
@@ -596,19 +596,19 @@ radar_upload_postgresql:
 
 radar_upload_connect_backend:
   _install: false
-  _chart_version: 0.7.0
+  _chart_version: 0.8.0
   _extra_timeout: 0
   replicaCount: 1
 
 radar_upload_connect_frontend:
   _install: false
-  _chart_version: 0.6.1
+  _chart_version: 0.7.0
   _extra_timeout: 0
   replicaCount: 1
 
 radar_upload_source_connector:
   _install: false
-  _chart_version: 0.4.2
+  _chart_version: 0.6.0
   _extra_timeout: 60
   replicaCount: 1
   s3Endpoint: http://minio:9000/
@@ -617,7 +617,7 @@ radar_upload_source_connector:
 
 ccSchemaRegistryProxy:
   _install: false
-  _chart_version: 0.4.1
+  _chart_version: 0.4.2
   _extra_timeout: 0
   externalName: schema-registry-domain
 
@@ -625,7 +625,7 @@ ccSchemaRegistryProxy:
 
 radar_push_endpoint:
   _install: false
-  _chart_version: 0.4.2
+  _chart_version: 0.6.0
   _extra_timeout: 180
   replicaCount: 1
   adminProperties: {}
@@ -636,7 +636,7 @@ radar_push_endpoint:
 
 velero:
   _install: false
-  _chart_version: 0.4.1
+  _chart_version: 0.4.2
   _extra_timeout: 0
   objectStorageBackupReplicaCount: 1
   backup:
@@ -651,5 +651,5 @@ velero:
 
 radar_mockserver:
   _install: false
-  _chart_version: 0.1.0
+  _chart_version: 0.1.3
   _extra_timeout: 0
