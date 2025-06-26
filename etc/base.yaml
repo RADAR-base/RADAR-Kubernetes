@@ -10,6 +10,8 @@ server_name: example.com
 maintainer_email: MAINTAINER_EMAIL@example.com
 # Number of Kafka pods that will be installed
 kafka_num_brokers: 3
+# Number of replicas for Kafka topics
+kafka_num_topic_replicas: 3
 # Number of partitions for Kafka topics
 kafka_num_topic_partitions: 9
 # Enable logging and monitoring

@@ -150,6 +150,8 @@ releases:
     set:
       - name: kafka.replicas
         value: {{ .Values.kafka_num_brokers }}
+      - name: kafka.replicationFactor
+        value: {{ .Values.kafka_num_topic_replicas }}
       - name: kafka.partitions
         value: {{ .Values.kafka_num_topic_partitions }}
       - name: dev_deployment
@@ -172,6 +174,10 @@ releases:
     set:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
+      - name: kafka_num_replication
+        value: {{ .Values.kafka_num_topic_replicas }}
+      - name: kafka_num_partitions
+        value: {{ .Values.kafka_num_topic_partitions }}
       - name: cc.enabled
         value: {{ .Values.confluent_cloud.enabled }}
       {{- if .Values.confluent_cloud.enabled }}
@@ -559,7 +565,8 @@ releases:
     installed: {{ .Values.radar_fitbit_connector._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_fitbit_connector._extra_timeout }}
     needs:
-      - cp-kafka
+      - radar-kafka
+      - catalog-server
       - radar-rest-sources-backend
       - management-portal
     <<: *logFailedRelease
