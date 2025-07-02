@@ -1,12 +1,22 @@
 [
   {
-    "KUBECTL_VERSION": "v1.31.0",
-    "K3S_VERSION": "v1.31.2+k3s1",
+    "KUBECTL_VERSION": "v1.33.0",
+    "K3S_VERSION": "v1.33.2+k3s1",
     "runOnBranch": "always"
   },
   {
+    "KUBECTL_VERSION": "v1.32.0",
+    "K3S_VERSION": "v1.32.6+k3s1",
+    "runOnBranch": "main"
+  },
+  {
+    "KUBECTL_VERSION": "v1.31.0",
+    "K3S_VERSION": "v1.31.10+k3s1",
+    "runOnBranch": "main"
+  },
+  {
     "KUBECTL_VERSION": "v1.30.0",
-    "K3S_VERSION": "v1.30.6+k3s1",
+    "K3S_VERSION": "v1.30.14+k3s1",
     "runOnBranch": "main"
   }
 ]
