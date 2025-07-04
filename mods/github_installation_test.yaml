@@ -36,3 +36,12 @@ radar_backend_monitor:
 
 radar_backend_stream:
   _install: false
+
+cp_schema_registry:
+  _install: false
+
+cp_zookeeper:
+  _install: false
+
+cp_kafka:
+  _install: false
