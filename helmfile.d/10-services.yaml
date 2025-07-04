@@ -566,8 +566,9 @@ releases:
       - name: timescaledb.cluster.fullnameOverride
         value: realtime-dashboard-timescaledb
 
-  - name: radar-fitbit-connector
-    chart: radar/radar-fitbit-connector
+  - name: radar-fitbit-connector-strimzi
+#    chart: radar/radar-fitbit-connector
+    chart: ../../radar-helm-charts/charts/radar-fitbit-connector-strimzi
     version: {{ .Values.radar_fitbit_connector._chart_version }}
     installed: {{ .Values.radar_fitbit_connector._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_fitbit_connector._extra_timeout }}
@@ -798,6 +799,28 @@ releases:
       - name: bucketSecretKey
         value: {{ dig "bucketSecretKey" .Values.s3_secret_key .Values.radar_s3_connector }}
 
+  - name: radar-s3-connector-strimzi
+#    chart: radar/radar-s3-connector-strimzi
+    chart: ../../radar-helm-charts/charts/radar-s3-connector-strimzi
+    version: {{ .Values.radar_s3_connector_strimzi._chart_version }}
+    installed: {{ .Values.radar_s3_connector_strimzi._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_s3_connector_strimzi._extra_timeout }}
+    needs:
+      # When catalog server is 'ready', kafka can be used.
+      - catalog-server
+      {{ if .Values.minio._install }}- minio{{ end }}
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.radar_s3_connector_strimzi | toYaml | indent 8 | trim }}
+      - {{ .Values.confluent_cloud | toYaml | indent 8 | trim }}
+    set:
+      - name: cc.enabled
+        value: {{ .Values.confluent_cloud.enabled }}
+      - name: bucketAccessKey
+        value: {{ dig "bucketAccessKey" .Values.s3_access_key .Values.radar_s3_connector }}
+      - name: bucketSecretKey
+        value: {{ dig "bucketSecretKey" .Values.s3_secret_key .Values.radar_s3_connector }}
+
   - name: s3-proxy
     chart: radar/s3-proxy
     version: {{ .Values.s3_proxy._chart_version }}
@@ -819,7 +842,7 @@ releases:
     timeout: {{ add .Values.base_timeout .Values.radar_output._extra_timeout }}
     <<: *logFailedRelease
     needs:
-      - radar-s3-connector
+      - radar-s3-connector-strimzi
       {{ if .Values.redis._install }}- redis{{ end }}
       {{ if .Values.minio._install }}- minio{{ end }}
     values:
