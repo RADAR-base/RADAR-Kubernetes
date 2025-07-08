@@ -684,6 +684,13 @@ radar_upload_source_connector:
   replicaCount: 1
   s3Endpoint: http://minio:9000/
 
+radar_upload_connector_strimzi:
+  _install: false
+  _chart_version: 0.0.1
+  _extra_timeout: 60
+  replicaCount: 1
+  s3Endpoint: http://minio:9000/
+
 # --------------------------------------------------------- 30-confluent-cloud.yaml ---------------------------------------------------------
 
 ccSchemaRegistryProxy:

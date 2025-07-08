@@ -982,6 +982,29 @@ releases:
       - name: client_secret
         value: {{ dig "client_secret" (dig "oauth_clients" "radar_upload_connect" "client_secret" "" .Values.management_portal) .Values.radar_upload_source_connector }}
 
+  - name: radar-upload-connector-strimzi
+#    chart: radar/radar-upload-source-connector
+    chart: ../../radar-helm-charts/charts/radar-upload-connector-strimzi
+    version: {{ .Values.radar_upload_connector_strimzi._chart_version }}
+    installed: {{ .Values.radar_upload_connector_strimzi._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_upload_connector_strimzi._extra_timeout }}
+    <<: *logFailedRelease
+    needs:
+      - management-portal
+      - radar-upload-connect-backend
+      {{ if .Values.minio._install }}- minio{{ end }}
+      {{ if .Values.cp_schema_registry._install }}- cp-schema-registry{{ end }}
+      {{ if .Values.radar_kafka_stack._install }}- radar-kafka{{ end }}
+    values:
+      - {{ .Values.radar_upload_connector_strimzi | toYaml | indent 8 | trim }}
+    set:
+      - name: bucketAccessKey
+        value: {{ .Values.s3_access_key }}
+      - name: bucketSecretKey
+        value: {{ .Values.s3_secret_key }}
+      - name: client_secret
+        value: {{ dig "client_secret" (dig "oauth_clients" "radar_upload_connect" "client_secret" "" .Values.management_portal) .Values.radar_upload_source_connector }}
+
   - name: cc-schema-registry-proxy
     chart: radar/cc-schema-registry-proxy
     version: {{ .Values.ccSchemaRegistryProxy._chart_version }}
