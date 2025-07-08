@@ -300,6 +300,13 @@ radar_fitbit_connector:
   replicaCount: 1
   oauthClientId: radar_fitbit_connector
 
+radar_fitbit_connector_strimzi:
+  _install: false
+  _chart_version: 0.0.1
+  _extra_timeout: 0
+  replicaCount: 1
+  oauthClientId: radar_fitbit_connector
+
 radar_oura_connector:
   _install: false
   _chart_version: 0.4.1
@@ -425,6 +432,26 @@ radar_jdbc_connector_grafana:
         storage:
           size: 8Gi
 
+# Install when radar_grafana._install is 'true'
+radar_jdbc_connector_grafana_strimzi:
+  _install: false
+  _chart_version: 0.0.1
+  _extra_timeout: 0
+  replicaCount: 1
+  sink:
+    # Change the list of topics if you have dashboards that read other data or if you don't have certain topics available on your cluster.
+    topics: android_phone_relative_location, android_phone_battery_level, connect_fitbit_intraday_heart_rate, connect_fitbit_intraday_steps
+  timescaledb:
+    enabled: true
+    cluster:
+      cluster:
+        instances: 2
+        initdb:
+          database: grafana
+          owner: grafana
+        storage:
+          size: 8Gi
+
 # Install when data_dashboard_backend._install is 'true'.
 radar_jdbc_connector_data_dashboard_backend:
   _install: false
@@ -442,10 +469,44 @@ radar_jdbc_connector_data_dashboard_backend:
         storage:
           size: 8Gi
 
+# Install when data_dashboard_backend._install is 'true'.
+radar_jdbc_connector_data_dashboard_backend_strimzi:
+  _install: false
+  _chart_version: 0.0.1
+  _extra_timeout: 0
+  replicaCount: 1
+  timescaledb:
+    enabled: true
+    cluster:
+      cluster:
+        instances: 2
+        initdb:
+          database: data-dashboard
+          owner: data-dashboard
+        storage:
+          size: 8Gi
+
 # Install when using realtime analysis
 radar_jdbc_connector_realtime_dashboard:
   _install: false
   _chart_version: 0.10.0
+  _extra_timeout: 0
+  replicaCount: 1
+  timescaledb:
+    enabled: true
+    cluster:
+      cluster:
+        instances: 2
+        initdb:
+          database: realtime-dashboard
+          owner: realtime-dashboard
+        storage:
+          size: 8Gi
+
+# Install when using realtime analysis
+radar_jdbc_connector_realtime_dashboard_strimzi:
+  _install: false
+  _chart_version: 0.0.1
   _extra_timeout: 0
   replicaCount: 1
   timescaledb:

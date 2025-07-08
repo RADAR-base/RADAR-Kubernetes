@@ -2,12 +2,12 @@ cloudnative_postgresql:
   cluster:
     cluster:
       instances: 1
-radar_jdbc_connector_data_dashboard_backend:
+radar_jdbc_connector_data_dashboard_backend_strimzi:
   timescaledb:
     cluster:
       cluster:
         instances: 1
-radar_jdbc_connector_grafana:
+radar_jdbc_connector_grafana_strimzi:
   timescaledb:
     cluster:
       cluster:
@@ -25,8 +25,10 @@ radar_kafka_stack:
 radar_gateway:
   hpa:
     enabled: false
-radar_s3_connector:
-  kafkaHeapOpts: "-Xms128m -Xmx256m"
+radar_s3_connector_strimzi:
+  jvmOptions:
+    xms: "128m"
+    xmx: "256m"
 radar_output:
   javaOpts: "-Xms128m -Xmx128m"
 minio:

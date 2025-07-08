@@ -83,13 +83,13 @@ radar_jdbc_connector_realtime_dashboard:
       cluster:
         monitoring:
           enabled: false
-radar_jdbc_connector_data_dashboard_backend:
+radar_jdbc_connector_data_dashboard_backend_strimzi:
   timescaledb:
     cluster:
       cluster:
         monitoring:
           enabled: false
-radar_jdbc_connector_grafana:
+radar_jdbc_connector_grafana_strimzi:
   timescaledb:
     cluster:
       cluster:
