@@ -7,10 +7,13 @@ app_server:
   _install: false
   upload:
     enabled: true
-radar_s3_connector:
+radar_s3_connector_strimzi:
   _install: true
   rotateInterval: 5000 # milliseconds
   flushSize: 1 # number of records
+  syncTopics:
+    cronjob:
+      schedule: "*/1 * * * *" # every minute
 radar_output:
   _install: true
   worker:
@@ -28,7 +31,7 @@ radar_rest_sources_backend:
       authorizationEndpoint: http://mockserver.mockserver:1080/fitbit/oauth2/authorize
       tokenEndpoint: http://mockserver.mockserver:1080/fitbit/oauth2/token
       scope: hartrate
-radar_fitbit_connector:
+radar_fitbit_connector_strimzi:
   _install: true
   fitbit_api_url: http://mockserver.mockserver:1080/fitbit
   rest_source_poll_interval_ms: 5000
@@ -41,11 +44,11 @@ data_dashboard_timescaledb:
   _install: true
 data_dashboard_backend:
   _install: true
-radar_jdbc_connector_data_dashboard_backend:
+radar_jdbc_connector_data_dashboard_backend_strimzi:
   _install: true
 grafana_metrics_timescaledb:
   _install: true
-radar_jdbc_connector_grafana:
+radar_jdbc_connector_grafana_strimzi:
   _install: true
   sink:
     topics: connect_fitbit_intraday_steps

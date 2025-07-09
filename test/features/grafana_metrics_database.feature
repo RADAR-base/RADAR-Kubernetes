@@ -8,7 +8,7 @@ e3)
     And these service states
       | service_name                                | state   |
       | ksql-server                                 | Running |
-      | radar-jdbc-connector-grafana                | Running |
+      | radar-jdbc-connector-grafana-strimzi        | Running |
       | grafana-timescaledb                         | Running |
     And registration of the subject with Fitbit authorization service
     Then Fitbit records are present in the database
