@@ -60,7 +60,7 @@ radar_jdbc_connector_grafana_strimzi:
       cluster:
         monitoring:
           enabled: false
-radar_jdbc_connector_realtime_dashboard:
+radar_jdbc_connector_realtime_dashboard_strimzi:
   timescaledb:
     cluster:
       cluster:

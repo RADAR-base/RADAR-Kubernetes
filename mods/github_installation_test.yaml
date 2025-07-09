@@ -64,5 +64,5 @@ radar_jdbc_connector_grafana:
 radar_jdbc_connector_data_dashboard_backend:
   _install: false
 
-radar_jdbc_connector_realtime_dashboard:
+radar_jdbc_connector_realtime_dashboard_strimzi:
   _install: false

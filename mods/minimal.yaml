@@ -12,7 +12,7 @@ radar_jdbc_connector_grafana_strimzi:
     cluster:
       cluster:
         instances: 1
-radar_jdbc_connector_realtime_dashboard:
+radar_jdbc_connector_realtime_dashboard_strimzi:
   timescaledb:
     cluster:
       cluster:
