@@ -281,7 +281,7 @@ releases:
       - name: oauth_clients.radar_redcap_integrator.enable
         value: {{ .Values.radar_integration._install }}
       - name: oauth_clients.radar_upload_connect.enable
-        value: {{ .Values.radar_upload_source_connector._install }}
+        value: {{ .Values.radar_upload_connector_strimzi._install }}
       - name: oauth_clients.radar_upload_frontend.enable
         value: {{ .Values.radar_upload_connect_frontend._install }}
       - name: oauth_clients.radar_upload_backend.enable
@@ -291,7 +291,7 @@ releases:
       - name: oauth_clients.radar_rest_sources_auth_backend.enable
         value: {{ .Values.radar_rest_sources_backend._install }}
       - name: oauth_clients.radar_fitbit_connector.enable
-        value: {{ .Values.radar_fitbit_connector._install }}
+        value: {{ .Values.radar_fitbit_connector_strimzi._install }}
       - name: oauth_clients.radar_appconfig.enable
         value: {{ .Values.app_config._install }}
       - name: oauth_clients.appconfig_frontend.enable
@@ -640,8 +640,6 @@ releases:
     values:
       - {{ .Values.radar_fitbit_connector_strimzi | toYaml | indent 8 | trim }}
     set:
-      - name: kafka_num_brokers
-        value: {{ .Values.kafka_num_brokers }}
       {{- if hasKey .Values "fitbit_api_client" }}
       - name: fitbit_api_client
         value: {{ .Values.fitbit_api_client }}
@@ -693,16 +691,18 @@ releases:
       - name: restSourceClients.fitbit.clientSecret
         value: {{ .Values.fitbit_api_secret }}
       {{- end }}
+      - name: client_secret
+        value: {{ dig "client_secret" (dig "oauth_clients" "radar_rest_sources_auth_backend" "client_secret" "" .Values.management_portal) .Values.radar_rest_sources_backend }}
       - name: restSourceClients.fitbit.enable
-        value: {{ .Values.radar_fitbit_connector._install }}
+        value: {{ .Values.radar_fitbit_connector_strimzi._install }}
       - name: restSourceClients.garmin.enable
         value: {{ and .Values.radar_push_endpoint._install .Values.radar_push_endpoint.garmin.enabled }}
       - name: restSourceClients.garmin.clientId
         value: {{ dig "restSourceClients" "garmin" "clientId" (dig "garmin" "consumerKey" "" .Values.radar_push_endpoint) .Values.radar_rest_sources_backend }}
       - name: restSourceClients.garmin.clientSecret
         value: {{ dig "restSourceClients" "garmin" "clientSecret" (dig "garmin" "consumerSecret" "" .Values.radar_push_endpoint) .Values.radar_rest_sources_backend }}
-      - name: client_secret
-        value: {{ dig "client_secret" (dig "oauth_clients" "radar_rest_sources_auth_backend" "client_secret" "" .Values.management_portal) .Values.radar_rest_sources_backend }}
+      - name: restSourceClients.oura.enable
+        value: {{ .Values.radar_oura_connector_strimzi._install }}
 
   - name: radar-oura-connector
     chart: radar/radar-oura-connector
@@ -718,6 +718,29 @@ releases:
     set:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
+      {{- if hasKey .Values "oura_api_client" }}
+      - name: oura_api_client
+        value: {{ .Values.oura_api_client }}
+      {{- end }}
+      {{- if hasKey .Values "oura_api_secret" }}
+      - name: oura_api_secret
+        value: {{ .Values.oura_api_secret }}
+      {{- end }}
+      - name: oauthClientSecret
+        value: {{ dig "radar_oura_connector" "client_secret" "" .Values.management_portal.oauth_clients }}
+
+  - name: radar-oura-connector-strimzi
+    chart: radar/radar-oura-connector
+    version: {{ .Values.radar_oura_connector_strimzi._chart_version }}
+    installed: {{ .Values.radar_oura_connector_strimzi._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_oura_connector_strimzi._extra_timeout }}
+    needs:
+      # When catalog server is 'ready', kafka can be used.
+      - catalog-server
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.radar_oura_connector_strimzi | toYaml | indent 8 | trim }}
+    set:
       {{- if hasKey .Values "oura_api_client" }}
       - name: oura_api_client
         value: {{ .Values.oura_api_client }}
