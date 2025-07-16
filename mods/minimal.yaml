@@ -2,36 +2,35 @@ cloudnative_postgresql:
   cluster:
     cluster:
       instances: 1
-radar_jdbc_connector_data_dashboard_backend:
+radar_jdbc_connector_data_dashboard_backend_strimzi:
   timescaledb:
     cluster:
       cluster:
         instances: 1
-radar_jdbc_connector_grafana:
+radar_jdbc_connector_grafana_strimzi:
   timescaledb:
     cluster:
       cluster:
         instances: 1
-radar_jdbc_connector_realtime_dashboard:
+radar_jdbc_connector_realtime_dashboard_strimzi:
   timescaledb:
     cluster:
       cluster:
         instances: 1
+radar_kafka_stack:
+  kafka:
+    extraEnvs:
+      - name: KAFKA_HEAP_OPTS
+        value: "-Xms128m -Xmx512m"
 radar_gateway:
   hpa:
     enabled: false
-radar_s3_connector:
-  kafkaHeapOpts: "-Xms128m -Xmx256m"
+radar_s3_connector_strimzi:
+  jvmOptions:
+    xms: "128m"
+    xmx: "256m"
 radar_output:
   javaOpts: "-Xms128m -Xmx128m"
-cp_kafka:
-  heapOptions: "-Xms128M -Xmx512M"
-  persistence:
-    size: 1Gi
-cp_zookeeper:
-  heapOptions: "-Xms128M -Xmx128M"
-cp_schema_registry:
-  heapOptions: "-Xms128M -Xmx128M"
 minio:
   # Turn off distributed mode for minio
   mode: standalone

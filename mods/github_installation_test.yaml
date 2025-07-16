@@ -36,3 +36,33 @@ radar_backend_monitor:
 
 radar_backend_stream:
   _install: false
+
+cp_schema_registry:
+  _install: false
+
+cp_zookeeper:
+  _install: false
+
+cp_kafka:
+  _install: false
+
+radar_fitbit_connector:
+  _install: false
+
+radar_upload_source_connector:
+  _install: false
+
+radar_s3_connector:
+  _install: false
+
+radar_oura_connector:
+  _install: false
+
+radar_jdbc_connector_grafana:
+  _install: false
+
+radar_jdbc_connector_data_dashboard_backend:
+  _install: false
+
+radar_jdbc_connector_realtime_dashboard_strimzi:
+  _install: false

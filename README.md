@@ -16,16 +16,16 @@ The Kubernetes stack of RADAR-base platform.
 - [About](#about)
 - [Status](#status)
 - [Prerequisites](#prerequisites)
-  - [Knowledge requirements ](#knowledge-requirements)
-  - [Software Compatibility](#software-compatibility)
-  - [Hosting ](#hosting)
-  - [Third party services](#third-party-services)
-  - [Local machine](#local-machine)
+    - [Knowledge requirements ](#knowledge-requirements)
+    - [Software Compatibility](#software-compatibility)
+    - [Hosting ](#hosting)
+    - [Third party services](#third-party-services)
+    - [Local machine](#local-machine)
 - [Installation](#installation)
-  - [Prepare](#prepare)
-  - [Project Structure](#project-structure)
-  - [Configure](#configure)
-  - [Install](#install)
+    - [Prepare](#prepare)
+    - [Project Structure](#project-structure)
+    - [Configure](#configure)
+    - [Install](#install)
 - [Usage and accessing the applications](#usage-and-accessing-the-applications)
 - [Service-specific documentation](#service-specific-documentation)
 - [Troubleshooting](#troubleshooting)
@@ -38,20 +38,40 @@ The Kubernetes stack of RADAR-base platform.
 
 ## About
 
-RADAR-base is an open-source platform designed to support remote clinical trials by collecting continuous data from wearables and mobile applications. RADAR-Kubernetes enables installing the RADAR-base platform onto Kubernetes clusters. RADAR-base platform can be used for wide range of use-cases. Depending on the use-case, the selection of applications need to be installed can vary. Please read the [component overview and breakdown](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/2673967112/Component+overview+and+breakdown) to understand the role of each component and how components work together.
+RADAR-base is an open-source platform designed to support remote clinical trials by collecting continuous data from
+wearables and mobile applications. RADAR-Kubernetes enables installing the RADAR-base platform onto Kubernetes clusters.
+RADAR-base platform can be used for wide range of use-cases. Depending on the use-case, the selection of applications
+need to be installed can vary. Please read
+the [component overview and breakdown](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/2673967112/Component+overview+and+breakdown)
+to understand the role of each component and how components work together.
 
-RADAR-Kubernetes setup uses [Helm](https://github.com/helm/helm) charts to package necessary Kubernetes resources for each component and [helmfile](https://github.com/roboll/helmfile) to modularize and deploy Helm charts of the platform on a Kubernetes cluster. This setup is designed to be a lightweight way to install and configure the RADAR-base components. The original images or charts may provide more and granular configurations. Please visit the `README` of respective charts in [radar-helm-charts](https://github.com/RADAR-base/radar-helm-charts) to understand the configurations and visit the main repository for in depth knowledge.
+RADAR-Kubernetes setup uses [Helm](https://github.com/helm/helm) charts to package necessary Kubernetes resources for
+each component and [helmfile](https://github.com/roboll/helmfile) to modularize and deploy Helm charts of the platform
+on a Kubernetes cluster. This setup is designed to be a lightweight way to install and configure the RADAR-base
+components. The original images or charts may provide more and granular configurations. Please visit the `README` of
+respective charts in [radar-helm-charts](https://github.com/RADAR-base/radar-helm-charts) to understand the
+configurations and visit the main repository for in depth knowledge.
 
 ## Status
 
-RADAR-Kubernetes is one of the youngest project of RADAR-base and will be the **long term supported form of deploying the platform**. Even though, RADAR-Kubernetes is being used in few production environments, it is still in its early stage of development. We are working on improving the set up and documentation to enable RADAR-base community to make use of the platform.
+RADAR-Kubernetes is one of the youngest project of RADAR-base and will be the **long term supported form of deploying
+the platform**. Even though, RADAR-Kubernetes is being used in few production environments, it is still in its early
+stage of development. We are working on improving the setup and documentation to enable RADAR-base community to make
+use of the platform.
 
 ## Prerequisites
 
 ### Knowledge requirements
 
-This documentation assumes familiarity with all referenced Kubernetes concepts, utilities, and procedures and familiarity with Helm charts and helmfile, depending on your environment you might need to have knowledege of other hosting infrastructure such as DNS and mail servers as well.
-While this documentation will provide guidance for installing and configuring RADAR-base platform on a Kubernetes cluster and tries to make is as simple and possible, it is not a replacement for the detailed knowledege of the tools that have been used. If you are not familiar with these tools, we strongly recommend you to get familiar with these tools. Here is a [list of useful links](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/2731638785/How+to+get+started+with+tools+around+RADAR-Kubernetes) to get started.
+This documentation assumes familiarity with all referenced Kubernetes concepts, utilities, and procedures and
+familiarity with Helm charts and helmfile, depending on your environment you might need to have knowledge of other
+hosting infrastructure such as DNS and mail servers as well. While this documentation will provide guidance for
+installing and configuring RADAR-base platform on a Kubernetes
+cluster and tries to make is as simple and possible, it is not a replacement for the detailed knowledge of the tools
+that have been used. If you are not familiar with these tools, we strongly recommend you to get familiar with these
+tools. Here is
+a [list of useful links](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/2731638785/How+to+get+started+with+tools+around+RADAR-Kubernetes)
+to get started.
 
 ### Software Compatibility
 
@@ -66,41 +86,48 @@ Currently RADAR-Kubernetes is tested and supported on following component versio
 | Helmfile | v0.169.1 |
 | YQ | v4.44.3 |
 
-It's possible to install RADAR-Kubernetes on different version of tools as well, but you might encounter compatibility issues. Make sure that `kubectl` version matches or it's higher than Kubernetes or K3s version that you're using. For other tools such as Git or Java the version, as long as it's not very old, it's not very impactful.
+It's possible to install RADAR-Kubernetes on different version of tools as well, but you might encounter compatibility
+issues. Make sure that `kubectl` version matches or exceeds the Kubernetes (or K3s) version that you're using. For
+other tools, such as Git and Java, as long as the versions are not very old, it's not very impactful.
 
 ### Hosting
 
-Kubernetes can be installed on wide varaity of platforms and in turn you can install RADAR-Base on most places that Kuberentes can run. However your infrastructure needs to have a set up requirements listed below:
+Kubernetes can be installed on wide variety of platforms and in turn you can install RADAR-Base on most places that
+Kubernetes can run. However, your infrastructure needs to meet the requirements listed below:
 
-| Component                             | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Required |
-| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| Kubernetes cluster                    | An infrastructure with working installation of Kubernetes services. Read [this article](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/2744942595?draftShareId=e09429e8-38c8-4b71-955d-5df8de94b694) for available options. Minimum requirements for a single node: 8 vCPU's, 32 GB memory, 200 GB storage. Minimum requirements for a cluster: 3 nodes with 3 vCPUs, 16 GB memory, 100 GB storage each and 200 GB shared storage.                                                                                                                    | Required |
-| DNS Server                            | Some applications are only accessible via HTTPS and it's essential to have a DNS server via providers like GoDaddy, Route53, etc                                                                                                                                                                                                                                                                                                                                                                                                                              | Required |
-| SMTP Server                           | RADAR-Base needs an SMTP server to send registration email to researchers and participants.                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Required |
-| Whitelisted acces to ports 80 and 443 | We use Let's Encrypt to create SSL certificates and in the default configuration we use HTTP challenge. This means that the RADAR-Base installation needs to be visible to Let's Encrypt servers for the verification, so make sure these ports are white listed in your firewall. If you want to have a private installation you should change Let's Encrypt configuration to use DNS challenge.                                                                                                                                                             | Required |
-| Object storage                        | An external object storage allows RADAR-Kubernetes to backup cluster data such as manifests, application configuration and data via Velero to a backup site. You can also send the RADAR-Base output data to this object storage, which can provider easier management and access compared to bundled Minio server inside RADAR-Kubernetes.                                                                                                                                                                                                                   | Optional |
-| Managed services                      | RADAR-Kubernetes includes all necessary components to run the platform as a standalone application. However, you can also opt to use managed services such as with the platform, e.g. Confluent cloud for Kafka and schema registry, Postgres DB for storage, Azure blob storage or AWS S3 instead of Minio. If you're using a managed object storage that you have to pay per request (such as AWS S3), it's recommeneded that to install the Minio just for the `radar-intermediate-storage` since the applications send a lot of API calls to that bucket. | Optional |
+| Component                              | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Required |
+|----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|
+| Kubernetes cluster                     | An infrastructure with working installation of Kubernetes services. Read [this article](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/2744942595?draftShareId=e09429e8-38c8-4b71-955d-5df8de94b694) for available options. Minimum requirements for a single node: 8 vCPU's, 32 GB memory, 200 GB storage. Minimum requirements for a cluster: 3 nodes with 3 vCPUs, 16 GB memory, 100 GB storage each and 200 GB shared storage.                                                                                                                   | Required |
+| DNS Server                             | Some applications are only accessible via HTTPS and it's essential to have a DNS server via providers like GoDaddy, Route53, etc                                                                                                                                                                                                                                                                                                                                                                                                                             | Required |
+| SMTP Server                            | RADAR-Base needs an SMTP server to send registration email to researchers and participants.                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Required |
+| Whitelisted access to ports 80 and 443 | We use Let's Encrypt to create SSL certificates and in the default configuration we use HTTP challenge. This means that the RADAR-Base installation needs to be visible to Let's Encrypt servers for the verification, so make sure these ports are white listed in your firewall. If you want to have a private installation you should change Let's Encrypt configuration to use DNS challenge.                                                                                                                                                            | Required |
+| Object storage                         | An external object storage allows RADAR-Kubernetes to backup cluster data such as manifests, application configuration and data via Velero to a backup site. You can also send the RADAR-Base output data to this object storage, which can provider easier management and access compared to bundled Minio server inside RADAR-Kubernetes.                                                                                                                                                                                                                  | Optional |
+| Managed services                       | RADAR-Kubernetes includes all necessary components to run the platform as a standalone application. However, you can also opt to use managed services such as with the platform, e.g. Confluent cloud for Kafka and schema registry, Postgres DB for storage, Azure blob storage or AWS S3 instead of Minio. If you're using a managed object storage that you have to pay per request (such as AWS S3), it's recommended that to install the Minio just for the `radar-intermediate-storage` since the applications send a lot of API calls to that bucket. | Optional |
 
-If you want to deploy a production ready cluster on AWS you can use [RADAR-K8s-Infrastructure](https://github.com/RADAR-base/RADAR-K8s-Infrastructure) which hosts the Terraform scripts required to create an AWS EKS cluster and other managed services required for RADAR-Base platform.
+If you want to deploy a production-ready cluster on AWS you can
+use [RADAR-K8s-Infrastructure](https://github.com/RADAR-base/RADAR-K8s-Infrastructure) which hosts the Terraform scripts
+required to create an AWS EKS cluster and other managed services required for RADAR-Base platform.
 
 Alternatively, in order to have a simple single node Kubernetes server you can run these commands on a Linux machine:
 
 ```shell
-curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION="v1.26.3+k3s1" K3S_KUBECONFIG_MODE="644" INSTALL_K3S_SYMLINK="skip" sh -s - --disable traefik --disable-helm-controller
+curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION="v1.31.2+k3s1" K3S_KUBECONFIG_MODE="644" INSTALL_K3S_SYMLINK="skip" sh -s - --disable traefik --disable-helm-controller
 ```
 
 ### Third party services
 
-Depending on which components you've enabled you might need credentials for Fitbit, REDCap, Google Firebase, etc. You need to provide them in order for the respective component to work properly.
+Depending on which components you've enabled you might need credentials for Fitbit, REDCap, Google Firebase, etc. You
+need to provide them in order for the respective component to work correctly.
 
 ### Local machine
 
-The following tools should be installed in your local machine to install the RADAR-Kubernetes on your Kubernetes cluster.
+The following tools should be installed in your local machine to install the RADAR-Kubernetes on your Kubernetes
+cluster.
 
 | Component                                                          | Description                                                                                                                                                                                                      |
-| ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|--------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [Git](https://git-scm.com/downloads)                               | RADAR-Kubernetes uses Git-submodules to use some third party Helm charts. Thus Git is required to properly download and sync correct versions of this repository and its dependent repositories                  |
-| [Java](https://openjdk.java.net/install/)                          | The installation setup uses Java Keytools to create Keystore files necessary for signing access tokens.                                                                                                          |
+| [Java](https://openjdk.java.net/install/)                          | The installation setup uses Java Keytools to create Keystore files + for signing access tokens.                                                                                                                  |
 | [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) | Kubernetes command-line tool, kubectl, allows you to run commands against Kubernetes clusters                                                                                                                    |
 | [helm 3](https://github.com/helm/helm#install)                     | Helm Charts are used to package Kubernetes resources for each component                                                                                                                                          |
 | [helmfile](https://github.com/helmfile/helmfile#installation)      | RADAR-Kubernetes uses helmfiles to deploy Helm charts.                                                                                                                                                           |
@@ -108,11 +135,14 @@ The following tools should be installed in your local machine to install the RAD
 | [yq](https://github.com/mikefarah/yq#install)                      | Used to run `init`, `generate-secrets` and `chart-updates` scripts.                                                                                                                                              |
 | openssl                                                            | Used in `init` and `generate-secrets` scripts to generate secret for Prometheus Nginx authentication. This binary is in `openssl` package for Ubuntu, it's also easily available on other distributions as well. |
 
-**Once you have a working installation of a Kubernetes cluster, please [configure Kubectl with the appropriate Kubeconfig](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#verify-kubectl-configuration) to enable Kubectl to find and access your cluster. Then proceed to the installation section.**
+**Once you have a working installation of a Kubernetes cluster,
+please [configure Kubectl with the appropriate Kubeconfig](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#verify-kubectl-configuration)
+to enable Kubectl to find and access your cluster. Then proceed to the installation section.**
 
 ## Installation
 
-> The following instructions on this guide are for local machines which runs on Linux operating systems. You can still use the same instructions with small to no changes on a MacOS device as well.
+> The following instructions on this guide are for local machines which runs on Linux operating systems. You can still
+> use the same instructions with small to no changes on a MacOS device as well.
 
 ### Prepare
 
@@ -129,39 +159,60 @@ The following tools should be installed in your local machine to install the RAD
    bin/init
    ```
 
-It is recommended make a private clone of this repository, if you want to version control your configurations and/or share with other people.
+It is recommended make a private clone of this repository, if you want to version control your configurations and/or
+share with other people.
 
-**You must keep `etc/secrets.yaml` secure and confidential once you have started installing the platform** and the best practice to share your platform configurations is by **sharing the encrypted version of `etc/secrets.yaml`, this can be done via the combination of [sops](https://github.com/getsops/sops) and [helm-secrets](https://github.com/jkroepke/helm-secrets) but it's outside the scope of this document**.
+**You must keep `etc/secrets.yaml` secure and confidential once you have started installing the platform** and the best
+practice to share your platform configurations is by **sharing the encrypted version of `etc/secrets.yaml`, this can be
+done via the combination of [sops](https://github.com/getsops/sops)
+and [helm-secrets](https://github.com/jkroepke/helm-secrets) but it's outside the scope of this document**.
 
 ### Project Structure
 
 - `bin/`: Contains initialization scripts.
 - `etc/`: Contains configurations for the Helm charts.
 - `helmfile.d/`: Contains Helmfiles for modular deployment of the platform.
-- `environments.yaml/`: Defines current environment files in order to be used by helmfile and where to find the configuration files.
-- `etc/production.yaml`: Production helmfile template to configure and install RADAR-base components. Inspect the file to enable, disable and configure components required for your use case. The default helmfile enables all core components that are needed to run RADAR-base platform with pRMT and aRMT apps. If you're not sure which components you want to enable you can refer to wiki for [an overview and breakdown on RADAR-Base components and their roles](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/2673967112/Component+overview+and+breakdown).
-- `etc/production.yaml.gotmpl`: Some helm charts need an external file during installation, you should put those files in the specifed path and uncomment the respective lines.
+- `environments.yaml/`: Defines current environment files in order to be used by helmfile and where to find the
+  configuration files.
+- `etc/production.yaml`: Production helmfile template to configure and install RADAR-base components. Inspect the file
+  to enable, disable and configure components required for your use case. The default helmfile enables all core
+  components that are needed to run RADAR-base platform with pRMT and aRMT apps. If you're not sure which components you
+  want to enable you can refer to wiki
+  for [an overview and breakdown on RADAR-Base components and their roles](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/2673967112/Component+overview+and+breakdown).
+- `etc/production.yaml.gotmpl`: Some helm charts need an external file during installation, you should put those files
+  in the specifed path and uncomment the respective lines.
 - `etc/secrets.yaml`: Passwords and client secrets used by the installation.
 
 ### Configure
 
-1. Configure the `etc/production.yaml`. Make sure to read the comments in the file and change the values that are relevant to your installation. You at least want to change the `server_name` and `management_portal.smtp` configuration. Optionally, you can also enable or disable other components that are configured otherwise by default.
+1. Configure the `etc/production.yaml`. Make sure to read the comments in the file and change the values that are
+   relevant to your installation. You at least want to change the `server_name` and `management_portal.smtp`
+   configuration. Optionally, you can also enable or disable other components that are configured otherwise by default.
 
    ```shell
    nano etc/production.yaml  # Change setup parameters and configurations
    ```
 
-   When doing a clean install, you are advised to change the `postgresql`, `radar_appserver_postgresql` `radar_upload_postgresql` image tags to the latest PostgreSQL version. Likewise, the timescaledb image tag should use the latest timescaledb version. PostgreSQL passwords and major versions cannot easily be updated after installation.
+   When doing a clean install, you are advised to change the `postgresql`, `radar_appserver_postgresql`
+   `radar_upload_postgresql` image tags to the latest PostgreSQL version. Likewise, the timescaledb image tag should use
+   the latest timescaledb version. PostgreSQL passwords and major versions cannot easily be updated after installation.
 
-2. In `etc/production.yaml.gotmpl` file, change setup parameters for charts that are reading input files. You most likely just want to put the file in the default location specified in the file and uncomment the respective lines. Make sure to remove both `#` and `{{/*` from the line in order to uncomment it.
+2. In `etc/production.yaml.gotmpl` file, change setup parameters for charts that are reading input files. You most
+   likely just want to put the file in the default location specified in the file and uncomment the respective lines.
+   Make sure to remove both `#` and `{{/*` from the line in order to uncomment it.
 
    ```shell
    nano etc/production.yaml.gotmpl
    ```
 
-3. (Optional) If you are installing `radar-appserver`, it needs to be authorized with the Google Firebase also used by the aRMT / Questionnaire app. In Firebase, go to _Project settings_ -> _Service accounts_ and download a Firebase Admin SDK private key. Store the generated key as `etc/radar-appserver/firebase-adminsdk.json` and uncomment the respective section in `etc/production.yaml.gotmpl`.
+3. (Optional) If you are installing `radar-appserver`, it needs to be authorized with the Google Firebase also used by
+   the aRMT / Questionnaire app. In Firebase, go to _Project settings_ -> _Service accounts_ and download a Firebase
+   Admin SDK private key. Store the generated key as `etc/radar-appserver/firebase-adminsdk.json` and uncomment the
+   respective section in `etc/production.yaml.gotmpl`.
 
-4. In `etc/secrets.yaml` file, change any passwords, client secrets or API credentials like for Fitbit or Garmin Connect. After the installation you can find login credentials to the components in this file. Be sure to keep it private.
+4. In `etc/secrets.yaml` file, change any passwords, client secrets or API credentials like for Fitbit or Garmin
+   Connect. After the installation you can find login credentials to the components in this file. Be sure to keep it
+   private.
    ```shell
    nano etc/secrets.yaml
    ```
@@ -176,20 +227,28 @@ Once all configuration files are ready, the RADAR-Kubernetes can be deployed on 
 helmfile sync --concurrency 1
 ```
 
-The `helmfile sync` will synchronize all the Kubernetes resources defined in the helmfiles with your Kubernetes cluster. Having `--concurrency 1` will make sure components are installed in required order. Depending on your cluster specification, this may take around 30 minutes when installed for the first time.
+The `helmfile sync` will synchronize all the Kubernetes resources defined in the helmfiles with your Kubernetes cluster.
+Having `--concurrency 1` will make sure components are installed in required order. Depending on your cluster
+specification, this may take around 30 minutes when installed for the first time.
 
 | :exclamation: Note |
-| :----------------- |
+|:-------------------|
 
-| Installing the stack with `--concurrency 1` may make the installation slower. However, it is necessary because some components such as `kube-prometheus-stack` and `catalog-server`, should be installed in their specified order. If you've forgotten to use this flag, then the installation may not be successful. To continue, follow [Uninstallation](#uninstall) steps to clean up the Kubernetes cluster before you can try again.
+| Installing the stack with `--concurrency 1` may make the installation slower. However, it is necessary because some
+components such as `kube-prometheus-stack` and `catalog-server`, should be installed in their specified order. If you've
+forgotten to use this flag, then the installation may not be successful. To continue,
+follow [Uninstallation](#uninstall) steps to clean up the Kubernetes cluster before you can try again.
 
-Graylog and fluent-bit services in the `graylog` namespace will not immediately be operational, first it needs an input source defined. Log into `graylog.<server name>` with the Graylog credentials. Then navigate to _System_ -> _Inputs_, select GELF TCP in the dropdown and _Launch new input_. Set it as a global input on port 12222.
+Graylog and fluent-bit services in the `graylog` namespace will not immediately be operational, first it needs an input
+source defined. Log into `graylog.<server name>` with the Graylog credentials. Then navigate to _System_ -> _Inputs_,
+select GELF TCP in the dropdown and _Launch new input_. Set it as a global input on port 12222.
 
 #### Monitor and verify the installation process.
 
 Once the installation is done or in progress, you can check the status using `kubectl get pods`.
 
-If the installation has been successful, you should see an output similar to the list below. However depending on which components that you've enabled for installation this list and be longer or shorter.
+If the installation has been successful, you should see an output similar to the list below. However, depending on which
+components that you've enabled for installation this list and be longer or shorter.
 
 ```shell
 ➜ kubectl get pods
@@ -264,7 +323,9 @@ cert-manager-cainjector-75b6bc7b8b-dv2js   1/1     Running   0          8m21s
 cert-manager-webhook-8444c4bc77-jhzgb      1/1     Running   0          8m21s
 ```
 
-In most cases seeing `1/1` or `2/2` in `READY` column and `Running` in `STATUS` column indicates that the application is running and healthy. Other ways to ensure that installation have been successful is to check application logs for errors and exceptions.
+In most cases seeing `1/1` or `2/2` in `READY` column and `Running` in `STATUS` column indicates that the application is
+running and healthy. Other ways to ensure that installation have been successful is to check application logs for errors
+and exceptions.
 
 #### Ensure Kafka cluster is functional and RADAR-base topics are loaded
 
@@ -297,9 +358,13 @@ kubectl exec -it $pod -c cp-schema-registry-server -- sh -c "$command --topic $t
 
 ## Usage and accessing the applications
 
-In order to access to the applications first you need to find the IP address that Nginx service is listening to and then point the domain that you've specified in `server_name` variable to this IP address via a DNS server (e.g. [Route53](https://aws.amazon.com/route53/), [Cloudflare](https://www.cloudflare.com/dns/), [Bind](https://www.isc.org/bind/)) or [`hosts` file](<https://en.wikipedia.org/wiki/Hosts_(file)>) in your local machine.
+In order to access to the applications first you need to find the IP address that Nginx service is listening to and then
+point the domain that you've specified in `server_name` variable to this IP address via a DNS server (
+e.g. [Route53](https://aws.amazon.com/route53/), [Cloudflare](https://www.cloudflare.com/dns/), [Bind](https://www.isc.org/bind/))
+or [`hosts` file](<https://en.wikipedia.org/wiki/Hosts_(file)>) in your local machine.
 
-> For this guide we assume that you've set `server_name` to "k8s.radar-base.org" and SSL is enabled. Please replace it with a DNS domain under your control.
+> For this guide we assume that you've set `server_name` to "k8s.radar-base.org" and SSL is enabled. Please replace it
+> with a DNS domain under your control.
 
 You can see details of Nginx service with following command:
 
@@ -309,24 +374,34 @@ NAME                       TYPE           CLUSTER-IP      EXTERNAL-IP           
 nginx-ingress-controller   LoadBalancer   10.100.237.75   XXXX.eu-central-1.elb.amazonaws.com   80:31046/TCP,443:30932/TCP   1h
 ```
 
-- If you're using a cloud provider you need to point the value in `EXTERNAL-IP` column (in this example `XXXX.eu-central-1.elb.amazonaws.com`) to `k8s.radar-base.org` domain in your DNS server.
-- Some of the RADAR-base applications are accesible through sub-domains and you need to configure the DNS server to allow access to those applications. The easy way to do this is to create two wildcard CNAME records:
+- If you're using a cloud provider you need to point the value in `EXTERNAL-IP` column (in this example
+  `XXXX.eu-central-1.elb.amazonaws.com`) to `k8s.radar-base.org` domain in your DNS server.
+- Some of the RADAR-base applications are accesible through sub-domains and you need to configure the DNS server to
+  allow access to those applications. The easy way to do this is to create two wildcard CNAME records:
   ```
   *.k8s.radar-base.org              IN  CNAME  k8s.radar-base.org
   *.*.k8s.radar-base.org            IN  CNAME  k8s.radar-base.org
   ```
-- If you're not using a cloud provider you need to use a load balancer to expose `31046` and `30932` ports (will be different in your setup) to a IP address and then point `k8s.radar-base.org` domain to that IP address.
-- For development and testing purposes you can run `sudo kubectl port-forward svc/nginx-ingress-controller 80:80 443:443` which will forward Nginx service ports to your local machine and you can have access to applications after adding `127.0.0.1       k8s.radar-base.org` to your `hosts` file.
+- If you're not using a cloud provider you need to use a load balancer to expose `31046` and `30932` ports (will be
+  different in your setup) to a IP address and then point `k8s.radar-base.org` domain to that IP address.
+- For development and testing purposes you can run
+  `sudo kubectl port-forward svc/nginx-ingress-controller 80:80 443:443` which will forward Nginx service ports to your
+  local machine and you can have access to applications after adding `127.0.0.1       k8s.radar-base.org` to your
+  `hosts` file.
 
-Now when you go to this IP address you should see a home page with a few links to applications that are installed in the cluster:
+Now when you go to this IP address you should see a home page with a few links to applications that are installed in the
+cluster:
 
 ```
 https://k8s.radar-base.org
 ```
 
-**Note:** If you have enabled the SSL you might see invalid certificate error when you try to access to the websites, in this case wait a couple of minutes until `cert-manager` issues those certificates.
+**Note:** If you have enabled the SSL you might see invalid certificate error when you try to access to the websites, in
+this case wait a couple of minutes until `cert-manager` issues those certificates.
 
-Now you can head over to the [Management Portal](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/49512484/Management+Portal) guide for next steps.
+Now you can head over to
+the [Management Portal](https://radar-base.atlassian.net/wiki/spaces/RAD/pages/49512484/Management+Portal) guide for
+next steps.
 
 ## Service-specific documentation
 
@@ -335,7 +410,9 @@ Now you can head over to the [Management Portal](https://radar-base.atlassian.ne
 
 ## Troubleshooting
 
-If an application doesn't become fully ready, installation will not be successful. In this case, you should investigate the root cause by investigating the relevant component. It's suggested to run the following command when `helmfile sync` command is running so you can keep an eye on the installation:
+If an application doesn't become fully ready, installation will not be successful. In this case, you should investigate
+the root cause by investigating the relevant component. It's suggested to run the following command when `helmfile sync`
+command is running so you can keep an eye on the installation:
 
 ```shell
 # on linux
@@ -345,9 +422,12 @@ watch kubectl get pods
 kubectl get pods --watch
 ```
 
-This can help you to findout potential issues faster.
+This can help you indentify potential issues faster.
 
-It is suggested to change value of `atomicInstall` to `false` in `etc/production.yaml` file during the installation. This will help troubleshooting potential installation issues easier since it will leave the broken components in place for further inspection, be sure to enable this flag after the installation to prevent broken components causing distruption in case of a faulty update.
+It is suggested to change value of `atomicInstall` to `false` in `etc/production.yaml` file during the installation.
+This will help troubleshooting potential installation issues easier since it will leave the broken components in place
+for further inspection, be sure to enable this flag after the installation to prevent broken components causing
+distruption in case of a faulty update.
 
 Some useful commands for troubleshooting a component are mentioned below.
 
@@ -375,18 +455,22 @@ kubectl logs --tail 100 <podname>
 kubectl logs -f <podname>
 ```
 
-For more information on how `kubectl` can be used to manage a Kubernetes application, please visit [Kubectl documentation](https://kubernetes.io/docs/reference/kubectl/cheatsheet/).
+For more information on how `kubectl` can be used to manage a Kubernetes application, please
+visit [Kubectl documentation](https://kubernetes.io/docs/reference/kubectl/cheatsheet/).
 | :exclamation: Note |
 |--------------------|
-| For most of the components, you can reinstall them without additional actions. However, for some components such as `kube-prometheus-stack` and `kafka-init`, you may need to remove everything before trying again.|
+| For most of the components, you can reinstall them without additional actions. However, for some components such as
+`kube-prometheus-stack` and `kafka-init`, you may need to remove everything before trying again.|
 
 Once you've solved the issue, you need to run the `helmfile sync` command again.
 
-If you have enabled monitoring you should also check **Prometheus** to see if there are any alerts. In next section there is a guide on how to connect to Prometheus.
+If you have enabled monitoring you should also check **Prometheus** to see if there are any alerts. In next section
+there is a guide on how to connect to Prometheus.
 
 ## Volume expansion
 
-If want to resize a volumes after its initialization you need to make sure that it's supported by its underlying volume plugin:
+If want to resize a volumes after its initialization you need to make sure that it's supported by its underlying volume
+plugin:
 https://kubernetes.io/docs/concepts/storage/persistent-volumes/#expanding-persistent-volumes-claims
 
 If it's supported then it should be an easy process like this:
@@ -394,7 +478,9 @@ https://www.jeffgeerling.com/blog/2019/expanding-k8s-pvs-eks-on-aws
 
 ## Uninstall
 
-If you can spin up a new Kubernetes cluster in a few mintues it's generally suggested to recreate the cluster since the installation creates various components that might need to be manually removed. If that's not an option you can run following commands to delete the applications from cluster:
+If you can spin up a new Kubernetes cluster in a few mintues it's generally suggested to recreate the cluster since the
+installation creates various components that might need to be manually removed. If that's not an option you can run
+following commands to delete the applications from cluster:
 
 ```shell
 helmfile destroy
@@ -426,6 +512,10 @@ bin/chart-updates
 
 ## Feedback and Contributions
 
-Enabling RADAR-base community to use RADAR-Kubernetes is important for us. If you have troubles setting up the platform using provided instructions, you can create an dicussion with exact details to reproduce and the expected behavior.
-You can also reach out to the RADAR-base community via RADAR-base Slack on **[radar-kubernetes channel](https://radardevelopment.slack.com/archives/C021AGGESC9)**. The RADAR-base developers support the community on a voluntary basis and will pick up your requests as time permits.
-If you'd like to contribute to this project, please checkout [CONTRIBUTING.md](https://github.com/RADAR-base/RADAR-Kubernetes/blob/main/CONTRIBUTING.md) file.
+Enabling RADAR-base community to use RADAR-Kubernetes is important for us. If you have troubles setting up the platform
+using provided instructions, you can create an dicussion with exact details to reproduce and the expected behavior.
+You can also reach out to the RADAR-base community via RADAR-base Slack on *
+*[radar-kubernetes channel](https://radardevelopment.slack.com/archives/C021AGGESC9)**. The RADAR-base developers
+support the community on a voluntary basis and will pick up your requests as time permits.
+If you'd like to contribute to this project, please
+checkout [CONTRIBUTING.md](https://github.com/RADAR-base/RADAR-Kubernetes/blob/main/CONTRIBUTING.md) file.

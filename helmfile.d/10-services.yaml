@@ -139,15 +139,37 @@ releases:
       - name: ingress.tls[0].hosts
         values: ["{{ .Values.server_name }}"]
 
+  - name: radar-kafka
+    chart: radar/radar-kafka
+    version: {{ .Values.radar_kafka_stack._chart_version }}
+    installed: {{ .Values.radar_kafka_stack._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_kafka_stack._extra_timeout }}
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.radar_kafka_stack | toYaml | indent 8 | trim }}
+    set:
+      - name: kafka.replicas
+        value: {{ .Values.kafka_num_brokers }}
+      - name: kafka.replicationFactor
+        value: {{ .Values.kafka_num_topic_replicas }}
+      - name: kafka.partitions
+        value: {{ .Values.kafka_num_topic_partitions }}
+      - name: schema_registry.topic.replicationFactor
+        value: {{ .Values.kafka_num_topic_replicas }}
+      - name: schema_registry.topic.partitions
+        value: {{ .Values.kafka_num_topic_partitions }}
+      - name: dev_deployment
+        value: {{ .Values.dev_deployment | default false }}
+
   - name: catalog-server
     chart: radar/catalog-server
     version: {{ .Values.catalog_server._chart_version }}
     installed: {{ .Values.catalog_server._install }}
     timeout: {{ add .Values.base_timeout .Values.catalog_server._extra_timeout }}
-    {{ if .Values.cp_kafka._install }}
+    {{ if or .Values.radar_kafka_stack._install .Values.cp_schema_registry._install }}
     needs:
-      - cp-kafka
-      - cp-schema-registry
+      {{ if .Values.radar_kafka_stack._install }}- radar-kafka{{ end }}
+      {{ if .Values.cp_schema_registry._install }}- cp-schema-registry{{ end }}
     {{ end }}
     <<: *logFailedRelease
     values:
@@ -156,6 +178,10 @@ releases:
     set:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
+      - name: kafka_num_replication
+        value: {{ .Values.kafka_num_topic_replicas }}
+      - name: kafka_num_partitions
+        value: {{ .Values.kafka_num_topic_partitions }}
       - name: cc.enabled
         value: {{ .Values.confluent_cloud.enabled }}
       {{- if .Values.confluent_cloud.enabled }}
@@ -255,7 +281,7 @@ releases:
       - name: oauth_clients.radar_redcap_integrator.enable
         value: {{ .Values.radar_integration._install }}
       - name: oauth_clients.radar_upload_connect.enable
-        value: {{ .Values.radar_upload_source_connector._install }}
+        value: {{ .Values.radar_upload_connector_strimzi._install }}
       - name: oauth_clients.radar_upload_frontend.enable
         value: {{ .Values.radar_upload_connect_frontend._install }}
       - name: oauth_clients.radar_upload_backend.enable
@@ -265,7 +291,9 @@ releases:
       - name: oauth_clients.radar_rest_sources_auth_backend.enable
         value: {{ .Values.radar_rest_sources_backend._install }}
       - name: oauth_clients.radar_fitbit_connector.enable
-        value: {{ .Values.radar_fitbit_connector._install }}
+        value: {{ .Values.radar_fitbit_connector_strimzi._install }}
+      - name: oauth_clients.radar_oura_connector.enable
+        value: {{ .Values.radar_oura_connector_strimzi._install }}
       - name: oauth_clients.radar_appconfig.enable
         value: {{ .Values.app_config._install }}
       - name: oauth_clients.appconfig_frontend.enable
@@ -438,7 +466,7 @@ releases:
     installed: {{ .Values.radar_grafana._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_grafana._extra_timeout }}
     needs:
-      - radar-jdbc-connector-grafana
+      - radar-jdbc-connector-grafana-strimzi
     <<: *logFailedRelease
     values:
       - {{ .Values.radar_grafana | toYaml | indent 8 | trim }}
@@ -458,7 +486,7 @@ releases:
     installed: {{ .Values.data_dashboard_backend._install }}
     timeout: {{ add .Values.base_timeout .Values.data_dashboard_backend._extra_timeout }}
     needs:
-      - radar-jdbc-connector-data-dashboard
+      - radar-jdbc-connector-data-dashboard-strimzi
     <<: *logFailedRelease
     values:
       - {{ .Values.data_dashboard_backend | toYaml | indent 8 | trim }}
@@ -490,8 +518,9 @@ releases:
     installed: {{ .Values.radar_jdbc_connector_grafana._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_jdbc_connector_grafana._extra_timeout }}
     needs:
-      - cp-kafka
-      {{ if index .Values "radar_jdbc_connector_grafana" "timescaledb" "enabled" }}- cloudnativepg-operator{{ end }}
+      {{ if .Values.radar_kafka_stack._install }}- radar-kafka{{ end }}
+      {{ if .Values.cp_schema_registry._install }}- cp-schema-registry{{ end }}
+      {{ if .Values.radar_jdbc_connector_grafana.timescaledb.enabled }}- cloudnativepg-operator{{ end }}
     <<: *logFailedRelease
     values:
       - {{ .Values.radar_jdbc_connector_grafana | toYaml | indent 8 | trim }}
@@ -501,14 +530,33 @@ releases:
       - name: timescaledb.cluster.fullnameOverride
         value: grafana-timescaledb
 
+  - name: radar-jdbc-connector-grafana-strimzi
+    chart: radar/radar-jdbc-connector-strimzi
+    version: {{ .Values.radar_jdbc_connector_grafana_strimzi._chart_version }}
+    installed: {{ .Values.radar_jdbc_connector_grafana_strimzi._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_jdbc_connector_grafana_strimzi._extra_timeout }}
+    needs:
+      {{ if .Values.radar_kafka_stack._install }}- radar-kafka{{ end }}
+      {{ if .Values.cp_schema_registry._install }}- cp-schema-registry{{ end }}
+      {{ if .Values.radar_jdbc_connector_grafana_strimzi.timescaledb.enabled }}- cloudnativepg-operator{{ end }}
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.radar_jdbc_connector_grafana_strimzi | toYaml | indent 8 | trim }}
+    set:
+      - name: fullnameOverride
+        value: radar-jdbc-connector-grafana-strimzi
+      - name: timescaledb.cluster.fullnameOverride
+        value: grafana-timescaledb
+
   - name: radar-jdbc-connector-data-dashboard
     chart: radar/radar-jdbc-connector
     version: {{ .Values.radar_jdbc_connector_data_dashboard_backend._chart_version }}
     installed: {{ .Values.radar_jdbc_connector_data_dashboard_backend._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_jdbc_connector_data_dashboard_backend._extra_timeout }}
     needs:
-      - cp-kafka
-      {{ if index .Values "radar_jdbc_connector_data_dashboard_backend" "timescaledb" "enabled" }}- cloudnativepg-operator{{ end }}
+      {{ if .Values.radar_kafka_stack._install }}- radar-kafka{{ end }}
+      {{ if .Values.cp_schema_registry._install }}- cp-schema-registry{{ end }}
+      {{ if .Values.radar_jdbc_connector_data_dashboard_backend.timescaledb.enabled }}- cloudnativepg-operator{{ end }}
     <<: *logFailedRelease
     values:
       - "../etc/radar-jdbc-connector-data-dashboard/values.yaml"
@@ -519,14 +567,34 @@ releases:
       - name: timescaledb.cluster.fullnameOverride
         value: data-dashboard-timescaledb
 
+  - name: radar-jdbc-connector-data-dashboard-strimzi
+    chart: radar/radar-jdbc-connector-strimzi
+    version: {{ .Values.radar_jdbc_connector_data_dashboard_backend_strimzi._chart_version }}
+    installed: {{ .Values.radar_jdbc_connector_data_dashboard_backend_strimzi._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_jdbc_connector_data_dashboard_backend_strimzi._extra_timeout }}
+    needs:
+      {{ if .Values.radar_kafka_stack._install }}- radar-kafka{{ end }}
+      {{ if .Values.cp_schema_registry._install }}- cp-schema-registry{{ end }}
+      {{ if .Values.radar_jdbc_connector_data_dashboard_backend_strimzi.timescaledb.enabled }}- cloudnativepg-operator{{ end }}
+    <<: *logFailedRelease
+    values:
+      - "../etc/radar-jdbc-connector-data-dashboard/values.yaml"
+      - {{ .Values.radar_jdbc_connector_data_dashboard_backend_strimzi | toYaml | indent 8 | trim }}
+    set:
+      - name: fullnameOverride
+        value: radar-jdbc-connector-data-dashboard-strimzi
+      - name: timescaledb.cluster.fullnameOverride
+        value: data-dashboard-timescaledb
+
   - name: radar-jdbc-connector-realtime-dashboard
     chart: radar/radar-jdbc-connector
     version: {{ .Values.radar_jdbc_connector_realtime_dashboard._chart_version }}
     installed: {{ .Values.radar_jdbc_connector_realtime_dashboard._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_jdbc_connector_realtime_dashboard._extra_timeout }}
     needs:
-      - cp-kafka
-      {{ if index .Values "radar_jdbc_connector_realtime_dashboard" "timescaledb" "enabled" }}- cloudnativepg-operator{{ end }}
+      {{ if .Values.radar_kafka_stack._install }}- radar-kafka{{ end }}
+      {{ if .Values.cp_schema_registry._install }}- cp-schema-registry{{ end }}
+      {{ if .Values.radar_jdbc_connector_realtime_dashboard.timescaledb.enabled }}- cloudnativepg-operator{{ end }}
     <<: *logFailedRelease
     values:
       - "../etc/radar-jdbc-connector-realtime-dashboard/values.yaml"
@@ -537,21 +605,39 @@ releases:
       - name: timescaledb.cluster.fullnameOverride
         value: realtime-dashboard-timescaledb
 
-  - name: radar-fitbit-connector
-    chart: radar/radar-fitbit-connector
-    version: {{ .Values.radar_fitbit_connector._chart_version }}
-    installed: {{ .Values.radar_fitbit_connector._install }}
-    timeout: {{ add .Values.base_timeout .Values.radar_fitbit_connector._extra_timeout }}
+  - name: radar-jdbc-connector-realtime-dashboard-strimzi
+    chart: radar/radar-jdbc-connector-strimzi
+    version: {{ .Values.radar_jdbc_connector_realtime_dashboard_strimzi._chart_version }}
+    installed: {{ .Values.radar_jdbc_connector_realtime_dashboard_strimzi._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_jdbc_connector_realtime_dashboard_strimzi._extra_timeout }}
     needs:
-      - cp-kafka
+      {{ if .Values.radar_kafka_stack._install }}- radar-kafka{{ end }}
+      {{ if .Values.cp_schema_registry._install }}- cp-schema-registry{{ end }}
+      {{ if .Values.radar_jdbc_connector_realtime_dashboard_strimzi.timescaledb.enabled }}- cloudnativepg-operator{{ end }}
+    <<: *logFailedRelease
+    values:
+      - "../etc/radar-jdbc-connector-realtime-dashboard/values.yaml"
+      - {{ .Values.radar_jdbc_connector_realtime_dashboard_strimzi | toYaml | indent 8 | trim }}
+    set:
+      - name: fullnameOverride
+        value: radar-jdbc-connector-realtime-dashboard-strimzi
+      - name: timescaledb.cluster.fullnameOverride
+        value: realtime-dashboard-timescaledb
+
+  - name: radar-fitbit-connector-strimzi
+    chart: radar/radar-fitbit-connector-strimzi
+    version: {{ .Values.radar_fitbit_connector_strimzi._chart_version }}
+    installed: {{ .Values.radar_fitbit_connector_strimzi._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_fitbit_connector_strimzi._extra_timeout }}
+    needs:
+      {{ if .Values.radar_kafka_stack._install }}- radar-kafka{{ end }}
+      - catalog-server
       - radar-rest-sources-backend
       - management-portal
     <<: *logFailedRelease
     values:
-      - {{ .Values.radar_fitbit_connector | toYaml | indent 8 | trim }}
+      - {{ .Values.radar_fitbit_connector_strimzi | toYaml | indent 8 | trim }}
     set:
-      - name: kafka_num_brokers
-        value: {{ .Values.kafka_num_brokers }}
       {{- if hasKey .Values "fitbit_api_client" }}
       - name: fitbit_api_client
         value: {{ .Values.fitbit_api_client }}
@@ -603,16 +689,26 @@ releases:
       - name: restSourceClients.fitbit.clientSecret
         value: {{ .Values.fitbit_api_secret }}
       {{- end }}
+      {{- if hasKey .Values "oura_api_client" }}
+      - name: restSourceClients.oura.clientId
+        value: {{ .Values.oura_api_client }}
+      {{- end }}
+      {{- if hasKey .Values "oura_api_secret" }}
+      - name: restSourceClients.oura.clientSecret
+        value: {{ .Values.oura_api_secret }}
+      {{- end }}
+      - name: client_secret
+        value: {{ dig "client_secret" (dig "oauth_clients" "radar_rest_sources_auth_backend" "client_secret" "" .Values.management_portal) .Values.radar_rest_sources_backend }}
       - name: restSourceClients.fitbit.enable
-        value: {{ .Values.radar_fitbit_connector._install }}
+        value: {{ .Values.radar_fitbit_connector_strimzi._install }}
       - name: restSourceClients.garmin.enable
         value: {{ and .Values.radar_push_endpoint._install .Values.radar_push_endpoint.garmin.enabled }}
       - name: restSourceClients.garmin.clientId
         value: {{ dig "restSourceClients" "garmin" "clientId" (dig "garmin" "consumerKey" "" .Values.radar_push_endpoint) .Values.radar_rest_sources_backend }}
       - name: restSourceClients.garmin.clientSecret
         value: {{ dig "restSourceClients" "garmin" "clientSecret" (dig "garmin" "consumerSecret" "" .Values.radar_push_endpoint) .Values.radar_rest_sources_backend }}
-      - name: client_secret
-        value: {{ dig "client_secret" (dig "oauth_clients" "radar_rest_sources_auth_backend" "client_secret" "" .Values.management_portal) .Values.radar_rest_sources_backend }}
+      - name: restSourceClients.oura.enable
+        value: {{ .Values.radar_oura_connector_strimzi._install }}
 
   - name: radar-oura-connector
     chart: radar/radar-oura-connector
@@ -639,12 +735,39 @@ releases:
       - name: oauthClientSecret
         value: {{ dig "radar_oura_connector" "client_secret" "" .Values.management_portal.oauth_clients }}
 
+  - name: radar-oura-connector-strimzi
+    chart: radar/radar-oura-connector-strimzi
+    version: {{ .Values.radar_oura_connector_strimzi._chart_version }}
+    installed: {{ .Values.radar_oura_connector_strimzi._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_oura_connector_strimzi._extra_timeout }}
+    needs:
+      # When catalog server is 'ready', kafka can be used.
+      - catalog-server
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.radar_oura_connector_strimzi | toYaml | indent 8 | trim }}
+    set:
+      {{- if hasKey .Values "oura_api_client" }}
+      - name: oura_api_client
+        value: {{ .Values.oura_api_client }}
+      {{- end }}
+      {{- if hasKey .Values "oura_api_secret" }}
+      - name: oura_api_secret
+        value: {{ .Values.oura_api_secret }}
+      {{- end }}
+      - name: oauthClientSecret
+        value: {{ dig "radar_oura_connector" "client_secret" "" .Values.management_portal.oauth_clients }}
+
   - name: radar-gateway
     chart: radar/radar-gateway
     version: {{ .Values.radar_gateway._chart_version }}
     installed: {{ .Values.radar_gateway._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_gateway._extra_timeout }}
-    {{ if .Values.cp_schema_registry._install }}needs: [cp-schema-registry]{{ end }}
+    {{ if or .Values.cp_schema_registry._install .Values.radar_kafka_stack._install }}
+    needs:
+      {{ if .Values.cp_schema_registry._install }}- cp-schema-registry{{ end }}
+      {{ if .Values.radar_kafka_stack._install }}- radar-kafka{{ end }}
+    {{ end }}
     <<: *logFailedRelease
     values:
       - {{ .Values.radar_gateway | toYaml | indent 8 | trim }}
@@ -764,6 +887,27 @@ releases:
       - name: bucketSecretKey
         value: {{ dig "bucketSecretKey" .Values.s3_secret_key .Values.radar_s3_connector }}
 
+  - name: radar-s3-connector-strimzi
+    chart: radar/radar-s3-connector-strimzi
+    version: {{ .Values.radar_s3_connector_strimzi._chart_version }}
+    installed: {{ .Values.radar_s3_connector_strimzi._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_s3_connector_strimzi._extra_timeout }}
+    needs:
+      # When catalog server is 'ready', kafka can be used.
+      - catalog-server
+      {{ if .Values.minio._install }}- minio{{ end }}
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.radar_s3_connector_strimzi | toYaml | indent 8 | trim }}
+      - {{ .Values.confluent_cloud | toYaml | indent 8 | trim }}
+    set:
+      - name: cc.enabled
+        value: {{ .Values.confluent_cloud.enabled }}
+      - name: bucketAccessKey
+        value: {{ dig "bucketAccessKey" .Values.s3_access_key .Values.radar_s3_connector }}
+      - name: bucketSecretKey
+        value: {{ dig "bucketSecretKey" .Values.s3_secret_key .Values.radar_s3_connector }}
+
   - name: s3-proxy
     chart: radar/s3-proxy
     version: {{ .Values.s3_proxy._chart_version }}
@@ -785,7 +929,7 @@ releases:
     timeout: {{ add .Values.base_timeout .Values.radar_output._extra_timeout }}
     <<: *logFailedRelease
     needs:
-      - radar-s3-connector
+      - radar-s3-connector-strimzi
       {{ if .Values.redis._install }}- redis{{ end }}
       {{ if .Values.minio._install }}- minio{{ end }}
     values:
@@ -853,11 +997,34 @@ releases:
       - management-portal
       - radar-upload-connect-backend
       {{ if .Values.cp_schema_registry._install }}- cp-schema-registry{{ end }}
+      {{ if .Values.radar_kafka_stack._install }}- radar-kafka{{ end }}
     values:
       - {{ .Values.radar_upload_source_connector | toYaml | indent 8 | trim }}
     set:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
+      - name: bucketAccessKey
+        value: {{ .Values.s3_access_key }}
+      - name: bucketSecretKey
+        value: {{ .Values.s3_secret_key }}
+      - name: client_secret
+        value: {{ dig "client_secret" (dig "oauth_clients" "radar_upload_connect" "client_secret" "" .Values.management_portal) .Values.radar_upload_source_connector }}
+
+  - name: radar-upload-connector-strimzi
+    chart: radar/radar-upload-source-connector-strimzi
+    version: {{ .Values.radar_upload_connector_strimzi._chart_version }}
+    installed: {{ .Values.radar_upload_connector_strimzi._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_upload_connector_strimzi._extra_timeout }}
+    <<: *logFailedRelease
+    needs:
+      - management-portal
+      - radar-upload-connect-backend
+      {{ if .Values.minio._install }}- minio{{ end }}
+      {{ if .Values.cp_schema_registry._install }}- cp-schema-registry{{ end }}
+      {{ if .Values.radar_kafka_stack._install }}- radar-kafka{{ end }}
+    values:
+      - {{ .Values.radar_upload_connector_strimzi | toYaml | indent 8 | trim }}
+    set:
       - name: bucketAccessKey
         value: {{ .Values.s3_access_key }}
       - name: bucketSecretKey

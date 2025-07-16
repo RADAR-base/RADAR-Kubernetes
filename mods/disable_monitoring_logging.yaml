@@ -49,18 +49,6 @@ catalog_server:
   prometheus:
     jmx:
       enabled: false
-cp_kafka:
-  prometheus:
-    jmx:
-      enabled: false
-cp_zookeeper:
-  prometheus:
-    jmx:
-      enabled: false
-cp_schema_registry:
-  prometheus:
-    jmx:
-      enabled: false
 redis:
   metrics:
     enabled: false
@@ -89,19 +77,19 @@ ksql_server:
   prometheus:
     jmx:
       enabled: false
-radar_jdbc_connector_realtime_dashboard:
+radar_jdbc_connector_realtime_dashboard_strimzi:
   timescaledb:
     cluster:
       cluster:
         monitoring:
           enabled: false
-radar_jdbc_connector_data_dashboard_backend:
+radar_jdbc_connector_data_dashboard_backend_strimzi:
   timescaledb:
     cluster:
       cluster:
         monitoring:
           enabled: false
-radar_jdbc_connector_grafana:
+radar_jdbc_connector_grafana_strimzi:
   timescaledb:
     cluster:
       cluster:
@@ -115,5 +103,8 @@ ksql_server:
     jmx:
       enabled: false
 mongodb:
+  metrics:
+    enabled: false
+radar_kafka_stack:
   metrics:
     enabled: false

@@ -118,7 +118,7 @@ This repository can be used for development automation for instance on a k3s or 
 2. Create a k3d cluster that is configured to run RADAR-base
 
 ```shell
-k3d cluster create my-test-cluster --port '80:80@loadbalancer' --config=.github/ci_config/k3d-config.yaml
+k3d cluster create my-test-cluster --config=.github/ci_config/k3d-config.yaml
 ```
 
 This example creates a cluster named `my-test-cluster` with a load balancer that forwards local port 80 to the cluster. The
