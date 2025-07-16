@@ -337,6 +337,8 @@ radar_rest_sources_backend:
       enable: "false"
     garmin:
       enable: "false"
+    oura:
+      enable: "false"
 
 # --------------------------------------------------------- 20-dashboard.yaml ---------------------------------------------------------
 

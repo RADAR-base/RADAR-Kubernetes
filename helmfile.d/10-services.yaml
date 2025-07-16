@@ -292,6 +292,8 @@ releases:
         value: {{ .Values.radar_rest_sources_backend._install }}
       - name: oauth_clients.radar_fitbit_connector.enable
         value: {{ .Values.radar_fitbit_connector_strimzi._install }}
+      - name: oauth_clients.radar_oura_connector.enable
+        value: {{ .Values.radar_oura_connector_strimzi._install }}
       - name: oauth_clients.radar_appconfig.enable
         value: {{ .Values.app_config._install }}
       - name: oauth_clients.appconfig_frontend.enable
@@ -690,6 +692,14 @@ releases:
       {{- if hasKey .Values "fitbit_api_secret" }}
       - name: restSourceClients.fitbit.clientSecret
         value: {{ .Values.fitbit_api_secret }}
+      {{- end }}
+      {{- if hasKey .Values "oura_api_client" }}
+      - name: restSourceClients.oura.clientId
+        value: {{ .Values.oura_api_client }}
+      {{- end }}
+      {{- if hasKey .Values "oura_api_secret" }}
+      - name: restSourceClients.oura.clientSecret
+        value: {{ .Values.oura_api_secret }}
       {{- end }}
       - name: client_secret
         value: {{ dig "client_secret" (dig "oauth_clients" "radar_rest_sources_auth_backend" "client_secret" "" .Values.management_portal) .Values.radar_rest_sources_backend }}
