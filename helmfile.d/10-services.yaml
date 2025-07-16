@@ -531,8 +531,7 @@ releases:
         value: grafana-timescaledb
 
   - name: radar-jdbc-connector-grafana-strimzi
-    #  chart: radar/radar-jdbc-connector
-    chart: ../../radar-helm-charts/charts/radar-jdbc-connector-strimzi
+    chart: radar/radar-jdbc-connector-strimzi
     version: {{ .Values.radar_jdbc_connector_grafana_strimzi._chart_version }}
     installed: {{ .Values.radar_jdbc_connector_grafana_strimzi._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_jdbc_connector_grafana_strimzi._extra_timeout }}
@@ -569,8 +568,7 @@ releases:
         value: data-dashboard-timescaledb
 
   - name: radar-jdbc-connector-data-dashboard-strimzi
-#    chart: radar/radar-jdbc-connector-strimzi
-    chart: ../../radar-helm-charts/charts/radar-jdbc-connector-strimzi
+    chart: radar/radar-jdbc-connector-strimzi
     version: {{ .Values.radar_jdbc_connector_data_dashboard_backend_strimzi._chart_version }}
     installed: {{ .Values.radar_jdbc_connector_data_dashboard_backend_strimzi._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_jdbc_connector_data_dashboard_backend_strimzi._extra_timeout }}
@@ -608,8 +606,7 @@ releases:
         value: realtime-dashboard-timescaledb
 
   - name: radar-jdbc-connector-realtime-dashboard-strimzi
-    #    chart: radar/radar-jdbc-connector-strimzi
-    chart: ../../radar-helm-charts/charts/radar-jdbc-connector-strimzi
+    chart: radar/radar-jdbc-connector-strimzi
     version: {{ .Values.radar_jdbc_connector_realtime_dashboard_strimzi._chart_version }}
     installed: {{ .Values.radar_jdbc_connector_realtime_dashboard_strimzi._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_jdbc_connector_realtime_dashboard_strimzi._extra_timeout }}
@@ -628,8 +625,7 @@ releases:
         value: realtime-dashboard-timescaledb
 
   - name: radar-fitbit-connector-strimzi
-#    chart: radar/radar-fitbit-connector
-    chart: ../../radar-helm-charts/charts/radar-fitbit-connector-strimzi
+    chart: radar/radar-fitbit-connector-strimzi
     version: {{ .Values.radar_fitbit_connector_strimzi._chart_version }}
     installed: {{ .Values.radar_fitbit_connector_strimzi._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_fitbit_connector_strimzi._extra_timeout }}
@@ -740,7 +736,7 @@ releases:
         value: {{ dig "radar_oura_connector" "client_secret" "" .Values.management_portal.oauth_clients }}
 
   - name: radar-oura-connector-strimzi
-    chart: radar/radar-oura-connector
+    chart: radar/radar-oura-connector-strimzi
     version: {{ .Values.radar_oura_connector_strimzi._chart_version }}
     installed: {{ .Values.radar_oura_connector_strimzi._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_oura_connector_strimzi._extra_timeout }}
@@ -892,8 +888,7 @@ releases:
         value: {{ dig "bucketSecretKey" .Values.s3_secret_key .Values.radar_s3_connector }}
 
   - name: radar-s3-connector-strimzi
-#    chart: radar/radar-s3-connector-strimzi
-    chart: ../../radar-helm-charts/charts/radar-s3-connector-strimzi
+    chart: radar/radar-s3-connector-strimzi
     version: {{ .Values.radar_s3_connector_strimzi._chart_version }}
     installed: {{ .Values.radar_s3_connector_strimzi._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_s3_connector_strimzi._extra_timeout }}
@@ -1016,8 +1011,7 @@ releases:
         value: {{ dig "client_secret" (dig "oauth_clients" "radar_upload_connect" "client_secret" "" .Values.management_portal) .Values.radar_upload_source_connector }}
 
   - name: radar-upload-connector-strimzi
-#    chart: radar/radar-upload-source-connector
-    chart: ../../radar-helm-charts/charts/radar-upload-connector-strimzi
+    chart: radar/radar-upload-source-connector-strimzi
     version: {{ .Values.radar_upload_connector_strimzi._chart_version }}
     installed: {{ .Values.radar_upload_connector_strimzi._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_upload_connector_strimzi._extra_timeout }}
