@@ -52,6 +52,11 @@ sysctl:
   enabled: true
   ## @param sysctl.command override default init-sysctl container command (useful when using custom images)
   ##
+  sysctl:
+    image:
+        registry: docker.io
+        repository: bitnami/os-shell
+        tag: 12-debian-12-r49
   command:
     - /bin/sh
     - -c
@@ -62,4 +67,3 @@ sysctl:
   ## @param sysctl.mountHostSys Mount the host `/sys` folder to `/host-sys`
   ##
   mountHostSys: true
- 
