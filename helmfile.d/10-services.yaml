@@ -319,6 +319,9 @@ releases:
         value: {{ .Values.radar_kratos.secrets.cookie }}
       - name: kratos.kratos.config.secrets.cipher[0]
         value: {{ .Values.radar_kratos.secrets.cipher }}
+      - name: kratos.kratos.development.enabled
+        # TODO This should be set to false in production!!!
+        value: true
 
   - name: radar-hydra
 #    chart: radar/radar-hydra
@@ -337,9 +340,9 @@ releases:
     set:
       - name: hydra.server_name
         value: {{ .Values.server_name }}
-      - name: hydra.hydra.secrets.system[0]
+      - name: hydra.hydra.config.secrets.system[0]
         value: {{ .Values.radar_hydra.secrets.system }}
-      - name: hydra.hydra.secrets.cookie[0]
+      - name: hydra.hydra.config.secrets.cookie[0]
         value: {{ .Values.radar_hydra.secrets.cookie }}
 
   - name: radar-self-enrolment-ui

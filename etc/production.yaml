@@ -186,8 +186,8 @@ management_portal:
   replicaCount: 1  # should be 1
   image:
     registry: docker.io
-    repository: pvannierop/management-portal
-    tag: feature-auth-fixes-2
+    repository: ewelina/management-portal
+    tag: auth-fixes-improvements
   managementportal:
     catalogue_server_enable_auto_import: true
     common_privacy_policy_url: http://info.thehyve.nl/radar-cns-privacy-policy
@@ -205,12 +205,17 @@ radar_kratos:
   _install: true
   _extra_timeout: 0
   kratos:
-#    kratos:
-#      courier:
-        smtp:
-          from_address: radar@thehyve.nl
+    kratos:
+      config:
+        courier:
+          smtp:
+            from_address: radar@thehyve.nl
 
 radar_self_enrolment_ui:
+  image:
+    registry: docker.io
+    repository: ewelina/radar-self-enrolment-ui
+    tag: auth-flows_v3
   _install: true
   _extra_timeout: 0
 
