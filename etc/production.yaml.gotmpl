@@ -12,6 +12,13 @@ management_portal:
   #    # file by setting
   #    {{/* keystore: {{ readFile "certificate.pem" | b64enc | quote }}  */}}
 
+  # Configure public key used for JWT signing in radar-kratos
+  public_jwks: {{ readFile "../etc/management-portal/public-jwks.json" | b64enc | quote }}
+
+radar_kratos:
+  # read keystore
+  keystore: {{ readFile "../etc/radar-kratos/jwks.json" | b64enc | quote }}
+
 radar_grafana:
   grafana:
     dashboards:

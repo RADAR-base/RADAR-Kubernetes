@@ -14,4 +14,6 @@ copy_template_if_absent etc/production.yaml.gotmpl etc/base.yaml.gotmpl
 create_production_yaml
 
 DNAME="$DNAME" bin/keystore-init
+bin/keystore-json-init
+
 bin/generate-secrets

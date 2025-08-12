@@ -11,6 +11,13 @@ management_portal:
   #    # With helmfile, this can be set in a production.yaml.gotmpl
   #    # file by setting
   #    {{/* keystore: {{ readFile "certificate.pem" | b64enc | quote }}  */}}
+  # Configure public key used for JWT signing in radar-kratos
+  public_jwks: {{ readFile "../etc/management-portal/public-jwks.json" | b64enc | quote }}
+
+# Configure radar-kratos for JWT signing
+radar_kratos:
+  # read keystore for JWT signing
+  keystore: {{ readFile "../etc/radar-kratos/jwks.json" }}
 
 radar_grafana:
   grafana:
