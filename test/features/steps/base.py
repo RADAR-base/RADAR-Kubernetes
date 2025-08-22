@@ -38,24 +38,108 @@ def format_url(path, context):
 def get_mp_token(context):
     if context.cache["management_portal_token"] is not None:
         return context.cache["management_portal_token"]
+
+    # 1. Initialize login flow via Kratos
+    kratos_session_token = get_kratos_session_token(context)
+
+    # 2. Exchange Kratos session token for JWT access token via ManagementPortal + Kratos
+    access_token = exchange_session_token_to_access_token(context, kratos_session_token)
+
+    context.cache["management_portal_token"] = access_token
+    return access_token
+
+def get_kratos_session_token(context):
+    if context.cache.get("kratos_session_token") is not None:
+        return context.cache["kratos_session_token"]
+
     mp_admin_password = get_secret('management_portal', 'managementportal', 'common_admin_password', context=context)
+
+    init_headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    }
+
+    init_response = requests.get(f'{context.config.userdata["url"]}/kratos/self-service/login/api', headers=init_headers)
+    print(f'Login flow init response status: {init_response.status_code}')
+    assert init_response.status_code == 200
+
+    login_flow = init_response.json()
+    action_url = login_flow['ui']['action']
+
+    login_headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    }
+
+    login_data = {
+        'method': 'password',
+        'identifier': 'admin@example.com',
+        'password': mp_admin_password
+    }
+
+    login_response = requests.post(action_url, headers=login_headers, json=login_data)
+    print(f'Login submission response status: {login_response.status_code}')
+
+    if login_response.status_code == 200:
+        login_result = login_response.json()
+        # Extract session token from response or cookies
+        session_token = login_result.get('session_token') or login_response.cookies.get('ory_kratos_session')
+        assert session_token is not None, "No session token received from Kratos"
+        context.cache["kratos_session_token"] = session_token
+        return session_token
+    else:
+        raise Exception(f'Kratos login failed with status {login_response.status_code}: {login_response.text}')
+
+def exchange_session_token_to_access_token(context, kratos_session_token):
     headers = {
         'Accept': 'application/json',
         'Content-Type': 'application/x-www-form-urlencoded'
     }
-    data={
-        'client_id': 'ManagementPortalapp',
-        'username': 'admin',
-        'password': mp_admin_password,
-        'grant_type': 'password',
+    data = {
+        'session_token': kratos_session_token,
     }
-    response = requests.post(f'{context.config.userdata["url"]}/managementportal/oauth/token', headers=headers, data=data)
+
+    response = requests.post(f'{context.config.userdata["url"]}/managementportal/api/token-exchange', headers=headers, data=data)
+    print(f'The token exchange response status is {response.status_code}')
+    if response.status_code != 200:
+        print(f'Token exchange error response: {response.text}')
+        print(f'Token exchange request data: {data}')
     assert response.status_code == 200
     management_portal_json = response.json()
-    token = management_portal_json['access_token']
-    assert token is not None
-    context.cache["management_portal_token"] = token
+    token = management_portal_json['accessToken']
+    if token is None:
+        raise Exception('Empty access token')
     return token
+
+def get_rest_source_access_token(context):
+    if context.cache.get("rest_source_token") is not None:
+        return context.cache["rest_source_token"]
+    data = {
+        'grant_type': 'client_credentials',
+        'client_id': 'radar_rest_sources_auth_backend',
+        'client_secret': 'secret',
+        'audience': 'res_restAuthorizer'
+    }
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+    
+    try:
+        response = requests.post(f'{context.config.userdata["url"]}/hydra/oauth2/token', headers=headers, data=data)
+        if not response.ok:
+            print(f'Failed to retrieve access token: {response.status_code}')
+            print(f'Response text: {response.text}')
+            raise Exception(f'Failed to retrieve access token: {response.status_code}')
+        
+        token_data = response.json()
+        access_token = token_data['access_token']
+        assert access_token is not None, "No access token received for rest source client"
+        context.cache["rest_source_token"] = access_token
+        return access_token
+        
+    except Exception as error:
+        print(f'Error getting access token: {error}')
+        return None
 
 def get_source_types(context):
     headers = {
@@ -416,7 +500,7 @@ def register_fitbit_user(context):
     headers = {
         'Accept': 'application/json, text/plain, */*',
         'Content-Type': 'application/json',
-        'Authorization': f'Bearer {get_mp_token(context)}'
+        'Authorization': f'Bearer {get_rest_source_access_token(context)}'
     }
     data = {
         "userId": context.cache["fitbit_user_json"]["id"],
@@ -451,7 +535,7 @@ def check_fitbit_user_exists(context):
     headers = {
         'Accept': 'application/json, text/plain, */*',
         'Content-Type': 'application/json',
-        'Authorization': f'Bearer {get_mp_token(context)}'
+        'Authorization': f'Bearer {get_rest_source_access_token(context)}'
     }
     project_name = context.cache["project_json"]["projectName"]
     user_id = context.cache["test_subject_id"]
@@ -472,7 +556,7 @@ def _create_fitbit_user(context):
     headers = {
         'Accept': 'application/json, text/plain, */*',
         'Content-Type': 'application/json',
-        'Authorization': f'Bearer {get_mp_token(context)}'
+        'Authorization': f'Bearer {get_rest_source_access_token(context)}'
     }
     project_name = context.cache["project_json"]["projectName"]
     user_id = context.cache["test_subject_id"]
