@@ -19,7 +19,7 @@ enable_tls: true
 # Minimal deployment for development (disables TLS, monitoring and logging, sets kafka and minio brokers to 1).
 dev_deployment: true
 # E2e test deployment (applies very fast application loop timings for tests).
-e2e_test: false
+e2e_test: true
 # Enable GitHub installation test
 github_installation_test: false
 
@@ -187,7 +187,7 @@ management_portal:
   image:
     registry: docker.io
     repository: ewelina/management-portal
-    tag: auth-fixes-improvements
+    tag: auth-fixes-improvements_v8
   managementportal:
     catalogue_server_enable_auto_import: true
     common_privacy_policy_url: http://info.thehyve.nl/radar-cns-privacy-policy
@@ -269,7 +269,7 @@ radar_appserver:
 # --------------------------------------------------------- 20-fitbit.yaml ---------------------------------------------------------
 # The charts in 20-fitbit.yaml only need to be installed if you will use a Fitbit, Garmin, or Oura API integration.
 radar_fitbit_connector:
-  _install: false
+  _install: true
   _extra_timeout: 0
   replicaCount: 1
   oauthClientId: radar_fitbit_connector
@@ -359,7 +359,7 @@ realtime_dashboard_timescaledb:
 #- radar_jdbc_connector_grafana._install to true
 #- ksql_server._install to true
 radar_grafana:
-  _install: false
+  _install: true
   _extra_timeout: 0
   replicaCount: 1
 
@@ -367,13 +367,13 @@ radar_grafana:
 #- radar_jdbc_connector_data_dashboard_backend._install to true
 #- ksql_server._install to true
 data_dashboard_backend:
-  _install: false
+  _install: true
   _extra_timeout: 0
   replicaCount: 1
 
 # Install when radar_grafana._install is 'true'
 radar_jdbc_connector_grafana:
-  _install: false
+  _install: true
   _extra_timeout: 0
   replicaCount: 1
   sink:
@@ -392,7 +392,7 @@ radar_jdbc_connector_grafana:
 
 # Install when data_dashboard_backend._install is 'true'.
 radar_jdbc_connector_data_dashboard_backend:
-  _install: false
+  _install: true
   _extra_timeout: 0
   replicaCount: 1
   timescaledb:
@@ -408,7 +408,7 @@ radar_jdbc_connector_data_dashboard_backend:
 
 # Install when using realtime analysis
 radar_jdbc_connector_realtime_dashboard:
-  _install: false
+  _install: true
   _extra_timeout: 0
   replicaCount: 1
   timescaledb:

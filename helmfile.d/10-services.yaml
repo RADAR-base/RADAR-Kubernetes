@@ -524,7 +524,7 @@ releases:
         value: realtime-dashboard-timescaledb
 
   - name: radar-fitbit-connector
-    chart: radar/radar-fitbit-connector
+    chart: ../../radar-helm-charts/charts/radar-fitbit-connector
     version: {{ .Values.radar_fitbit_connector._chart_version }}
     installed: {{ .Values.radar_fitbit_connector._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_fitbit_connector._extra_timeout }}
@@ -550,7 +550,7 @@ releases:
         value: {{ dig "radar_fitbit_connector" "client_secret" "" .Values.management_portal.oauth_clients }}
 
   - name: radar-rest-sources-authorizer
-    chart: radar/radar-rest-sources-authorizer
+    chart: ../../radar-helm-charts/charts/radar-rest-sources-authorizer
     version: {{ .Values.radar_rest_sources_authorizer._chart_version }}
     installed: {{ .Values.radar_rest_sources_authorizer._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_rest_sources_authorizer._extra_timeout }}
@@ -564,7 +564,7 @@ releases:
         value: {{ .Values.server_name }}
 
   - name: radar-rest-sources-backend
-    chart: radar/radar-rest-sources-backend
+    chart: ../../radar-helm-charts/charts/radar-rest-sources-backend
     version: {{ .Values.radar_rest_sources_backend._chart_version }}
     installed: {{ .Values.radar_rest_sources_backend._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_rest_sources_backend._extra_timeout }}
