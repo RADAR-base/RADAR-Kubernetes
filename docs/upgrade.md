@@ -1,5 +1,9 @@
 # Upgrade instructions
 
+| /!\ Version compatibility /!\ |
+| ---------------------------------------- |
+| This project requires Helmfile v0.169.1. Using newer versions like v1.0.0 WILL cause template processing issues, especially with the environments.yaml file. |
+
 <!-- TOC -->
 * [Upgrade instructions](#upgrade-instructions)
   * [Upgrade to RADAR-Kubernetes version 1.3.0](#upgrade-to-radar-kubernetes-version-130)
@@ -28,6 +32,7 @@
     * [Disable data ingestion](#disable-data-ingestion)
     * [Disable database changes](#disable-database-changes)
 <!-- TOC -->
+
 
 Run the following instructions to upgrade an existing RADAR-Kubernetes cluster.
 

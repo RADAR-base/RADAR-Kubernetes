@@ -143,6 +143,128 @@ It is recommended make a private clone of this repository, if you want to versio
 - `etc/production.yaml.gotmpl`: Some helm charts need an external file during installation, you should put those files in the specifed path and uncomment the respective lines.
 - `etc/secrets.yaml`: Passwords and client secrets used by the installation.
 
+To deploy RADAR-base platform, you need the following:
+
+- A Kubernetes cluster
+- Helm 3.16.3+ ([setup instructions](#installing-helm))
+- Helmfile 0.169.1 ([setup instructions](#installing-helmfile))
+- `kubectl` access to your cluster
+- `yq` (for generating secrets)
+- Optionally, a domain name with access to its DNS settings
+
+### Installing Helm
+
+#### Option 1: Using Homebrew (macOS)
+```bash
+brew install helm@3.16.3
+```
+
+#### Option 2: Manual installation
+
+##### macOS
+```bash
+# Download Helm
+curl -Lo helm.tar.gz https://get.helm.sh/helm-v3.16.3-darwin-amd64.tar.gz
+
+# Extract the archive
+tar -zxvf helm.tar.gz
+
+# Move the helm binary to a directory in your PATH
+sudo mv darwin-amd64/helm /usr/local/bin/
+
+# Verify installation
+helm version
+# Should output: version.BuildInfo{Version:"v3.16.3", ...}
+
+# Clean up
+rm -rf helm.tar.gz darwin-amd64
+```
+
+##### Linux
+```bash
+# Download Helm
+curl -Lo helm.tar.gz https://get.helm.sh/helm-v3.16.3-linux-amd64.tar.gz
+
+# Extract the archive
+tar -zxvf helm.tar.gz
+
+# Move the helm binary to a directory in your PATH
+sudo mv linux-amd64/helm /usr/local/bin/
+
+# Verify installation
+helm version
+# Should output: version.BuildInfo{Version:"v3.16.3", ...}
+
+# Clean up
+rm -rf helm.tar.gz linux-amd64
+```
+
+### Installing Helmfile
+
+⚠️ **IMPORTANT**: Helmfile version 0.169.1 is required. Newer versions like v1.0.0 may cause template processing issues with RADAR-Kubernetes.
+
+#### Option 1: Using Homebrew (macOS)
+```bash
+# Remove existing version if present
+brew uninstall helmfile
+
+# Tap the helmfile repository
+brew tap helmfile/tap
+
+# Install the specific version
+brew install helmfile/tap/helmfile@0.169.1
+```
+
+#### Option 2: Manual installation
+
+##### macOS
+```bash
+# Download Helmfile
+curl -Lo helmfile.tar.gz https://github.com/helmfile/helmfile/releases/download/v0.169.1/helmfile_0.169.1_darwin_amd64.tar.gz
+
+# Extract the archive
+tar -zxvf helmfile.tar.gz
+
+# Make it executable and move it to your PATH
+chmod +x helmfile
+sudo mv helmfile /usr/local/bin/
+
+# Clean up
+rm -f helmfile.tar.gz LICENSE README.md
+
+# Verify installation
+helmfile --version
+# Should output: helmfile version v0.169.1
+```
+
+##### Linux
+```bash
+# Download Helmfile
+curl -Lo helmfile.tar.gz https://github.com/helmfile/helmfile/releases/download/v0.169.1/helmfile_0.169.1_linux_amd64.tar.gz
+
+# Extract the archive
+tar -zxvf helmfile.tar.gz
+
+# Make it executable and move it to your PATH
+chmod +x helmfile
+sudo mv helmfile /usr/local/bin/
+
+# Clean up
+rm -f helmfile.tar.gz LICENSE README.md
+
+# Verify installation
+helmfile --version
+# Should output: helmfile version v0.169.1
+```
+
+### Installing Required Helm Plugins
+
+Helmfile requires the helm-diff plugin to function properly:
+
+```bash
+helm plugin install https://github.com/databus23/helm-diff --version 3.9.12
+```
+
 ### Configure
 
 1. Configure the `etc/production.yaml`. Make sure to read the comments in the file and change the values that are relevant to your installation. You at least want to change the `server_name` and `management_portal.smtp` configuration. Optionally, you can also enable or disable other components that are configured otherwise by default.
