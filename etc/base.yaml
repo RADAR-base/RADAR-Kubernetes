@@ -259,6 +259,11 @@ radar_hydra:
   _chart_version: 0.2.2
   _extra_timeout: 0
 
+radar_console:
+  _install: true
+  _chart_version: 0.0.1
+  _extra_timeout: 0
+
 app_config:
   _install: false
   _chart_version: 1.7.2

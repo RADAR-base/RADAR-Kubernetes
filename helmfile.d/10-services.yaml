@@ -327,6 +327,23 @@ releases:
         values:
           - "https://dashboard.{{ .Values.server_name }}/login/generic_oauth"
 
+  - name: radar-console
+    #chart: radar/radar-console
+    chart: ../../radar-helm-charts/charts/radar-console
+    version: {{ .Values.radar_console._chart_version }}
+    installed: {{ .Values.radar_console._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_console._extra_timeout }}
+    needs:
+      - management-portal
+      - app-config
+      - radar-appserver
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.radar_console | toYaml | indent 8 | trim }}
+    set:
+      - name: ingress.hostname
+        value: {{ .Values.server_name }}
+
   - name: app-config
     chart: radar/app-config
     version: {{ .Values.app_config._chart_version }}
