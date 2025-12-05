@@ -67,3 +67,6 @@ minio:
 cp_schema_registry:
   ingress:
     tls: []
+radar_console:
+  ingress:
+    tls: []
