@@ -26,7 +26,8 @@ releases:
     namespace: cert-manager
     chart: radar/cert-manager
     version: {{ .Values.cert_manager._chart_version }}
-    installed: {{ .Values.cert_manager._install }}
+    # Nifi needs cert-manager to be installed when not running in unauthenticated dev-mode.
+    installed: {{ or .Values.cert_manager._install (and .Values.radar_nifi._install (not .Values.dev_deployment)) }}
     timeout: {{ add .Values.base_timeout .Values.cert_manager._extra_timeout }}
     {{ if .Values.kube_prometheus_stack._install }}
     needs:

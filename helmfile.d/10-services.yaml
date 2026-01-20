@@ -97,58 +97,6 @@ releases:
       - name: maintainerEmail
         value: {{ .Values.maintainer_email }}
 
-  - name: cp-zookeeper
-    chart: cp-radar/cp-zookeeper
-    version: {{ .Values.cp_zookeeper._chart_version }}
-    installed: {{ .Values.cp_zookeeper._install }}
-    timeout: {{ add .Values.base_timeout .Values.cp_zookeeper._extra_timeout }}
-    <<: *logFailedRelease
-    values:
-      - "../etc/cp-zookeeper/values.yaml"
-      - {{ .Values.cp_zookeeper | toYaml | indent 8 | trim }}
-
-  - name: cp-kafka
-    chart: cp-radar/cp-kafka
-    version: {{ .Values.cp_kafka._chart_version }}
-    installed: {{ .Values.cp_kafka._install }}
-    timeout: {{ add .Values.base_timeout .Values.cp_kafka._extra_timeout }}
-    {{ if .Values.cp_zookeeper._install }}needs: [cp-zookeeper]{{ end }}
-    <<: *logFailedRelease
-    values:
-      - "../etc/cp-kafka/values.yaml"
-      - {{ .Values.cp_kafka | toYaml | indent 8 | trim }}
-    set:
-      - name: brokers
-        value: {{ .Values.kafka_num_brokers }}
-      - name: configurationOverrides.default\.replication\.factor
-        value: {{ .Values.kafka_num_topic_replicas }}
-      - name: configurationOverrides.min\.insync\.replicas
-        value: {{ .Values.kafka_num_in_sync_brokers }}
-      - name: configurationOverrides.num\.partitions
-        value: {{ .Values.kafka_num_topic_partitions }}
-
-  - name: cp-schema-registry
-    chart: cp-radar/cp-schema-registry
-    version: {{ .Values.cp_schema_registry._chart_version }}
-    installed: {{ .Values.cp_schema_registry._install }}
-    timeout: {{ add .Values.base_timeout .Values.cp_schema_registry._extra_timeout }}
-    {{ if .Values.cp_kafka._install }}needs: [cp-kafka]{{ end }}
-    <<: *logFailedRelease
-    values:
-      - "../etc/cp-schema-registry/values.yaml"
-      - {{ .Values.cp_schema_registry | toYaml | indent 8 | trim }}
-    set:
-      - name: ingress.hosts[0].host
-        value: "{{ .Values.server_name }}"
-      - name: ingress.hosts[0].paths
-        values: ["/schema/?(.*)"]
-      {{- if .Values.enable_tls }}
-      - name: ingress.tls[0].secretName
-        value: radar-base-tls
-      - name: ingress.tls[0].hosts
-        values: ["{{ .Values.server_name }}"]
-      {{- end }}
-
   - name: radar-kafka
     chart: radar/radar-kafka
     version: {{ .Values.radar_kafka_stack._chart_version }}
@@ -240,15 +188,6 @@ releases:
       - name: logging.url
         value: {{ dig "logging" "url" (printf "https://graylog.%s/" .Values.server_name) .Values.radar_home }}
       {{ end }}
-
-  - name: postgresql
-    chart: radar/radar-postgresql
-    version: {{ .Values.postgresql._chart_version }}
-    installed: {{ .Values.postgresql._install }}
-    timeout: {{ add .Values.base_timeout .Values.postgresql._extra_timeout }}
-    <<: *logFailedRelease
-    values:
-      - {{ .Values.postgresql | toYaml | indent 8 | trim }}
 
   - name: cloudnativepg-operator
     chart: radar/cloudnative-pg
@@ -423,15 +362,6 @@ releases:
       - name: kratosBrowserUrl
         value: https://{{ .Values.server_name }}/kratos
 
-  - name: radar-appserver-postgresql
-    chart: radar/radar-postgresql
-    version: {{ .Values.radar_appserver_postgresql._chart_version }}
-    installed: {{ .Values.radar_appserver_postgresql._install }}
-    timeout: {{ add .Values.base_timeout .Values.radar_appserver_postgresql._extra_timeout }}
-    <<: *logFailedRelease
-    values:
-      - {{ .Values.radar_appserver_postgresql | toYaml | indent 8 | trim }}
-
   - name: radar-appserver
     chart: radar/radar-appserver
     version: {{ .Values.radar_appserver._chart_version }}
@@ -456,33 +386,6 @@ releases:
       - name: upload.storage.secret_key
         value: {{ dig "s3" "credential" .Values.s3_secret_key .Values.s3_proxy }}
     {{ end }}
-
-  - name: data-dashboard-timescaledb
-    chart: radar/radar-timescaledb
-    version: {{ .Values.data_dashboard_timescaledb._chart_version }}
-    installed: {{ .Values.data_dashboard_timescaledb._install }}
-    timeout: {{ add .Values.base_timeout .Values.data_dashboard_timescaledb._extra_timeout }}
-    <<: *logFailedRelease
-    values:
-      - {{ .Values.data_dashboard_timescaledb | toYaml | indent 8 | trim }}
-
-  - name: grafana-metrics-timescaledb
-    chart: radar/radar-timescaledb
-    version: {{ .Values.grafana_metrics_timescaledb._chart_version }}
-    installed: {{ .Values.grafana_metrics_timescaledb._install }}
-    timeout: {{ add .Values.base_timeout .Values.grafana_metrics_timescaledb._extra_timeout }}
-    <<: *logFailedRelease
-    values:
-      - {{ .Values.grafana_metrics_timescaledb | toYaml | indent 8 | trim }}
-
-  - name: realtime-dashboard-timescaledb
-    chart: radar/radar-timescaledb
-    version: {{ .Values.realtime_dashboard_timescaledb._chart_version }}
-    installed: {{ .Values.realtime_dashboard_timescaledb._install }}
-    timeout: {{ add .Values.base_timeout .Values.realtime_dashboard_timescaledb._extra_timeout }}
-    <<: *logFailedRelease
-    values:
-      - {{ .Values.realtime_dashboard_timescaledb | toYaml | indent 8 | trim }}
 
   - name: radar-grafana
     chart: radar/radar-grafana
@@ -779,16 +682,6 @@ releases:
       - name: oauth_client_secret
         value: {{ dig "oauth_client_secret" (dig "oauth_clients" "radar_redcap_integrator" "client_secret" "" .Values.management_portal) .Values.radar_integration }}
 
-  - name: redis
-    chart: radar/redis
-    version: {{ .Values.redis._chart_version }}
-    installed: {{ .Values.redis._install }}
-    timeout: {{ add .Values.base_timeout .Values.redis._extra_timeout }}
-    <<: *logFailedRelease
-    values:
-      - "../etc/redis/values.yaml"
-      - {{ .Values.redis | toYaml | indent 8 | trim }}
-      -
   - name: radar-redis
     chart: radar/radar-redis
     version: {{ .Values.radar_redis._chart_version }}
@@ -881,6 +774,158 @@ releases:
       - name: target.s3.secretKey
         value: {{ dig "target" "s3" "secretKey" .Values.s3_secret_key .Values.radar_output }}
 
+  - name: cc-schema-registry-proxy
+    chart: radar/cc-schema-registry-proxy
+    version: {{ .Values.ccSchemaRegistryProxy._chart_version }}
+    installed: {{ .Values.ccSchemaRegistryProxy._install }}
+    timeout: {{ add .Values.base_timeout .Values.ccSchemaRegistryProxy._extra_timeout }}
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.ccSchemaRegistryProxy | toYaml | indent 8 | trim }}
+      - {{ .Values.confluent_cloud| toYaml | indent 8 | trim }}
+    set:
+      - name: service.externalName
+        value: {{ .Values.ccSchemaRegistryProxy.externalName }}
+      - name: ingress.hosts
+        values: [{{ .Values.server_name }}]
+
+  - name: radar-push-endpoint
+    chart: radar/radar-push-endpoint
+    version: {{ .Values.radar_push_endpoint._chart_version }}
+    installed: {{ .Values.radar_push_endpoint._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_push_endpoint._extra_timeout }}
+    needs:
+      - management-portal
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.radar_push_endpoint | toYaml | indent 8 | trim }}
+      - {{ .Values.confluent_cloud | toYaml | indent 8 | trim }}
+    set:
+      - name: ingress.hosts
+        values: [{{ .Values.server_name }}]
+      - name: cc.enabled
+        value: {{ .Values.confluent_cloud.enabled }}
+      - name: serviceMonitor.enabled
+        value: {{ .Values.kube_prometheus_stack._install }}
+      {{ if .Values.confluent_cloud.enabled }}
+      - name: schemaRegistry
+        value: {{ .Values.confluent_cloud.cc.schemaRegistryUrl }}
+      - name: bootstrapServers
+        value: {{ .Values.confluent_cloud.cc.bootstrapServerurl }}
+      {{ end }}
+      - name: garmin.userRepositoryClientSecret
+        value: {{ dig "garmin" "userRepositoryClientSecret" (dig "oauth_clients" "radar_push_endpoint" "client_secret" "" .Values.management_portal) .Values.radar_push_endpoint }}
+
+# ---------------------------------- LEGACY services --------------------------------------------
+# ---------- these deprecated services are no longer maintained; use at your own risk -----------
+
+  - name: cp-zookeeper
+    chart: cp-radar/cp-zookeeper
+    version: {{ .Values.cp_zookeeper._chart_version }}
+    installed: {{ .Values.cp_zookeeper._install }}
+    timeout: {{ add .Values.base_timeout .Values.cp_zookeeper._extra_timeout }}
+    <<: *logFailedRelease
+    values:
+      - "../etc/cp-zookeeper/values.yaml"
+      - {{ .Values.cp_zookeeper | toYaml | indent 8 | trim }}
+
+  - name: cp-kafka
+    chart: cp-radar/cp-kafka
+    version: {{ .Values.cp_kafka._chart_version }}
+    installed: {{ .Values.cp_kafka._install }}
+    timeout: {{ add .Values.base_timeout .Values.cp_kafka._extra_timeout }}
+    {{ if .Values.cp_zookeeper._install }}needs: [cp-zookeeper]{{ end }}
+    <<: *logFailedRelease
+    values:
+      - "../etc/cp-kafka/values.yaml"
+      - {{ .Values.cp_kafka | toYaml | indent 8 | trim }}
+    set:
+      - name: brokers
+        value: {{ .Values.kafka_num_brokers }}
+      - name: configurationOverrides.default\.replication\.factor
+        value: {{ .Values.kafka_num_topic_replicas }}
+      - name: configurationOverrides.min\.insync\.replicas
+        value: {{ .Values.kafka_num_in_sync_brokers }}
+      - name: configurationOverrides.num\.partitions
+        value: {{ .Values.kafka_num_topic_partitions }}
+
+  - name: cp-schema-registry
+    chart: cp-radar/cp-schema-registry
+    version: {{ .Values.cp_schema_registry._chart_version }}
+    installed: {{ .Values.cp_schema_registry._install }}
+    timeout: {{ add .Values.base_timeout .Values.cp_schema_registry._extra_timeout }}
+    {{ if .Values.cp_kafka._install }}needs: [cp-kafka]{{ end }}
+    <<: *logFailedRelease
+    values:
+      - "../etc/cp-schema-registry/values.yaml"
+      - {{ .Values.cp_schema_registry | toYaml | indent 8 | trim }}
+    set:
+      - name: ingress.hosts[0].host
+        value: "{{ .Values.server_name }}"
+      - name: ingress.hosts[0].paths
+        values: ["/schema/?(.*)"]
+      {{- if .Values.enable_tls }}
+      - name: ingress.tls[0].secretName
+        value: radar-base-tls
+      - name: ingress.tls[0].hosts
+        values: ["{{ .Values.server_name }}"]
+      {{- end }}
+
+  - name: postgresql
+    chart: radar/radar-postgresql
+    version: {{ .Values.postgresql._chart_version }}
+    installed: {{ .Values.postgresql._install }}
+    timeout: {{ add .Values.base_timeout .Values.postgresql._extra_timeout }}
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.postgresql | toYaml | indent 8 | trim }}
+
+  - name: radar-appserver-postgresql
+    chart: radar/radar-postgresql
+    version: {{ .Values.radar_appserver_postgresql._chart_version }}
+    installed: {{ .Values.radar_appserver_postgresql._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_appserver_postgresql._extra_timeout }}
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.radar_appserver_postgresql | toYaml | indent 8 | trim }}
+
+  - name: data-dashboard-timescaledb
+    chart: radar/radar-timescaledb
+    version: {{ .Values.data_dashboard_timescaledb._chart_version }}
+    installed: {{ .Values.data_dashboard_timescaledb._install }}
+    timeout: {{ add .Values.base_timeout .Values.data_dashboard_timescaledb._extra_timeout }}
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.data_dashboard_timescaledb | toYaml | indent 8 | trim }}
+
+  - name: grafana-metrics-timescaledb
+    chart: radar/radar-timescaledb
+    version: {{ .Values.grafana_metrics_timescaledb._chart_version }}
+    installed: {{ .Values.grafana_metrics_timescaledb._install }}
+    timeout: {{ add .Values.base_timeout .Values.grafana_metrics_timescaledb._extra_timeout }}
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.grafana_metrics_timescaledb | toYaml | indent 8 | trim }}
+
+  - name: realtime-dashboard-timescaledb
+    chart: radar/radar-timescaledb
+    version: {{ .Values.realtime_dashboard_timescaledb._chart_version }}
+    installed: {{ .Values.realtime_dashboard_timescaledb._install }}
+    timeout: {{ add .Values.base_timeout .Values.realtime_dashboard_timescaledb._extra_timeout }}
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.realtime_dashboard_timescaledb | toYaml | indent 8 | trim }}
+
+  - name: redis
+    chart: radar/redis
+    version: {{ .Values.redis._chart_version }}
+    installed: {{ .Values.redis._install }}
+    timeout: {{ add .Values.base_timeout .Values.redis._extra_timeout }}
+    <<: *logFailedRelease
+    values:
+      - "../etc/redis/values.yaml"
+      - {{ .Values.redis | toYaml | indent 8 | trim }}
+
   - name: radar-upload-postgresql
     chart: radar/radar-postgresql
     version: {{ .Values.radar_upload_postgresql._chart_version }}
@@ -946,60 +991,3 @@ releases:
         value: {{ .Values.s3_secret_key }}
       - name: client_secret
         value: {{ dig "client_secret" (dig "oauth_clients" "radar_upload_connect" "client_secret" "" .Values.management_portal) .Values.radar_upload_source_connector }}
-
-  - name: cc-schema-registry-proxy
-    chart: radar/cc-schema-registry-proxy
-    version: {{ .Values.ccSchemaRegistryProxy._chart_version }}
-    installed: {{ .Values.ccSchemaRegistryProxy._install }}
-    timeout: {{ add .Values.base_timeout .Values.ccSchemaRegistryProxy._extra_timeout }}
-    <<: *logFailedRelease
-    values:
-      - {{ .Values.ccSchemaRegistryProxy | toYaml | indent 8 | trim }}
-      - {{ .Values.confluent_cloud| toYaml | indent 8 | trim }}
-    set:
-      - name: service.externalName
-        value: {{ .Values.ccSchemaRegistryProxy.externalName }}
-      - name: ingress.hosts
-        values: [{{ .Values.server_name }}]
-
-  - name: radar-push-endpoint
-    chart: radar/radar-push-endpoint
-    version: {{ .Values.radar_push_endpoint._chart_version }}
-    installed: {{ .Values.radar_push_endpoint._install }}
-    timeout: {{ add .Values.base_timeout .Values.radar_push_endpoint._extra_timeout }}
-    needs:
-      - management-portal
-    <<: *logFailedRelease
-    values:
-      - {{ .Values.radar_push_endpoint | toYaml | indent 8 | trim }}
-      - {{ .Values.confluent_cloud | toYaml | indent 8 | trim }}
-    set:
-      - name: ingress.hosts
-        values: [{{ .Values.server_name }}]
-      - name: cc.enabled
-        value: {{ .Values.confluent_cloud.enabled }}
-      - name: serviceMonitor.enabled
-        value: {{ .Values.kube_prometheus_stack._install }}
-      {{ if .Values.confluent_cloud.enabled }}
-      - name: schemaRegistry
-        value: {{ .Values.confluent_cloud.cc.schemaRegistryUrl }}
-      - name: bootstrapServers
-        value: {{ .Values.confluent_cloud.cc.bootstrapServerurl }}
-      {{ end }}
-      - name: garmin.userRepositoryClientSecret
-        value: {{ dig "garmin" "userRepositoryClientSecret" (dig "oauth_clients" "radar_push_endpoint" "client_secret" "" .Values.management_portal) .Values.radar_push_endpoint }}
-
-  - name: velero
-    namespace: velero
-    chart: radar/velero-s3-deployment
-    version: {{ .Values.velero._chart_version }}
-    installed: {{ .Values.velero._install }}
-    timeout: {{ add .Values.base_timeout .Values.velero._extra_timeout }}
-    <<: *logFailedRelease
-    values:
-      - {{ .Values.velero | toYaml | indent 8 | trim }}
-    set:
-      - name: local.accessKey
-        value: {{ dig "local" "accessKey" .Values.s3_access_key .Values.velero }}
-      - name: local.secretKey
-        value: {{ dig "local" "secretKey" .Values.s3_secret_key .Values.velero }}

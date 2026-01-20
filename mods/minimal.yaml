@@ -95,3 +95,8 @@ radar_upload_postgresql:
           cpu: 50m
       persistence:
         size: 1Gi
+radar_redis:
+  mode: standalone
+radar_output:
+  redis:
+    uri: redis://radar-redis-standalone:6379

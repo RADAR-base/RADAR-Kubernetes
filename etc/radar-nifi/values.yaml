@@ -1,0 +1,45 @@
+  nifi-cluster:
+    cluster:
+      nodeConfigGroups:
+        default_group:
+          storageConfigs:
+            - mountPath: /opt/nifi/flowfile_repository
+              name: flowfile-repository
+              pvcSpec:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 10Gi
+            - mountPath: /opt/nifi/nifi-current/conf
+              name: conf
+              pvcSpec:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 500m
+            - mountPath: /opt/nifi/content_repository
+              name: content-repository-default
+              pvcSpec:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 10Gi
+            - mountPath: /opt/nifi/provenance_repository
+              name: provenance-repository-default
+              pvcSpec:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 10Gi
+            - mountPath: /opt/nifi/data
+              name: data
+              pvcSpec:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 5Gi

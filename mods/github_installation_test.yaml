@@ -1,13 +1,14 @@
 atomicInstall: false
 base_timeout: 420
 
+# Fluent bit does not install on kd3 because of missing machineid file.
+fluent_bit:
+  _install: false
+
 confluent_cloud:
   enabled: false
 
 ccSchemaRegistryProxy:
-  _install: false
-
-nifi:
   _install: false
 
 radar_kratos:
@@ -43,3 +44,12 @@ cp_zookeeper:
 
 cp_kafka:
   _install: false
+
+# ---- extra services ----
+velero:
+  _install: false
+
+radar_nifi:
+  _install: false
+# ------------------------
+
