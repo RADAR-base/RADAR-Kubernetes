@@ -27,7 +27,7 @@ radar_rest_sources_backend:
       enable: true
       authorizationEndpoint: http://mockserver.mockserver:1080/fitbit/oauth2/authorize
       tokenEndpoint: http://mockserver.mockserver:1080/fitbit/oauth2/token
-      scope: hartrate
+      scope: heartrate
 radar_fitbit_connector:
   _install: true
   fitbit_api_url: http://mockserver.mockserver:1080/fitbit
@@ -375,6 +375,8 @@ radar_hydra:
         - authorization_code
         - refresh_token
         - client_credentials
+      audience:
+        - res_ManagementPortal
       tokenEndpointAuthMethod: client_secret_basic
     aRMT:
       enable: true
@@ -383,13 +385,17 @@ radar_hydra:
         - authorization_code
         - client_credentials
     radar_rest_sources_auth_backend:
+      enable: true
       audience:
         - res_ManagementPortal
         - res_upload
-        # TODO the last aud was added to make e2e tests passing - double-check if it is acceptable (change due to new way of fetching token with client_credentials)
         - res_restAuthorizer
       scope:
         - PROJECT.READ
         - SUBJECT.READ
-        # TODO the last scope was added to make e2e tests passing - double-check if it is acceptable (change due to new way of fetching token with client_credentials)
         - SUBJECT.UPDATE
+      tokenEndpointAuthMethod: client_secret_post
+    radar_rest_sources_authorizer:
+      enable: true
+    radar_fitbit_connector:
+      enable: true

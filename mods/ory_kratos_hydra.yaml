@@ -1,0 +1,23 @@
+# Management-portal chart is set to MP only mode by default (using internal IDP and internal auth server)
+management_portal:
+  identity_server:
+    internal: false
+  authserver:
+    internal: false
+  urlSecret:
+    name: radar-cloudnative-postgresql-managementportal
+    key: jdbc-uri
+  userSecret:
+    name: radar-cloudnative-postgresql-managementportal
+    key: username
+  passwordSecret:
+    name: radar-cloudnative-postgresql-managementportal
+    key: password
+  managementportal:
+    base_url: http://localhost/managementportal
+
+radar_kratos:
+  _install: true
+
+radar_hydra:
+  _install: true

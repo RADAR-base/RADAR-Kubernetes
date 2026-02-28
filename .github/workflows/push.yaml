@@ -37,7 +37,10 @@ jobs:
           ./.github/ci_config/bin/install-dependencies
 
       - name: Install Python dependencies
-        run: pip install -r test/features/requirements.txt
+        run: |
+          python3.12 -m pip install -r test/features/requirements.txt
+          python3.12 -m playwright install-deps
+          python3.12 -m playwright install
 
       - name: Prepare the environment (add secrets and enable installation of all components)
         run: |

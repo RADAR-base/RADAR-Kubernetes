@@ -6,6 +6,7 @@ environments:
       - ../etc/production.yaml.gotmpl
       - ../etc/secrets.yaml
       - ../mods/confluent_kafka.yaml
+      - ../mods/ory_kratos_hydra.yaml
     {{ if not .Values.enable_tls }}
       - ../mods/disable_tls.yaml
     {{ end }}
