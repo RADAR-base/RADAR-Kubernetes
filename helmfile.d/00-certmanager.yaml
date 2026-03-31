@@ -13,7 +13,15 @@ releases:
     installed: {{ .Values.kube_prometheus_stack._install }}
     timeout: {{ add .Values.base_timeout .Values.kube_prometheus_stack._extra_timeout }}
     disableValidation: true
-    <<: *logFailedReleasePrometheus
+    hooks:
+      - events: ["presync"]
+        showlogs: true
+        command: "kubectl"
+        args: ["--context", "{{ .Values.kubeContext }}", "apply", "--force-conflicts", "--server-side", "-f", "../etc/kube-prometheus-stack/files/crds.yaml"]
+      - events: ["postsync"]
+        showlogs: true
+        command: "../bin/log-failed-release"
+        args: ["-c", "'{{ .Values.kubeContext }}'", "-n", "'monitoring'", "-r", "'kube-prometheus-stack'", "-e", "''"]
     values:
       - {{ .Values.kube_prometheus_stack | toYaml | indent 8 | trim }}
     set:
@@ -33,7 +41,15 @@ releases:
       - monitoring/kube-prometheus-stack
     {{ end }}
     disableValidation: true
-    <<: *logFailedReleaseCertManager
+    hooks:
+      - events: ["presync"]
+        showlogs: true
+        command: "kubectl"
+        args: ["--context", "{{ .Values.kubeContext }}", "apply", "-f", "../etc/cert-manager/files/crds.yaml"]
+      - events: ["postsync"]
+        showlogs: true
+        command: "../bin/log-failed-release"
+        args: ["-c", "'{{ .Values.kubeContext }}'", "-n", "'cert-manager'", "-r", "'cert-manager'", "-e", "''"]
     values:
       - {{ .Values.cert_manager | toYaml | indent 8 | trim }}
     set:
