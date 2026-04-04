@@ -823,7 +823,7 @@ releases:
 
   - name: radar-seaweedfs
 #    chart: radar/radar-seaweedfs
-    chart: ../../radar-helm-charts/charts/radar-seaweedfs
+    chart: ./helm/charts/radar-seaweedfs
     version: {{ .Values.radar_seaweedfs._chart_version }}
     installed: {{ .Values.radar_seaweedfs._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_seaweedfs._extra_timeout }}
@@ -858,6 +858,30 @@ releases:
         value: {{ dig "bucketAccessKey" .Values.s3_access_key .Values.radar_s3_connector }}
       - name: bucketSecretKey
         value: {{ dig "bucketSecretKey" .Values.s3_secret_key .Values.radar_s3_connector }}
+
+  - name: radar-iceberg-connector
+#    chart: radar/radar-s3-connector
+    chart: ./helm/charts/radar-iceberg-connector
+    version: {{ .Values.radar_iceberg_connector._chart_version }}
+    installed: {{ .Values.radar_iceberg_connector._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_iceberg_connector._extra_timeout }}
+    needs:
+      # When catalog server is 'ready', kafka can be used.
+      - catalog-server
+      {{ if .Values.radar_seaweedfs._install }}- radar-seaweedfs{{ end }}
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.radar_iceberg_connector | toYaml | indent 8 | trim }}
+      - {{ .Values.confluent_cloud | toYaml | indent 8 | trim }}
+    set:
+      - name: kafka_num_brokers
+        value: {{ .Values.kafka_num_brokers }}
+      - name: cc.enabled
+        value: {{ .Values.confluent_cloud.enabled }}
+      - name: iceberg.s3.accessKey
+        value: {{ dig "bucketAccessKey" .Values.s3_access_key .Values.radar_iceberg_connector }}
+      - name: iceberg.s3.secretKey
+        value: {{ dig "bucketSecretKey" .Values.s3_secret_key .Values.radar_iceberg_connector }}
 
   - name: s3-proxy
     chart: radar/s3-proxy

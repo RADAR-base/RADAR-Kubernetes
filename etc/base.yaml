@@ -541,7 +541,7 @@ redis:
     enabled: true
 
 radar_redis:
-  _install: true
+  _install: false
   _chart_version: 1.2.0
   _extra_timeout: 90
   redis-operator:
@@ -560,7 +560,7 @@ radar_seaweedfs:
     - radar-intermediate-storage
 
 minio:
-  _install: true
+  _install: false
   _chart_version: 14.6.32
   _extra_timeout: 210
   persistence:
@@ -584,7 +584,7 @@ minio:
 
 radar_s3_connector:
   # set to true if radar-s3-connector should be installed
-  _install: true
+  _install: false
   _chart_version: 0.7.1
   _extra_timeout: 90
   replicaCount: 1
@@ -601,7 +601,7 @@ s3_proxy:
     provider: azureblob
 
 radar_output:
-  _install: true
+  _install: false
   _chart_version: 1.2.7
   _extra_timeout: 0
   replicaCount: 1
@@ -613,6 +613,11 @@ radar_output:
     s3:
       endpoint: http://radar-seaweedfs-filer:8333/
       bucket: radar-output-storage
+
+radar_iceberg_connector:
+  _install: true
+  _chart_version: 0.0.1
+  _extra_timeout: 0
 
 # --------------------------------------------------------- 20-upload.yaml ---------------------------------------------------------
 
