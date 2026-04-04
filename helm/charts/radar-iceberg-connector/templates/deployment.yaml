@@ -1,0 +1,306 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "common.names.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "radar-iceberg-connector.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      annotations:
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
+      labels:
+        app.kubernetes.io/name: {{ include "radar-iceberg-connector.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      {{- include "radar-iceberg-connector.imagePullSecrets" . | nindent 6 }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                  - key: "app.kubernetes.io/name"
+                    operator: In
+                    values:
+                    - {{ template "radar-iceberg-connector.name" . }}
+                  - key: "app.kubernetes.io/instance"
+                    operator: In
+                    values:
+                    - {{ .Release.Name }}
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: {{ template "radar-iceberg-connector.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          env:
+          - name: CONNECT_BOOTSTRAP_SERVERS
+            value: "{{ .Values.kafka.url }}"
+          - name: CONNECT_REQUEST_TIMEOUT_MS
+            value: "20000"
+          - name: CONNECT_RETRY_BACKOFF_MS
+            value: "500"
+          - name: CONNECT_PRODUCER_BOOTSTRAP_SERVERS
+            value: "{{ .Values.kafka.url }}"
+          {{- if .Values.cc.enabled }}
+          - name: CONNECT_SECURITY_PROTOCOL
+            value: "SASL_SSL"
+          - name: CONNECT_SASL_JAAS_CONFIG
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "radar-iceberg-connector.fullname" . }}
+                key: kafkaSaslJaasConfig
+          - name: CONNECT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM
+            value: "https"
+          - name: CONNECT_SSL_ENABLED_PROTOCOLS
+            value: "TLSv1.2"
+          - name: CONNECT_SASL_MECHANISM
+            value: "PLAIN"
+          - name: CONNECT_PRODUCER_SECURITY_PROTOCOL
+            value: "SASL_SSL"
+          - name: CONNECT_PRODUCER_SASL_JAAS_CONFIG
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "radar-iceberg-connector.fullname" . }}
+                key: kafkaSaslJaasConfig
+          - name: CONNECT_PRODUCER_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM
+            value: "https"
+          - name: CONNECT_PRODUCER_SSL_ENABLED_PROTOCOLS
+            value: "TLSv1.2"
+          - name: CONNECT_PRODUCER_SASL_MECHANISM
+            value: "PLAIN"
+          - name: CONNECT_CONSUMER_SECURITY_PROTOCOL
+            value: "SASL_SSL"
+          - name: CONNECT_CONSUMER_SASL_JAAS_CONFIG
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "radar-iceberg-connector.fullname" . }}
+                key: kafkaSaslJaasConfig
+          - name: CONNECT_CONSUMER_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM
+            value: "https"
+          - name: CONNECT_CONSUMER_SSL_ENABLED_PROTOCOLS
+            value: "TLSv1.2"
+          - name: CONNECT_CONSUMER_SASL_MECHANISM
+            value: "PLAIN"
+          - name: CONNECT_KEY_CONVERTER_BASIC_AUTH_CREDENTIALS_SOURCE
+            value: "USER_INFO"
+          - name: CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "radar-iceberg-connector.fullname" . }}
+                key: schemaRegistryCredential
+          - name: CONNECT_VALUE_CONVERTER_BASIC_AUTH_CREDENTIALS_SOURCE
+            value: "USER_INFO"
+          - name: CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "radar-iceberg-connector.fullname" . }}
+                key: schemaRegistryCredential
+          - name: CONNECT_BASIC_AUTH_CREDENTIALS_SOURCE
+            value: "USER_INFO"
+          - name: CONNECT_BASIC_AUTH_USER_INFO
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "radar-iceberg-connector.fullname" . }}
+                key: schemaRegistryCredential
+          - name: CONNECT_SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "radar-iceberg-connector.fullname" . }}
+                key: schemaRegistryCredential
+          {{- else }}
+            {{- with .Values.kafka.security.env }}
+              {{- toYaml . | nindent 10 }}
+            {{- end }}
+              {{- if .Values.kafka.security.jaasSecret.name }}
+          - name: CONNECT_SASL_JAAS_CONFIG
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.kafka.security.jaasSecret.name }}
+                key: {{ .Values.kafka.security.jaasSecret.key }}
+          - name: CONNECT_PRODUCER_SASL_JAAS_CONFIG
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.kafka.security.jaasSecret.name }}
+                key: {{ .Values.kafka.security.jaasSecret.key }}
+          - name: CONNECT_CONSUMER_SASL_JAAS_CONFIG
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.kafka.security.jaasSecret.name }}
+                key: {{ .Values.kafka.security.jaasSecret.key }}
+              {{- end }}
+          {{- end }}
+          - name: CONNECT_PRODUCER_REQUEST_TIMEOUT_MS
+            value: "20000"
+          - name: CONNECT_PRODUCER_RETRY_BACKOFF_MS
+            value: "500"
+          - name: CONNECT_CONSUMER_BOOTSTRAP_SERVERS
+            value: "{{ .Values.kafka.url }}"
+          - name: CONNECT_CONSUMER_REQUEST_TIMEOUT_MS
+            value: "20000"
+          - name: CONNECT_CONSUMER_RETRY_BACKOFF_MS
+            value: "500"
+          - name: CONNECT_REST_PORT
+            value: "8083"
+          - name: CONNECT_GROUP_ID
+            value: "default"
+          - name: CONNECT_CONFIG_STORAGE_TOPIC
+            value: "default.config"
+          - name: CONNECT_OFFSET_STORAGE_TOPIC
+            value: "default.offsets"
+          - name: CONNECT_STATUS_STORAGE_TOPIC
+            value: "default.status"
+          - name: CONNECT_KEY_CONVERTER
+            value: "io.confluent.connect.avro.AvroConverter"
+          - name: CONNECT_VALUE_CONVERTER
+            value: "io.confluent.connect.avro.AvroConverter"
+          - name: CONNECT_KEY_CONVERTER_SCHEMAS_ENABLE
+            value: "false"
+          - name: CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE
+            value: "false"
+          - name: CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL
+            value: "{{ .Values.schemaRegistry.url }}"
+          - name: CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL
+            value: "{{ .Values.schemaRegistry.url }}"
+          - name: CONNECT_KEY_CONVERTER_ENHANCED_AVRO_SCHEMA_SUPPORT
+            value: "false"
+          - name: CONNECT_VALUE_CONVERTER_ENHANCED_AVRO_SCHEMA_SUPPORT
+            value: "false"
+          - name: CONNECT_INTERNAL_KEY_CONVERTER
+            value: "org.apache.kafka.connect.json.JsonConverter"
+          - name: CONNECT_INTERNAL_VALUE_CONVERTER
+            value: "org.apache.kafka.connect.json.JsonConverter"
+          - name: CONNECT_OFFSET_FLUSH_INTERVAL_MS
+            value: "10000"
+          - name: CONNECT_OFFSET_STORAGE_FILE_FILENAME
+            value: "/tmp/connect2.offset"
+          - name: CONNECT_REST_ADVERTISED_HOST_NAME
+            value: {{ include "radar-iceberg-connector.fullname" . }}
+          - name: CONNECT_PLUGIN_PATH
+            value: "/usr/share/kafka-connect/plugins"
+          - name: CONNECTOR_PROPERTY_FILE_PREFIX
+            value: "sink-iceberg/sink-iceberg"
+          - name: CONNECT_VALUE_CONVERTER_CONNECT_META_DATA
+            value: "false"
+          - name: KAFKA_HEAP_OPTS
+            value: "{{ .Values.kafkaHeapOpts }}"
+          - name: KAFKA_BROKERS
+            value: "{{ .Values.kafka_num_brokers }}"
+          - name: CONNECT_LOG4J_LOGGERS
+            value: "org.reflections=ERROR"
+          {{- if and .Values.bucketAccessKey .Values.bucketSecretKey }}
+          - name: AWS_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "radar-iceberg-connector.fullname" . }}
+                key: awsAccessKey
+          - name: AWS_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "radar-iceberg-connector.fullname" . }}
+                key: awsSecretKey
+          {{- end }}
+          {{- with .Values.extraEnvVars }}
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 8083
+              protocol: TCP
+          {{- if .Values.customLivenessProbe }}
+          livenessProbe: {{- .Values.customLivenessProbe | toYaml | nindent 12 }}
+          {{- else if .Values.livenessProbe.enabled }}
+          livenessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - /etc/kafka-connect/sink-iceberg/original/healthcheck.sh
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+          {{- end }}
+          {{- if .Values.customReadinessProbe }}
+          readinessProbe: {{- .Values.customReadinessProbe | toYaml | nindent 12 }}
+          {{- else if .Values.readinessProbe.enabled }}
+          readinessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - /etc/kafka-connect/sink-iceberg/original/healthcheck.sh
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+          {{- end }}
+          {{- if .Values.customStartupProbe }}
+          startupProbe: {{- .Values.customStartupProbe | toYaml | nindent 12 }}
+          {{- else if .Values.startupProbe.enabled }}
+          startupProbe:
+            exec:
+              command:
+              - /bin/sh
+              - /etc/kafka-connect/sink-iceberg/original/healthcheck.sh
+            initialDelaySeconds: {{ .Values.startupProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.startupProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.startupProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.startupProbe.successThreshold }}
+            failureThreshold: {{ .Values.startupProbe.failureThreshold }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: config-original
+              mountPath: /etc/kafka-connect/sink-iceberg/original
+            - name: {{ if .Values.initTopics.enabled }}config-updated{{ else }}config-original{{ end }}
+              mountPath: /etc/kafka-connect/sink-iceberg
+      {{- if .Values.initTopics.enabled }}
+      initContainers:
+        - name: init-topics
+          image: {{ .Values.initTopics.image.repository }}:{{ .Values.initTopics.image.tag | default .Chart.AppVersion }}
+          imagePullPolicy: {{ .Values.initTopics.image.pullPolicy }}
+          command:
+            - /bin/sh
+            - /etc/kafka-connect/sink-iceberg/original/add-topics-to-config.sh
+            - /etc/kafka-connect/sink-iceberg/original/sink-iceberg.properties
+            - /etc/kafka-connect/sink-iceberg/sink-iceberg.properties
+          volumeMounts:
+            - name: config-original
+              mountPath: /etc/kafka-connect/sink-iceberg/original
+            - name: config-updated
+              mountPath: /etc/kafka-connect/sink-iceberg
+      {{- end }}
+      volumes:
+        - name: config-original
+          configMap:
+            name: {{ include "radar-iceberg-connector.fullname" . }}
+        - name: config-updated
+          emptyDir: {}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

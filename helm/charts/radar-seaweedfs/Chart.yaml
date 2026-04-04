@@ -1,0 +1,22 @@
+apiVersion: v2
+appVersion: "4.02"
+description: Seaweedfs charts for Radar-base
+name: radar-seaweedfs
+home: "https://radar-base.org"
+version: 0.0.1
+maintainers:
+  - email: pim@thehyve.nl
+    name: Pim van Nierop
+    url: https://www.thehyve.nl/experts/pim-van-nierop
+type: application
+dependencies:
+  - name: common
+    repository: https://radar-base.github.io/radar-helm-charts
+    tags:
+      - bitnami-common
+    version: 2.x.x
+  - name: seaweedfs-operator
+    repository: file://../../external/seaweedfs-operator
+    version: 0.1.9
+    condition: seaweedfs-operator.enabled
+    alias: operator

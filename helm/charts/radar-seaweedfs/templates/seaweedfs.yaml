@@ -1,0 +1,52 @@
+apiVersion: seaweed.seaweedfs.com/v1
+kind: Seaweed
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{ include "common.labels.standard" . | nindent 4 }}
+spec:
+  image: {{ include "common.images.image" (dict "imageRoot" .Values.image "global" .Values.global "chart" .Chart ) }}
+  imagePullPolicy: {{ .Values.image.pullPolicy }}
+  volumeServerDiskCount: 1
+  hostSuffix: seaweed.{{ .Values.serverName }}
+  {{- if .Values.affinity }}
+  affinity: {{ .Values.affinity | toYaml | nindent 4 }}
+  {{- end }}
+  master:
+    replicas: {{ .Values.master.replicas }}
+    {{- if .Values.master.volumeSizeLimitMB }}
+    volumeSizeLimitMB: {{ .Values.master.volumeSizeLimitMB }}
+    {{- end }}
+    {{- if .Values.master.resources }}
+    resources:
+      requests: {{ default dict .Values.master.resources.requests | toYaml | nindent 8 }}
+      limits: {{ default dict .Values.master.resources.limits | toYaml | nindent 8 }}
+    {{- end }}
+    defaultReplication: {{ default "000" .Values.replication | quote }}
+  volume:
+    replicas: {{ .Values.volume.replicas }}
+    {{- if .Values.volume.resources }}
+    resources:
+      requests: {{ default dict .Values.volume.resources.requests | toYaml | nindent 8 }}
+      limits: {{ default dict .Values.volume.resources.limits | toYaml | nindent 8 }}
+    {{- end }}
+    requests:
+      storage: {{ .Values.volume.storage.size }}
+    rack: "rack1"
+    dataCenter: "dc1"
+  filer:
+    replicas: {{ .Values.filer.replicas }}
+    {{- if .Values.filer.resources }}
+    resources:
+      requests: {{ default dict .Values.filer.resources.requests | toYaml | nindent 8 }}
+      limits: {{ default dict .Values.filer.resources.limits | toYaml | nindent 8 }}
+    {{- end }}
+    s3:
+      enabled: true
+      configSecret:
+        name: {{ include "common.names.fullname" . }}-s3-config
+        key: s3_config.json
+    config: |
+      [leveldb2]
+      enabled = true
+      dir = "/data/filerldb2"

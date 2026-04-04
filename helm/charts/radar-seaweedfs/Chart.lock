@@ -1,0 +1,9 @@
+dependencies:
+- name: common
+  repository: https://radar-base.github.io/radar-helm-charts
+  version: 2.27.0
+- name: seaweedfs-operator
+  repository: file://../../external/seaweedfs-operator
+  version: 0.1.9
+digest: sha256:8c5099446a0accb988023ceaddc54155a57bac724cc546891075bfa41177e222
+generated: "2025-12-14T11:37:12.985665266+01:00"

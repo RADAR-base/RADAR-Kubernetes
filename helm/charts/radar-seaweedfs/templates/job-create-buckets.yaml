@@ -1,0 +1,78 @@
+{{- if .Values.createBuckets }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "common.names.fullname" . }}-create-buckets
+  namespace: {{ .Release.Namespace }}
+  labels: {{ include "common.labels.standard" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-weight: "5"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels: {{ include "common.labels.standard" . | nindent 8 }}
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: create-buckets
+          image: curlimages/curl:8.10.1
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: FILER_URL
+              value: http://{{ include "common.names.fullname" . }}-filer.{{ .Release.Namespace }}.svc:8888
+            - name: POLL_INTERVAL
+              value: "{{ default 2 .Values.createBucketsWait.pollIntervalSeconds }}"
+            - name: FILER_READY_TIMEOUT
+              value: "{{ default 120 .Values.createBucketsWait.filerReadyTimeoutSeconds }}"
+            - name: BUCKETS_API_TIMEOUT
+              value: "{{ default 120 .Values.createBucketsWait.bucketsApiTimeoutSeconds }}"
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -eu
+              echo "Waiting for SeaweedFS filer to be ready at ${FILER_URL} ..."
+              # Wait for the filer HTTP endpoint to be responsive, with timeout
+              start_ts=$(date +%s)
+              until curl -sf "${FILER_URL}/" >/dev/null; do
+                now_ts=$(date +%s)
+                elapsed=$(( now_ts - start_ts ))
+                if [ "${elapsed}" -ge "${FILER_READY_TIMEOUT}" ]; then
+                  echo "Timed out (${elapsed}s) waiting for filer at ${FILER_URL}." >&2
+                  exit 1
+                fi
+                echo "... waiting for filer to be ready ..."
+                sleep "${POLL_INTERVAL}"
+              done
+              echo "Filer is online."
+
+              create_bucket() {
+                bname="$1"
+                # Check if bucket exists (200 when present)
+                code=$(curl -s -o /dev/null -w "%{http_code}" "${FILER_URL}/buckets/${bname}/")
+                if [ "${code}" = "200" ]; then
+                  echo "Bucket '${bname}' already exists. Skipping."
+                else
+                  echo "Creating bucket '${bname}' ..."
+                  # SeaweedFS filer API: POST /buckets/{bucket}
+                  # Some SeaweedFS versions expect an explicit empty Content-Type and Content-Length: 0,
+                  # and prefer a trailing slash in the bucket URL (like the web UI does).
+                  if curl -sf -X POST \
+                    -H 'Content-Type:' \
+                    -H 'Content-Length: 0' \
+                    "${FILER_URL}/buckets/${bname}/" >/dev/null; then
+                    echo "Bucket '${bname}' created."
+                  else
+                    echo "Failed to create bucket '${bname}'." >&2
+                    exit 1
+                  fi
+                fi
+              }
+
+              {{- range $idx, $b := .Values.createBuckets }}
+              create_bucket {{ $b | quote }}
+              {{- end }}
+{{- end }}

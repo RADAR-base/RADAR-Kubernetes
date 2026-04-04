@@ -1,0 +1,27 @@
+apiVersion: v2
+appVersion: 0.0.1
+description: A Helm chart for RADAR-base iceberg connector. This connector uses Confluent s3 connector with a custom data transformers. These configurations enable a sink connector. See full list of properties here https://docs.confluent.io/kafka-connect-s3-sink/current/configuration_options.html#s3-configuration-options
+name: radar-iceberg-connector
+version: 0.7.3
+icon: "http://radar-base.org/wp-content/uploads/2022/09/Logo_RADAR-Base-RGB.png"
+sources:
+- https://github.com/RADAR-base/radar-helm-charts/tree/main/charts/radar-iceberg-connector
+- https://github.com/RADAR-base/kafka-connect-transform-keyvalue
+- https://docs.confluent.io/kafka-connect-s3-sink/current/configuration_options.html#s3-configuration-options
+keywords:
+  - radar-base
+  - remote-trial
+annotations:
+  artifacthub.io/license: Apache-2.0
+type: application
+home: "https://radar-base.org"
+maintainers:
+  - email: pim@thehyve.nl
+    name: Pim van Nierop
+    url: https://www.thehyve.nl/experts/pim-van-nierop
+dependencies:
+- name: common
+  repository: https://radar-base.github.io/radar-helm-charts
+  tags:
+  - bitnami-common
+  version: 2.x.x

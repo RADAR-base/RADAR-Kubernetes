@@ -1,0 +1,269 @@
+# Default values for radar-iceberg-connector.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# -- Number of radar-iceberg-connector replicas to deploy
+replicaCount: 1
+
+image:
+  # -- Image registry
+  registry: ghcr.io
+  # -- Image repository
+  repository: radar-base/kafka-connect-transform-keyvalue/kafka-connect-transform-s3
+  # -- Image tag (immutable tags are recommended)
+  # Overrides the image tag whose default is the chart appVersion.
+  tag:
+  # -- Image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag
+  digest: ""
+  # -- Image pull policy
+  pullPolicy: IfNotPresent
+  # -- Optionally specify an array of imagePullSecrets.
+  # Secrets must be manually created in the namespace.
+  # e.g:
+  # pullSecrets:
+  #   - myRegistryKeySecretName
+  #
+  pullSecrets: []
+
+# -- String to partially override radar-iceberg-connector.fullname template with a string (will prepend the release name)
+nameOverride: ""
+# -- String to fully override radar-iceberg-connector.fullname template with a string
+fullnameOverride: ""
+
+# -- Configure radar-iceberg-connector pods' Security Context
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# -- JVM Options
+kafkaHeapOpts: "-Xms3g -Xmx4g"
+
+# -- Configure radar-iceberg-connector containers' Security Context
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  # -- Kubernetes Service type
+  type: ClusterIP
+  # -- radar-iceberg-connector port
+  port: 8083
+
+resources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+  # -- CPU/Memory resource requests
+  requests:
+    cpu: 100m
+    memory: 3Gi
+
+# -- Node labels for pod assignment
+nodeSelector: {}
+
+# -- Toleration labels for pod assignment
+tolerations: []
+
+# -- Affinity labels for pod assignment
+affinity: {}
+
+# -- Additional environment variables to pass to the connector. These can be used to pass supported kafka and connect specific [configs](https://docs.confluent.io/platform/current/installation/docker/config-reference.html#kconnect-long-configuration)
+extraEnvVars: []
+
+# -- Custom livenessProbe that overrides the default one
+customLivenessProbe: {}
+
+livenessProbe:
+  # -- Enable livenessProbe
+  enabled: true
+  # -- Initial delay seconds for livenessProbe
+  initialDelaySeconds: 5
+  # -- Period seconds for livenessProbe
+  periodSeconds: 30
+  # -- Timeout seconds for livenessProbe
+  timeoutSeconds: 5
+  # -- Success threshold for livenessProbe
+  successThreshold: 1
+  # -- Failure threshold for livenessProbe
+  failureThreshold: 3
+
+# -- Custom readinessProbe that overrides the default one
+customReadinessProbe: {}
+
+readinessProbe:
+  # -- Enable readinessProbe
+  enabled: true
+  # -- Initial delay seconds for readinessProbe
+  initialDelaySeconds: 5
+  # -- Period seconds for readinessProbe
+  periodSeconds: 30
+  # -- Timeout seconds for readinessProbe
+  timeoutSeconds: 5
+  # -- Success threshold for readinessProbe
+  successThreshold: 1
+  # -- Failure threshold for readinessProbe
+  failureThreshold: 3
+
+# -- Custom startupProbe that overrides the default one
+customStartupProbe: {}
+
+startupProbe:
+  # -- Enable startupProbe
+  enabled: true
+  # -- Initial delay seconds for startupProbe
+  initialDelaySeconds: 5
+  # -- Period seconds for startupProbe
+  periodSeconds: 10
+  # -- Timeout seconds for startupProbe
+  timeoutSeconds: 10
+  # -- Success threshold for startupProbe
+  successThreshold: 1
+  # -- Failure threshold for startupProbe
+  failureThreshold: 30
+
+# -- Network policy defines who can access this application and who this applications has access to
+# @default -- check `values.yaml`
+networkpolicy:
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - ipBlock:
+        cidr: 0.0.0.0/0
+        except:
+        - 10.0.0.0/8
+        - 192.168.0.0/16
+        - 172.16.0.0/12
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: '{{ .Release.Namespace }}'
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/name: 'radar-kafka-kafka-bootstrap'
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: '{{ .Release.Namespace }}'
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/name: 'radar-kafka-schema-registry'
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: '{{ .Release.Namespace }}'
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/name: 'catalog-server'
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: '{{ .Release.Namespace }}'
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/name: 'minio'
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+      - port: 53
+        protocol: UDP
+      - port: 53
+        protocol: TCP
+
+
+# -- Number of deployed Kafka broker instances
+kafka_num_brokers: 3
+
+kafka:
+  # -- Kafka broker URLs
+  url: SASL_PLAINTEXT://radar-kafka-kafka-bootstrap:9094
+  # -- Security related env vars set in pods. Not applied when `cc.enabled` is true.
+  security:
+    # -- Env vars set for authentication with Kafka brokers. Not applied when `cc.enabled` is true.
+    env:
+      # -- Protocol used to communicate with brokers. Valid values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL.
+      - name: CONNECT_SECURITY_PROTOCOL
+        value: SASL_PLAINTEXT
+      # -- Mechanism used to authenticate with SASL. Valid values are: PLAIN, SCRAM-SHA-256, SCRAM-SHA-512.
+      - name: CONNECT_SASL_MECHANISM
+        value: SCRAM-SHA-512
+      # -- Protocol used to communicate with brokers. Valid values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL.
+      - name: CONNECT_PRODUCER_SECURITY_PROTOCOL
+        value: SASL_PLAINTEXT
+      # -- Mechanism used to authenticate with SASL. Valid values are: PLAIN, SCRAM-SHA-256, SCRAM-SHA-512.
+      - name: CONNECT_PRODUCER_SASL_MECHANISM
+        value: SCRAM-SHA-512
+      # -- Protocol used to communicate with brokers. Valid values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL.
+      - name: CONNECT_CONSUMER_SECURITY_PROTOCOL
+        value: SASL_PLAINTEXT
+      # -- Mechanism used to authenticate with SASL. Valid values are: PLAIN, SCRAM-SHA-256, SCRAM-SHA-512.
+      - name: CONNECT_CONSUMER_SASL_MECHANISM
+        value: SCRAM-SHA-512
+    # -- Secret for the Kafka SASL JAAS configuration. Not applied when `cc.enabled` is true.
+    jaasSecret:
+      name: shared-service-user
+      key: sasl.jaas.config
+
+schemaRegistry:
+  # -- Schema registry URL
+  url: http://radar-kafka-schema-registry:8081
+
+catalogServer:
+  # -- Catalog server URL
+  url: http://catalog-server:9010
+
+# -- List of topics to be consumed by the sink connector separated by comma. Topics defined in the catalog server
+# will automatically be loaded if `initTopics.enabled` is true.
+topics: ""
+# -- Number of tasks in the connector
+maxTasks: 4
+
+iceberg:
+  catalog:
+    uri: http://seaweedfs-filer:8181/iceberg
+    type: rest
+    ioImpl: org.apache.iceberg.aws.s3.S3FileIO
+    s3:
+      endpoint: http://seaweedfs-s3:8333
+      accessKey: access_key
+      secretKey: secret_key
+      region:
+      pathStyleAccess: true
+
+cc:
+  # -- Set to true, if Confluent Cloud is used
+  enabled: false
+  # -- Confluent cloud based Kafka broker URL (if Confluent Cloud based Kafka cluster is used)
+  bootstrapServerurl: ""
+  # -- Confluent cloud based Schema registry URL (if Confluent Cloud based Schema registry is used)
+  schemaRegistryUrl: ""
+  # -- API Key of the Confluent Cloud cluster
+  apiKey: ccApikey
+  # -- API secret of the Confluent Cloud cluster
+  apiSecret: ccApiSecret
+  # -- API Key of the Confluent Cloud Schema registry
+  schemaRegistryApiKey: srApiKey
+  # -- API Key of the Confluent Cloud Schema registry
+  schemaRegistryApiSecret: srApiSecret
+
+initTopics:
+  # -- If true, fetch list of topics from catalog server
+  enabled: true
+
+  image:
+    # -- Image repository to fetch topics with
+    repository: linuxserver/yq
+    # -- Image tag to fetch topics with
+    tag: 3.2.2
+    # -- Image pull policy to fetch topics with
+    pullPolicy: IfNotPresent

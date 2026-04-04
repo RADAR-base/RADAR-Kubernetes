@@ -1,0 +1,153 @@
+serverName: localhost
+
+operator:
+  fullnameOverride: seaweedfs-operator
+  webhook:
+    enabled: false
+  enabled: true
+  serviceMonitor:
+    enabled: true
+  grafanaDashboard:
+    enabled: true
+  # -- Values passed to the seaweedfs-operator chart
+  # @default -- check `values.yaml`
+  # resources:
+  #    requests:
+  #      cpu: 101m
+  #      memory: 128Mi
+  #    limits:
+  #      cpu: 101m
+  #      memory: 128Mi
+
+image:
+  # -- Image registry
+  registry: docker.io
+  # -- Image repository
+  repository: chrislusf/seaweedfs
+  # -- Image tag (immutable tags are recommended)
+  # Overrides the image tag whose default is the chart appVersion.
+  tag:
+  # -- Image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag
+  digest: ""
+  # -- Image pull policy
+  pullPolicy: IfNotPresent
+  # -- Optionally specify an array of imagePullSecrets.
+  # Secrets must be manually created in the namespace.
+  # e.g:
+  # pullSecrets:
+  #   - myRegistryKeySecretName
+  #
+  pullSecrets: []
+
+master:
+  replicas: 3
+  # -- Max size of a single volume in MB. Default is ~30Gb.
+  # When full, new volumes will be created with this size.
+  volumeSizeLimitMB:
+  resources:
+#    requests:
+#      cpu: 101m
+#      memory: 128Mi
+#    limits:
+#      cpu: 101m
+#      memory: 128Mi
+
+volume:
+  replicas: 2
+  storage:
+    # -- Size of PVC for volume server.
+    # Note that PVC size must take into account replication factor (see 'replication').
+    # e.g. 2Gi * 2 replicas in the server rack = 4Gi
+    size: 2Gi
+  resources:
+#    requests:
+#      cpu: 101m
+#      memory: 128Mi
+#    limits:
+#      cpu: 101m
+#      memory: 128Mi
+
+filer:
+  replicas: 2
+  resources:
+#    requests:
+#      cpu: 101m
+#      memory: 128Mi
+#    limits:
+#      cpu: 101m
+
+affinity:
+#  nodeAffinity:
+#    preferredDuringSchedulingIgnoredDuringExecution:
+#    ...
+#  podAffinity:
+#    preferredDuringSchedulingIgnoredDuringExecution:
+#    ...
+#  podAntiAffinity:
+#    preferredDuringSchedulingIgnoredDuringExecution:
+#    ...
+
+# -- Replication factor for data volumes in format "XYZ" where X, Y and Z are the number
+# of data replicates across data centers, racks and servers in a rack, respectively. X, Y
+# and Z can be 0, 1 or 2 signifying the number of replicates at the corresponding level.
+# For instance, "001" adds one replica on the servers in the same rack. Important: the
+# RADAR-base volume servers are hard-coded to run in the same rack; the X and Y positions
+# are not in effect, therefore.
+replication: "000"
+
+# -- List of S3 buckets to create on the SeaweedFS filer. Buckets are created idempotently.
+# If empty, no buckets will be created.
+createBuckets: []
+
+# -- Settings for the create-buckets Job waiting loops
+# Configure timeouts (in seconds) for waiting on the filer and the buckets API.
+# Defaults are 120s (2 minutes) each. Poll interval controls how often the checks run.
+createBucketsWait:
+  pollIntervalSeconds: 2
+  filerReadyTimeoutSeconds: 120
+  bucketsApiTimeoutSeconds: 120
+
+s3Config:
+  identities:
+    admin:
+      actions: ["Admin"]
+      credentials:
+        accessKey: secret
+        secretKey: secret
+    user:
+      actions: ["Read", "Write", "List"]
+      credentials:
+        accessKey: secret
+        secretKey: secret
+
+# -- Network policy defines who can access this application and who this applications has access to
+# @default -- check `values.yaml`
+networkpolicy:
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: '{{ .Release.Namespace }}'
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: radar-output
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: '{{ .Release.Namespace }}'
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: radar-s3-connector
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: '{{ .Release.Namespace }}'
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: radar-upload-source-connector
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: '{{ .Release.Namespace }}'
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: radar-gateway
