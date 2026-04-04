@@ -16,11 +16,10 @@ data:
     connect.meta.data=false
     rotate.schedule.interval.ms={{ .Values.rotateInterval | int }}
     timezone=UTC
-
     iceberg.catalog.type={{ .Values.iceberg.catalog.type }}
     iceberg.catalog.io-impl={{ .Values.iceberg.catalog.ioImpl }}
-    iceberg.catalog.s3.endpoint={{ .Values.iceberg.catalog.s3.endpoint }}
-    iceberg.catalog.s3.path-style-access={{ .Values.iceberg.catalog.s3.pathStyleAccess }}
+    iceberg.catalog.s3.endpoint={{ .Values.iceberg.s3.endpoint }}
+    iceberg.catalog.s3.path-style-access={{ .Values.iceberg.s3.pathStyleAccess }}
 
     {{/*-1 means use default configured by the kafka broker*/}}
     config.storage.replication.factor=-1

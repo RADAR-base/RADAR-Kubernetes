@@ -7,9 +7,9 @@ replicaCount: 1
 
 image:
   # -- Image registry
-  registry: ghcr.io
+  registry: docker.io
   # -- Image repository
-  repository: radar-base/kafka-connect-transform-keyvalue/kafka-connect-transform-s3
+  repository: pvannierop/radar-iceberg-connector
   # -- Image tag (immutable tags are recommended)
   # Overrides the image tag whose default is the chart appVersion.
   tag:
@@ -166,7 +166,7 @@ networkpolicy:
           kubernetes.io/metadata.name: '{{ .Release.Namespace }}'
       podSelector:
         matchLabels:
-          app.kubernetes.io/name: 'minio'
+          app.kubernetes.io/name: 'radar-seaweedfs'
   - to:
     - namespaceSelector:
         matchLabels:
@@ -233,12 +233,12 @@ iceberg:
     uri: http://seaweedfs-filer:8181/iceberg
     type: rest
     ioImpl: org.apache.iceberg.aws.s3.S3FileIO
-    s3:
-      endpoint: http://seaweedfs-s3:8333
-      accessKey: access_key
-      secretKey: secret_key
-      region:
-      pathStyleAccess: true
+  s3:
+    endpoint: http://seaweedfs-s3:8333
+    accessKey: access_key
+    secretKey: secret_key
+    region:
+    pathStyleAccess: true
 
 cc:
   # -- Set to true, if Confluent Cloud is used

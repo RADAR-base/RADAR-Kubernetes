@@ -202,7 +202,7 @@ spec:
             value: "{{ .Values.kafka_num_brokers }}"
           - name: CONNECT_LOG4J_LOGGERS
             value: "org.reflections=ERROR"
-          {{- if and .Values.bucketAccessKey .Values.bucketSecretKey }}
+          {{- if and .Values.iceberg.s3.accessKey .Values.iceberg.s3.secretKey }}
           - name: AWS_ACCESS_KEY
             valueFrom:
               secretKeyRef:
@@ -213,6 +213,10 @@ spec:
               secretKeyRef:
                 name: {{ template "radar-iceberg-connector.fullname" . }}
                 key: awsSecretKey
+          {{- end }}
+          {{- if .Values.iceberg.s3.region }}
+            - name: AWS_REGION
+              value: {{ .Values.iceberg.s3.region }}
           {{- end }}
           {{- with .Values.extraEnvVars }}
             {{- toYaml . | nindent 10 }}
