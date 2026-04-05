@@ -255,13 +255,13 @@ radar_hydra:
   _extra_timeout: 0
 
 app_config:
-  _install: true
+  _install: false
   _chart_version: 1.7.1
   _extra_timeout: 0
   replicaCount: 1
 
 app_config_frontend:
-  _install: true
+  _install: false
   _chart_version: 2.4.0
   _extra_timeout: 0
   replicaCount: 1
