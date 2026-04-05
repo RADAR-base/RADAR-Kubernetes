@@ -1,0 +1,125 @@
+{{/*
+Expand the name of the chart.
+*/}}
+{{- define "seaweedfs-operator.name" -}}
+{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+If release name contains chart name it will be used as a full name.
+*/}}
+{{- define "seaweedfs-operator.fullname" -}}
+{{- if .Values.fullnameOverride }}
+{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- $name := default .Chart.Name .Values.nameOverride }}
+{{- if contains $name .Release.Name }}
+{{- .Release.Name | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
+Create chart name and version as used by the chart label.
+*/}}
+{{- define "seaweedfs-operator.chart" -}}
+{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Common labels
+*/}}
+{{- define "seaweedfs-operator.labels" -}}
+helm.sh/chart: {{ include "seaweedfs-operator.chart" . }}
+{{ include "seaweedfs-operator.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
+
+{{/*
+Selector labels
+*/}}
+{{- define "seaweedfs-operator.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "seaweedfs-operator.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{/*
+Docker registry image pull secret
+*/}}
+{{- define "seaweedfs-operator.imagePullSecret" }}
+{{- $auth := printf "%s:%s" .username .password | b64enc -}}
+{{- printf "{\"auths\": {\"%s\": {\"auth\": \"%s\"}}}" .registry $auth | b64enc }}
+{{- end }}
+
+{{- define "seaweedfs-operator.createPullSecret" -}}
+{{- if and .Values.image.credentials (not .Values.image.pullSecrets) }}
+  {{- true -}}
+{{- else -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "seaweedfs-operator.pullSecretName" -}}
+{{- if .Values.image.pullSecrets -}}
+  {{- printf "%s" (tpl .Values.image.pullSecrets .) -}}
+{{- else -}}
+  {{- printf "%s-container-registry" (include "seaweedfs-operator.fullname" .) -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create the name of the service account to use
+*/}}
+{{- define "seaweedfs-operator.serviceAccountName" -}}
+{{- if .Values.rbac.serviceAccount.create -}}
+  {{- default (include "seaweedfs-operator.fullname" .) .Values.rbac.serviceAccount.name -}}
+{{- else -}}
+  {{- default "default" .Values.rbac.serviceAccount.name -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Mutating webhook path
+*/}}
+{{- define "seaweedfs-operator.mutatingWebhookPath" -}}/mutate-seaweed-seaweedfs-com-v1-seaweed{{- end -}}
+
+{{/*
+Validating webhook path
+*/}}
+{{- define "seaweedfs-operator.validatingWebhookPath" -}}/validate-seaweed-seaweedfs-com-v1-seaweed{{- end -}}
+
+{{/*
+Webhook Pod Security Context
+*/}}
+{{- define "seaweedfs-operator.webhookPodSecurityContext" -}}
+{{- with .Values.webhook.podSecurityContext }}
+securityContext:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Webhook Container Security Context
+*/}}
+{{- define "seaweedfs-operator.webhookContainerSecurityContext" -}}
+{{- with .Values.webhook.securityContext }}
+securityContext:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Webhook init container for waiting until webhook service is ready
+*/}}
+{{- define "seaweedfs-operator.webhookWaitInitContainer" -}}
+- name: wait-for-webhook
+  image: {{ .Values.webhook.initContainer.image }}
+  {{- include "seaweedfs-operator.webhookContainerSecurityContext" . | nindent 2 }}
+  command: ['sh', '-c', 'set -e; until curl -sk --fail --head --max-time 5 https://{{ include "seaweedfs-operator.fullname" . }}-webhook.{{ .Release.Namespace }}.svc:443{{ .webhookPath }} >/dev/null; do echo waiting for webhook; sleep 1; done;']
+{{- end -}}

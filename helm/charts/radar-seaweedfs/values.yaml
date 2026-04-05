@@ -107,6 +107,10 @@ createBucketsWait:
   filerReadyTimeoutSeconds: 120
   bucketsApiTimeoutSeconds: 120
 
+iceberg:
+  enabled: false
+  port: 8181
+
 s3Config:
   identities:
     admin:

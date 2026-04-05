@@ -58,7 +58,24 @@ cp_zookeeper:
     requests:
       cpu: 100m
       memory: 300Mi
+
 radar_s3_connector:
+  schemaRegistry:
+    url: http://cp-schema-registry:8081
+  kafka:
+    url: PLAINTEXT://cp-kafka-headless:9092
+    security:
+      env:
+        - name: CONNECT_SECURITY_PROTOCOL
+          value: PLAINTEXT
+        - name: CONNECT_PRODUCER_SECURITY_PROTOCOL
+          value: PLAINTEXT
+        - name: CONNECT_CONSUMER_SECURITY_PROTOCOL
+          value: PLAINTEXT
+      jaasSecret:
+        name: null
+
+radar_iceberg_connector:
   schemaRegistry:
     url: http://cp-schema-registry:8081
   kafka:

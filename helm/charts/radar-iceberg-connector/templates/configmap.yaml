@@ -10,16 +10,23 @@ metadata:
 data:
   sink-iceberg.properties: |
     name=radar-iceberg-sink-connector
-    connector.class=io.confluent.connect.s3.S3SinkConnector
+    connector.class=org.apache.iceberg.connect.IcebergSinkConnector
     tasks.max={{ .Values.maxTasks | int }}
+    format.class=io.confluent.connect.s3.format.avro.AvroFormat
+    flush.size={{ .Values.flushSize | int }}
     topics={{ .Values.topics }}
     connect.meta.data=false
     rotate.schedule.interval.ms={{ .Values.rotateInterval | int }}
     timezone=UTC
+    iceberg.catalog.uri={{ .Values.iceberg.catalog.uri }}
     iceberg.catalog.type={{ .Values.iceberg.catalog.type }}
     iceberg.catalog.io-impl={{ .Values.iceberg.catalog.ioImpl }}
     iceberg.catalog.s3.endpoint={{ .Values.iceberg.s3.endpoint }}
     iceberg.catalog.s3.path-style-access={{ .Values.iceberg.s3.pathStyleAccess }}
+    iceberg.tables={{ .Values.iceberg.tables.tables }}
+    iceberg.tables.control.topic={{ .Values.iceberg.control.topic }}
+    iceberg.tables.auto-create-enabled={{ .Values.iceberg.tables.autoCreateEnabled }}
+    iceberg.tables.dynamic-schema-evolution-enabled={{ .Values.iceberg.tables.automaticSchemaEvolutionEnabled }}
 
     {{/*-1 means use default configured by the kafka broker*/}}
     config.storage.replication.factor=-1

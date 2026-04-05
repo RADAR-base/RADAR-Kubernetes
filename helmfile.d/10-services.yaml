@@ -823,7 +823,7 @@ releases:
 
   - name: radar-seaweedfs
 #    chart: radar/radar-seaweedfs
-    chart: ./helm/charts/radar-seaweedfs
+    chart: ../helm/charts/radar-seaweedfs
     version: {{ .Values.radar_seaweedfs._chart_version }}
     installed: {{ .Values.radar_seaweedfs._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_seaweedfs._extra_timeout }}
@@ -861,7 +861,7 @@ releases:
 
   - name: radar-iceberg-connector
 #    chart: radar/radar-s3-connector
-    chart: ./helm/charts/radar-iceberg-connector
+    chart: ../helm/charts/radar-iceberg-connector
     version: {{ .Values.radar_iceberg_connector._chart_version }}
     installed: {{ .Values.radar_iceberg_connector._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_iceberg_connector._extra_timeout }}
