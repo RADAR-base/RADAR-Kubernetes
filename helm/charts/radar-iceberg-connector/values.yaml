@@ -234,7 +234,7 @@ iceberg:
   control:
     topic: iceberg-control-topic
   catalog:
-    uri: http://radar-seaweedfs-filer:8181/iceberg
+    uri: http://radar-seaweedfs-s3:8181
     type: rest
     ioImpl: org.apache.iceberg.aws.s3.S3FileIO
   tables:
@@ -243,7 +243,7 @@ iceberg:
     tables: "${topic}"
     automaticSchemaEvolutionEnabled: true
   s3:
-    endpoint: http://radar-seaweedfs-filer:8333
+    endpoint: http://radar-seaweedfs-s3:8333
     accessKey: access_key
     secretKey: secret_key
     region:

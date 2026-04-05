@@ -821,7 +821,7 @@ releases:
       - name: metrics.prometheusRule.enabled
         value: {{ .Values.kube_prometheus_stack._install }}
 
-  - name: radar-seaweedfs
+  - name: radar-seaweedfs-crd
 #    chart: radar/radar-seaweedfs
     chart: ../helm/charts/radar-seaweedfs
     version: {{ .Values.radar_seaweedfs._chart_version }}
@@ -835,6 +835,16 @@ releases:
         value: {{ .Values.s3_access_key }}
       - name: s3Config.identities.user.credentials.secretKey
         value: {{ .Values.s3_secret_key }}
+
+  - name: radar-seaweedfs
+    #    chart: radar/radar-seaweedfs
+    chart: ../helm/external/seaweedfs
+    version: {{ .Values.seaweedfs._chart_version }}
+    installed: {{ .Values.seaweedfs._install }}
+    timeout: {{ add .Values.base_timeout .Values.seaweedfs._extra_timeout }}
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.seaweedfs | toYaml | indent 8 | trim }}
 
   - name: radar-s3-connector
     chart: radar/radar-s3-connector

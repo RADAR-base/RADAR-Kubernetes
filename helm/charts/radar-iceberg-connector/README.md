@@ -91,7 +91,7 @@ A Helm chart for RADAR-base s3 connector. This connector uses Confluent s3 conne
 | schemaRegistry.url | string | `"http://radar-kafka-schema-registry:8081"` | Schema registry URL |
 | catalogServer.url | string | `"http://catalog-server:9010"` | Catalog server URL |
 | topics | string | `""` | List of topics to be consumed by the sink connector separated by comma. Topics defined in the catalog server will automatically be loaded if `initTopics.enabled` is true. |
-| s3Endpoint | string | `"http://radar-seaweedfs-filer:8333/"` | Target S3 endpoint url |
+| s3Endpoint | string | `"http://radar-seaweedfs-s3:8333/"` | Target S3 endpoint url |
 | s3Tagging | bool | `false` | set to true, if S3 objects should be tagged with start and end offsets, as well as record count. |
 | s3PartSize | int | `5242880` | The Part Size in S3 Multi-part Uploads. |
 | s3Region | string | `nil` | The AWS region to be used the connector. Some compatibility layers require this. |
