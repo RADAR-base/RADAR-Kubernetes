@@ -1,5 +1,5 @@
 customEnv:
-  KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+  KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
   KAFKA_LOG_RETENTION_HOURS: "730"
   KAFKA_MESSAGE_MAX_BYTES: "4000048"
   KAFKA_LOG4J_LOGGERS: kafka.producer.async.DefaultEventHandler=INFO,kafka.controller=INFO,state.change.logger=INFO

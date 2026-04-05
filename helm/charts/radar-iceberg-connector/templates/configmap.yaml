@@ -18,15 +18,23 @@ data:
     connect.meta.data=false
     rotate.schedule.interval.ms={{ .Values.rotateInterval | int }}
     timezone=UTC
+    iceberg.control.group-id-prefix=cg-control
+    iceberg.coordinator.transactional.id.prefix=NEW_2_
+    iceberg.control.group-id=lalalalalalal
     iceberg.catalog.uri={{ .Values.iceberg.catalog.uri }}
     iceberg.catalog.type={{ .Values.iceberg.catalog.type }}
     iceberg.catalog.io-impl={{ .Values.iceberg.catalog.ioImpl }}
     iceberg.catalog.s3.endpoint={{ .Values.iceberg.s3.endpoint }}
     iceberg.catalog.s3.path-style-access={{ .Values.iceberg.s3.pathStyleAccess }}
+    #iceberg.tables.dynamic-enabled=true
     iceberg.tables={{ .Values.iceberg.tables.tables }}
-    iceberg.tables.control.topic={{ .Values.iceberg.control.topic }}
+    iceberg.control.topic={{ .Values.iceberg.control.topic }}
     iceberg.tables.auto-create-enabled={{ .Values.iceberg.tables.autoCreateEnabled }}
     iceberg.tables.dynamic-schema-evolution-enabled={{ .Values.iceberg.tables.automaticSchemaEvolutionEnabled }}
+    # Kafka producer configuration for transaction coordinator discovery
+    producer.retry.backoff.ms=1000
+    producer.max.block.ms=30000
+    producer.metadata.max.age.ms=30000
 
     {{/*-1 means use default configured by the kafka broker*/}}
     config.storage.replication.factor=-1
