@@ -1,0 +1,229 @@
+{{/**
+
+  Copyright (C) 2024 Dremio
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+**/}}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "nessie.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "nessie.labels" . | nindent 4 }}
+    {{- if .Values.configMapLabels }}
+    {{- toYaml .Values.configMapLabels | nindent 4 }}
+    {{- end }}
+  {{- if .Values.configMapAnnotations }}
+  annotations:
+    {{- tpl (toYaml .Values.configMapAnnotations) . | nindent 4 }}
+  {{- end }}
+data:
+  application.properties: |-
+    {{- $map := dict -}}
+    {{- $_ := set $map "nessie.version.store.type" .Values.versionStoreType -}}
+
+    {{- $serviceNamesMgmt := include "nessie.fullname" . | printf "%s-mgmt" -}}
+    {{- $cacheInvalToken := .Values.managementService | toYaml | sha1sum -}}
+    {{- $_ = set $map "nessie.version.store.persist.cache-invalidations.service-names" $serviceNamesMgmt -}}
+    {{- $_ = set $map "nessie.version.store.persist.cache-invalidations.valid-tokens" $cacheInvalToken -}}
+
+    {{- $_ = set $map "quarkus.http.port" (get (first .Values.service.ports) "number") -}}
+    {{- $_ = set $map "quarkus.management.port" .Values.managementService.portNumber -}}
+
+    {{- $_ = set $map "quarkus.log.level" (coalesce .Values.logLevel .Values.log.level) -}}
+    {{- if .Values.log.console.enabled -}}
+    {{- $_ = set $map "quarkus.log.console.enable" "true" -}}
+    {{- $_ = set $map "quarkus.log.console.level" .Values.log.console.threshold -}}
+    {{- if .Values.log.console.json -}}
+    {{- $_ = set $map "quarkus.log.console.json.enabled" "true" -}}
+    {{- else -}}
+    {{- $_ = set $map "quarkus.log.console.format" .Values.log.console.format -}}
+    {{- end -}}
+    {{- else -}}
+    {{- $_ = set $map "quarkus.log.console.enable" "false" -}}
+    {{- end -}}
+    {{- if .Values.log.file.enabled -}}
+    {{- $_ = set $map "quarkus.log.file.enable" "true" -}}
+    {{- $_ = set $map "quarkus.log.file.level" .Values.log.file.threshold -}}
+    {{- $_ = set $map "quarkus.log.file.path" (printf "%s/%s" .Values.log.file.logsDir .Values.log.file.fileName) -}}
+    {{- $_ = set $map "quarkus.log.file.rotation.max-file-size" (include "nessie.quantity" .Values.log.file.rotation.maxFileSize) -}}
+    {{- $_ = set $map "quarkus.log.file.rotation.max-backup-index" .Values.log.file.rotation.maxBackupIndex -}}
+    {{- if .Values.log.file.rotation.fileSuffix -}}
+    {{- $_ = set $map "quarkus.log.file.rotation.file-suffix" .Values.log.file.rotation.fileSuffix -}}
+    {{- end -}}
+    {{- if .Values.log.file.json -}}
+    {{- $_ = set $map "quarkus.log.file.json" "true" -}}
+    {{- else -}}
+    {{- $_ = set $map "quarkus.log.file.format" .Values.log.file.format -}}
+    {{- end -}}
+    {{- else -}}
+    {{- $_ = set $map "quarkus.log.file.enable" "false" -}}
+    {{- end -}}
+    {{- if .Values.log.sentry.enabled -}}
+    {{- $_ = set $map "quarkus.log.sentry" "true" -}}
+    {{- if not .Values.log.sentry.dsn -}}{{- required "log.sentry.dsn is required when log.sentry.enabled is true" .Values.log.sentry.dsn -}}{{- end -}}
+    {{- $_ = set $map "quarkus.log.sentry.dsn" .Values.log.sentry.dsn -}}
+    {{- $_ = set $map "quarkus.log.sentry.level" .Values.log.sentry.level -}}
+    {{- if .Values.log.sentry.environment -}}
+    {{- $_ = set $map "quarkus.log.sentry.environment" .Values.log.sentry.environment -}}
+    {{- end -}}
+    {{- if .Values.log.sentry.release -}}
+    {{- $_ = set $map "quarkus.log.sentry.release" .Values.log.sentry.release -}}
+    {{- end -}}
+    {{- $_ = set $map "quarkus.log.sentry.in-app-packages" ( join "," .Values.log.sentry.inAppPackages ) -}}
+    {{- else -}}
+    {{- $_ = set $map "quarkus.log.sentry" "false" -}}
+    {{- end -}}
+    {{- $categories := dict -}}
+    {{- list .Values.log.categories "" $categories | include "nessie.mergeAdvancedConfig" -}}
+    {{- range $k, $v := $categories -}}
+    {{- $_ = set $map (printf "quarkus.log.category.\"%s\".level" $k) $v -}}
+    {{- end -}}
+
+    {{- if hasPrefix "DYNAMODB" .Values.versionStoreType -}}
+    {{- if .Values.dynamodb.region -}}
+    {{- $_ = set $map "quarkus.dynamodb.aws.region" .Values.dynamodb.region -}}
+    {{- end -}}
+    {{- if .Values.dynamodb.profile -}}
+    {{- $_ = set $map "quarkus.dynamodb.aws.credentials.profile-provider.profile-name" .Values.dynamodb.profile -}}
+    {{- end -}}
+    {{- end -}}
+
+    {{- if hasPrefix "CASSANDRA" .Values.versionStoreType -}}
+    {{- $_ = set $map "quarkus.cassandra.keyspace" .Values.cassandra.keyspace -}}
+    {{- $_ = set $map "quarkus.cassandra.contact-points" .Values.cassandra.contactPoints -}}
+    {{- if .Values.cassandra.localDatacenter -}}
+    {{- $_ = set $map "quarkus.cassandra.local-datacenter" .Values.cassandra.localDatacenter -}}
+    {{- end -}}
+    {{- /* legacy support for username/password */}}
+    {{- if and .Values.cassandra.auth .Values.cassandra.auth.username -}}
+    {{- $_ = set $map "quarkus.cassandra.auth.username" .Values.cassandra.auth.username -}}
+    {{- $_ = set $map "quarkus.cassandra.auth.password" .Values.cassandra.auth.password -}}
+    {{- end -}}
+    {{- end -}}
+
+    {{- if hasPrefix "ROCKSDB" .Values.versionStoreType -}}
+    {{- $_ = set $map "nessie.version.store.persist.rocks.database-path" "/rocks-nessie" -}}
+    {{- end -}}
+
+    {{- if hasPrefix "MONGODB" .Values.versionStoreType -}}
+    {{- if .Values.mongodb.name -}}
+    {{- $_ = set $map "quarkus.mongodb.database" .Values.mongodb.name -}}
+    {{- end -}}
+    {{- if .Values.mongodb.connectionString -}}
+    {{- $_ = set $map "quarkus.mongodb.connection-string" .Values.mongodb.connectionString -}}
+    {{- end -}}
+    {{- end -}}
+
+    {{- if hasPrefix "JDBC" .Values.versionStoreType -}}
+    {{- $oldConfig := .Values.postgres | default dict -}}
+    {{- $newConfig := .Values.jdbc | default dict -}}
+    {{- $jdbcUrl := coalesce $oldConfig.jdbcUrl $newConfig.jdbcUrl -}}
+    {{- $dbKind := include "nessie.dbKind" $jdbcUrl -}}
+    {{- $_ = set $map "nessie.version.store.persist.jdbc.datasource"  $dbKind -}}
+    {{- $_ = set $map ( printf "quarkus.datasource.%s.jdbc.url" $dbKind ) $jdbcUrl }}
+    {{- end -}}
+
+    {{- if hasPrefix "BIGTABLE" .Values.versionStoreType -}}
+    {{- $_ = set $map "quarkus.google.cloud.project-id" .Values.bigtable.projectId -}}
+    {{- $_ = set $map "nessie.version.store.persist.bigtable.instance-id" .Values.bigtable.instanceId -}}
+    {{- $_ = set $map "nessie.version.store.persist.bigtable.app-profile-id" .Values.bigtable.appProfileId -}}
+    {{- end -}}
+
+    {{- if .Values.authentication.enabled -}}
+    {{- $_ = set $map "nessie.server.authentication.enabled" .Values.authentication.enabled -}}
+    {{- $_ = set $map "quarkus.oidc.ui-app.application-type" "web-app" -}}
+    {{- $_ = set $map "quarkus.oidc.ui-app.tenant-paths" "/,/tree*,/content*,/notfound*,/commits*" -}}
+    {{- if .Values.authentication.oidcAuthServerUrl -}}
+    {{- $_ = set $map "quarkus.oidc.auth-server-url" .Values.authentication.oidcAuthServerUrl -}}
+    {{- $_ = set $map "quarkus.oidc.ui-app.auth-server-url" .Values.authentication.oidcAuthServerUrl -}}
+    {{- end -}}
+    {{- if .Values.authentication.oidcClientId -}}
+    {{- $_ = set $map "quarkus.oidc.client-id" .Values.authentication.oidcClientId -}}
+    {{- $_ = set $map "quarkus.oidc.ui-app.client-id" .Values.authentication.oidcClientId -}}
+    {{- end -}}
+    {{- else -}}
+    {{- $_ = set $map "quarkus.oidc.tenant-enabled" false -}}
+    {{- end -}}
+
+    {{- if .Values.authorization.enabled -}}
+    {{- $_ = set $map "nessie.server.authorization.enabled" .Values.authorization.enabled -}}
+    {{- if .Values.authorization.rules -}}
+    {{- range $ruleId, $rule := .Values.authorization.rules -}}
+    {{- $_ = set $map (printf "nessie.server.authorization.rules.%s" $ruleId ) $rule -}}
+    {{- end -}}
+    {{- end -}}
+    {{- end -}}
+
+    {{- if .Values.tracing.enabled -}}
+    {{- $_ = set $map "quarkus.otel.exporter.otlp.endpoint" .Values.tracing.endpoint -}}
+    {{- if .Values.tracing.attributes -}}
+    {{- $_ = set $map "quarkus.otel.resource.attributes" (include "nessie.dictToString" .Values.tracing.attributes) -}}
+    {{- end -}}
+    {{- if .Values.tracing.sample -}}
+    {{ if eq .Values.tracing.sample "all" -}}
+    {{- $_ = set $map "quarkus.otel.traces.sampler" "parentbased_always_on" -}}
+    {{- else if eq .Values.tracing.sample "none" -}}
+    {{- $_ = set $map "quarkus.otel.traces.sampler" "always_off" -}}
+    {{- else -}}
+    {{- $_ = set $map "quarkus.otel.traces.sampler" "parentbased_traceidratio" -}}
+    {{- $_ = set $map "quarkus.otel.traces.sampler.arg" .Values.tracing.sample -}}
+    {{- end -}}
+    {{- end -}}
+    {{- else -}}
+    {{- $_ = set $map "quarkus.otel.sdk.disabled" true -}}
+    {{- end -}}
+
+    {{- if .Values.metrics.enabled -}}
+    {{- range $name, $value := .Values.metrics.tags -}}
+    {{- $_ = set $map (print "nessie.metrics.tags." $name) $value -}}
+    {{- end -}}
+    {{- else -}}
+    {{- $_ = set $map "quarkus.micrometer.enabled" "false" -}}
+    {{- end -}}
+
+    {{- if .Values.catalog.enabled -}}
+    {{- list .Values.catalog.iceberg $map | include "nessie.applyCatalogIcebergOptions" -}}
+    {{- if .Values.catalog.storage.retryAfter -}}
+    {{- $_ = set $map "nessie.catalog.error-handling.throttled-retry-after" .Values.catalog.storage.retryAfter -}}
+    {{- end -}}
+    {{- list .Values.catalog.storage.s3 "nessie.catalog.service.s3." $map | include "nessie.applyCatalogStorageS3RootOptions" }}
+    {{- list .Values.catalog.storage.s3.defaultOptions "nessie.catalog.service.s3.default-options." $map | include "nessie.applyCatalogStorageS3BucketOptions" }}
+    {{- range $i, $bucket := .Values.catalog.storage.s3.buckets -}}
+    {{- if not $bucket.name -}}{{- required ( printf "catalog.storage.s3.buckets[%d]: missing bucket name" $i ) $bucket.name -}}{{- end -}}
+    {{- list $bucket ( printf "nessie.catalog.service.s3.buckets.bucket%d." (add $i 1) ) $map | include "nessie.applyCatalogStorageS3BucketOptions" }}
+    {{- end -}}
+    {{- list .Values.catalog.storage.gcs "nessie.catalog.service.gcs." $map | include "nessie.applyCatalogStorageGcsRootOptions" }}
+    {{- list .Values.catalog.storage.gcs.defaultOptions "nessie.catalog.service.gcs.default-options." $map | include "nessie.applyCatalogStorageGcsBucketOptions" }}
+    {{- range $i, $bucket := .Values.catalog.storage.gcs.buckets -}}
+    {{- if not $bucket.name -}}{{- required ( printf "catalog.storage.gcs.buckets[%d]: missing bucket name" $i ) $bucket.name -}}{{- end -}}
+    {{ list $bucket ( printf "nessie.catalog.service.gcs.buckets.bucket%d." (add $i 1) ) $map | include "nessie.applyCatalogStorageGcsBucketOptions" }}
+    {{- end -}}
+    {{- list .Values.catalog.storage.adls "nessie.catalog.service.adls." $map | include "nessie.applyCatalogStorageAdlsRootOptions" }}
+    {{- list .Values.catalog.storage.adls.defaultOptions "nessie.catalog.service.adls.default-options." $map | include "nessie.applyCatalogStorageAdlsFileSystemOptions" }}
+    {{- range $i, $filesystem := .Values.catalog.storage.adls.filesystems -}}
+    {{- if not $filesystem.name -}}{{- required ( printf "catalog.storage.adls.filesystems[%d]: missing filesystem name" $i ) $filesystem.name -}}{{- end -}}
+    {{- list $filesystem ( printf "nessie.catalog.service.adls.file-systems.filesystem%d." (add $i 1) ) $map | include "nessie.applyCatalogStorageAdlsFileSystemOptions" }}
+    {{- end -}}
+    {{- else -}}
+    {{- $_ = set $map "nessie.catalog.object-stores.health-check.enabled" false -}}
+    {{- end -}}
+
+    {{- list .Values.advancedConfig "" $map | include "nessie.mergeAdvancedConfig" }}
+    {{- $global := . -}}
+    {{- range $k, $v := $map }}
+    {{ include "nessie.appendConfigOption" (list  $k $v $global) }}
+    {{- end }}

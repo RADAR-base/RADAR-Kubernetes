@@ -1,0 +1,445 @@
+<!---
+This README.md file was generated with:
+https://github.com/norwoodj/helm-docs
+Do not modify the README.md file directly, please modify README.md.gotmpl instead.
+To re-generate the README.md file, install helm-docs then run from the repo root:
+helm-docs --chart-search-root=helm
+-->
+
+# Nessie Helm chart
+
+![Version: 0.107.4](https://img.shields.io/badge/Version-0.107.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+
+A Helm chart for Nessie.
+
+**Homepage:** <https://projectnessie.org/>
+
+## Maintainers
+* [nastra](https://github.com/nastra)
+* [snazy](https://github.com/snazy)
+* [dimas-b](https://github.com/dimas-b)
+* [adutra](https://github.com/adutra)
+
+## Source Code
+
+* <https://github.com/projectnessie/nessie>
+
+## Documentation
+
+For users: see [Nessie on Kubernetes](https://projectnessie.org/try/kubernetes/)
+for more information.
+
+For developers: to update this README file, e.g. when the chart is updated or when the template file
+`README.md.gotmpl` is updated, install the [helm-docs](https://github.com/norwoodj/helm-docs) tool,
+then run:
+
+```bash
+helm-docs --chart-search-root=helm
+```
+
+Note: don't modify the README.md file directly, please modify `README.md.gotmpl` instead.
+
+## Installation
+
+### From Helm repo
+```bash
+helm repo add nessie-helm https://charts.projectnessie.org
+helm repo update
+helm install --namespace nessie-ns nessie nessie-helm/nessie
+```
+
+### From local directory (for development purposes ONLY!)
+
+From Nessie repo root:
+
+```bash
+helm install --namespace nessie-ns nessie helm/nessie
+```
+
+Beware that the local chart may contain changes that are not yet released.
+
+### Uninstalling the chart
+
+```bash
+helm uninstall --namespace nessie-ns nessie
+```
+
+## Debugging, linting & testing locally
+
+To debug the rendering of Helm templates:
+
+```bash
+helm template nessie -n nessie-ns helm/nessie --debug
+```
+
+You can also provide a values file:
+
+```bash
+helm template nessie -n nessie-ns helm/nessie --values helm/nessie/ci/inmemory-values.yaml --debug
+```
+
+For linting and testing, the [chart-testing](https://github.com/helm/chart-testing) tool (`ct`) must
+be installed.
+
+To lint the Helm chart, use `ct lint`:
+
+```bash
+ct lint --charts helm/nessie
+```
+
+To test the charts against a local running minikube cluster, first create the namespace and apply the fixtures:
+
+```bash
+kubectl create namespace nessie-ns
+# Install Gateway API CRDs
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/latest/download/standard-install.yaml
+helm install envoy-gateway oci://docker.io/envoyproxy/gateway-helm -n gateway --create-namespace
+# Install other fixtures
+kubectl apply --namespace nessie-ns $(find helm/nessie/ci/fixtures -name "*.yaml" -exec echo -n "-f {} " \;)
+```
+
+Then run the tests with `ct install`:
+
+```bash
+ct install --charts ./helm/nessie --namespace nessie-ns --debug
+```
+
+## Exposing Nessie via the Gateway API
+
+The chart now supports the [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/) as an
+alternative to the traditional Ingress resource. Enable it by toggling `gatewayApi.enabled` and
+supplying a `gateway.gatewayClassName`. The chart will render a `Gateway` and one or more
+`HTTPRoute` objects that target the main Nessie Service by default. Only the GA
+`gateway.networking.k8s.io/v1` resources are rendered; make sure the v1 CRDs are installed in the
+cluster.
+
+Example configuration:
+
+```yaml
+gatewayApi:
+  enabled: true
+  gateway:
+    gatewayClassName: envoy
+    listeners:
+      - name: https
+        port: 443
+        protocol: HTTPS
+        hostname: nessie.example.com
+        tls:
+          enabled: true
+          certificateRefs:
+            - name: nessie-cert
+  httpRoutes:
+    - hostnames: [ nessie.example.com ]
+      rules:
+        - matches:
+            - path:
+                type: PathPrefix
+                value: /
+          backendRefs:
+            - service:
+                port: 19120
+```
+
+If `gatewayApi.enabled` remains `false`, no Gateway API objects are rendered. Make sure the Gateway API CRDs (and a compatible controller such as Envoy Gateway or Istio) are
+installed in the cluster before enabling this feature; the chart will fail fast if the resources
+are unavailable. A more advanced sample configuration can be found in
+`helm/nessie/ci/gateway-api-values.yaml`, which is also used by the chart unit tests.
+installed in the cluster before enabling this feature; the chart will fail fast if the resources
+are unavailable.
+
+## Values
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| advancedConfig | object | `{}` | Advanced configuration. You can pass here any valid Nessie or Quarkus configuration property. Any property that is defined here takes precedence over all the other configuration values generated by this chart. Properties can be passed "flattened" or as nested YAML objects (see examples below). |
+| affinity | object | `{}` | Affinity and anti-affinity for nessie pods. See https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity. |
+| authentication.enabled | bool | `false` | Specifies whether authentication for the nessie server should be enabled. |
+| authentication.oidcAuthServerUrl | string | `nil` | Sets the base URL of the OpenID Connect (OIDC) server. Required if authentication is enabled (unless local token introspection is enforced through advanced configuration). |
+| authentication.oidcClientId | string | `"nessie"` | Set the OIDC client ID. If Nessie must contact the OIDC server, this is the client ID that will be used to identify the application. |
+| authentication.oidcClientSecret | object | `{}` | Set the OIDC client secret. Whether the client secret is required depends on the OIDC server configuration. For Keycloak, the client secret is generally not required as the returned tokens can be introspected locally by Nessie. If token introspection requires a round-trip to the OIDC server, the client secret is required. |
+| authorization.enabled | bool | `false` | Specifies whether authorization for the nessie server should be enabled. |
+| authorization.rules | object | `{}` | The authorization rules when authorization.enabled=true. Example rules can be found at https://projectnessie.org/features/metadata_authorization/#authorization-rules |
+| autoscaling.enabled | bool | `false` | Specifies whether automatic horizontal scaling should be enabled. Do not enable this when using ROCKSDB version store type. |
+| autoscaling.maxReplicas | int | `3` | The maximum number of replicas to maintain. |
+| autoscaling.minReplicas | int | `1` | The minimum number of replicas to maintain. |
+| autoscaling.targetCPUUtilizationPercentage | int | `80` | Optional; set to zero or empty to disable. |
+| autoscaling.targetMemoryUtilizationPercentage | string | `nil` | Optional; set to zero or empty to disable. |
+| bigtable.appProfileId | string | `"default"` | The Google Cloud Bigtable app profile ID. |
+| bigtable.instanceId | string | `"nessie-bigtable"` | The Google Cloud Bigtable instance ID. |
+| bigtable.projectId | string | `"my-gcp-project"` | The Google Cloud project ID. |
+| bigtable.secret | object | `{}` | The secret to use to authenticate against BigTable. When provided, it is assumed that authentication will use a service account JSON key. See https://cloud.google.com/iam/docs/keys-create-delete for details on how to create a service account key. If left empty, then Workload Identity usage is assumed instead; in this case, make sure that the pod's service account has been granted access to BigTable. See https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity#authenticating_to for details on how to create a suitable service account. Important: when using Workload Identity, unless the cluster is in Autopilot mode, it is also required to add the following nodeSelector label: iam.gke.io/gke-metadata-server-enabled: "true" This is not done automatically by this chart because this selector would be invalid for Autopilot clusters. |
+| cassandra.contactPoints | string | `"cassandra.cassandra.svc.cluster.local:9042"` | The contact points for the Cassandra cluster. At least one contact point must be provided, but more can be added for redundancy. The format is a comma-separated list of host:port elements. |
+| cassandra.keyspace | string | `"nessie"` |  |
+| cassandra.localDatacenter | string | `"datacenter1"` |  |
+| cassandra.secret.name | string | `"cassandra-creds"` | The secret name to pull Cassandra credentials from. |
+| cassandra.secret.password | string | `"cassandra_password"` | The secret key storing the Cassandra password. |
+| cassandra.secret.username | string | `"cassandra_username"` | The secret key storing the Cassandra username. |
+| catalog | object | `{"enabled":false,"iceberg":{"configDefaults":{},"configOverrides":{},"defaultWarehouse":null,"objectStoresHealthCheckEnabled":true,"warehouses":[{"configDefaults":{},"configOverrides":{},"location":null,"name":null}]},"storage":{"adls":{"advancedConfig":{},"defaultOptions":{"accountSecret":{"accountKey":null,"accountName":null,"name":null},"authType":null,"endpoint":null,"externalEndpoint":null,"maxRetries":null,"maxRetryDelay":null,"retryDelay":null,"retryPolicy":null,"sasTokenSecret":{"name":null,"sasToken":null},"tryTimeout":null},"filesystems":[],"transport":{"connectTimeout":null,"connectionIdleTimeout":null,"maxHttpConnections":null,"readBlockSize":null,"readTimeout":null,"writeBlockSize":null,"writeTimeout":null}},"gcs":{"buckets":[],"defaultOptions":{"authCredentialsJsonSecret":{"key":null,"name":null},"authType":null,"clientLibToken":null,"decryptionKey":null,"deleteBatchSize":null,"encryptionKey":null,"externalHost":null,"host":null,"oauth2TokenSecret":{"expiresAt":null,"name":null,"token":null},"projectId":null,"quotaProjectId":null,"readChunkSize":null,"userProject":null,"writeChunkSize":null},"transport":{"connectTimeout":null,"initialRetryDelay":null,"initialRpcTimeout":null,"logicalTimeout":null,"maxAttempts":null,"maxRetryDelay":null,"maxRpcTimeout":null,"readTimeout":null,"retryDelayMultiplier":null,"rpcTimeoutMultiplier":null,"totalTimeout":null}},"retryAfter":null,"s3":{"buckets":[],"defaultOptions":{"accessKeySecret":{"awsAccessKeyId":null,"awsSecretAccessKey":null,"name":null},"accessPoint":null,"allowCrossRegionAccessPoint":null,"authType":null,"chunkedEncodingEnabled":null,"clientIam":{"enabled":null,"externalId":null,"policy":null,"roleArn":null,"roleSessionName":null,"sessionDuration":null,"statements":null},"endpoint":null,"externalEndpoint":null,"pathStyleAccess":null,"region":null,"requestSigningEnabled":null,"serverIam":{"enabled":null,"externalId":null,"policy":null,"roleArn":null,"roleSessionName":null,"sessionDuration":null},"stsEndpoint":null,"urlSigningExpire":null},"sessionCredentials":{"sessionCredentialCacheMaxEntries":null,"sessionCredentialRefreshGracePeriod":null,"stsClientsCacheMaxEntries":null},"transport":{"connectTimeout":null,"connectionAcquisitionTimeout":null,"connectionMaxIdleTime":null,"connectionTimeToLive":null,"expectContinueEnabled":null,"maxHttpConnections":null,"readTimeout":null}}}}` | The Nessie catalog server configuration. |
+| catalog.enabled | bool | `false` | Whether to enable the REST catalog service. |
+| catalog.iceberg | object | `{"configDefaults":{},"configOverrides":{},"defaultWarehouse":null,"objectStoresHealthCheckEnabled":true,"warehouses":[{"configDefaults":{},"configOverrides":{},"location":null,"name":null}]}` | Iceberg catalog settings. |
+| catalog.iceberg.configDefaults | object | `{}` | Iceberg config defaults applicable to all clients and warehouses. Any properties that are common to all iceberg clients should be included here. They will be passed to all clients on all warehouses as config defaults. These defaults can be overridden on a per-warehouse basis, see below. |
+| catalog.iceberg.configOverrides | object | `{}` | Iceberg config overrides applicable to all clients and warehouses. Any properties that are common to all iceberg clients should be included here. They will be passed to all clients on all warehouses as config overrides. These overrides can be overridden on a per-warehouse basis, see below. |
+| catalog.iceberg.defaultWarehouse | string | `nil` | The default warehouse name. Required. This is just a symbolic name; it must refer to a declared warehouse below. |
+| catalog.iceberg.warehouses | list | `[{"configDefaults":{},"configOverrides":{},"location":null,"name":null}]` | Iceberg warehouses. Each warehouse is a location where Iceberg tables are stored. Each warehouse has a name, a location, and optional config defaults and overrides. At least one warehouse must be defined. |
+| catalog.iceberg.warehouses[0] | object | `{"configDefaults":{},"configOverrides":{},"location":null,"name":null}` | Symbolic name of the warehouse. Required. |
+| catalog.iceberg.warehouses[0].configDefaults | object | `{}` | Iceberg config defaults specific to this warehouse. They override any defaults specified above in catalog.iceberg.configDefaults. |
+| catalog.iceberg.warehouses[0].configOverrides | object | `{}` | Iceberg config overrides specific to this warehouse. They override any defaults specified above in catalog.iceberg.configOverrides. |
+| catalog.iceberg.warehouses[0].location | string | `nil` | Location of the warehouse. Required. Used to determine the base location of a table. Scheme must be either s3 (Amazon S3), gs (Google GCS) or abfs / abfss (Azure ADLS). Storage properties for each location can be defined below. |
+| catalog.storage | object | `{"adls":{"advancedConfig":{},"defaultOptions":{"accountSecret":{"accountKey":null,"accountName":null,"name":null},"authType":null,"endpoint":null,"externalEndpoint":null,"maxRetries":null,"maxRetryDelay":null,"retryDelay":null,"retryPolicy":null,"sasTokenSecret":{"name":null,"sasToken":null},"tryTimeout":null},"filesystems":[],"transport":{"connectTimeout":null,"connectionIdleTimeout":null,"maxHttpConnections":null,"readBlockSize":null,"readTimeout":null,"writeBlockSize":null,"writeTimeout":null}},"gcs":{"buckets":[],"defaultOptions":{"authCredentialsJsonSecret":{"key":null,"name":null},"authType":null,"clientLibToken":null,"decryptionKey":null,"deleteBatchSize":null,"encryptionKey":null,"externalHost":null,"host":null,"oauth2TokenSecret":{"expiresAt":null,"name":null,"token":null},"projectId":null,"quotaProjectId":null,"readChunkSize":null,"userProject":null,"writeChunkSize":null},"transport":{"connectTimeout":null,"initialRetryDelay":null,"initialRpcTimeout":null,"logicalTimeout":null,"maxAttempts":null,"maxRetryDelay":null,"maxRpcTimeout":null,"readTimeout":null,"retryDelayMultiplier":null,"rpcTimeoutMultiplier":null,"totalTimeout":null}},"retryAfter":null,"s3":{"buckets":[],"defaultOptions":{"accessKeySecret":{"awsAccessKeyId":null,"awsSecretAccessKey":null,"name":null},"accessPoint":null,"allowCrossRegionAccessPoint":null,"authType":null,"chunkedEncodingEnabled":null,"clientIam":{"enabled":null,"externalId":null,"policy":null,"roleArn":null,"roleSessionName":null,"sessionDuration":null,"statements":null},"endpoint":null,"externalEndpoint":null,"pathStyleAccess":null,"region":null,"requestSigningEnabled":null,"serverIam":{"enabled":null,"externalId":null,"policy":null,"roleArn":null,"roleSessionName":null,"sessionDuration":null},"stsEndpoint":null,"urlSigningExpire":null},"sessionCredentials":{"sessionCredentialCacheMaxEntries":null,"sessionCredentialRefreshGracePeriod":null,"stsClientsCacheMaxEntries":null},"transport":{"connectTimeout":null,"connectionAcquisitionTimeout":null,"connectionMaxIdleTime":null,"connectionTimeToLive":null,"expectContinueEnabled":null,"maxHttpConnections":null,"readTimeout":null}}}` | Catalog storage settings. |
+| catalog.storage.adls.advancedConfig | object | `{}` | Custom ADLS configuration options, see javadocs of com.azure.core.util.Configuration. Not overridable on a per-filesystem basis. |
+| catalog.storage.adls.defaultOptions.accountSecret | object | `{"accountKey":null,"accountName":null,"name":null}` | A secret containing the account name and key to use. Required when authType is STORAGE_SHARED_KEY. |
+| catalog.storage.adls.defaultOptions.accountSecret.accountKey | string | `nil` | Secret key containing the account key. |
+| catalog.storage.adls.defaultOptions.accountSecret.accountName | string | `nil` | Secret key containing the fully-qualified account name, e.g. "myaccount.dfs.core.windows.net". |
+| catalog.storage.adls.defaultOptions.accountSecret.name | string | `nil` | Name of the secret containing the account name and key. |
+| catalog.storage.adls.defaultOptions.authType | string | `nil` | The authentication type to use. Valid values are:  NONE, STORAGE_SHARED_KEY, SAS_TOKEN, APPLICATION_DEFAULT. The default is NONE. |
+| catalog.storage.adls.defaultOptions.endpoint | string | `nil` | Custom HTTP endpoint. In case clients need to use a different URI, use externalEndpoint. |
+| catalog.storage.adls.defaultOptions.externalEndpoint | string | `nil` | Custom HTTP endpoint to be used by clients. If not set, the endpoint value is used. |
+| catalog.storage.adls.defaultOptions.maxRetries | string | `nil` | The maximum number of retries. Must be a positive integer. Default is 4. Optional. Valid if retryPolicy is EXPONENTIAL_BACKOFF or FIXED_DELAY. |
+| catalog.storage.adls.defaultOptions.maxRetryDelay | string | `nil` | Specifies the maximum delay allowed before retrying an operation, default value is PT120s (120 seconds). Must be a valid ISO duration. Valid if retryPolicy is EXPONENTIAL_BACKOFF. |
+| catalog.storage.adls.defaultOptions.retryDelay | string | `nil` | Specifies the amount of delay to use before retrying an operation, default value is PT4S (4 seconds) when retryPolicy is EXPONENTIAL_BACKOFF and PT30S (30 seconds) when retryPolicy is FIXED_DELAY. Must be a valid ISO duration. |
+| catalog.storage.adls.defaultOptions.retryPolicy | string | `nil` | The retry strategy to use. Valid values are: NONE, EXPONENTIAL_BACKOFF, FIXED_DELAY. The default is EXPONENTIAL_BACKOFF. |
+| catalog.storage.adls.defaultOptions.sasTokenSecret | object | `{"name":null,"sasToken":null}` | A secret containing the SAS token to use. Required when authType is SAS_TOKEN. |
+| catalog.storage.adls.defaultOptions.sasTokenSecret.name | string | `nil` | Name of the secret containing the SAS token. |
+| catalog.storage.adls.defaultOptions.sasTokenSecret.sasToken | string | `nil` | Secret key containing the SAS token. |
+| catalog.storage.adls.defaultOptions.tryTimeout | string | `nil` | The maximum time allowed before a request is cancelled and assumed failed, default is Integer.MAX_VALUE. Optional. Must be a valid ISO duration. Valid if retryPolicy is EXPONENTIAL_BACKOFF or FIXED_DELAY. |
+| catalog.storage.adls.filesystems | list | `[]` | Per-filesystem ADLS settings. Override the general settings above. |
+| catalog.storage.adls.transport | object | `{"connectTimeout":null,"connectionIdleTimeout":null,"maxHttpConnections":null,"readBlockSize":null,"readTimeout":null,"writeBlockSize":null,"writeTimeout":null}` | ADLS transport settings. Not overridable on a per-bucket basis. |
+| catalog.storage.adls.transport.connectTimeout | string | `nil` | Sets the connection timeout for a request to be sent. The default is PT10S (10 seconds). Must be a valid ISO duration. Not overridable on a per-filesystem basis. |
+| catalog.storage.adls.transport.connectionIdleTimeout | string | `nil` | Sets the maximum idle time for a connection to be kept alive. The default is PT60S (60 seconds). Must be a valid ISO duration. Not overridable on a per-filesystem basis. |
+| catalog.storage.adls.transport.maxHttpConnections | string | `nil` | The default maximum connection pool size is determined by the underlying HTTP client. Not overridable on a per-filesystem basis. |
+| catalog.storage.adls.transport.readBlockSize | string | `nil` | The size of each data chunk returned from the service in bytes. The default value is 4 MB. Not overridable on a per-filesystem basis. |
+| catalog.storage.adls.transport.readTimeout | string | `nil` | Sets the read timeout duration used when reading the server response. The default is PT60S (60 seconds). Must be a valid ISO duration. Not overridable on a per-filesystem basis. |
+| catalog.storage.adls.transport.writeBlockSize | string | `nil` | Sets the block size in bytes to transfer at a time. Not overridable on a per-filesystem basis. |
+| catalog.storage.adls.transport.writeTimeout | string | `nil` | Sets the write timeout duration used when writing the request to the server. The default is PT60S (60 seconds). Must be a valid ISO duration. Not overridable on a per-filesystem basis. |
+| catalog.storage.gcs.buckets | list | `[]` | Per-bucket GCS settings. Override the general settings above. |
+| catalog.storage.gcs.defaultOptions.authCredentialsJsonSecret | object | `{"key":null,"name":null}` | The Google Cloud service account key secret. This is required when authType is USER or SERVICE_ACCOUNT. |
+| catalog.storage.gcs.defaultOptions.authCredentialsJsonSecret.key | string | `nil` | The secret key storing the Google Cloud service account JSON key. |
+| catalog.storage.gcs.defaultOptions.authCredentialsJsonSecret.name | string | `nil` | The secret name to pull a valid Google Cloud service account key from. |
+| catalog.storage.gcs.defaultOptions.authType | string | `nil` | The authentication type to use. Valid values are: NONE, USER, SERVICE_ACCOUNT, ACCESS_TOKEN, APPLICATION_DEFAULT. The default is NONE. |
+| catalog.storage.gcs.defaultOptions.clientLibToken | string | `nil` | The Google client lib token. |
+| catalog.storage.gcs.defaultOptions.decryptionKey | string | `nil` | Customer-supplied AES256 key for blob decryption when reading. Currently unsupported. |
+| catalog.storage.gcs.defaultOptions.deleteBatchSize | string | `nil` | The delete batch size. |
+| catalog.storage.gcs.defaultOptions.encryptionKey | string | `nil` | Customer-supplied AES256 key for blob encryption when writing. Currently unsupported. |
+| catalog.storage.gcs.defaultOptions.externalHost | string | `nil` | When using a specific endpoint, see host, and the endpoint URIs for the Nessie server differ, you can specify the URI passed down to clients using this setting. Otherwise, clients will receive the value from the host setting. |
+| catalog.storage.gcs.defaultOptions.host | string | `nil` | The default endpoint override to use. The endpoint is almost always used for testing purposes. If the endpoint URIs for the Nessie server and clients differ, this one defines the endpoint used for the Nessie server. |
+| catalog.storage.gcs.defaultOptions.oauth2TokenSecret | object | `{"expiresAt":null,"name":null,"token":null}` | The oauth2 token secret. This is required when authType is ACCESS_TOKEN. |
+| catalog.storage.gcs.defaultOptions.projectId | string | `nil` | The Google project ID. |
+| catalog.storage.gcs.defaultOptions.quotaProjectId | string | `nil` | The Google quota project ID. |
+| catalog.storage.gcs.defaultOptions.readChunkSize | string | `nil` | The read chunk size in bytes. Must be a valid ISO duration. |
+| catalog.storage.gcs.defaultOptions.userProject | string | `nil` | Optionally specify the user project (Google term). |
+| catalog.storage.gcs.defaultOptions.writeChunkSize | string | `nil` | The write chunk size in bytes. Must be a valid ISO duration. |
+| catalog.storage.gcs.transport | object | `{"connectTimeout":null,"initialRetryDelay":null,"initialRpcTimeout":null,"logicalTimeout":null,"maxAttempts":null,"maxRetryDelay":null,"maxRpcTimeout":null,"readTimeout":null,"retryDelayMultiplier":null,"rpcTimeoutMultiplier":null,"totalTimeout":null}` | GCS transport settings. Not overridable on a per-bucket basis. |
+| catalog.storage.gcs.transport.connectTimeout | string | `nil` | Override the default connection timeout. Must be a valid ISO duration. |
+| catalog.storage.gcs.transport.initialRetryDelay | string | `nil` | Override the default initial retry delay. Must be a valid ISO duration. |
+| catalog.storage.gcs.transport.initialRpcTimeout | string | `nil` | Override the default initial RPC timeout. Must be a valid ISO duration. |
+| catalog.storage.gcs.transport.logicalTimeout | string | `nil` | Override the default logical request timeout. Must be a valid ISO duration. |
+| catalog.storage.gcs.transport.maxAttempts | string | `nil` | Override the default maximum number of attempts. |
+| catalog.storage.gcs.transport.maxRetryDelay | string | `nil` | Override the default maximum retry delay. Must be a valid ISO duration. |
+| catalog.storage.gcs.transport.maxRpcTimeout | string | `nil` | Override the default maximum RPC timeout. Must be a valid ISO duration. |
+| catalog.storage.gcs.transport.readTimeout | string | `nil` | Override the default read timeout. Must be a valid ISO duration. |
+| catalog.storage.gcs.transport.retryDelayMultiplier | string | `nil` | Override the default retry delay multiplier. Must be a valid ISO duration. |
+| catalog.storage.gcs.transport.rpcTimeoutMultiplier | string | `nil` | Override the default RPC timeout multiplier. Must be a valid ISO duration. |
+| catalog.storage.gcs.transport.totalTimeout | string | `nil` | Override the default total timeout. Must be a valid ISO duration. |
+| catalog.storage.retryAfter | string | `nil` | Interval after which a request is retried when Storage responds with some "retry later" error. Must be a valid ISO duration. |
+| catalog.storage.s3.buckets | list | `[]` | Per-bucket S3 settings. Override the general settings above. |
+| catalog.storage.s3.defaultOptions.accessKeySecret | object | `{"awsAccessKeyId":null,"awsSecretAccessKey":null,"name":null}` | AWS credentials. Required when serverAuthenticationMode is STATIC. |
+| catalog.storage.s3.defaultOptions.accessKeySecret.awsAccessKeyId | string | `nil` | The secret key storing the AWS secret key id. |
+| catalog.storage.s3.defaultOptions.accessKeySecret.awsSecretAccessKey | string | `nil` | The secret key storing the AWS secret access key. |
+| catalog.storage.s3.defaultOptions.accessKeySecret.name | string | `nil` | The secret name to pull AWS credentials from. |
+| catalog.storage.s3.defaultOptions.accessPoint | string | `nil` | AWS Access point for this bucket. Access points can be used to perform S3 operations by specifying a mapping of bucket to access points. This is useful for multi-region access, cross-region access, disaster recovery, etc. See https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-access-points.html. |
+| catalog.storage.s3.defaultOptions.allowCrossRegionAccessPoint | string | `nil` | Authorize cross-region calls when contacting an access point. The default is false. |
+| catalog.storage.s3.defaultOptions.authType | string | `nil` | Controls the authentication mode for the Catalog server. Valid values are: - APPLICATION_GLOBAL: Use the default AWS credentials provider chain. - STATIC: Static credentials provided through the accessKeySecret option. The default is STATIC. |
+| catalog.storage.s3.defaultOptions.chunkedEncodingEnabled | string | `nil` | Controls whether the AWS SDK uses chunked transfer encoding when uploading payloads. Set to false for S3-compatible services (for example Oracle Cloud Infrastructure) that reject chunked payload signatures (x-amz-content-sha256). Defaults to true. |
+| catalog.storage.s3.defaultOptions.clientIam.enabled | string | `nil` | Whether to enable vended credentials functionality. If this option is enabled, the server will temporarily assume the configured role, then pass the returned session credentials down to the client, for each table that is created, updated or registered. Vended credentials are not cached server-side. |
+| catalog.storage.s3.defaultOptions.clientIam.externalId | string | `nil` | An identifier for the party assuming the role. This parameter must match the external ID configured in IAM rules that govern the assume role process for the specified roleArn. |
+| catalog.storage.s3.defaultOptions.clientIam.policy | string | `nil` | The IAM policy in JSON format to be used as an inline session policy when calling the assume-role endpoint. Optional. |
+| catalog.storage.s3.defaultOptions.clientIam.roleArn | string | `nil` | The ARN of the role to assume for accessing S3 data. This parameter is required for Amazon S3, but may not be required for other storage providers (e.g. Minio does not use it at all). |
+| catalog.storage.s3.defaultOptions.clientIam.roleSessionName | string | `nil` | An identifier for the assumed role session. This parameter is most important in cases when the same role is assumed by different principals in different use cases. |
+| catalog.storage.s3.defaultOptions.clientIam.sessionDuration | string | `nil` | A higher bound estimate of the expected duration of client "sessions" working with data in this bucket. A session, for example, is the lifetime of an Iceberg REST catalog object on the client side. This value is used for validating expiration times of credentials associated with the warehouse. If unset, a default of one hour is assumed. |
+| catalog.storage.s3.defaultOptions.clientIam.statements | string | `nil` | Additional IAM policy statements in JSON format to add to generated per-table IAM policies. |
+| catalog.storage.s3.defaultOptions.endpoint | string | `nil` | Endpoint URI, required for private clouds. Optional; if not provided, the default is used. |
+| catalog.storage.s3.defaultOptions.externalEndpoint | string | `nil` | Endpoint URI, required for private clouds. Optional; if not provided, the default is used. If the endpoint URIs for the Nessie server and clients differ, this one defines the endpoint used for the Nessie server. |
+| catalog.storage.s3.defaultOptions.pathStyleAccess | string | `nil` | Whether to use path-style access. Optional; if not provided, the default is used. If true, path-style access will be used, as in: https://<domain>/<bucket>. If false, a virtual-hosted style will be used instead, as in: https://<bucket>.<domain>. |
+| catalog.storage.s3.defaultOptions.region | string | `nil` | DNS name of the region, required for AWS. |
+| catalog.storage.s3.defaultOptions.requestSigningEnabled | string | `nil` | Optional parameter to disable S3 request signing. Default is to enable S3 request signing. |
+| catalog.storage.s3.defaultOptions.serverIam | object | `{"enabled":null,"externalId":null,"policy":null,"roleArn":null,"roleSessionName":null,"sessionDuration":null}` | Settings only relevant when clientAuthenticationMode is ASSUME_ROLE. |
+| catalog.storage.s3.defaultOptions.serverIam.enabled | string | `nil` | Whether to enable server assume-role functionality. If this option is enabled, the server will attempt to assume the configured role at startup and cache the returned session credentials. |
+| catalog.storage.s3.defaultOptions.serverIam.externalId | string | `nil` | An identifier for the party assuming the role. This parameter must match the external ID configured in IAM rules that govern the assume role process for the specified roleArn. |
+| catalog.storage.s3.defaultOptions.serverIam.policy | string | `nil` | The IAM policy in JSON format to be used as an inline session policy when calling the assume-role endpoint. Optional. |
+| catalog.storage.s3.defaultOptions.serverIam.roleArn | string | `nil` | The ARN of the role to assume for accessing S3 data. This parameter is required for Amazon S3, but may not be required for other storage providers (e.g. Minio does not use it at all). |
+| catalog.storage.s3.defaultOptions.serverIam.roleSessionName | string | `nil` | An identifier for the assumed role session. This parameter is most important in cases when the same role is assumed by different principals in different use cases. |
+| catalog.storage.s3.defaultOptions.serverIam.sessionDuration | string | `nil` | A higher bound estimate of the expected duration of client "sessions" working with data in this bucket. A session, for example, is the lifetime of an Iceberg REST catalog object on the client side. This value is used for validating expiration times of credentials associated with the warehouse. If unset, a default of one hour is assumed. |
+| catalog.storage.s3.defaultOptions.stsEndpoint | string | `nil` | The STS endpoint. Optional; if not provided, the default is used. This parameter must be set if the cloud provider is not AMAZON and the catalog is configured to use S3 sessions (e.g. to use the "assume role" functionality). |
+| catalog.storage.s3.defaultOptions.urlSigningExpire | string | `nil` | Defines the validity of the signing endpoint returned to clients, defaults to 3 hours. |
+| catalog.storage.s3.sessionCredentials.sessionCredentialCacheMaxEntries | string | `nil` | Maximum number of entries to keep in the session credentials cache (assumed role credentials). Not overridable on a per-bucket basis. The default is 1000. |
+| catalog.storage.s3.sessionCredentials.sessionCredentialRefreshGracePeriod | string | `nil` | The time period to subtract from the S3 session credentials (assumed role credentials) expiry time to define the time when those credentials become eligible for refreshing. Not overridable on a per-bucket basis. The default is PT5M (5 minutes). |
+| catalog.storage.s3.sessionCredentials.stsClientsCacheMaxEntries | string | `nil` | Maximum number of entries to keep in the STS clients cache. Not overridable on a per-bucket basis. The default is 50. |
+| catalog.storage.s3.transport | object | `{"connectTimeout":null,"connectionAcquisitionTimeout":null,"connectionMaxIdleTime":null,"connectionTimeToLive":null,"expectContinueEnabled":null,"maxHttpConnections":null,"readTimeout":null}` | S3 transport settings. Not overridable on a per-bucket basis. |
+| catalog.storage.s3.transport.connectTimeout | string | `nil` | Override the default TCP connect timeout. Must be a valid ISO duration. |
+| catalog.storage.s3.transport.connectionAcquisitionTimeout | string | `nil` | Override default connection acquisition timeout. This is the time a request will wait for a connection from the pool. Must be a valid ISO duration. |
+| catalog.storage.s3.transport.connectionMaxIdleTime | string | `nil` | Override default max idle time of a pooled connection. Must be a valid ISO duration. |
+| catalog.storage.s3.transport.connectionTimeToLive | string | `nil` | Override default time-time of a pooled connection. Must be a valid ISO duration. |
+| catalog.storage.s3.transport.expectContinueEnabled | string | `nil` | Override default behavior whether to expect an HTTP/100-Continue. Must be a valid ISO duration. |
+| catalog.storage.s3.transport.maxHttpConnections | string | `nil` | Override the default maximum number of pooled connections. |
+| catalog.storage.s3.transport.readTimeout | string | `nil` | Override the default connection read timeout. Must be a valid ISO duration. |
+| configMapAnnotations | object | `{}` | Additional Annotations to apply to nessie configmap. |
+| configMapLabels | object | `{}` | Additional Labels to apply to nessie configmap. |
+| deploymentStrategy | object | `{}` | Override the strategy for nessie deployment. Valid values for type are: RollingUpdate and Recreate. If you are using the ROCKSDB version store type then you should use Recreate. Max Surge will allow new pods to be created before old ones are culled. Do not enable this when using ROCKSDB version store type. Max Unavailable will allow old pods to be culled before replacements are created See: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy |
+| dynamodb.profile | string | `"default"` | The name of the profile that should be used, when loading AWS credentials from a profile file. Required only if no secret is provided below. |
+| dynamodb.region | string | `"us-west-2"` | The AWS region to use. |
+| dynamodb.secret.awsAccessKeyId | string | `"aws_access_key_id"` | The secret key storing the AWS secret key id. |
+| dynamodb.secret.awsSecretAccessKey | string | `"aws_secret_access_key"` | The secret key storing the AWS secret access key. |
+| dynamodb.secret.name | string | `"awscreds"` | The secret name to pull AWS credentials from. Optional; if not present, the default AWS credentials provider chain is used. |
+| extraContainers | list | `[]` | Add additional sidecar containers to the nessie pod(s). See https://kubernetes.io/docs/concepts/workloads/pods/. |
+| extraEnv | list | `[]` | Advanced configuration via Environment Variables. Extra environment variables to add to the Nessie server container. You can pass here any valid EnvVar object: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#envvar-v1-core This can be useful to get configuration values from Kubernetes secrets or config maps. |
+| extraInitContainers | list | `[]` | Add additional init containers to the nessie pod(s) See https://kubernetes.io/docs/concepts/workloads/pods/init-containers/. |
+| extraServices | list | `[]` | Additional service definitions. All service definitions always select all Nessie pods. Use this if you need to expose specific ports with different configurations. |
+| extraVolumeMounts | list | `[]` | Extra volume mounts to add to the nessie container. See https://kubernetes.io/docs/concepts/storage/volumes/. |
+| extraVolumes | list | `[]` | Extra volumes to add to the nessie pod. See https://kubernetes.io/docs/concepts/storage/volumes/. |
+| gatewayApi | object | `{"enabled":false,"gateway":{"addresses":[],"annotations":{},"create":true,"gatewayClassName":"","labels":{},"listeners":[{"allowedRoutes":{"namespaces":{"from":"Same"}},"hostname":"","name":"nessie-http","port":80,"protocol":"HTTP","tls":{"certificateRefs":[],"enabled":false,"mode":"Terminate","options":{}}}],"name":"","nameSuffix":"","namespace":""},"httpRoutes":[{"annotations":{},"hostnames":[],"labels":{},"name":"","nameSuffix":"-httproute","namespace":"","parentRefs":[],"rules":[{"backendRefs":[{"group":"","kind":"","name":"","namespace":"","port":null,"service":{"name":"","nameSuffix":"","namespace":"","port":null},"weight":1}],"filters":[],"matches":[{"headers":[],"path":{"type":"PathPrefix","value":"/"}}]}]}]}` | Gateway API support (Gateway + HTTPRoute resources) Use this section to expose Nessie through the Kubernetes Gateway API instead of the traditional Ingress resource. |
+| gatewayApi.enabled | bool | `false` | Specifies whether Gateway/HTTPRoute resources should be created. |
+| gatewayApi.gateway.addresses | list | `[]` | Optional addresses block passed directly to the Gateway spec. |
+| gatewayApi.gateway.annotations | object | `{}` | Annotations to add to the Gateway metadata. |
+| gatewayApi.gateway.create | bool | `true` | Specifies whether a Gateway resource should be created. Set to false to reference an existing Gateway. |
+| gatewayApi.gateway.gatewayClassName | string | `""` | The GatewayClass to target. Required when gatewayApi is enabled. |
+| gatewayApi.gateway.labels | object | `{}` | Labels to add to the Gateway metadata. |
+| gatewayApi.gateway.listeners | list | `[{"allowedRoutes":{"namespaces":{"from":"Same"}},"hostname":"","name":"nessie-http","port":80,"protocol":"HTTP","tls":{"certificateRefs":[],"enabled":false,"mode":"Terminate","options":{}}}]` | Listeners describe how traffic enters the Gateway. |
+| gatewayApi.gateway.listeners[0].allowedRoutes | object | `{"namespaces":{"from":"Same"}}` | Allowed routes constraints for this listener. Defaults to namespaces.from=Same when omitted. |
+| gatewayApi.gateway.listeners[0].hostname | string | `""` | Optional hostname (wildcard supported, e.g. "nessie.example.com"). Leave empty to accept all hostnames. |
+| gatewayApi.gateway.listeners[0].name | string | `"nessie-http"` | Listener name. Must be unique per Gateway. |
+| gatewayApi.gateway.listeners[0].port | int | `80` | Listener port. |
+| gatewayApi.gateway.listeners[0].protocol | string | `"HTTP"` | Protocol handled by the listener. Typically HTTP or HTTPS. |
+| gatewayApi.gateway.listeners[0].tls.certificateRefs | list | `[]` | List of certificate references for this listener. |
+| gatewayApi.gateway.listeners[0].tls.enabled | bool | `false` | Whether TLS should be configured for this listener. |
+| gatewayApi.gateway.listeners[0].tls.mode | string | `"Terminate"` | TLS mode (Terminate, Passthrough, etc.). |
+| gatewayApi.gateway.listeners[0].tls.options | object | `{}` | Optional TLS options map. |
+| gatewayApi.gateway.name | string | `""` | Optional explicit name for the Gateway. If empty, the chart fullname plus nameSuffix is used. |
+| gatewayApi.gateway.nameSuffix | string | `""` | Optional suffix appended to the autogenerated name when `name` is not set. |
+| gatewayApi.gateway.namespace | string | `""` | Optional namespace override for the Gateway resource (defaults to the release namespace). |
+| gatewayApi.httpRoutes[0].annotations | object | `{}` | Annotations to add to the HTTPRoute metadata. |
+| gatewayApi.httpRoutes[0].hostnames | list | `[]` | Hostnames handled by this route. Leave empty to match all hostnames. |
+| gatewayApi.httpRoutes[0].labels | object | `{}` | Labels to add to the HTTPRoute metadata. |
+| gatewayApi.httpRoutes[0].name | string | `""` | Optional explicit name for the HTTPRoute. |
+| gatewayApi.httpRoutes[0].nameSuffix | string | `"-httproute"` | Optional suffix appended to the autogenerated name when `name` is not set. |
+| gatewayApi.httpRoutes[0].namespace | string | `""` | Optional namespace override for the HTTPRoute (defaults to the release namespace). |
+| gatewayApi.httpRoutes[0].parentRefs | list | `[]` | Parent references attached to the route. When empty, the chart-generated Gateway is referenced automatically. |
+| gatewayApi.httpRoutes[0].rules | list | `[{"backendRefs":[{"group":"","kind":"","name":"","namespace":"","port":null,"service":{"name":"","nameSuffix":"","namespace":"","port":null},"weight":1}],"filters":[],"matches":[{"headers":[],"path":{"type":"PathPrefix","value":"/"}}]}]` | Rules evaluated by the HTTPRoute. |
+| gatewayApi.httpRoutes[0].rules[0].backendRefs[0].group | string | `""` | Optional backend group override. |
+| gatewayApi.httpRoutes[0].rules[0].backendRefs[0].kind | string | `""` | Optional backend kind override (defaults to Service when using service.* helper). |
+| gatewayApi.httpRoutes[0].rules[0].backendRefs[0].name | string | `""` | Explicit backend name. Takes precedence over service.* if set. |
+| gatewayApi.httpRoutes[0].rules[0].backendRefs[0].namespace | string | `""` | Optional backend namespace. Defaults to the HTTPRoute namespace when unset. |
+| gatewayApi.httpRoutes[0].rules[0].backendRefs[0].port | string | `nil` | Optional backend port. When unset, the service port or chart default is used. |
+| gatewayApi.httpRoutes[0].rules[0].backendRefs[0].service | object | `{"name":"","nameSuffix":"","namespace":"","port":null}` | Optionally reference a Service managed by this chart. |
+| gatewayApi.httpRoutes[0].rules[0].backendRefs[0].service.name | string | `""` | Optional explicit service name. If empty, fullname plus nameSuffix is used. |
+| gatewayApi.httpRoutes[0].rules[0].backendRefs[0].service.nameSuffix | string | `""` | Optional suffix appended to the release fullname when service.name is empty. |
+| gatewayApi.httpRoutes[0].rules[0].backendRefs[0].service.namespace | string | `""` | Optional namespace override for the backend Service. |
+| gatewayApi.httpRoutes[0].rules[0].backendRefs[0].service.port | string | `nil` | Optional port override for the backend Service. When empty, the first service port is used. |
+| gatewayApi.httpRoutes[0].rules[0].backendRefs[0].weight | int | `1` | Optional backend weight. |
+| image.configDir | string | `"/deployments/config"` | The path to the directory where the application.properties file should be mounted. |
+| image.pullPolicy | string | `"IfNotPresent"` | The image pull policy. |
+| image.repository | string | `"ghcr.io/projectnessie/nessie"` | The image repository to pull from. |
+| image.tag | string | `""` | Overrides the image tag whose default is the chart version. |
+| imagePullSecrets | list | `[]` | References to secrets in the same namespace to use for pulling any of the images used by this chart. Each entry is a LocalObjectReference to an existing secret in the namespace. The secret must contain a .dockerconfigjson key with a base64-encoded Docker configuration file. See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/ for more information. |
+| ingress | object | `{"annotations":{},"className":"","enabled":false,"hosts":[{"host":"chart-example.local","paths":[],"service":{"nameSuffix":"","portName":"nessie-http"}}],"pathType":"ImplementationSpecific","tls":[]}` | Nessie Ingress settings. These settings generate an Ingress resource that routes external traffic to the Nessie service. Consider enabling sticky sessions based on the remote client's IP address; this is generally beneficial to Nessie deployments, but some testing may be required in order to make sure that the load is distributed evenly among the pods. Check your ingress controller's documentation. |
+| ingress.annotations | object | `{}` | Annotations to add to the ingress. |
+| ingress.className | string | `""` | Specifies the ingressClassName; leave empty if you don't want to customize it. |
+| ingress.enabled | bool | `false` | Specifies whether an ingress should be created. |
+| ingress.hosts | list | `[{"host":"chart-example.local","paths":[],"service":{"nameSuffix":"","portName":"nessie-http"}}]` | A list of host paths used to configure the ingress. |
+| ingress.hosts[0].service | object | `{"nameSuffix":"","portName":"nessie-http"}` | The service target for the ingress. |
+| ingress.hosts[0].service.nameSuffix | string | `""` | The target service name suffix. Optional; if not provided, the main service will be targeted. Change this only if you are targeting a service defined in extraServices. |
+| ingress.hosts[0].service.portName | string | `"nessie-http"` | The port name to route traffic to. Must match one of the ports in service.ports or in extraServices.ports. Optional; if not provided, the first port in service.ports will be used. |
+| ingress.pathType | string | `"ImplementationSpecific"` | Specifies the path type of host paths. Valid values are: "Prefix", "Exact" or "ImplementationSpecific". |
+| ingress.tls | list | `[]` | A list of TLS certificates; each entry has a list of hosts in the certificate, along with the secret name used to terminate TLS traffic on port 443. |
+| jdbc.jdbcUrl | string | `"jdbc:postgresql://localhost:5432/my_database?currentSchema=nessie"` | The JDBC connection string. If you are using Nessie OSS images, then only PostgreSQL, MariaDB and MySQL URLs are supported. Check your JDBC driver documentation for the correct URL format. |
+| jdbc.secret.name | string | `"datasource-creds"` | The secret name to pull datasource credentials from. |
+| jdbc.secret.password | string | `"password"` | The secret key storing the datasource password. |
+| jdbc.secret.username | string | `"username"` | The secret key storing the datasource username. |
+| livenessProbe | object | `{"failureThreshold":3,"initialDelaySeconds":5,"periodSeconds":10,"successThreshold":1,"terminationGracePeriodSeconds":30,"timeoutSeconds":10}` | Configures the liveness probe for nessie pods. |
+| livenessProbe.failureThreshold | int | `3` | Minimum consecutive failures for the probe to be considered failed after having succeeded. Minimum value is 1. |
+| livenessProbe.initialDelaySeconds | int | `5` | Number of seconds after the container has started before liveness probes are initiated. Minimum value is 0. |
+| livenessProbe.periodSeconds | int | `10` | How often (in seconds) to perform the probe. Minimum value is 1. |
+| livenessProbe.successThreshold | int | `1` | Minimum consecutive successes for the probe to be considered successful after having failed. Minimum value is 1. |
+| livenessProbe.terminationGracePeriodSeconds | int | `30` | Optional duration in seconds the pod needs to terminate gracefully upon probe failure. Minimum value is 1. |
+| livenessProbe.timeoutSeconds | int | `10` | Number of seconds after which the probe times out. Minimum value is 1. |
+| log | object | `{"categories":{"org.projectnessie":"INFO"},"console":{"enabled":true,"format":"%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c{3.}] (%t) %s%e%n","json":false,"threshold":"ALL"},"file":{"enabled":false,"fileName":"nessie.log","format":"%d{yyyy-MM-dd HH:mm:ss,SSS} %h %N[%i] %-5p [%X{traceId},%X{spanId},%X{sampled}] [%c{3.}] (%t) %s%e%n","json":false,"logsDir":"/deployments/logs","rotation":{"fileSuffix":null,"maxBackupIndex":5,"maxFileSize":"100Mi"},"storage":{"className":"standard","selectorLabels":{},"size":"512Gi"},"threshold":"ALL"},"level":"INFO","sentry":{"dsn":null,"enabled":false,"environment":null,"inAppPackages":["org.projectnessie"],"level":"ERROR","release":null}}` | Logging configuration. |
+| log.categories | object | `{"org.projectnessie":"INFO"}` | Configuration for specific log categories. |
+| log.console | object | `{"enabled":true,"format":"%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c{3.}] (%t) %s%e%n","json":false,"threshold":"ALL"}` | Configuration for the console appender. |
+| log.console.enabled | bool | `true` | Whether to enable the console appender. |
+| log.console.format | string | `"%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c{3.}] (%t) %s%e%n"` | The log format to use. Ignored if JSON format is enabled. See https://quarkus.io/guides/logging#logging-format for details. |
+| log.console.json | bool | `false` | Whether to log in JSON format. |
+| log.console.threshold | string | `"ALL"` | The log level of the console appender. |
+| log.file | object | `{"enabled":false,"fileName":"nessie.log","format":"%d{yyyy-MM-dd HH:mm:ss,SSS} %h %N[%i] %-5p [%X{traceId},%X{spanId},%X{sampled}] [%c{3.}] (%t) %s%e%n","json":false,"logsDir":"/deployments/logs","rotation":{"fileSuffix":null,"maxBackupIndex":5,"maxFileSize":"100Mi"},"storage":{"className":"standard","selectorLabels":{},"size":"512Gi"},"threshold":"ALL"}` | Configuration for the file appender. |
+| log.file.enabled | bool | `false` | Whether to enable the file appender. |
+| log.file.fileName | string | `"nessie.log"` | The log file name. |
+| log.file.format | string | `"%d{yyyy-MM-dd HH:mm:ss,SSS} %h %N[%i] %-5p [%X{traceId},%X{spanId},%X{sampled}] [%c{3.}] (%t) %s%e%n"` | The log format to use. Ignored if JSON format is enabled. See https://quarkus.io/guides/logging#logging-format for details. |
+| log.file.json | bool | `false` | Whether to log in JSON format. |
+| log.file.logsDir | string | `"/deployments/logs"` | The local directory where log files are stored. The persistent volume claim will be mounted here. |
+| log.file.rotation | object | `{"fileSuffix":null,"maxBackupIndex":5,"maxFileSize":"100Mi"}` | Log rotation configuration. |
+| log.file.rotation.fileSuffix | string | `nil` | An optional suffix to append to the rotated log files. If present, the rotated log files will be grouped in time buckets, and each bucket will contain at most maxBackupIndex files. The suffix must be in a date-time format that is understood by DateTimeFormatter. If the suffix ends with .gz or .zip, the rotated files will also be compressed using the corresponding algorithm. |
+| log.file.rotation.maxBackupIndex | int | `5` | The maximum number of backup files to keep. |
+| log.file.rotation.maxFileSize | string | `"100Mi"` | The maximum size of the log file before it is rotated. Should be expressed as a Kubernetes quantity. |
+| log.file.storage | object | `{"className":"standard","selectorLabels":{},"size":"512Gi"}` | The log storage configuration. A persistent volume claim will be created using these settings. |
+| log.file.storage.className | string | `"standard"` | The storage class name of the persistent volume claim to create. |
+| log.file.storage.selectorLabels | object | `{}` | Labels to add to the persistent volume claim spec selector; a persistent volume with matching labels must exist. Leave empty if using dynamic provisioning. |
+| log.file.storage.size | string | `"512Gi"` | The size of the persistent volume claim to create. |
+| log.file.threshold | string | `"ALL"` | The log level of the file appender. |
+| log.level | string | `"INFO"` | The log level of the root category, which is used as the default log level for all categories. |
+| log.sentry | object | `{"dsn":null,"enabled":false,"environment":null,"inAppPackages":["org.projectnessie"],"level":"ERROR","release":null}` | Configuration for the Sentry appender. See https://sentry.io and https://docs.quarkiverse.io/quarkus-logging-sentry/dev for more information. |
+| log.sentry.dsn | string | `nil` | The Sentry DSN. Required. |
+| log.sentry.enabled | bool | `false` | Whether to enable the Sentry appender. |
+| log.sentry.environment | string | `nil` | The environment to report to Sentry. Optional. |
+| log.sentry.inAppPackages | list | `["org.projectnessie"]` | Package prefixes that belong to your application. |
+| log.sentry.level | string | `"ERROR"` | The log level of the Sentry appender. |
+| log.sentry.release | string | `nil` | The release version to report to Sentry. Optional. |
+| managementService | object | `{"annotations":{},"portName":"nessie-mgmt","portNumber":9000}` | Management service settings. These settings are used to configure liveness and readiness probes, and to configure the dedicated headless service that will expose health checks and metrics, e.g. for metrics scraping and service monitoring. |
+| managementService.annotations | object | `{}` | Annotations to add to the service. |
+| managementService.portName | string | `"nessie-mgmt"` | The name of the management port. Required. |
+| managementService.portNumber | int | `9000` | The port the management service listens on. By default, the management interface is exposed on HTTP port 9000. |
+| metrics.enabled | bool | `true` | Specifies whether metrics for the nessie server should be enabled. |
+| metrics.tags | object | `{}` | Additional tags (dimensional labels) to add to the metrics. |
+| mongodb.connectionString | string | `"mongodb://localhost:27017"` | The MongoDB connection string. |
+| mongodb.name | string | `"nessie"` | The MongoDB database name. |
+| mongodb.secret.name | string | `"mongodb-creds"` | The secret name to pull MongoDB credentials from. |
+| mongodb.secret.password | string | `"mongodb_password"` | The secret key storing the MongoDB password. |
+| mongodb.secret.username | string | `"mongodb_username"` | The secret key storing the MongoDB username. |
+| nodeSelector | object | `{}` | Node labels which must match for the nessie pod to be scheduled on that node. See https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector. |
+| podAnnotations | object | `{}` | Annotations to apply to nessie pods. |
+| podDisruptionBudget | object | `{"enabled":false,"policy":{}}` | Add a PodDisruptionBudget. See https://kubernetes.io/docs/tasks/run-application/configure-pdb/. |
+| podLabels | object | `{}` | Additional Labels to apply to nessie pods. |
+| podSecurityContext | object | `{"fsGroup":10001,"seccompProfile":{"type":"RuntimeDefault"}}` | Security context for the nessie pod. See https://kubernetes.io/docs/tasks/configure-pod-container/security-context/. |
+| priorityClassName | string | `""` | The priority class name to associate with Nessie pods. Leave empty to keep the default priority. |
+| readinessProbe | object | `{"failureThreshold":3,"initialDelaySeconds":5,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":10}` | Configures the readiness probe for nessie pods. |
+| readinessProbe.failureThreshold | int | `3` | Minimum consecutive failures for the probe to be considered failed after having succeeded. Minimum value is 1. |
+| readinessProbe.initialDelaySeconds | int | `5` | Number of seconds after the container has started before readiness probes are initiated. Minimum value is 0. |
+| readinessProbe.periodSeconds | int | `10` | How often (in seconds) to perform the probe. Minimum value is 1. |
+| readinessProbe.successThreshold | int | `1` | Minimum consecutive successes for the probe to be considered successful after having failed. Minimum value is 1. |
+| readinessProbe.timeoutSeconds | int | `10` | Number of seconds after which the probe times out. Minimum value is 1. |
+| replicaCount | int | `1` | The number of replicas to deploy (horizontal scaling). Beware that replicas are stateless; don't set this number > 1 when using IN_MEMORY or ROCKSDB version store types. |
+| resources | object | `{}` | Configures the resources requests and limits for nessie pods. We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts run on environments with little resources, such as Minikube. If you do want to specify resources, uncomment the following lines, adjust them as necessary, and remove the curly braces after 'resources:'. |
+| rocksdb.selectorLabels | object | `{}` | Labels to add to the persistent volume claim spec selector; a persistent volume with matching labels must exist. Leave empty if using dynamic provisioning. |
+| rocksdb.storageClassName | string | `"standard"` | The storage class name of the persistent volume claim to create. |
+| rocksdb.storageSize | string | `"1Gi"` | The size of the persistent volume claim to create. |
+| securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"readOnlyRootFilesystem":true,"runAsGroup":10001,"runAsNonRoot":true,"runAsUser":10000}` | Security context for the nessie container. See https://kubernetes.io/docs/tasks/configure-pod-container/security-context/. |
+| service | object | `{"annotations":{},"clusterIP":"","externalTrafficPolicy":"Cluster","internalTrafficPolicy":"Cluster","ports":[{"name":"nessie-http","nodePort":null,"number":19120}],"sessionAffinity":"None","trafficDistribution":"PreferClose","type":"ClusterIP"}` | Nessie main service settings. |
+| service.annotations | object | `{}` | Annotations to add to the service. |
+| service.clusterIP | string | `""` | You can specify your own cluster IP address If you define a Service that has the .spec.clusterIP set to "None" then Kubernetes does not assign an IP address. Instead, DNS records for the service will return the IP addresses of each pod targeted by the server. This is called a headless service. See https://kubernetes.io/docs/concepts/services-networking/service/#headless-services |
+| service.internalTrafficPolicy | string | `"Cluster"` | The traffic policy fields control how traffic from internal and external sources are routed respectively. Valid values are Cluster and Local. Set the field to Cluster to route traffic to all ready endpoints. Set the field to Local to only route to ready node-local endpoints. If the traffic policy is Local and there are no node-local endpoints, traffic is dropped by kube-proxy |
+| service.ports | list | `[{"name":"nessie-http","nodePort":null,"number":19120}]` | The ports the service will listen on. At least one port is required; the first port implicitly becomes the HTTP port that the application will use for serving API requests. By default, it's 19120. Note: port names must be unique and no more than 15 characters long. |
+| service.ports[0].nodePort | string | `nil` | The port on each node on which this service is exposed. Only meaningful when service type is NodePort or LoadBalancer. Leave empty (~) to let Kubernetes assign a random port. |
+| service.sessionAffinity | string | `"None"` | The session affinity for the service. Valid values are: None, ClientIP. ClientIP enables sticky sessions based on the client's IP address. This is generally beneficial to Nessie deployments, but some testing may be required in order to make sure that the load is distributed evenly among the pods. Also, this setting affects only internal clients, not external ones. If Ingress is enabled, it is recommended to set sessionAffinity to None. |
+| service.trafficDistribution | string | `"PreferClose"` | The traffic distribution field provides another way to influence traffic routing within a Kubernetes Service. While traffic policies focus on strict semantic guarantees, traffic distribution allows you to express preferences such as routing to topologically closer endpoints. Valid values are: PreferClose |
+| service.type | string | `"ClusterIP"` | The type of service to create. |
+| serviceAccount.annotations | object | `{}` | Annotations to add to the service account. |
+| serviceAccount.create | bool | `true` | Specifies whether a service account should be created. |
+| serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template. |
+| serviceMonitor.enabled | bool | `true` | Specifies whether a ServiceMonitor for Prometheus operator should be created. |
+| serviceMonitor.interval | string | `""` | The scrape interval; leave empty to let Prometheus decide. Must be a valid duration, e.g. 1d, 1h30m, 5m, 10s. |
+| serviceMonitor.labels | object | `{}` | Labels for the created ServiceMonitor so that Prometheus operator can properly pick it up. |
+| serviceMonitor.metricRelabelings | list | `[]` | Relabeling rules to apply to metrics. Ref https://prometheus.io/docs/prometheus/latest/configuration/configuration/#relabel_config. |
+| tolerations | list | `[]` | A list of tolerations to apply to nessie pods. See https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/. |
+| tracing.attributes | object | `{}` | Resource attributes to identify the nessie service among other tracing sources. See https://opentelemetry.io/docs/reference/specification/resource/semantic_conventions/#service. If left empty, traces will be attached to a service named "Nessie"; to change this, provide a service.name attribute here. |
+| tracing.enabled | bool | `false` | Specifies whether tracing for the nessie server should be enabled. |
+| tracing.endpoint | string | `"http://otlp-collector:4317"` | The collector endpoint URL to connect to (required). The endpoint URL must have either the http:// or the https:// scheme. The collector must talk the OpenTelemetry protocol (OTLP) and the port must be its gRPC port (by default 4317). See https://quarkus.io/guides/opentelemetry for more information. |
+| tracing.sample | string | `"1.0d"` | Which requests should be sampled. Valid values are: "all", "none", or a ratio between 0.0 and "1.0d" (inclusive). E.g. "0.5d" means that 50% of the requests will be sampled. |
+| versionStoreType | string | `"IN_MEMORY"` | Which type of version store to use: IN_MEMORY, ROCKSDB, DYNAMODB2, MONGODB2, CASSANDRA2, JDBC2, BIGTABLE. Note: the version store type JDBC is deprecated, please use the Nessie Server Admin Tool to migrate to JDBC2. Note: the version store type CASSANDRA is deprecated, please use the Nessie Server Admin Tool to migrate to CASSANDRA2. Note: the version store type DYNAMODB is deprecated, please use the Nessie Server Admin Tool to migrate to DYNAMODB2. Note: the version store type MONGODB is deprecated, please use the Nessie Server Admin Tool to migrate to MONGODB2. |

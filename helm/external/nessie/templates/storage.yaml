@@ -1,0 +1,63 @@
+{{/**
+
+  Copyright (C) 2024 Dremio
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+**/}}
+
+{{- if or (eq .Values.versionStoreType "ROCKS") (eq .Values.versionStoreType "ROCKSDB") }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "nessie.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "nessie.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  storageClassName: {{ .Values.rocksdb.storageClassName }}
+  resources:
+    requests:
+      storage: "{{ .Values.rocksdb.storageSize }}"
+{{- if .Values.rocksdb.selectorLabels }}
+  selector:
+    matchLabels:
+      {{- toYaml .Values.rocksdb.selectorLabels | nindent 6 }}
+{{- end }}
+{{- end }}
+---
+{{- if .Values.log.file.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "nessie.fullname" . }}-logs
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "nessie.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  storageClassName: {{ .Values.log.file.storage.className }}
+  resources:
+    requests:
+      storage: "{{ .Values.log.file.storage.size }}"
+{{- if .Values.log.file.storage.selectorLabels }}
+  selector:
+    matchLabels:
+      {{- toYaml .Values.log.file.storage.selectorLabels | nindent 6 }}
+{{- end }}
+{{- end }}

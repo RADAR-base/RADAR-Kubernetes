@@ -1,0 +1,22 @@
+{{- if not (and .Values.tests .Values.tests.disabled) }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "nessie.fullname" . }}-test-connection"
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "nessie.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "nessie.fullname" . }}:{{ get (first .Values.service.ports) "number" }}']
+  initContainers:
+    - name: sleep
+      image: busybox
+      command: [ 'sleep', '10' ]
+  restartPolicy: Never
+{{- end }}
