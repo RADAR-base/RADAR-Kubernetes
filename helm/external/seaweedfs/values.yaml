@@ -243,10 +243,10 @@ master:
   containerSecurityContext: {}
 
   ingress:
-    enabled: false
-    className: ""
+    enabled: true
+    className: "nginx"
     # host: false for "*" hostname
-    host: "master.seaweedfs.local"
+    host: "master.seaweedfs.localhost"
     path: "/sw-master/?(.*)"
     pathType: ImplementationSpecific
     annotations: {}
@@ -558,9 +558,9 @@ volume:
     timeoutSeconds: 30
 
   ingress:
-    enabled: false
-    className: ""
-    host: "volume.seaweedfs.local"
+    enabled: true
+    className: "nginx"
+    host: "volume.seaweedfs.localhost"
     path: "/"
     pathType: Prefix
     annotations:
@@ -810,11 +810,11 @@ filer:
   containerSecurityContext: {}
 
   ingress:
-    enabled: false
-    className: ""
+    enabled: true
+    className: "nginx"
     # host: false for "*" hostname
-    host: "seaweedfs.cluster.local"
-    path: "/sw-filer/?(.*)"
+    host: "filer.seaweedfs.localhost"
+    path: "/"
     pathType: ImplementationSpecific
     annotations: {}
       # nginx.ingress.kubernetes.io/backend-protocol: GRPC
@@ -892,14 +892,14 @@ filer:
     #     key: password
 
   s3:
-    enabled: false
+    enabled: true
     port: 8333
     # add additional https port
     httpsPort: 0
     # Suffix of the host name, {bucket}.{domainName}
     domainName: ""
     # enable user & permission to s3 (need to inject to all services)
-    enableAuth: false
+    enableAuth: true
     # set to the name of an existing kubernetes Secret with the s3 json config file
     # should have a secret key called seaweedfs_s3_config with an inline json configure
     existingConfigSecret: null
@@ -913,16 +913,14 @@ filer:
     # ttl format: [1-255][m|h|d|w|M|y] (e.g., 7d)
     # objectLock enables S3 Object Lock (irreversible, forces versioning)
     # versioning: Enabled or Suspended (or true to enable)
-    # createBuckets:
-    #   - name: bucket-a
-    #     anonymousRead: true
-    #     ttl: 7d
-    #     objectLock: true
-    #     versioning: Enabled
-    #   - name: bucket-b
-    #     anonymousRead: false
+    createBuckets:
+      - name: radar-intermediate-storage
+        anonymousRead: false
+      - name: radar-output-storage
+        anonymousRead: false
     createBucketsHook:
       resources: {}
+
 
 s3:
   enabled: true
@@ -946,7 +944,7 @@ s3:
   icebergPort: 8181
   loggingOverrideLevel: null
   # enable user & permission to s3 (need to inject to all services)
-  enableAuth: false
+  enableAuth: true
   # set to the name of an existing kubernetes Secret with the s3 json config file
   # should have a secret key called seaweedfs_s3_config with an inline json config
   existingConfigSecret: null
@@ -1094,10 +1092,10 @@ s3:
     resources: {}
 
   ingress:
-    enabled: false
-    className: ""
+    enabled: true
+    className: "nginx"
     # host: false for "*" hostname, or an array for multiple hostnames
-    host: "seaweedfs.cluster.local"
+    host: "s3.seaweedfs.localhost"
     path: "/"
     pathType: Prefix
     # additional ingress annotations for the s3 endpoint
@@ -1111,7 +1109,7 @@ s3:
   icebergIngress:
     enabled: false
     className: ""
-    host: "seaweedfs-iceberg.cluster.local"
+    host: "seaweedfs-iceberg.cluster.localhost"
     path: "/"
     pathType: Prefix
     annotations: {}
@@ -1313,7 +1311,7 @@ admin:
     enabled: false
     className: "nginx"
     # host: false for "*" hostname
-    host: "admin.seaweedfs.local"
+    host: "admin.seaweedfs.localhost"
     path: "/"
     pathType: Prefix
     annotations: {}
