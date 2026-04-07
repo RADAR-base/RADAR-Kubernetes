@@ -41,6 +41,9 @@ radar_appserver_postgresql:
 velero:
   _install: false
 
+radar_nifi:
+  _install: false
+
 redis:
   _install: false
 

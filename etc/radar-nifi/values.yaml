@@ -1,0 +1,75 @@
+nifi-cluster:
+  cluster:
+    initContainers:
+    - name: download-postgres-driver
+      image: curlimages/curl:8.12.1
+      command:
+        - sh
+        - -c
+        - |
+          curl -L -o /jdbc/postgresql-42.7.5.jar \
+            https://jdbc.postgresql.org/download/postgresql-42.7.5.jar
+      volumeMounts:
+        - name: jdbc-drivers
+          mountPath: /jdbc
+    - name: download-postgres-nar
+      image: curlimages/curl:8.12.1
+      command:
+        - sh
+        - -c
+        - |
+          curl -L -o /extensions/nifi-dbcp-service-nar-2.5.0.nar \
+            https://repo1.maven.org/maven2/org/apache/nifi/nifi-dbcp-service-nar/2.5.0/nifi-dbcp-service-nar-2.5.0.nar
+      volumeMounts:
+        - name: extensions
+          mountPath: /extensions
+    nodeConfigGroups:
+      default_group:
+        storageConfigs:
+          - mountPath: /opt/nifi/flowfile_repository
+            name: flowfile-repository
+            pvcSpec:
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 10Gi
+          - mountPath: /opt/nifi/nifi-current/conf
+            name: conf
+            pvcSpec:
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 500m
+          - mountPath: /opt/nifi/content_repository
+            name: content-repository-default
+            pvcSpec:
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 10Gi
+          - mountPath: /opt/nifi/provenance_repository
+            name: provenance-repository-default
+            pvcSpec:
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 10Gi
+          - mountPath: /opt/nifi/data
+            name: data
+            pvcSpec:
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 5Gi
+        externalVolumeConfigs:
+          - name: jdbc-drivers
+            mountPath: /opt/nifi/jdbc
+            emptyDir: {}
+          - name: extensions
+            mountPath: /opt/nifi/extensions
+            emptyDir: {}

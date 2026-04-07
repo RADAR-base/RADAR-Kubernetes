@@ -83,3 +83,38 @@ cloudnative_postgresql:
   cluster:
     backups:
       enabled: false
+
+radar_nifi:
+  advertised_protocol: http
+  nifi-cluster:
+    cluster:
+      singleUserConfiguration:
+        # Nifi on HTTP never uses authentication
+        enabled: false
+      listenersConfig:
+        internalListeners:
+          - type: http
+            name: http
+            containerPort: 8080
+          - type: cluster
+            name: cluster
+            containerPort: 6007
+          - type: s2s
+            name: s2s
+            containerPort: 10000
+        sslSecrets: null
+      externalServices:
+        - name: nifikop
+          spec:
+            portConfigs:
+              - internalListenerName: http
+                port: 80
+              - internalListenerName: s2s
+                port: 10000
+            type: LoadBalancer
+  ingress:
+    annotations:
+      nginx.ingress.kubernetes.io/backend-protocol: HTTP
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        add_header X-ProxyPort "80" always;
+    tls: false

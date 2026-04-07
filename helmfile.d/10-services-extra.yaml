@@ -1,0 +1,40 @@
+bases:
+- ../environments.yaml
+
+---
+
+{{ readFile "../etc/helmfile-templates.yaml" }}
+
+releases:
+  - name: velero
+    namespace: velero
+    chart: radar/velero-s3-deployment
+    version: {{ .Values.velero._chart_version }}
+    installed: {{ .Values.velero._install }}
+    timeout: {{ add .Values.base_timeout .Values.velero._extra_timeout }}
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.velero | toYaml | indent 8 | trim }}
+    set:
+      - name: local.accessKey
+        value: {{ dig "local" "accessKey" .Values.s3_access_key .Values.velero }}
+      - name: local.secretKey
+        value: {{ dig "local" "secretKey" .Values.s3_secret_key .Values.velero }}
+
+  - name: radar-nifi
+    namespace: default
+    chart: radar/radar-nifi
+    version: {{ .Values.radar_nifi._chart_version }}
+    installed: {{ .Values.radar_nifi._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_nifi._extra_timeout }}
+    <<: *logFailedRelease
+    values:
+      - "../etc/radar-nifi/values.yaml"
+      - {{ .Values.radar_nifi | toYaml | indent 8 | trim }}
+    set:
+      - name: serverName
+        value: {{ .Values.server_name }}
+      - name: nifi-cluster.cluster.nifiProperties.webProxyHosts[0]
+        value: nifi.{{ .Values.server_name }}
+      - name: nifi-cluster.cluster.nifiProperties.webProxyHosts[1]
+        value: nifi.{{ .Values.server_name }}:{{ ternary 443 80 .Values.dev_deployment }}
