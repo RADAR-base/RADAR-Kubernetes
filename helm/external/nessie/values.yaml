@@ -183,11 +183,11 @@ jdbc:
   # -- The JDBC connection string. If you are using Nessie OSS images, then only
   # PostgreSQL, MariaDB and MySQL URLs are supported. Check your JDBC driver documentation
   # for the correct URL format.
-  jdbcUrl: jdbc:postgresql://radar-cloudnative-postgresql-cluster-rw:5432/hydra?currentSchema=hydra
+  jdbcUrl: jdbc:postgresql://radar-cloudnative-postgresql-cluster-rw:5432/nessie?currentSchema=public
   secret:
     # -- The secret name to pull datasource credentials from.
-    name: radar-cloudnative-postgresql-hydra
-    # -- The secret key storing the datasource username.
+    name: radar-cloudnative-postgresql-nessie
+    # -- The secret key storing the datasource username
     username: username
     # -- The secret key storing the datasource password.
     password: password
@@ -276,7 +276,7 @@ catalog:
       # Global S3 settings. Can be overridden on a per-bucket basis below.
       defaultOptions:
         # -- DNS name of the region, required for AWS.
-        region: ~  # us-west-2
+        region: eu-east-1  # us-west-2
         # -- Endpoint URI, required for private clouds. Optional; if not provided, the default is
         # used.
         endpoint: http://radar-seaweedfs-s3:8333
