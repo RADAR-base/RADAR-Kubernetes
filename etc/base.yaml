@@ -162,18 +162,18 @@ cp_schema_registry:
 
 radar_kafka_stack:
   _install: true
-  _chart_version: 0.4.0
+  _chart_version: 0.4.1
   _extra_timeout: 0
 
 catalog_server:
   _install: true
-  _chart_version: 0.9.1
+  _chart_version: 0.9.2
   _extra_timeout: 90
   replicaCount: 1
 
 radar_home:
   _install: true
-  _chart_version: 0.5.3
+  _chart_version: 0.5.4
   _extra_timeout: 0
 
 # --------------------------------------------------------- 10-managementportal.yaml ---------------------------------------------------------
@@ -261,13 +261,13 @@ radar_hydra:
 
 app_config:
   _install: false
-  _chart_version: 1.7.1
+  _chart_version: 1.7.2
   _extra_timeout: 0
   replicaCount: 1
 
 app_config_frontend:
   _install: false
-  _chart_version: 2.4.0
+  _chart_version: 2.4.1
   _extra_timeout: 0
   replicaCount: 1
 
@@ -291,7 +291,7 @@ radar_appserver_postgresql:
 
 radar_appserver:
   _install: false
-  _chart_version: 0.10.2
+  _chart_version: 0.10.3
   _extra_timeout: 0
   replicaCount: 1
   managementportal_resource_name: res_AppServer
@@ -310,21 +310,21 @@ radar_appserver:
 # The charts in 20-fitbit.yaml only need to be installed if you will use a Fitbit, Garmin, or Oura API integration.
 radar_fitbit_connector:
   _install: false
-  _chart_version: 0.11.2
+  _chart_version: 0.11.3
   _extra_timeout: 0
   replicaCount: 1
   oauthClientId: radar_fitbit_connector
 
 radar_oura_connector:
   _install: false
-  _chart_version: 0.5.2
+  _chart_version: 0.5.3
   _extra_timeout: 0
   replicaCount: 1
   oauthClientId: radar_oura_connector
 
 radar_rest_sources_authorizer:
   _install: false
-  _chart_version: 2.3.1
+  _chart_version: 2.3.2
   _extra_timeout: 0
   replicaCount: 1
   # -- Remove when running with ory hydra/kratos setups
@@ -332,7 +332,7 @@ radar_rest_sources_authorizer:
 
 radar_rest_sources_backend:
   _install: false
-  _chart_version: 1.5.8
+  _chart_version: 1.5.9
   _extra_timeout: 0
   replicaCount: 1
   restSourceClients:
@@ -422,14 +422,14 @@ radar_grafana:
 #- ksql_server._install to true
 data_dashboard_backend:
   _install: false
-  _chart_version: 0.6.1
+  _chart_version: 0.6.2
   _extra_timeout: 0
   replicaCount: 1
 
 # Install when radar_grafana._install is 'true'
 radar_jdbc_connector_grafana:
   _install: false
-  _chart_version: 0.11.0
+  _chart_version: 0.11.2
   _extra_timeout: 0
   replicaCount: 1
   sink:
@@ -459,7 +459,7 @@ radar_jdbc_connector_grafana:
 # Install when data_dashboard_backend._install is 'true'.
 radar_jdbc_connector_data_dashboard_backend:
   _install: false
-  _chart_version: 0.11.0
+  _chart_version: 0.11.2
   _extra_timeout: 0
   replicaCount: 1
   timescaledb:
@@ -486,7 +486,7 @@ radar_jdbc_connector_data_dashboard_backend:
 # Install when using realtime analysis
 radar_jdbc_connector_realtime_dashboard:
   _install: false
-  _chart_version: 0.11.0
+  _chart_version: 0.11.2
   _extra_timeout: 0
   replicaCount: 1
   timescaledb:
@@ -528,7 +528,7 @@ ksql_server:
 
 radar_gateway:
   _install: true
-  _chart_version: 1.8.0
+  _chart_version: 1.8.2
   _extra_timeout: 0
   replicaCount: 1
 
@@ -588,7 +588,7 @@ minio:
 radar_s3_connector:
   # set to true if radar-s3-connector should be installed
   _install: true
-  _chart_version: 0.7.1
+  _chart_version: 0.7.2
   _extra_timeout: 90
   replicaCount: 1
   # The bucket name where intermediate data for cold storage should be written to.
@@ -605,7 +605,7 @@ s3_proxy:
 
 radar_output:
   _install: true
-  _chart_version: 1.2.7
+  _chart_version: 1.2.8
   _extra_timeout: 0
   replicaCount: 1
   source:
@@ -692,7 +692,7 @@ velero:
 
 radar_nifi:
   _install: false
-  _chart_version: 3.0.0
+  _chart_version: 3.1.0
   _extra_timeout: 0
 
 radar_mockserver:
