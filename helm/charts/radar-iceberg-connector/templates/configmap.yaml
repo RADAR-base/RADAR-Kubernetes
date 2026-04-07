@@ -13,38 +13,73 @@ data:
     connector.class=org.apache.iceberg.connect.IcebergSinkConnector
     tasks.max={{ .Values.maxTasks | int }}
     format.class=io.confluent.connect.s3.format.avro.AvroFormat
+    value.converter.schemas.enable=false
+    key.converter.schemas.enable=false
+    value.converter=io.confluent.connect.avro.AvroConverter
+    value.converter.schema.registry.url=http://cp-schema-registry:8081
+    key.converter=io.confluent.connect.avro.AvroConverter
+    key.converter.schema.registry.url=http://cp-schema-registry:8081
+    #transforms=combineKeyValue
+    #transforms.combineKeyValue.type=org.radarbase.kafka.connect.transforms.CombineKeyValue
     flush.size={{ .Values.flushSize | int }}
     topics={{ .Values.topics }}
     connect.meta.data=false
-    rotate.schedule.interval.ms={{ .Values.rotateInterval | int }}
     timezone=UTC
-    iceberg.control.group-id-prefix=cg-control
-    iceberg.coordinator.transactional.id.prefix=NEW_2_
-    iceberg.control.group-id=lalalalalalal
+    iceberg.control.group-id=new-coord-group-v6
+    #iceberg.control.group-id-prefix=cg-control
+    iceberg.coordinator.transactional.id.prefix=
+    #iceberg.control.group-id={{ template "common.names.fullname" . }}-group
     iceberg.catalog.uri={{ .Values.iceberg.catalog.uri }}
     iceberg.catalog.type={{ .Values.iceberg.catalog.type }}
     iceberg.catalog.io-impl={{ .Values.iceberg.catalog.ioImpl }}
     iceberg.catalog.s3.endpoint={{ .Values.iceberg.s3.endpoint }}
     iceberg.catalog.s3.path-style-access={{ .Values.iceberg.s3.pathStyleAccess }}
-    #iceberg.tables.dynamic-enabled=true
-    iceberg.tables={{ .Values.iceberg.tables.tables }}
+    iceberg.catalog.warehouse={{ .Values.iceberg.catalog.warehouse }}
+    iceberg.tables.dynamic-enabled=false
+    # Use the topic name as the route field
+    iceberg.tables.route-field=None
+    iceberg.tables=default.questionnaire_response
+    #iceberg.tables={{ .Values.iceberg.tables.tables }}
     iceberg.control.topic={{ .Values.iceberg.control.topic }}
+    iceberg.control.replication.factor=1
     iceberg.tables.auto-create-enabled={{ .Values.iceberg.tables.autoCreateEnabled }}
     iceberg.tables.dynamic-schema-evolution-enabled={{ .Values.iceberg.tables.automaticSchemaEvolutionEnabled }}
+    iceberg.control.commit.interval-ms={{ .Values.iceberg.control.commit.intervalMs }}
+    iceberg.catalog.s3.access-key-id=eLx2gEe0YKXhC493Jldi
+    iceberg.catalog.s3.secret-access-key=TgrQ13m4W17YzKCfsPX54WSwXS3eBdZtJycoOEdK
+    # Force the internal Control Consumer to stop trying to parse Avro/JSON
+    iceberg.control.consumer.key.deserializer=org.apache.kafka.common.serialization.ByteArrayDeserializer
+    iceberg.control.consumer.value.deserializer=org.apache.kafka.common.serialization.ByteArrayDeserializer
+
+    # Force the internal Control Producer to send raw bytes
+    iceberg.control.producer.key.serializer=org.apache.kafka.common.serialization.ByteArraySerializer
+    iceberg.control.producer.value.serializer=org.apache.kafka.common.serialization.ByteArraySerializer
+
+    # Keep these as well for the Connect Framework layer
+    iceberg.control.key.converter=org.apache.kafka.connect.converters.ByteArrayConverter
+    iceberg.control.value.converter=org.apache.kafka.connect.converters.ByteArrayConverter
+    iceberg.kafka.key.serializer=org.apache.kafka.common.serialization.ByteArraySerializer
+    iceberg.kafka.value.serializer=org.apache.kafka.common.serialization.ByteArraySerializer
+    iceberg.kafka.key.deserializer=org.apache.kafka.common.serialization.ByteArrayDeserializer
+    iceberg.kafka.value.deserializer=org.apache.kafka.common.serialization.ByteArrayDeserializer
     # Kafka producer configuration for transaction coordinator discovery
     producer.retry.backoff.ms=1000
     producer.max.block.ms=30000
     producer.metadata.max.age.ms=30000
 
     {{/*-1 means use default configured by the kafka broker*/}}
-    config.storage.replication.factor=-1
-    offset.storage.replication.factor=-1
-    status.storage.replication.factor=-1
-    topic.creation.default.replication.factor=-1
+
+    config.storage.topic=default.config
+    config.storage.replication.factor=1
+    offset.storage.topic=default.offsets
+    offset.storage.replication.factor=1
+    status.storage.topic=default.status
+    status.storage.replication.factor=1
+    topic.creation.default.replication.factor=1
 
     # --
     avro.codec=deflate
-    errors.tolerance=all
+    errors.tolerance=none
     errors.log.enable=true
     errors.retry.delay.max.ms=60000
     errors.retry.timeout=300000

@@ -168,24 +168,18 @@ spec:
             value: "io.confluent.connect.avro.AvroConverter"
           - name: CONNECT_VALUE_CONVERTER
             value: "io.confluent.connect.avro.AvroConverter"
-          - name: CONNECT_KEY_CONVERTER_SCHEMAS_ENABLE
-            value: "false"
-          - name: CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE
-            value: "false"
           - name: CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL
             value: "{{ .Values.schemaRegistry.url }}"
           - name: CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL
             value: "{{ .Values.schemaRegistry.url }}"
           - name: CONNECT_KEY_CONVERTER_ENHANCED_AVRO_SCHEMA_SUPPORT
-            value: "false"
+            value: "true"
           - name: CONNECT_VALUE_CONVERTER_ENHANCED_AVRO_SCHEMA_SUPPORT
-            value: "false"
+            value: "true"
           - name: CONNECT_INTERNAL_KEY_CONVERTER
-            value: "org.apache.kafka.connect.json.JsonConverter"
+            value: "org.apache.kafka.connect.converters.ByteArrayConverter"
           - name: CONNECT_INTERNAL_VALUE_CONVERTER
-            value: "org.apache.kafka.connect.json.JsonConverter"
-          - name: CONNECT_OFFSET_FLUSH_INTERVAL_MS
-            value: "10000"
+            value: "org.apache.kafka.connect.converters.ByteArrayConverter"
           - name: CONNECT_OFFSET_STORAGE_FILE_FILENAME
             value: "/tmp/connect2.offset"
           - name: CONNECT_REST_ADVERTISED_HOST_NAME
@@ -193,7 +187,7 @@ spec:
           - name: CONNECT_PLUGIN_PATH
             value: "/usr/share/kafka-connect/plugins"
           - name: CONNECTOR_PROPERTY_FILE_PREFIX
-            value: "sink-iceberg/sink-iceberg"
+            value: ""
           - name: CONNECT_VALUE_CONVERTER_CONNECT_META_DATA
             value: "false"
           - name: KAFKA_HEAP_OPTS
@@ -203,16 +197,16 @@ spec:
           - name: CONNECT_LOG4J_LOGGERS
             value: "org.reflections=ERROR"
           {{- if and .Values.iceberg.s3.accessKey .Values.iceberg.s3.secretKey }}
-          - name: AWS_ACCESS_KEY
+          - name: AWS_ACCESS_KEY_ID
             valueFrom:
               secretKeyRef:
-                name: {{ template "radar-iceberg-connector.fullname" . }}
-                key: awsAccessKey
-          - name: AWS_SECRET_KEY
+                name: {{ .Values.iceberg.s3.accessKeySecret.name }}
+                key: {{ .Values.iceberg.s3.accessKeySecret.key }}
+          - name: AWS_SECRET_ACCESS_KEY
             valueFrom:
               secretKeyRef:
-                name: {{ template "radar-iceberg-connector.fullname" . }}
-                key: awsSecretKey
+                name: {{ .Values.iceberg.s3.secretKeySecret.name }}
+                key: {{ .Values.iceberg.s3.secretKeySecret.key }}
           {{- end }}
           {{- if .Values.iceberg.s3.region }}
             - name: AWS_REGION

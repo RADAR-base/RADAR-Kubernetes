@@ -1,0 +1,25 @@
+apiVersion: "sparkoperator.k8s.io/v1beta2"
+kind: SparkApplication
+metadata:
+  name: iceberg-upsert-processor
+spec:
+  type: Python
+  image: "pvannierop/radar-spark-applications:0.0.1"
+  mainApplicationFile: "local:///opt/spark/scripts/output-restructure.py"
+  sparkConf:
+    # Iceberg Extensions
+    "spark.sql.extensions": "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions"
+    # Catalog config moves here if you prefer it outside the Python script
+    "spark.sql.catalog.seaweed": "org.apache.iceberg.spark.SparkCatalog"
+    "spark.sql.catalog.seaweed.type": "hadoop"
+  deps:
+    packages:
+      - "org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:1.5.0"
+      - "org.apache.hadoop:hadoop-aws:3.3.4"
+  driver:
+    cores: 1
+    memory: "1g"
+  executor:
+    cores: 1
+    instances: 2
+    memory: "2g"

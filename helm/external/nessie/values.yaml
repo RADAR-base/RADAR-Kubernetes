@@ -118,7 +118,7 @@ log:
 # Note: the version store type CASSANDRA is deprecated, please use the Nessie Server Admin Tool to migrate to CASSANDRA2.
 # Note: the version store type DYNAMODB is deprecated, please use the Nessie Server Admin Tool to migrate to DYNAMODB2.
 # Note: the version store type MONGODB is deprecated, please use the Nessie Server Admin Tool to migrate to MONGODB2.
-versionStoreType: IN_MEMORY
+versionStoreType: JDBC2
 
 # Cassandra settings. Only required when using CASSANDRA version store type; ignored otherwise.
 cassandra:
@@ -183,10 +183,10 @@ jdbc:
   # -- The JDBC connection string. If you are using Nessie OSS images, then only
   # PostgreSQL, MariaDB and MySQL URLs are supported. Check your JDBC driver documentation
   # for the correct URL format.
-  jdbcUrl: jdbc:postgresql://localhost:5432/my_database?currentSchema=nessie
+  jdbcUrl: jdbc:postgresql://radar-cloudnative-postgresql-cluster-rw:5432/hydra?currentSchema=hydra
   secret:
     # -- The secret name to pull datasource credentials from.
-    name: datasource-creds
+    name: radar-cloudnative-postgresql-hydra
     # -- The secret key storing the datasource username.
     username: username
     # -- The secret key storing the datasource password.
@@ -223,14 +223,14 @@ bigtable:
 catalog:
 
   # -- Whether to enable the REST catalog service.
-  enabled: false
+  enabled: true
 
   # -- Iceberg catalog settings.
   iceberg:
 
     # -- The default warehouse name. Required. This is just a symbolic name; it must refer to a
     # declared warehouse below.
-    defaultWarehouse: ~  # warehouse1
+    defaultWarehouse: radar-warehouse  # warehouse1
 
     # -- Iceberg config defaults applicable to all clients and warehouses. Any properties that are
     # common to all iceberg clients should be included here. They will be passed to all clients on
@@ -251,15 +251,15 @@ catalog:
     # warehouse must be defined.
     warehouses:
       # -- Symbolic name of the warehouse. Required.
-    - name: ~  # warehouse1
+    - name: radar-warehouse  # warehouse1
       # -- Location of the warehouse. Required. Used to determine the base location of a table.
       # Scheme must be either s3 (Amazon S3), gs (Google GCS) or abfs / abfss (Azure ADLS). Storage
       # properties for each location can be defined below.
-      location: ~  # s3://bucket1/
+      location: s3://radar-intermediate-storage/  # s3://bucket1/
       # -- Iceberg config defaults specific to this warehouse. They override any defaults specified
       # above in catalog.iceberg.configDefaults.
       configDefaults: {}
-      # -- Iceberg config overrides specific to this warehouse. They override any defaults specified
+      # -- Iceberg config overrides specific to this warehouse. They overridefalse any defaults specified
       # above in catalog.iceberg.configOverrides.
       configOverrides: {}
     # In rare cases it might be legit to turn off the object-stores readiness check.
@@ -267,7 +267,7 @@ catalog:
 
   # -- Catalog storage settings.
   storage:
-    # -- Interval after which a request is retried when Storage responds with some "retry later"
+    # -- Interval after which a request is retried when Storage responds withfalse some "retry later"
     # error. Must be a valid ISO duration.
     retryAfter: ~
 
@@ -279,7 +279,7 @@ catalog:
         region: ~  # us-west-2
         # -- Endpoint URI, required for private clouds. Optional; if not provided, the default is
         # used.
-        endpoint: ~  # "https://bucket1.s3.amazonaws.com"
+        endpoint: http://radar-seaweedfs-s3:8333
         # -- Endpoint URI, required for private clouds. Optional; if not provided, the default is
         # used. If the endpoint URIs for the Nessie server and clients differ, this one defines the
         # endpoint used for the Nessie server.
@@ -287,7 +287,7 @@ catalog:
         # -- Whether to use path-style access. Optional; if not provided, the default is used. If
         # true, path-style access will be used, as in: https://<domain>/<bucket>. If false, a
         # virtual-hosted style will be used instead, as in: https://<bucket>.<domain>.
-        pathStyleAccess: ~
+        pathStyleAccess: true
         # -- AWS Access point for this bucket. Access points can be used to perform S3 operations by
         # specifying a mapping of bucket to access points. This is useful for multi-region access,
         # cross-region access, disaster recovery, etc. See
@@ -340,7 +340,7 @@ catalog:
           # -- Additional IAM policy statements in JSON format to add to generated per-table IAM policies.
           statements: ~
           # - >-
-          #   {
+          #     # "https://bucket1.s3.amazonaws.com"{
           #   "Effect": "Allow",
           #   "Action": "s3:GetObject",
           #   "Resource": "arn:aws:s3:::bucket1.{{ .Release.Namespace }}/*"
@@ -380,17 +380,17 @@ catalog:
         # -- AWS credentials. Required when serverAuthenticationMode is STATIC.
         accessKeySecret:
           # -- The secret name to pull AWS credentials from.
-          name: ~
+          name: radar-seaweedfs-s3-secret
           # -- The secret key storing the AWS secret key id.
-          awsAccessKeyId: ~
+          awsAccessKeyId: admin_access_key_id
           # -- The secret key storing the AWS secret access key.
-          awsSecretAccessKey: ~
+          awsSecretAccessKey: admin_secret_access_key
 
       # -- Per-bucket S3 settings. Override the general settings above.
       buckets: []
       # - name: bucket1
       #   authority: bucket1
-      #   pathPrefix: path/in/the/bucket
+      #   pathPrefix: path/in/the/bucke~t
       #   endpoint: "https://bucket1.s3.amazonaws.com"
       #   accessKeySecret:
       #     name: awscreds

@@ -566,6 +566,16 @@ seaweedfs:
   s3:
     icebergPort: 8181
 
+radar_nessie:
+  _install: true
+  _chart_version: 0.107.4
+  _extra_timeout: 0
+
+spark_operator:
+  _install: true
+  _chart_version: 2.5.0-rc.0
+  _extra_timeout: 0
+
 minio:
   _install: false
   _chart_version: 14.6.32
