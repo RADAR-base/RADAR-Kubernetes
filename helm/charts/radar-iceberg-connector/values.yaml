@@ -236,28 +236,29 @@ iceberg:
     commit:
       intervalMs: 10000
   catalog:
-#    uri: http://radar-seaweedfs-s3:8181
-    type: hadoop
+    uri: http://radar-nessie:19120/api/v1
+    catalogImpl: org.apache.iceberg.nessie.NessieCatalog
+    ref: main
+    warehouse: s3a://radar-intermediate-storage/
     ioImpl: org.apache.iceberg.aws.s3.S3FileIO
-    warehouse: s3://radar-intermediate-storage/iceberg-data
+    s3:
+      endpoint: http://radar-seaweedfs-s3.default.svc.cluster.local:8333
+      pathStyleAccess: true
+      accessKey: access_key
+      secretKey: secret_key
+      accessKeySecret:
+        name: radar-seaweedfs-s3-secret
+        key: admin_access_key_id
+      secretKeySecret:
+        name: radar-seaweedfs-s3-secret
+        key: admin_secret_access_key
+    client:
+      region: eu-west-1
   tables:
     # Auto-create tables with the same name as the topic
     autoCreateEnabled: true
-    tables: "${topic}"
+    tables: "default.questionnaire_response"
     automaticSchemaEvolutionEnabled: true
-  s3:
-    endpoint: http://radar-seaweedfs-s3:8333
-    accessKey: access_key
-    secretKey: secret_key
-    accessKeySecret:
-      name: radar-seaweedfs-s3-secret
-      key: admin_access_key_id
-    secretKeySecret:
-      name: radar-seaweedfs-s3-secret
-      key: admin_secret_access_key
-    region:
-    pathStyleAccess: true
-    bucketName: radar-intermediate-storage
 
 cc:
   # -- Set to true, if Confluent Cloud is used

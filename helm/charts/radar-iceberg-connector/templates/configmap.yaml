@@ -9,63 +9,27 @@ metadata:
   {{- end }}
 data:
   sink-iceberg.properties: |
-    name=radar-iceberg-sink-connector
-    connector.class=org.apache.iceberg.connect.IcebergSinkConnector
-    tasks.max={{ .Values.maxTasks | int }}
-    format.class=io.confluent.connect.s3.format.avro.AvroFormat
-    value.converter.schemas.enable=false
-    key.converter.schemas.enable=false
-    value.converter=io.confluent.connect.avro.AvroConverter
-    value.converter.schema.registry.url=http://cp-schema-registry:8081
-    key.converter=io.confluent.connect.avro.AvroConverter
-    key.converter.schema.registry.url=http://cp-schema-registry:8081
-    #transforms=combineKeyValue
-    #transforms.combineKeyValue.type=org.radarbase.kafka.connect.transforms.CombineKeyValue
-    flush.size={{ .Values.flushSize | int }}
-    topics={{ .Values.topics }}
-    connect.meta.data=false
-    timezone=UTC
-    iceberg.control.group-id=new-coord-group-v6
-    #iceberg.control.group-id-prefix=cg-control
-    iceberg.coordinator.transactional.id.prefix=
-    #iceberg.control.group-id={{ template "common.names.fullname" . }}-group
-    iceberg.catalog.uri={{ .Values.iceberg.catalog.uri }}
-    iceberg.catalog.type={{ .Values.iceberg.catalog.type }}
-    iceberg.catalog.io-impl={{ .Values.iceberg.catalog.ioImpl }}
-    iceberg.catalog.s3.endpoint={{ .Values.iceberg.s3.endpoint }}
-    iceberg.catalog.s3.path-style-access={{ .Values.iceberg.s3.pathStyleAccess }}
-    iceberg.catalog.warehouse={{ .Values.iceberg.catalog.warehouse }}
-    iceberg.tables.dynamic-enabled=false
-    # Use the topic name as the route field
-    iceberg.tables.route-field=None
-    iceberg.tables=default.questionnaire_response
-    #iceberg.tables={{ .Values.iceberg.tables.tables }}
-    iceberg.control.topic={{ .Values.iceberg.control.topic }}
-    iceberg.control.replication.factor=1
-    iceberg.tables.auto-create-enabled={{ .Values.iceberg.tables.autoCreateEnabled }}
-    iceberg.tables.dynamic-schema-evolution-enabled={{ .Values.iceberg.tables.automaticSchemaEvolutionEnabled }}
-    iceberg.control.commit.interval-ms={{ .Values.iceberg.control.commit.intervalMs }}
-    iceberg.catalog.s3.access-key-id=eLx2gEe0YKXhC493Jldi
-    iceberg.catalog.s3.secret-access-key=TgrQ13m4W17YzKCfsPX54WSwXS3eBdZtJycoOEdK
-    # Force the internal Control Consumer to stop trying to parse Avro/JSON
-    iceberg.control.consumer.key.deserializer=org.apache.kafka.common.serialization.ByteArrayDeserializer
-    iceberg.control.consumer.value.deserializer=org.apache.kafka.common.serialization.ByteArrayDeserializer
-
-    # Force the internal Control Producer to send raw bytes
-    iceberg.control.producer.key.serializer=org.apache.kafka.common.serialization.ByteArraySerializer
-    iceberg.control.producer.value.serializer=org.apache.kafka.common.serialization.ByteArraySerializer
-
-    # Keep these as well for the Connect Framework layer
-    iceberg.control.key.converter=org.apache.kafka.connect.converters.ByteArrayConverter
-    iceberg.control.value.converter=org.apache.kafka.connect.converters.ByteArrayConverter
-    iceberg.kafka.key.serializer=org.apache.kafka.common.serialization.ByteArraySerializer
-    iceberg.kafka.value.serializer=org.apache.kafka.common.serialization.ByteArraySerializer
-    iceberg.kafka.key.deserializer=org.apache.kafka.common.serialization.ByteArrayDeserializer
-    iceberg.kafka.value.deserializer=org.apache.kafka.common.serialization.ByteArrayDeserializer
-    # Kafka producer configuration for transaction coordinator discovery
-    producer.retry.backoff.ms=1000
-    producer.max.block.ms=30000
-    producer.metadata.max.age.ms=30000
+    tasks.max=1,
+    topics=questionnaire_response,
+    iceberg.catalog.ref=main,
+    iceberg.catalog.uri=http://radar-nessie.default.svc.cluster.local:19120/api/v2,
+    iceberg.catalog.catalog-impl=org.apache.iceberg.nessie.NessieCatalog,
+    iceberg.catalog.io-impl=org.apache.iceberg.aws.s3.S3FileIO,
+    iceberg.catalog.s3.endpoint=http://radar-seaweedfs-s3.default.svc.cluster.local:8333,
+    iceberg.catalog.client.region=us-east-1,
+    iceberg.catalog.s3.path-style-access=true,
+    iceberg.catalog.warehouse=s3://radar-intermediate-storage/,
+    iceberg.catalog.s3.access-key-id=eLx2gEe0YKXhC493Jldi,
+    iceberg.catalog.s3.secret-access-key=TgrQ13m4W17YzKCfsPX54WSwXS3eBdZtJycoOEdK,
+    iceberg.control.topic=iceberg-control-topic,
+    iceberg.control.group-id=radar-cg-reset-v21,
+    key.converter=org.apache.kafka.connect.converters.ByteArrayConverter,
+    value.converter=io.confluent.connect.avro.AvroConverter,
+    value.converter.schema.registry.url=http://cp-schema-registry:8081,
+    iceberg.tables=default.questionnaire_response,
+    iceberg.tables.dynamic-enabled=false,
+    iceberg.table.default.questionnaire_response.route-regex=.*,
+    iceberg.tables.auto-create-enabled=true
 
     {{/*-1 means use default configured by the kafka broker*/}}
 

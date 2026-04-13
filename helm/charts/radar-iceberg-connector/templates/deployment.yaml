@@ -196,21 +196,17 @@ spec:
             value: "{{ .Values.kafka_num_brokers }}"
           - name: CONNECT_LOG4J_LOGGERS
             value: "org.reflections=ERROR"
-          {{- if and .Values.iceberg.s3.accessKey .Values.iceberg.s3.secretKey }}
+          {{- if and .Values.iceberg.catalog.s3.accessKey .Values.iceberg.catalog.s3.secretKey }}
           - name: AWS_ACCESS_KEY_ID
             valueFrom:
               secretKeyRef:
-                name: {{ .Values.iceberg.s3.accessKeySecret.name }}
-                key: {{ .Values.iceberg.s3.accessKeySecret.key }}
+                name: {{ .Values.iceberg.catalog.s3.accessKeySecret.name }}
+                key: {{ .Values.iceberg.catalog.s3.accessKeySecret.key }}
           - name: AWS_SECRET_ACCESS_KEY
             valueFrom:
               secretKeyRef:
-                name: {{ .Values.iceberg.s3.secretKeySecret.name }}
-                key: {{ .Values.iceberg.s3.secretKeySecret.key }}
-          {{- end }}
-          {{- if .Values.iceberg.s3.region }}
-            - name: AWS_REGION
-              value: {{ .Values.iceberg.s3.region }}
+                name: {{ .Values.iceberg.catalog.s3.secretKeySecret.name }}
+                key: {{ .Values.iceberg.catalog.s3.secretKeySecret.key }}
           {{- end }}
           {{- with .Values.extraEnvVars }}
             {{- toYaml . | nindent 10 }}
