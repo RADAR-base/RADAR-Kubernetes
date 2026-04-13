@@ -9,26 +9,28 @@ metadata:
   {{- end }}
 data:
   sink-iceberg.properties: |
-    tasks.max=1,
-    topics=questionnaire_response,
-    iceberg.catalog.ref=main,
-    iceberg.catalog.uri=http://radar-nessie.default.svc.cluster.local:19120/api/v2,
-    iceberg.catalog.catalog-impl=org.apache.iceberg.nessie.NessieCatalog,
-    iceberg.catalog.io-impl=org.apache.iceberg.aws.s3.S3FileIO,
-    iceberg.catalog.s3.endpoint=http://radar-seaweedfs-s3.default.svc.cluster.local:8333,
-    iceberg.catalog.client.region=us-east-1,
-    iceberg.catalog.s3.path-style-access=true,
-    iceberg.catalog.warehouse=s3://radar-intermediate-storage/,
-    iceberg.catalog.s3.access-key-id=eLx2gEe0YKXhC493Jldi,
-    iceberg.catalog.s3.secret-access-key=TgrQ13m4W17YzKCfsPX54WSwXS3eBdZtJycoOEdK,
-    iceberg.control.topic=iceberg-control-topic,
-    iceberg.control.group-id=radar-cg-reset-v21,
-    key.converter=org.apache.kafka.connect.converters.ByteArrayConverter,
-    value.converter=io.confluent.connect.avro.AvroConverter,
-    value.converter.schema.registry.url=http://cp-schema-registry:8081,
-    iceberg.tables=default.questionnaire_response,
-    iceberg.tables.dynamic-enabled=false,
-    iceberg.table.default.questionnaire_response.route-regex=.*,
+    name=radar-iceberg-sink-connector
+    connector.class=org.apache.iceberg.connect.IcebergSinkConnector
+    tasks.max=1
+    topics=questionnaire_response
+    iceberg.catalog.ref=main
+    iceberg.catalog.uri=http://radar-nessie.default.svc.cluster.local:19120/api/v2
+    iceberg.catalog.catalog-impl=org.apache.iceberg.nessie.NessieCatalog
+    iceberg.catalog.io-impl=org.apache.iceberg.aws.s3.S3FileIO
+    iceberg.catalog.s3.endpoint=http://radar-seaweedfs-s3.default.svc.cluster.local:8333
+    iceberg.catalog.client.region=us-east-1
+    iceberg.catalog.s3.path-style-access=true
+    iceberg.catalog.warehouse=s3://radar-intermediate-storage/
+    iceberg.catalog.s3.access-key-id=eLx2gEe0YKXhC493Jldi
+    iceberg.catalog.s3.secret-access-key=TgrQ13m4W17YzKCfsPX54WSwXS3eBdZtJycoOEdK
+    iceberg.control.topic=iceberg-control-topic
+    iceberg.control.group-id=radar-cg-reset-v21
+    key.converter=org.apache.kafka.connect.converters.ByteArrayConverter
+    value.converter=io.confluent.connect.avro.AvroConverter
+    value.converter.schema.registry.url=http://cp-schema-registry:8081
+    iceberg.tables=default.questionnaire_response
+    iceberg.tables.dynamic-enabled=false
+    iceberg.table.default.questionnaire_response.route-regex=.*
     iceberg.tables.auto-create-enabled=true
 
     {{/*-1 means use default configured by the kafka broker*/}}

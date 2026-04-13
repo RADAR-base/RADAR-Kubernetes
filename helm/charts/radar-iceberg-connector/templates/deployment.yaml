@@ -187,7 +187,7 @@ spec:
           - name: CONNECT_PLUGIN_PATH
             value: "/usr/share/kafka-connect/plugins"
           - name: CONNECTOR_PROPERTY_FILE_PREFIX
-            value: ""
+            value: "sink-iceberg/sink-iceberg"
           - name: CONNECT_VALUE_CONVERTER_CONNECT_META_DATA
             value: "false"
           - name: KAFKA_HEAP_OPTS
