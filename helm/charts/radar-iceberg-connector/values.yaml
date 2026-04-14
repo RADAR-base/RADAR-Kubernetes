@@ -242,9 +242,10 @@ s3:
 
 extraConnectConfig:
   connector.class: org.apache.iceberg.connect.IcebergSinkConnector
-  iceberg.catalog.ref: main
-  iceberg.catalog.uri: http://radar-nessie.default.svc.cluster.local:19120/api/v2
-  iceberg.catalog.catalog-impl: org.apache.iceberg.nessie.NessieCatalog
+  iceberg.control.group-id: radar-iceberg-connector-V3
+  iceberg.catalog.uri: http://radar-seaweedfs-s3.default.svc.cluster.local:8181
+  iceberg.catalog.prefix: radar-intermediate-storage
+  iceberg.catalog.catalog-impl: org.apache.iceberg.rest.RESTCatalog
   iceberg.catalog.io-impl: org.apache.iceberg.aws.s3.S3FileIO
   iceberg.catalog.s3.endpoint: http://radar-seaweedfs-s3.default.svc.cluster.local:8333
   iceberg.catalog.client.region: us-east-1

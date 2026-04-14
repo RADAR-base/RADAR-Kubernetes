@@ -16,7 +16,6 @@ data:
     {{- end }}
     tasks.max={{ .Values.maxTasks }}
     topics={{ .Values.topics }}
-    iceberg.control.group-id={{ include "common.names.fullname" . }}
     {{- with .Values.extraConnectConfig }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
