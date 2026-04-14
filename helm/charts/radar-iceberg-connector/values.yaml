@@ -252,6 +252,8 @@ extraConnectConfig:
   iceberg.catalog.s3.path-style-access: true
   iceberg.catalog.warehouse: s3://radar-intermediate-storage/
   iceberg.control.topic: iceberg-control-topic
+  iceberg.control.commit.interval-ms: 30000
+  iceberg.control.commit.timeout-ms: 30000
   key.converter: io.confluent.connect.avro.AvroConverter
   value.converter: io.confluent.connect.avro.AvroConverter
   iceberg.tables: default.questionnaire_response
