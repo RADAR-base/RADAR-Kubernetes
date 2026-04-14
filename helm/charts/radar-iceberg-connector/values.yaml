@@ -23,7 +23,7 @@ image:
   # pullSecrets:
   #   - myRegistryKeySecretName
   #
-  pullSecrets: []
+  pullSecrets: [ ]
 
 # -- String to partially override radar-iceberg-connector.fullname template with a string (will prepend the release name)
 nameOverride: ""
@@ -31,20 +31,20 @@ nameOverride: ""
 fullnameOverride: ""
 
 # -- Configure radar-iceberg-connector pods' Security Context
-podSecurityContext: {}
-  # fsGroup: 2000
+podSecurityContext: { }
+# fsGroup: 2000
 
 # -- JVM Options
 kafkaHeapOpts: "-Xms3g -Xmx4g"
 
 # -- Configure radar-iceberg-connector containers' Security Context
-securityContext: {}
+securityContext: { }
   # capabilities:
   #   drop:
   #   - ALL
   # readOnlyRootFilesystem: true
   # runAsNonRoot: true
-  # runAsUser: 1000
+# runAsUser: 1000
 
 service:
   # -- Kubernetes Service type
@@ -67,19 +67,19 @@ resources:
     memory: 3Gi
 
 # -- Node labels for pod assignment
-nodeSelector: {}
+nodeSelector: { }
 
 # -- Toleration labels for pod assignment
-tolerations: []
+tolerations: [ ]
 
 # -- Affinity labels for pod assignment
-affinity: {}
+affinity: { }
 
 # -- Additional environment variables to pass to the connector. These can be used to pass supported kafka and connect specific [configs](https://docs.confluent.io/platform/current/installation/docker/config-reference.html#kconnect-long-configuration)
-extraEnvVars: []
+extraEnvVars: [ ]
 
 # -- Custom livenessProbe that overrides the default one
-customLivenessProbe: {}
+customLivenessProbe: { }
 
 livenessProbe:
   # -- Enable livenessProbe
@@ -96,7 +96,7 @@ livenessProbe:
   failureThreshold: 3
 
 # -- Custom readinessProbe that overrides the default one
-customReadinessProbe: {}
+customReadinessProbe: { }
 
 readinessProbe:
   # -- Enable readinessProbe
@@ -113,7 +113,7 @@ readinessProbe:
   failureThreshold: 3
 
 # -- Custom startupProbe that overrides the default one
-customStartupProbe: {}
+customStartupProbe: { }
 
 startupProbe:
   # -- Enable startupProbe
@@ -133,52 +133,52 @@ startupProbe:
 # @default -- check `values.yaml`
 networkpolicy:
   policyTypes:
-  - Egress
+    - Egress
   egress:
-  - to:
-    - ipBlock:
-        cidr: 0.0.0.0/0
-        except:
-        - 10.0.0.0/8
-        - 192.168.0.0/16
-        - 172.16.0.0/12
-  - to:
-    - namespaceSelector:
-        matchLabels:
-          kubernetes.io/metadata.name: '{{ .Release.Namespace }}'
-      podSelector:
-        matchLabels:
-          app.kubernetes.io/name: 'radar-kafka-kafka-bootstrap'
-    - namespaceSelector:
-        matchLabels:
-          kubernetes.io/metadata.name: '{{ .Release.Namespace }}'
-      podSelector:
-        matchLabels:
-          app.kubernetes.io/name: 'radar-kafka-schema-registry'
-    - namespaceSelector:
-        matchLabels:
-          kubernetes.io/metadata.name: '{{ .Release.Namespace }}'
-      podSelector:
-        matchLabels:
-          app.kubernetes.io/name: 'catalog-server'
-    - namespaceSelector:
-        matchLabels:
-          kubernetes.io/metadata.name: '{{ .Release.Namespace }}'
-      podSelector:
-        matchLabels:
-          app.kubernetes.io/name: 'radar-seaweedfs'
-  - to:
-    - namespaceSelector:
-        matchLabels:
-          kubernetes.io/metadata.name: kube-system
-      podSelector:
-        matchLabels:
-          k8s-app: kube-dns
-    ports:
-      - port: 53
-        protocol: UDP
-      - port: 53
-        protocol: TCP
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+              - 192.168.0.0/16
+              - 172.16.0.0/12
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: '{{ .Release.Namespace }}'
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: 'radar-kafka-kafka-bootstrap'
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: '{{ .Release.Namespace }}'
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: 'radar-kafka-schema-registry'
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: '{{ .Release.Namespace }}'
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: 'catalog-server'
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: '{{ .Release.Namespace }}'
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: 'radar-seaweedfs'
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
 
 
 # -- Number of deployed Kafka broker instances
@@ -214,6 +214,8 @@ kafka:
       name: shared-service-user
       key: sasl.jaas.config
 
+connectorName: radar-iceberg-connector
+
 schemaRegistry:
   # -- Schema registry URL
   url: http://radar-kafka-schema-registry:8081
@@ -226,39 +228,40 @@ catalogServer:
 # will automatically be loaded if `initTopics.enabled` is true.
 topics: "questionnaire_response"
 # -- Number of records written to store before invoking file commits.
-flushSize: 10000
-# -- Number of tasks in the connector
 maxTasks: 1
 
-iceberg:
-  control:
-    topic: iceberg-control-topic
-    commit:
-      intervalMs: 10000
-  catalog:
-    uri: http://radar-nessie:19120/api/v1
-    catalogImpl: org.apache.iceberg.nessie.NessieCatalog
-    ref: main
-    warehouse: s3a://radar-intermediate-storage/
-    ioImpl: org.apache.iceberg.aws.s3.S3FileIO
-    s3:
-      endpoint: http://radar-seaweedfs-s3.default.svc.cluster.local:8333
-      pathStyleAccess: true
-      accessKey: access_key
-      secretKey: secret_key
-      accessKeySecret:
-        name: radar-seaweedfs-s3-secret
-        key: admin_access_key_id
-      secretKeySecret:
-        name: radar-seaweedfs-s3-secret
-        key: admin_secret_access_key
-    client:
-      region: eu-west-1
-  tables:
-    # Auto-create tables with the same name as the topic
-    autoCreateEnabled: true
-    tables: "default.questionnaire_response"
-    automaticSchemaEvolutionEnabled: true
+s3:
+  accessKeyId:
+  secretKey:
+  accessKeyIdSecret:
+    name: radar-seaweedfs-s3-secret
+    key: admin_access_key_id
+  secretKeySecret:
+    name: radar-seaweedfs-s3-secret
+    key: admin_secret_access_key
+
+extraConnectConfig:
+  connector.class: org.apache.iceberg.connect.IcebergSinkConnector
+  iceberg.catalog.ref: main
+  iceberg.catalog.uri: http://radar-nessie.default.svc.cluster.local:19120/api/v2
+  iceberg.catalog.catalog-impl: org.apache.iceberg.nessie.NessieCatalog
+  iceberg.catalog.io-impl: org.apache.iceberg.aws.s3.S3FileIO
+  iceberg.catalog.s3.endpoint: http://radar-seaweedfs-s3.default.svc.cluster.local:8333
+  iceberg.catalog.client.region: us-east-1
+  iceberg.catalog.s3.path-style-access: true
+  iceberg.catalog.warehouse: s3://radar-intermediate-storage/
+  iceberg.control.topic: iceberg-control-topic
+  key.converter: io.confluent.connect.avro.AvroConverter
+  value.converter: io.confluent.connect.avro.AvroConverter
+  iceberg.tables: default.questionnaire_response
+  iceberg.tables.dynamic-enabled: false
+  iceberg.table.default.questionnaire_response.route-regex: .*
+  iceberg.tables.auto-create-enabled: true
+  avro.codec: deflate
+  errors.tolerance: none
+  errors.log.enable: true
+  errors.retry.delay.max.ms: 60000
+  errors.retry.timeout: 300000
 
 cc:
   # -- Set to true, if Confluent Cloud is used

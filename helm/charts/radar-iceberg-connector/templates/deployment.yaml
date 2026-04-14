@@ -196,17 +196,24 @@ spec:
             value: "{{ .Values.kafka_num_brokers }}"
           - name: CONNECT_LOG4J_LOGGERS
             value: "org.reflections=ERROR"
-          {{- if and .Values.iceberg.catalog.s3.accessKey .Values.iceberg.catalog.s3.secretKey }}
+          {{- if and .Values.s3.accessKeyId .Values.s3.secretKey }}
+          - name: AWS_ACCESS_KEY_ID
+            value: {{ .Values.s3.accessKeyId }}
+          - name: AWS_SECRET_ACCESS_KEY
+            value: {{ .Values.s3.secretKey }}
+          {{- else if and .Values.s3.accessKeyIdSecret.name .Values.s3.secretKeySecret.name }}
           - name: AWS_ACCESS_KEY_ID
             valueFrom:
               secretKeyRef:
-                name: {{ .Values.iceberg.catalog.s3.accessKeySecret.name }}
-                key: {{ .Values.iceberg.catalog.s3.accessKeySecret.key }}
+                name: {{ .Values.s3.accessKeyIdSecret.name }}
+                key: {{ .Values.s3.accessKeyIdSecret.key }}
           - name: AWS_SECRET_ACCESS_KEY
             valueFrom:
               secretKeyRef:
-                name: {{ .Values.iceberg.catalog.s3.secretKeySecret.name }}
-                key: {{ .Values.iceberg.catalog.s3.secretKeySecret.key }}
+                name: {{ .Values.s3.secretKeySecret.name }}
+                key: {{ .Values.s3.secretKeySecret.key }}
+          {{- else }}
+          {{ fail "S3 credentials are misconfigured in the values.yaml" }}
           {{- end }}
           {{- with .Values.extraEnvVars }}
             {{- toYaml . | nindent 10 }}
