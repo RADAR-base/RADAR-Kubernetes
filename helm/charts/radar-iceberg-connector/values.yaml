@@ -242,7 +242,7 @@ s3:
 
 extraConnectConfig:
   connector.class: org.apache.iceberg.connect.IcebergSinkConnector
-  iceberg.control.group-id: radar-iceberg-connector-V3
+  iceberg.control.group-id: radar-iceberg-connector-V15
   iceberg.catalog.uri: http://radar-seaweedfs-s3.default.svc.cluster.local:8181
   iceberg.catalog.prefix: radar-intermediate-storage
   iceberg.catalog.catalog-impl: org.apache.iceberg.rest.RESTCatalog
@@ -252,19 +252,20 @@ extraConnectConfig:
   iceberg.catalog.s3.path-style-access: true
   iceberg.catalog.warehouse: s3://radar-intermediate-storage/
   iceberg.control.topic: iceberg-control-topic
-  iceberg.control.commit.interval-ms: 30000
-  iceberg.control.commit.timeout-ms: 30000
+  iceberg.control.commit.interval-ms: 5000
+  iceberg.control.commit.timeout-ms: 10000
   key.converter: io.confluent.connect.avro.AvroConverter
   value.converter: io.confluent.connect.avro.AvroConverter
   iceberg.tables: default.questionnaire_response
   iceberg.tables.dynamic-enabled: false
-  iceberg.table.default.questionnaire_response.route-regex: .*
   iceberg.tables.auto-create-enabled: true
+  transforms: mergeKey
+  transforms.mergeKey.type: org.radarbase.kafka.connect.transforms.MergeKey
   avro.codec: deflate
   errors.tolerance: none
   errors.log.enable: true
   errors.retry.delay.max.ms: 60000
-  errors.retry.timeout: 300000
+  errors.retry.timeout: 30000
 
 cc:
   # -- Set to true, if Confluent Cloud is used
