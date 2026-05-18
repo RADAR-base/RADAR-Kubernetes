@@ -18,3 +18,5 @@ secrets/
 google-services.json
 google-credentials.json
 !.github/environments.yaml
+.radarctl-state.yaml
+cli/bin/
