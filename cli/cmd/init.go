@@ -42,7 +42,11 @@ func runInit(_ *cobra.Command, _ []string) error {
 			if r.OK {
 				output.Success(fmt.Sprintf("%-12s %s", r.Tool, r.Version))
 			} else {
-				output.Error(fmt.Sprintf("%-12s not found — %s", r.Tool, r.InstallHint))
+				msg := r.Error
+				if msg == "" {
+					msg = "not found"
+				}
+				output.Error(fmt.Sprintf("%-12s %s — %s", r.Tool, msg, r.InstallHint))
 				failed++
 			}
 		}
