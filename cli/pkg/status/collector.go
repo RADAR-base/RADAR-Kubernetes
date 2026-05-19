@@ -2,6 +2,7 @@ package status
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/RADAR-base/RADAR-Kubernetes/cli/pkg/kubectl"
 )
@@ -59,13 +60,17 @@ func classifyRelease(name string, pods []kubectl.Pod) ReleaseStatus {
 	}
 
 	rs.TotalPods = len(pods)
+	var errMsgs []string
 	for _, p := range pods {
 		if p.Ready {
 			rs.ReadyPods++
 		}
 		if p.Message != "" {
-			rs.Error = p.Message
+			errMsgs = append(errMsgs, p.Message)
 		}
+	}
+	if len(errMsgs) > 0 {
+		rs.Error = strings.Join(errMsgs, "; ")
 	}
 
 	switch {

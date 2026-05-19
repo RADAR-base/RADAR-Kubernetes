@@ -2,7 +2,6 @@ package output
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 
 	"github.com/pterm/pterm"
@@ -54,8 +53,3 @@ type ValidationJSON struct {
 	Warnings []string `json:"warnings"`
 }
 
-// Fatalf prints an error and exits 1.
-func Fatalf(format string, args ...any) {
-	fmt.Fprintf(os.Stderr, "error: "+format+"\n", args...)
-	os.Exit(1)
-}

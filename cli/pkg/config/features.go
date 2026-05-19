@@ -23,7 +23,7 @@ var featureRegistry = map[string]feature{
 		},
 	},
 	"garmin": {
-		apply: func(c *Config) {},
+		apply: func(c *Config) { c.EnableGarmin = true },
 		secrets: []SecretPrompt{
 			{SecretKey: "garmin_consumer_key", Label: "Garmin Consumer Key", Mask: false},
 			{SecretKey: "garmin_consumer_secret", Label: "Garmin Consumer Secret", Mask: true},

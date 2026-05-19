@@ -12,6 +12,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// StatusOutput wraps the status report with optional ingress URLs for JSON output.
+type StatusOutput struct {
+	*status.Report
+	Ingresses []kubectl.Ingress `json:"ingresses,omitempty"`
+}
+
 var (
 	statusWatch     bool
 	statusComponent string
@@ -40,8 +46,13 @@ func init() {
 }
 
 func runStatus(_ *cobra.Command, _ []string) error {
+	repoRoot, err := findRepoRoot()
+	if err != nil {
+		return err
+	}
+
 	exec := &executor.ShellExecutor{}
-	kr := kubectl.NewRunner(exec, kubeContext)
+	kr := kubectl.NewRunner(exec, resolvedKubeContext(repoRoot))
 	namespace := "default"
 
 	for {
@@ -51,9 +62,17 @@ func runStatus(_ *cobra.Command, _ []string) error {
 		}
 
 		if outputFormat == string(output.JSON) {
-			output.PrintJSON(report)
+			out := StatusOutput{Report: report}
+			if statusShowURLs {
+				ingresses, _ := kr.GetIngresses(namespace)
+				out.Ingresses = ingresses
+			}
+			output.PrintJSON(out)
 		} else {
 			printStatusReport(report)
+			if statusShowURLs {
+				printIngressURLs(kr, namespace)
+			}
 		}
 
 		if !statusWatch {
@@ -63,6 +82,27 @@ func runStatus(_ *cobra.Command, _ []string) error {
 		pterm.Println()
 	}
 	return nil
+}
+
+func printIngressURLs(kr *kubectl.Runner, namespace string) {
+	ingresses, err := kr.GetIngresses(namespace)
+	if err != nil {
+		output.Warning(fmt.Sprintf("Could not retrieve ingresses: %s", err))
+		return
+	}
+	if len(ingresses) == 0 {
+		output.Info("No ingresses found")
+		return
+	}
+	pterm.Println("Ingress URLs:")
+	for _, ing := range ingresses {
+		scheme := "https"
+		url := fmt.Sprintf("%s://%s", scheme, ing.Host)
+		if len(ing.Paths) > 0 {
+			url += ing.Paths[0]
+		}
+		pterm.Printf("  %-30s %s\n", ing.Name, url)
+	}
 }
 
 func printStatusReport(report *status.Report) {

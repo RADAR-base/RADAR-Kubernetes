@@ -16,6 +16,7 @@ type Config struct {
 	ConfluentCloud     bool    `yaml:"confluent_cloud"`
 	EnableFitbit       bool    `yaml:"radar_fitbit_connector_install"`
 	EnableRedcap       bool    `yaml:"radar_redcap_integrator_install"`
+	EnableGarmin       bool    `yaml:"radar_garmin_connector_install"`
 	EnableKratos       bool    `yaml:"radar_kratos_install"`
 	EnableHydra        bool    `yaml:"radar_hydra_install"`
 	UseExternalS3      bool    `yaml:"external_s3"`

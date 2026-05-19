@@ -2,6 +2,7 @@ package prereqs
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/RADAR-base/RADAR-Kubernetes/cli/pkg/executor"
@@ -20,6 +21,7 @@ type toolDef struct {
 	args         []string
 	parseVersion func(string) string
 	installHint  string
+	minVersion   string // e.g. "v3.0.0" — empty means no minimum
 }
 
 var tools = []toolDef{
@@ -44,6 +46,7 @@ var tools = []toolDef{
 		args:         []string{"version", "--short"},
 		parseVersion: func(out string) string { return strings.TrimSpace(out) },
 		installHint:  "https://helm.sh/docs/intro/install/",
+		minVersion:   "v3",
 	},
 	{
 		name: "helmfile",
@@ -56,12 +59,14 @@ var tools = []toolDef{
 			return out
 		},
 		installHint: "https://github.com/helmfile/helmfile/releases",
+		minVersion:  "v0.169.1",
 	},
 	{
-		name: "helm diff",
-		args: []string{"diff", "version"},
+		name:         "helm diff",
+		args:         []string{"diff", "version"},
 		parseVersion: func(out string) string { return strings.TrimSpace(out) },
 		installHint:  "helm plugin install https://github.com/databus23/helm-diff",
+		minVersion:   "v3.9.12",
 	},
 	{
 		name: "yq",
@@ -74,6 +79,7 @@ var tools = []toolDef{
 			return out
 		},
 		installHint: "https://github.com/mikefarah/yq#install",
+		minVersion:  "v4.44.3",
 	},
 	{
 		name: "java",
@@ -101,17 +107,61 @@ var tools = []toolDef{
 	},
 }
 
+// meetsMinVersion returns true if version >= minVersion using simple semver comparison.
+// Both version and minVersion should be in the form "vX", "vX.Y", or "vX.Y.Z".
+// The "v" prefix is stripped before comparison.
+func meetsMinVersion(version, minVersion string) bool {
+	stripV := func(s string) string {
+		return strings.TrimPrefix(strings.TrimSpace(s), "v")
+	}
+	// Extract only the leading version token (e.g. "3.9.12" from "3.9.12+g...")
+	ver := strings.FieldsFunc(stripV(version), func(r rune) bool {
+		return r == '+' || r == '-'
+	})
+	min := strings.FieldsFunc(stripV(minVersion), func(r rune) bool {
+		return r == '+' || r == '-'
+	})
+
+	var verStr, minStr string
+	if len(ver) > 0 {
+		verStr = ver[0]
+	}
+	if len(min) > 0 {
+		minStr = min[0]
+	}
+
+	vParts := strings.Split(verStr, ".")
+	mParts := strings.Split(minStr, ".")
+
+	// Pad to same length
+	for len(vParts) < len(mParts) {
+		vParts = append(vParts, "0")
+	}
+	for len(mParts) < len(vParts) {
+		mParts = append(mParts, "0")
+	}
+
+	for i := range vParts {
+		v, _ := strconv.Atoi(vParts[i])
+		m, _ := strconv.Atoi(mParts[i])
+		if v > m {
+			return true
+		}
+		if v < m {
+			return false
+		}
+	}
+	return true // equal
+}
+
 // Check runs all prerequisite checks and returns one result per tool.
 func Check(exec executor.Executor) []CheckResult {
 	results := make([]CheckResult, 0, len(tools))
 	for _, t := range tools {
 		toolName := strings.Fields(t.name)[0]
+		// For compound tool names like "helm diff", toolName is "helm" and
+		// t.args already contains the subcommand (e.g. ["diff", "version"]).
 		args := t.args
-		if strings.Contains(t.name, " ") {
-			// e.g. "helm diff" → run as "helm" with ["diff", "version"]
-			extraArgs := strings.Fields(t.name)[1:]
-			args = append(extraArgs, t.args...)
-		}
 		out, err := exec.Run(toolName, args...)
 		if err != nil {
 			results = append(results, CheckResult{
@@ -122,11 +172,18 @@ func Check(exec executor.Executor) []CheckResult {
 			})
 			continue
 		}
-		results = append(results, CheckResult{
+		version := t.parseVersion(out)
+		r := CheckResult{
 			Tool:    t.name,
 			OK:      true,
-			Version: t.parseVersion(out),
-		})
+			Version: version,
+		}
+		if t.minVersion != "" && !meetsMinVersion(version, t.minVersion) {
+			r.OK = false
+			r.Error = fmt.Sprintf("version %s found, need >= %s", version, t.minVersion)
+			r.InstallHint = t.installHint
+		}
+		results = append(results, r)
 	}
 	return results
 }

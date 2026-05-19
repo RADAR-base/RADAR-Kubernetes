@@ -75,7 +75,7 @@ func runInit(_ *cobra.Command, _ []string) error {
 
 		if mode == wizard.ModeExpert {
 			output.Info("Expert mode: running config validation only")
-			return runValidate(nil, nil)
+			return validateConfig(repoRoot)
 		}
 
 		output.Header("Configuring RADAR-Kubernetes")

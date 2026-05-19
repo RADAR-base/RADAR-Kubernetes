@@ -159,7 +159,7 @@ func runDeploy(_ *cobra.Command, _ []string) error {
 	}
 
 	// 5. Post-deploy health check
-	kr := kubectl.NewRunner(exec, kubeContext)
+	kr := kubectl.NewRunner(exec, resolvedKubeContext(repoRoot))
 	report, err := status.Collect(kr, "default", knownReleases)
 	if err != nil {
 		return &ExitError{Code: 4, Message: fmt.Sprintf("cluster unreachable: %s", err)}

@@ -3,7 +3,9 @@ package cmd
 import (
 	"errors"
 	"os"
+	"path/filepath"
 
+	"github.com/RADAR-base/RADAR-Kubernetes/cli/pkg/config"
 	"github.com/RADAR-base/RADAR-Kubernetes/cli/pkg/output"
 	"github.com/spf13/cobra"
 )
@@ -41,4 +43,16 @@ func init() {
 
 func isJSON() bool {
 	return outputFormat == string(output.JSON)
+}
+
+func resolvedKubeContext(repoRoot string) string {
+	if kubeContext != "" {
+		return kubeContext
+	}
+	cfgPath := filepath.Join(repoRoot, "etc", "production.yaml")
+	cfg, err := config.LoadConfig(cfgPath)
+	if err != nil {
+		return ""
+	}
+	return cfg.KubeContext
 }

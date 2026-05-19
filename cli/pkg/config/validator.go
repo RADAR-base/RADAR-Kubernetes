@@ -21,7 +21,7 @@ func (r *ValidationResult) IsValid() bool {
 	return len(r.Errors) == 0
 }
 
-var placeholders = []string{"change_me", "secret", "MAINTAINER_EMAIL@example.com", "example.com"}
+var placeholders = []string{"change_me", "MAINTAINER_EMAIL@example.com", "example.com"}
 
 func isPlaceholder(v string) bool {
 	for _, p := range placeholders {

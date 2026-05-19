@@ -20,12 +20,15 @@ func init() {
 	rootCmd.AddCommand(validateCmd)
 }
 
-func runValidate(cmd *cobra.Command, _ []string) error {
+func runValidate(_ *cobra.Command, _ []string) error {
 	repoRoot, err := findRepoRoot()
 	if err != nil {
 		return err
 	}
+	return validateConfig(repoRoot)
+}
 
+func validateConfig(repoRoot string) error {
 	cfgPath := filepath.Join(repoRoot, "etc", "production.yaml")
 	secPath := filepath.Join(repoRoot, "etc", "secrets.yaml")
 
