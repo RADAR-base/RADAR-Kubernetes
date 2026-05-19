@@ -63,6 +63,19 @@ func FeatureSecretPrompts(name string) []SecretPrompt {
 // ApplyDeploymentProfile sets config values for a named profile and returns the mods to apply.
 func ApplyDeploymentProfile(cfg *Config, profile string) []string {
 	switch profile {
+	case "demo":
+		cfg.EnableTLS = false
+		cfg.DevDeployment = true
+		cfg.KafkaNumBrokers = 1
+		cfg.KafkaNumReplicas = 1
+		cfg.AtomicInstall = false
+		return []string{
+			"mods/minimal.yaml",
+			"mods/localdev.yaml",
+			"mods/disable_tls.yaml",
+			"mods/fast_deploy.yaml",
+			"mods/disable_monitoring_logging.yaml",
+		}
 	case "dev":
 		cfg.EnableTLS = false
 		cfg.DevDeployment = true

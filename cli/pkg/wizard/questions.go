@@ -48,11 +48,12 @@ func collectProfile(a *Answers) error {
 		huh.NewGroup(
 			huh.NewSelect[string]().
 				Title("Deployment profile").
-				Description("Controls resource sizing, replica counts, and TLS behaviour.\nProduction: full replicas, TLS on — use for live studies.\nStaging: reduced resources, TLS on — use for pre-production testing.\nLocal dev: no TLS, single replicas, faster health probes — use for development.").
+				Description("Controls resource sizing, replica counts, and TLS behaviour.\nProduction: full replicas, TLS on — use for live studies.\nStaging: reduced resources, TLS on — use for pre-production testing.\nLocal dev: no TLS, single replicas, fast probes — use for development.\nLocal demo: lightest possible — no TLS, no monitoring/logging, fastest startup for demonstrations.").
 				Options(
 					huh.NewOption("Production — full stack, TLS enabled", "production"),
 					huh.NewOption("Staging — minimal resources, TLS enabled", "staging"),
 					huh.NewOption("Local dev — no TLS, single replicas, fast probes", "dev"),
+					huh.NewOption("Local demo — no TLS, no monitoring, fastest startup", "demo"),
 				).
 				Value(&a.Profile),
 		),
