@@ -18,8 +18,11 @@ func collectBasics(a *Answers) error {
 				Placeholder("radar.example.com").
 				Value(&a.ServerName).
 				Validate(func(s string) error {
-					if s == "" || s == "example.com" {
-						return fmt.Errorf("enter your actual domain name")
+					if err := validateHostname(s); err != nil {
+						return err
+					}
+					if s == "example.com" || strings.HasSuffix(s, ".example.com") {
+						return fmt.Errorf("enter your actual domain name, not the example placeholder")
 					}
 					return nil
 				}),
@@ -28,12 +31,7 @@ func collectBasics(a *Answers) error {
 				Description("Used for Let's Encrypt TLS certificate expiry notifications.\nMust be a real, monitored address.").
 				Placeholder("ops@example.com").
 				Value(&a.MaintainerEmail).
-				Validate(func(s string) error {
-					if s == "" {
-						return fmt.Errorf("email is required")
-					}
-					return nil
-				}),
+				Validate(validateEmail),
 			huh.NewInput().
 				Title("Kubernetes context").
 				Description("The kubectl context to use for all deployments.\nRun 'kubectl config get-contexts' to list available contexts.\nLeave blank to use the currently active context.").
@@ -77,7 +75,8 @@ func collectConfluentCredentials(a *Answers) error {
 			huh.NewInput().
 				Title("Confluent Cloud bootstrap server URL").
 				Description("Found under your Confluent Cloud cluster → Cluster Settings → Endpoints.\nFormat: pkc-xxxxx.us-east-1.aws.confluent.cloud:9092").
-				Value(&a.ConfluentURL),
+				Value(&a.ConfluentURL).
+				Validate(validateConfluentURL),
 			huh.NewInput().
 				Title("Confluent Cloud API key").
 				Description("An API key with produce/consume permissions on the cluster.\nCreate one under Confluent Cloud → API Keys (not your login credentials).").
@@ -176,15 +175,18 @@ func collectStorage(a *Answers) error {
 		huh.NewInput().
 			Title("S3 bucket name").
 			Description("The name of the pre-existing S3 bucket RADAR will write data to.\nThe bucket must already exist — radarctl does not create it.").
-			Value(&a.S3Bucket),
+			Value(&a.S3Bucket).
+			Validate(validateS3Bucket),
 		huh.NewInput().
 			Title("S3 region").
 			Description("The AWS region where the bucket is hosted, e.g. us-east-1, eu-west-2.\nFor non-AWS providers, use the region identifier from their documentation.").
-			Value(&a.S3Region),
+			Value(&a.S3Region).
+			Validate(validateS3Region),
 		huh.NewInput().
 			Title("S3 access key ID").
 			Description("AWS access key ID with s3:PutObject and s3:GetObject permissions on the bucket.\nCreate one under AWS IAM → Users → Security credentials.").
-			Value(&a.S3AccessKey),
+			Value(&a.S3AccessKey).
+			Validate(validateS3Key),
 		huh.NewInput().
 			Title("S3 secret access key").
 			Description("The secret access key corresponding to the access key ID above.").
