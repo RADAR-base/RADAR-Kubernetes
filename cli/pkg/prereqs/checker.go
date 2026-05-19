@@ -80,7 +80,7 @@ var tools = []toolDef{
 		// Remove first (best-effort) in case of broken install, then reinstall.
 		installCmds: [][]string{
 			{"helm", "plugin", "remove", "diff"},
-			{"helm", "plugin", "install", "https://github.com/databus23/helm-diff"},
+			{"helm", "plugin", "install", "--verify=false", "https://github.com/databus23/helm-diff"},
 		},
 		upgradeCmds: [][]string{{"helm", "plugin", "update", "diff"}},
 	},
