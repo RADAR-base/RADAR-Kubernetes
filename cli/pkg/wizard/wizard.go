@@ -42,7 +42,13 @@ func runWizard(a *Answers) (*Answers, error) {
 	steps := []func(*Answers) error{
 		collectBasics,
 		collectProfile,
-		collectKafka,
+		func(a *Answers) error {
+			if a.Profile == "demo" || a.Profile == "dev" {
+				a.UseConfluent = false
+				return nil
+			}
+			return collectKafka(a)
+		},
 		func(a *Answers) error {
 			if a.UseConfluent {
 				return collectConfluentCredentials(a)

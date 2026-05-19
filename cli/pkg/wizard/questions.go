@@ -282,8 +282,19 @@ func runInteractive(a *Answers) (*Answers, error) {
 	steps := []func() error{
 		func() error { return collectBasics(a) },
 		func() error { return collectProfile(a) },
-		func() error { return collectKafka(a) },
-		func() error { return collectConfluentCredentials(a) },
+		func() error {
+			if a.Profile == "demo" || a.Profile == "dev" {
+				a.UseConfluent = false
+				return nil
+			}
+			return collectKafka(a)
+		},
+		func() error {
+			if a.UseConfluent {
+				return collectConfluentCredentials(a)
+			}
+			return nil
+		},
 		func() error { return collectFeatures(a) },
 		func() error { return collectAllFeatureSecrets(a) },
 		func() error { return collectStorage(a) },
