@@ -51,9 +51,16 @@ func runWizard(a *Answers) (*Answers, error) {
 		},
 		collectFeatures,
 		collectFeatureSecrets,
-		collectAuth,
 		collectStorage,
-		collectMonitoring,
+		func(a *Answers) error {
+			// Demo profile disables monitoring automatically — skip the question.
+			if a.Profile == "demo" {
+				a.EnablePrometheus = false
+				a.EnableGraylog = false
+				return nil
+			}
+			return collectMonitoring(a)
+		},
 		collectConfirm,
 	}
 
@@ -62,6 +69,10 @@ func runWizard(a *Answers) (*Answers, error) {
 			return nil, fmt.Errorf("wizard step failed: %w", err)
 		}
 	}
+
+	// Kratos/Hydra is always enabled — not a user choice.
+	a.EnableKratos = true
+	a.Features = appendIfMissing(a.Features, "kratos")
 
 	cfg := &config.Config{}
 	a.AppliedMods = config.ApplyDeploymentProfile(cfg, a.Profile)
@@ -133,6 +144,15 @@ func loadExistingAnswers(repoRoot string) *Answers {
 	}
 
 	return a
+}
+
+func appendIfMissing(slice []string, s string) []string {
+	for _, v := range slice {
+		if v == s {
+			return slice
+		}
+	}
+	return append(slice, s)
 }
 
 func profileFrom(cfg *config.Config) string {

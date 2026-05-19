@@ -208,6 +208,13 @@ func collectMonitoring(a *Answers) error {
 	)).Run()
 }
 
+func storageSummary(a *Answers) string {
+	if a.UseExternalS3 {
+		return fmt.Sprintf("external S3 (bucket: %s, region: %s)", a.S3Bucket, a.S3Region)
+	}
+	return "local MinIO"
+}
+
 func kafkaSummary(a *Answers) string {
 	if a.UseConfluent {
 		return fmt.Sprintf("Confluent Cloud (%s)", a.ConfluentURL)
@@ -229,20 +236,24 @@ func featuresSummary(a *Answers) string {
 }
 
 func collectConfirm(a *Answers) error {
+	monitoringSummary := fmt.Sprintf("Prometheus: %v, Graylog: %v", a.EnablePrometheus, a.EnableGraylog)
+	if a.Profile == "demo" {
+		monitoringSummary = "disabled (demo profile)"
+	}
+
 	summary := fmt.Sprintf(
 		"Review your configuration:\n\n"+
-			"  Server:        %s\n"+
-			"  Email:         %s\n"+
-			"  Profile:       %s\n"+
-			"  Kafka:         %s\n"+
-			"  Features:      %s\n"+
-			"  Auth (Kratos): %v\n"+
-			"  External S3:   %v\n"+
-			"  Prometheus:    %v\n"+
-			"  Graylog:       %v\n\n"+
+			"  Server:      %s\n"+
+			"  Email:       %s\n"+
+			"  Profile:     %s\n"+
+			"  Kafka:       %s\n"+
+			"  Features:    %s\n"+
+			"  Auth:        Ory Kratos + Hydra (always enabled)\n"+
+			"  Storage:     %s\n"+
+			"  Monitoring:  %s\n\n"+
 			"Files to write: etc/production.yaml, etc/secrets.yaml, environments.yaml",
 		a.ServerName, a.MaintainerEmail, a.Profile,
-		kafkaSummary(a), featuresSummary(a), a.EnableKratos, a.UseExternalS3, a.EnablePrometheus, a.EnableGraylog,
+		kafkaSummary(a), featuresSummary(a), storageSummary(a), monitoringSummary,
 	)
 
 	pterm.Info.Println(summary)
@@ -275,9 +286,15 @@ func runInteractive(a *Answers) (*Answers, error) {
 		func() error { return collectConfluentCredentials(a) },
 		func() error { return collectFeatures(a) },
 		func() error { return collectAllFeatureSecrets(a) },
-		func() error { return collectAuth(a) },
 		func() error { return collectStorage(a) },
-		func() error { return collectMonitoring(a) },
+		func() error {
+			if a.Profile == "demo" {
+				a.EnablePrometheus = false
+				a.EnableGraylog = false
+				return nil
+			}
+			return collectMonitoring(a)
+		},
 		func() error { return collectConfirm(a) },
 	}
 	for _, step := range steps {
@@ -285,6 +302,9 @@ func runInteractive(a *Answers) (*Answers, error) {
 			return nil, fmt.Errorf("wizard step failed: %w", err)
 		}
 	}
+
+	a.EnableKratos = true
+	a.Features = appendIfMissing(a.Features, "kratos")
 
 	cfg := &config.Config{}
 	a.AppliedMods = config.ApplyDeploymentProfile(cfg, a.Profile)
