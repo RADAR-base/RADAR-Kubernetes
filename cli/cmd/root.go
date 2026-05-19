@@ -14,8 +14,9 @@ var outputFormat string
 var kubeContext string
 
 var rootCmd = &cobra.Command{
-	Use:   "radarctl",
-	Short: "CLI for deploying and managing the RADAR-Kubernetes stack",
+	Use:          "radarctl",
+	Short:        "CLI for deploying and managing the RADAR-Kubernetes stack",
+	SilenceUsage: true,
 }
 
 // ExitError signals radarctl should exit with a specific code.
