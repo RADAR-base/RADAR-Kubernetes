@@ -297,7 +297,13 @@ func runInteractive(a *Answers) (*Answers, error) {
 		},
 		func() error { return collectFeatures(a) },
 		func() error { return collectAllFeatureSecrets(a) },
-		func() error { return collectStorage(a) },
+		func() error {
+			if a.Profile == "demo" || a.Profile == "dev" {
+				a.UseExternalS3 = false
+				return nil
+			}
+			return collectStorage(a)
+		},
 		func() error {
 			if a.Profile == "demo" {
 				a.EnablePrometheus = false

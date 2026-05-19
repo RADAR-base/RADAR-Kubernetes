@@ -57,7 +57,13 @@ func runWizard(a *Answers) (*Answers, error) {
 		},
 		collectFeatures,
 		collectFeatureSecrets,
-		collectStorage,
+		func(a *Answers) error {
+			if a.Profile == "demo" || a.Profile == "dev" {
+				a.UseExternalS3 = false
+				return nil
+			}
+			return collectStorage(a)
+		},
 		func(a *Answers) error {
 			// Demo profile disables monitoring automatically — skip the question.
 			if a.Profile == "demo" {
