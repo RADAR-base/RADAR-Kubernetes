@@ -11,6 +11,8 @@ import (
 	"github.com/RADAR-base/RADAR-Kubernetes/cli/pkg/output"
 	"github.com/RADAR-base/RADAR-Kubernetes/cli/pkg/prereqs"
 	"github.com/RADAR-base/RADAR-Kubernetes/cli/pkg/wizard"
+	"github.com/charmbracelet/huh"
+	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 )
 
@@ -27,6 +29,76 @@ func init() {
 	initCmd.Flags().BoolVar(&skipPrereqs, "skip-prereqs", false, "Skip prerequisite checks (advanced users only)")
 }
 
+func printPrereqResults(results []prereqs.CheckResult) int {
+	failed := 0
+	for _, r := range results {
+		if r.OK {
+			output.Success(fmt.Sprintf("%-12s %s", r.Tool, r.Version))
+		} else {
+			msg := r.Error
+			if msg == "" {
+				msg = "not found"
+			}
+			output.Error(fmt.Sprintf("%-12s %s", r.Tool, msg))
+			failed++
+		}
+	}
+	return failed
+}
+
+func runPrereqsCheck(exec *executor.ShellExecutor) error {
+	output.Header("Checking prerequisites...")
+	results := prereqs.Check(exec)
+	failed := printPrereqResults(results)
+	if failed == 0 {
+		return nil
+	}
+
+	// Count how many we can auto-fix.
+	fixable := 0
+	for _, r := range results {
+		if !r.OK && len(r.FixCmds) > 0 {
+			fixable++
+		}
+	}
+	if fixable == 0 {
+		return &ExitError{Code: 3, Message: fmt.Sprintf("%d prerequisite(s) missing", failed)}
+	}
+
+	var doInstall bool
+	label := fmt.Sprintf("Install/upgrade %d missing prerequisite(s) now? (uses Homebrew)", fixable)
+	if err := huh.NewForm(huh.NewGroup(
+		huh.NewConfirm().Title(label).Value(&doInstall),
+	)).Run(); err != nil || !doInstall {
+		return &ExitError{Code: 3, Message: fmt.Sprintf("%d prerequisite(s) missing", failed)}
+	}
+
+	for _, r := range results {
+		if r.OK || len(r.FixCmds) == 0 {
+			continue
+		}
+		action := "Installing"
+		if r.NeedsUpgrade {
+			action = "Upgrading"
+		}
+		spinner, _ := pterm.DefaultSpinner.Start(fmt.Sprintf("%s %s...", action, r.Tool))
+		if err := prereqs.AutoFix(exec, r); err != nil {
+			spinner.Fail(fmt.Sprintf("%s %s failed: %s", action, r.Tool, err))
+		} else {
+			spinner.Success(fmt.Sprintf("%s %s complete", action, r.Tool))
+		}
+	}
+
+	pterm.Println()
+	output.Header("Re-checking prerequisites...")
+	results = prereqs.Check(exec)
+	failed = printPrereqResults(results)
+	if failed > 0 {
+		return &ExitError{Code: 3, Message: fmt.Sprintf("%d prerequisite(s) still missing after install", failed)}
+	}
+	return nil
+}
+
 func runInit(_ *cobra.Command, _ []string) error {
 	repoRoot, err := findRepoRoot()
 	if err != nil {
@@ -34,24 +106,9 @@ func runInit(_ *cobra.Command, _ []string) error {
 	}
 
 	if !skipPrereqs {
-		output.Header("Checking prerequisites...")
 		exec := &executor.ShellExecutor{}
-		results := prereqs.Check(exec)
-		failed := 0
-		for _, r := range results {
-			if r.OK {
-				output.Success(fmt.Sprintf("%-12s %s", r.Tool, r.Version))
-			} else {
-				msg := r.Error
-				if msg == "" {
-					msg = "not found"
-				}
-				output.Error(fmt.Sprintf("%-12s %s — %s", r.Tool, msg, r.InstallHint))
-				failed++
-			}
-		}
-		if failed > 0 {
-			return &ExitError{Code: 3, Message: fmt.Sprintf("%d prerequisite(s) missing. Install them and re-run radarctl init", failed)}
+		if err := runPrereqsCheck(exec); err != nil {
+			return err
 		}
 	}
 

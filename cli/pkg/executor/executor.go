@@ -31,7 +31,11 @@ func (e *ShellExecutor) Run(name string, args ...string) (string, error) {
 	if err := cmd.Run(); err != nil {
 		return strings.TrimSpace(out.String()), fmt.Errorf("%w\n%s", err, strings.TrimSpace(errOut.String()))
 	}
-	return strings.TrimSpace(out.String()), nil
+	// Some tools (e.g. java -version) write to stderr even on success.
+	if stdout := strings.TrimSpace(out.String()); stdout != "" {
+		return stdout, nil
+	}
+	return strings.TrimSpace(errOut.String()), nil
 }
 
 func (e *ShellExecutor) RunStreaming(name string, args []string, onLine func(string)) error {

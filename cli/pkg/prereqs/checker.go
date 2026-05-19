@@ -9,11 +9,13 @@ import (
 )
 
 type CheckResult struct {
-	Tool        string
-	OK          bool
-	Version     string
-	Error       string
-	InstallHint string
+	Tool         string
+	OK           bool
+	Version      string
+	Error        string
+	InstallHint  string
+	NeedsUpgrade bool       // true if installed but below minimum version
+	FixCmds      [][]string // commands to run to install or upgrade
 }
 
 type toolDef struct {
@@ -21,7 +23,9 @@ type toolDef struct {
 	args         []string
 	parseVersion func(string) string
 	installHint  string
-	minVersion   string // e.g. "v3.0.0" — empty means no minimum
+	minVersion   string
+	installCmds  [][]string // commands to install from scratch
+	upgradeCmds  [][]string // commands to upgrade an existing install
 }
 
 var tools = []toolDef{
@@ -40,6 +44,8 @@ var tools = []toolDef{
 			return out
 		},
 		installHint: "https://kubernetes.io/docs/tasks/tools/",
+		installCmds: [][]string{{"brew", "install", "kubectl"}},
+		upgradeCmds: [][]string{{"brew", "upgrade", "kubectl"}},
 	},
 	{
 		name:         "helm",
@@ -47,6 +53,8 @@ var tools = []toolDef{
 		parseVersion: func(out string) string { return strings.TrimSpace(out) },
 		installHint:  "https://helm.sh/docs/intro/install/",
 		minVersion:   "v3",
+		installCmds:  [][]string{{"brew", "install", "helm"}},
+		upgradeCmds:  [][]string{{"brew", "upgrade", "helm"}},
 	},
 	{
 		name: "helmfile",
@@ -60,6 +68,8 @@ var tools = []toolDef{
 		},
 		installHint: "https://github.com/helmfile/helmfile/releases",
 		minVersion:  "v0.169.1",
+		installCmds: [][]string{{"brew", "install", "helmfile"}},
+		upgradeCmds: [][]string{{"brew", "upgrade", "helmfile"}},
 	},
 	{
 		name:         "helm diff",
@@ -67,6 +77,12 @@ var tools = []toolDef{
 		parseVersion: func(out string) string { return strings.TrimSpace(out) },
 		installHint:  "helm plugin install https://github.com/databus23/helm-diff",
 		minVersion:   "v3.9.12",
+		// Remove first (best-effort) in case of broken install, then reinstall.
+		installCmds: [][]string{
+			{"helm", "plugin", "remove", "diff"},
+			{"helm", "plugin", "install", "https://github.com/databus23/helm-diff"},
+		},
+		upgradeCmds: [][]string{{"helm", "plugin", "update", "diff"}},
 	},
 	{
 		name: "yq",
@@ -80,6 +96,8 @@ var tools = []toolDef{
 		},
 		installHint: "https://github.com/mikefarah/yq#install",
 		minVersion:  "v4.44.3",
+		installCmds: [][]string{{"brew", "install", "yq"}},
+		upgradeCmds: [][]string{{"brew", "upgrade", "yq"}},
 	},
 	{
 		name: "java",
@@ -92,35 +110,34 @@ var tools = []toolDef{
 			return out
 		},
 		installHint: "https://adoptium.net/ or: brew install openjdk",
+		installCmds: [][]string{{"brew", "install", "openjdk"}},
+		upgradeCmds: [][]string{{"brew", "upgrade", "openjdk"}},
 	},
 	{
 		name:         "openssl",
 		args:         []string{"version"},
 		parseVersion: func(out string) string { return strings.TrimSpace(out) },
 		installHint:  "brew install openssl  (macOS) or: apt install openssl",
+		installCmds:  [][]string{{"brew", "install", "openssl"}},
+		upgradeCmds:  [][]string{{"brew", "upgrade", "openssl"}},
 	},
 	{
 		name:         "git",
 		args:         []string{"--version"},
 		parseVersion: func(out string) string { return strings.TrimSpace(out) },
 		installHint:  "https://git-scm.com/downloads",
+		installCmds:  [][]string{{"brew", "install", "git"}},
+		upgradeCmds:  [][]string{{"brew", "upgrade", "git"}},
 	},
 }
 
 // meetsMinVersion returns true if version >= minVersion using simple semver comparison.
-// Both version and minVersion should be in the form "vX", "vX.Y", or "vX.Y.Z".
-// The "v" prefix is stripped before comparison.
 func meetsMinVersion(version, minVersion string) bool {
 	stripV := func(s string) string {
 		return strings.TrimPrefix(strings.TrimSpace(s), "v")
 	}
-	// Extract only the leading version token (e.g. "3.9.12" from "3.9.12+g...")
-	ver := strings.FieldsFunc(stripV(version), func(r rune) bool {
-		return r == '+' || r == '-'
-	})
-	min := strings.FieldsFunc(stripV(minVersion), func(r rune) bool {
-		return r == '+' || r == '-'
-	})
+	ver := strings.FieldsFunc(stripV(version), func(r rune) bool { return r == '+' || r == '-' })
+	min := strings.FieldsFunc(stripV(minVersion), func(r rune) bool { return r == '+' || r == '-' })
 
 	var verStr, minStr string
 	if len(ver) > 0 {
@@ -132,8 +149,6 @@ func meetsMinVersion(version, minVersion string) bool {
 
 	vParts := strings.Split(verStr, ".")
 	mParts := strings.Split(minStr, ".")
-
-	// Pad to same length
 	for len(vParts) < len(mParts) {
 		vParts = append(vParts, "0")
 	}
@@ -151,7 +166,7 @@ func meetsMinVersion(version, minVersion string) bool {
 			return false
 		}
 	}
-	return true // equal
+	return true
 }
 
 // Check runs all prerequisite checks and returns one result per tool.
@@ -159,12 +174,8 @@ func Check(exec executor.Executor) []CheckResult {
 	results := make([]CheckResult, 0, len(tools))
 	for _, t := range tools {
 		toolName := strings.Fields(t.name)[0]
-		// For compound tool names like "helm diff", toolName is "helm" and
-		// t.args already contains the subcommand (e.g. ["diff", "version"]).
-		args := t.args
-		out, err := exec.Run(toolName, args...)
+		out, err := exec.Run(toolName, t.args...)
 		if err != nil {
-			// Extract the most useful line from the error (skip generic "exit status N" lines)
 			errMsg := "not found"
 			for _, line := range strings.Split(err.Error(), "\n") {
 				line = strings.TrimSpace(line)
@@ -178,6 +189,7 @@ func Check(exec executor.Executor) []CheckResult {
 				OK:          false,
 				Error:       errMsg,
 				InstallHint: t.installHint,
+				FixCmds:     t.installCmds,
 			})
 			continue
 		}
@@ -189,10 +201,24 @@ func Check(exec executor.Executor) []CheckResult {
 		}
 		if t.minVersion != "" && !meetsMinVersion(version, t.minVersion) {
 			r.OK = false
+			r.NeedsUpgrade = true
 			r.Error = fmt.Sprintf("version %s found, need >= %s", version, t.minVersion)
 			r.InstallHint = t.installHint
+			r.FixCmds = t.upgradeCmds
 		}
 		results = append(results, r)
 	}
 	return results
+}
+
+// AutoFix runs the fix commands for a failed check result.
+// Intermediate commands are best-effort (errors ignored); only the last must succeed.
+func AutoFix(exec executor.Executor, result CheckResult) error {
+	for i, cmd := range result.FixCmds {
+		_, err := exec.Run(cmd[0], cmd[1:]...)
+		if err != nil && i == len(result.FixCmds)-1 {
+			return fmt.Errorf("%w", err)
+		}
+	}
+	return nil
 }
