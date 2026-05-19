@@ -1,7 +1,9 @@
 package helmfile
 
 import (
+	"errors"
 	"fmt"
+	"os/exec"
 	"strings"
 
 	"github.com/RADAR-base/RADAR-Kubernetes/cli/pkg/executor"
@@ -26,12 +28,18 @@ func (r *Runner) baseArgs(selector string) []string {
 }
 
 // Diff returns the helmfile diff output as a string.
+// helmfile diff exits with code 2 when there are differences — that is treated as success.
+// Any other non-zero exit code is a real error and is returned.
 func (r *Runner) Diff(selector string) (string, error) {
 	args := append(r.baseArgs(selector), "diff")
 	out, err := r.exec.Run("helmfile", args...)
 	if err != nil {
-		// helmfile diff exits non-zero when there are differences — treat as success
-		return out, nil
+		var exitErr *exec.ExitError
+		if errors.As(err, &exitErr) && exitErr.ExitCode() == 2 {
+			// exit 2 = has differences, not a real error
+			return out, nil
+		}
+		return out, err
 	}
 	return out, nil
 }
@@ -47,21 +55,14 @@ func (r *Runner) Sync(selector string, atomic bool) error {
 	return err
 }
 
-// SyncWithCallback runs helmfile sync and calls onLine for each output line.
+// SyncWithCallback runs helmfile sync and calls onLine for each output line as it arrives.
 func (r *Runner) SyncWithCallback(selector string, atomic bool, onLine func(string)) error {
 	args := r.baseArgs(selector)
 	if atomic {
 		args = append(args, "--atomic")
 	}
 	args = append(args, "sync")
-
-	out, err := r.exec.Run("helmfile", args...)
-	for _, line := range strings.Split(out, "\n") {
-		if line != "" {
-			onLine(line)
-		}
-	}
-	return err
+	return r.exec.RunStreaming("helmfile", args, onLine)
 }
 
 // ParseDiffSummary counts changed/new/removed releases from helmfile diff output.
