@@ -2,6 +2,7 @@ package wizard
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/RADAR-base/RADAR-Kubernetes/cli/pkg/config"
 	"github.com/charmbracelet/huh"
@@ -17,11 +18,12 @@ const (
 
 // Run executes the wizard in the given mode and returns the collected Answers.
 func Run(mode Mode, repoRoot string) (*Answers, error) {
+	defaults := loadExistingAnswers(repoRoot)
 	switch mode {
 	case ModeWizard:
-		return runWizard()
+		return runWizard(defaults)
 	case ModeInteractive:
-		return runWizard() // interactive uses same flow in v1
+		return runInteractive(defaults)
 	case ModeExpert:
 		return nil, nil
 	default:
@@ -29,8 +31,13 @@ func Run(mode Mode, repoRoot string) (*Answers, error) {
 	}
 }
 
-func runWizard() (*Answers, error) {
-	a := &Answers{Secrets: make(map[string]string)}
+func runWizard(a *Answers) (*Answers, error) {
+	if a == nil {
+		a = &Answers{Secrets: make(map[string]string)}
+	}
+	if a.Secrets == nil {
+		a.Secrets = make(map[string]string)
+	}
 
 	steps := []func(*Answers) error{
 		collectBasics,
@@ -45,6 +52,9 @@ func runWizard() (*Answers, error) {
 		collectFeatures,
 		collectFeatureSecrets,
 		collectAuth,
+		collectStorage,
+		collectMonitoring,
+		collectConfirm,
 	}
 
 	for _, step := range steps {
@@ -75,4 +85,62 @@ func SelectMode() (Mode, error) {
 		),
 	).Run()
 	return Mode(chosen), err
+}
+
+// loadExistingAnswers attempts to load existing config and secrets to pre-fill the wizard.
+func loadExistingAnswers(repoRoot string) *Answers {
+	a := &Answers{Secrets: make(map[string]string)}
+
+	cfg, err := config.LoadConfig(filepath.Join(repoRoot, "etc", "production.yaml"))
+	if err == nil {
+		a.ServerName = cfg.ServerName
+		a.MaintainerEmail = cfg.MaintainerEmail
+		a.KubeContext = cfg.KubeContext
+		a.UseConfluent = cfg.ConfluentCloud
+		a.Profile = profileFrom(cfg)
+		a.UseExternalS3 = cfg.UseExternalS3
+		a.S3Bucket = cfg.S3Bucket
+		a.S3Region = cfg.S3Region
+		a.EnablePrometheus = cfg.EnablePrometheus
+		a.EnableGraylog = cfg.EnableGraylog
+		a.EnableKratos = cfg.EnableKratos
+	}
+
+	sec, err := config.LoadSecrets(filepath.Join(repoRoot, "etc", "secrets.yaml"))
+	if err == nil {
+		if sec.ConfluentCloud.BootstrapServer != "" {
+			a.ConfluentURL = sec.ConfluentCloud.BootstrapServer
+			a.ConfluentKey = sec.ConfluentCloud.APIKey
+			a.ConfluentSecret = sec.ConfluentCloud.APISecret
+		}
+		if sec.FitbitClientID != "" {
+			a.Secrets["fitbit_client_id"] = sec.FitbitClientID
+		}
+		if sec.FitbitClientSecret != "" {
+			a.Secrets["fitbit_client_secret"] = sec.FitbitClientSecret
+		}
+		if sec.GarminConsumerKey != "" {
+			a.Secrets["garmin_consumer_key"] = sec.GarminConsumerKey
+		}
+		if sec.GarminConsumerSecret != "" {
+			a.Secrets["garmin_consumer_secret"] = sec.GarminConsumerSecret
+		}
+		if sec.RedcapToken != "" {
+			a.Secrets["redcap_token"] = sec.RedcapToken
+		}
+		a.S3AccessKey = sec.S3AccessKey
+		a.S3SecretKey = sec.S3SecretKey
+	}
+
+	return a
+}
+
+func profileFrom(cfg *config.Config) string {
+	if cfg.DevDeployment {
+		return "dev"
+	}
+	if cfg.KafkaNumBrokers <= 1 {
+		return "staging"
+	}
+	return "production"
 }

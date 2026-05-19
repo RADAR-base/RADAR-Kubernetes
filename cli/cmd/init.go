@@ -1,7 +1,11 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/RADAR-base/RADAR-Kubernetes/cli/pkg/executor"
 	"github.com/RADAR-base/RADAR-Kubernetes/cli/pkg/output"
@@ -43,24 +47,47 @@ func runInit(_ *cobra.Command, _ []string) error {
 			}
 		}
 		if failed > 0 {
-			return fmt.Errorf("%d prerequisite(s) missing. Install them and re-run radarctl init", failed)
+			return &ExitError{Code: 3, Message: fmt.Sprintf("%d prerequisite(s) missing. Install them and re-run radarctl init", failed)}
 		}
 	}
 
-	mode, err := wizard.SelectMode()
-	if err != nil {
-		return err
+	// Check for saved wizard state and offer to resume.
+	statePath := filepath.Join(repoRoot, ".radarctl-state.yaml")
+	var answers *wizard.Answers
+	if saved, err := wizard.LoadState(statePath); err == nil {
+		output.Info("Previous wizard answers found. Resume from saved state? [y/N] ")
+		reader := bufio.NewReader(os.Stdin)
+		line, _ := reader.ReadString('\n')
+		line = strings.TrimSpace(strings.ToLower(line))
+		if line == "y" || line == "yes" {
+			answers = saved
+			output.Info("Resuming from saved state — skipping to confirmation step")
+		} else {
+			_ = os.Remove(statePath)
+		}
 	}
 
-	if mode == wizard.ModeExpert {
-		output.Info("Expert mode: running config validation only")
-		return runValidate(nil, nil)
+	if answers == nil {
+		mode, err := wizard.SelectMode()
+		if err != nil {
+			return err
+		}
+
+		if mode == wizard.ModeExpert {
+			output.Info("Expert mode: running config validation only")
+			return runValidate(nil, nil)
+		}
+
+		output.Header("Configuring RADAR-Kubernetes")
+		answers, err = wizard.Run(mode, repoRoot)
+		if err != nil {
+			return fmt.Errorf("wizard failed: %w", err)
+		}
 	}
 
-	output.Header("Configuring RADAR-Kubernetes")
-	answers, err := wizard.Run(mode, repoRoot)
-	if err != nil {
-		return fmt.Errorf("wizard failed: %w", err)
+	// Save state after wizard completes successfully.
+	if err := wizard.SaveState(answers, statePath); err != nil {
+		output.Warning(fmt.Sprintf("Could not save wizard state: %s", err))
 	}
 
 	w := wizard.NewWriter(repoRoot)
@@ -72,6 +99,23 @@ func runInit(_ *cobra.Command, _ []string) error {
 	}
 
 	output.Success("Configuration written to etc/production.yaml, etc/secrets.yaml, environments.yaml")
+
+	// Run bin/keystore-init if it exists.
+	keystoreInit := filepath.Join(repoRoot, "bin", "keystore-init")
+	if _, err := os.Stat(keystoreInit); err == nil {
+		output.Info("Running bin/keystore-init...")
+		exec := &executor.ShellExecutor{WorkDir: repoRoot}
+		if _, err := exec.Run(keystoreInit); err != nil {
+			output.Warning(fmt.Sprintf("keystore-init failed: %s", err))
+			output.Warning("You may need to run bin/keystore-init manually")
+		} else {
+			output.Success("Keystores initialized")
+		}
+	}
+
+	// Remove state file after successful write.
+	_ = os.Remove(statePath)
+
 	output.Info("Run `radarctl deploy` to deploy the stack")
 	return nil
 }

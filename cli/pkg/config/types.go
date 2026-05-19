@@ -18,6 +18,11 @@ type Config struct {
 	EnableRedcap       bool    `yaml:"radar_redcap_integrator_install"`
 	EnableKratos       bool    `yaml:"radar_kratos_install"`
 	EnableHydra        bool    `yaml:"radar_hydra_install"`
+	UseExternalS3      bool    `yaml:"external_s3"`
+	S3Bucket           string  `yaml:"s3_bucket"`
+	S3Region           string  `yaml:"s3_region"`
+	EnablePrometheus   bool    `yaml:"radar_prometheus_install"`
+	EnableGraylog      bool    `yaml:"radar_graylog_install"`
 	Minio              struct {
 		ExternalEndpoint string `yaml:"externalEndpoint"`
 	} `yaml:"minio"`

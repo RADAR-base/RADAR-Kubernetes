@@ -10,20 +10,25 @@ import (
 
 // Answers holds all values collected by the wizard.
 type Answers struct {
-	ServerName      string
-	MaintainerEmail string
-	KubeContext     string
-	Profile         string // "production", "staging", "dev"
-	UseConfluent    bool
-	ConfluentURL    string
-	ConfluentKey    string
-	ConfluentSecret string
-	Features        []string          // enabled feature names e.g. ["fitbit", "redcap"]
-	UseExternalS3   bool
-	S3Bucket        string
-	S3Region        string
-	AppliedMods     []string
-	Secrets         map[string]string // secret key → value collected from prompts
+	ServerName        string
+	MaintainerEmail   string
+	KubeContext       string
+	Profile           string // "production", "staging", "dev"
+	UseConfluent      bool
+	ConfluentURL      string
+	ConfluentKey      string
+	ConfluentSecret   string
+	Features          []string          // enabled feature names e.g. ["fitbit", "redcap"]
+	UseExternalS3     bool
+	S3Bucket          string
+	S3Region          string
+	S3AccessKey       string
+	S3SecretKey       string
+	EnablePrometheus  bool
+	EnableGraylog     bool
+	EnableKratos      bool
+	AppliedMods       []string
+	Secrets           map[string]string // secret key → value collected from prompts
 }
 
 // Writer persists wizard answers to config files.
@@ -59,6 +64,19 @@ func (w *Writer) WriteAnswers(a *Answers) error {
 		cfg.ConfluentCloud = true
 	}
 
+	if a.UseExternalS3 {
+		cfg.UseExternalS3 = true
+		cfg.S3Bucket = a.S3Bucket
+		cfg.S3Region = a.S3Region
+	}
+
+	cfg.EnablePrometheus = a.EnablePrometheus
+	cfg.EnableGraylog = a.EnableGraylog
+
+	if a.EnableKratos {
+		_ = config.ApplyFeature(cfg, "kratos")
+	}
+
 	cfgPath := filepath.Join(w.repoRoot, "etc", "production.yaml")
 	if err := config.WriteConfig(cfg, cfgPath); err != nil {
 		return err
@@ -84,6 +102,10 @@ func (w *Writer) WriteAnswers(a *Answers) error {
 	}
 	if v, ok := a.Secrets["redcap_token"]; ok {
 		sec.RedcapToken = v
+	}
+	if a.UseExternalS3 {
+		sec.S3AccessKey = a.S3AccessKey
+		sec.S3SecretKey = a.S3SecretKey
 	}
 
 	secPath := filepath.Join(w.repoRoot, "etc", "secrets.yaml")
@@ -120,4 +142,29 @@ func (w *Writer) WriteEnvironmentsYAML(mods []string) error {
 		return err
 	}
 	return os.WriteFile(filepath.Join(w.repoRoot, "environments.yaml"), data, 0644)
+}
+
+// SaveState serializes Answers to a YAML file for resumability.
+func SaveState(a *Answers, path string) error {
+	data, err := yaml.Marshal(a)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(path, data, 0600)
+}
+
+// LoadState deserializes Answers from a YAML state file.
+func LoadState(path string) (*Answers, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	var a Answers
+	if err := yaml.Unmarshal(data, &a); err != nil {
+		return nil, err
+	}
+	if a.Secrets == nil {
+		a.Secrets = make(map[string]string)
+	}
+	return &a, nil
 }
