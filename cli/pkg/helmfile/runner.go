@@ -44,6 +44,13 @@ func (r *Runner) Diff(selector string) (string, error) {
 	return out, nil
 }
 
+// Template runs helmfile template (render only, no apply).
+func (r *Runner) Template(selector string) (string, error) {
+	args := append(r.baseArgs(selector), "template")
+	out, err := r.exec.Run("helmfile", args...)
+	return out, err
+}
+
 // Sync runs helmfile sync.
 func (r *Runner) Sync(selector string, atomic bool) error {
 	args := r.baseArgs(selector)
