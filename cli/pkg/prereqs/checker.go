@@ -164,10 +164,19 @@ func Check(exec executor.Executor) []CheckResult {
 		args := t.args
 		out, err := exec.Run(toolName, args...)
 		if err != nil {
+			// Extract the most useful line from the error (skip generic "exit status N" lines)
+			errMsg := "not found"
+			for _, line := range strings.Split(err.Error(), "\n") {
+				line = strings.TrimSpace(line)
+				if line != "" && !strings.HasPrefix(line, "exit status") {
+					errMsg = line
+					break
+				}
+			}
 			results = append(results, CheckResult{
 				Tool:        t.name,
 				OK:          false,
-				Error:       fmt.Sprintf("not found or failed: %s", err.Error()),
+				Error:       errMsg,
 				InstallHint: t.installHint,
 			})
 			continue
