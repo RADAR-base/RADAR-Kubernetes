@@ -30,22 +30,3 @@ grafana_metrics_timescaledb:
 
 data_dashboard_timescaledb:
   _install: false
-
-# FIXME Frontend is broken but this component is not used and also no maintained
-radar_upload_connect_frontend:
-  _install: false
-
-radar_appserver_postgresql:
-  _install: false
-
-velero:
-  _install: false
-
-radar_nifi:
-  _install: false
-
-redis:
-  _install: false
-
-radar_upload_postgresql:
-  _install: false

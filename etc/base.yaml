@@ -176,6 +176,27 @@ radar_home:
   _chart_version: 0.5.4
   _extra_timeout: 0
 
+# ---------------------------------------------------------- kafka-analysis.yaml ----------------------------------------------------------
+
+radar_backend_monitor:
+  _install: false
+  _chart_version: 0.5.0
+  _extra_timeout: 0
+  replicaCount: 1
+  smtp:
+    host: smtp.google.com
+    port: 25
+    user: user@gmail.com
+  persistence:
+    size: 1Gi
+
+radar_backend_stream:
+  _install: false
+  _chart_version: 0.4.0
+  _extra_timeout: 0
+  replicaCount: 1
+
+
 # --------------------------------------------------------- 10-managementportal.yaml ---------------------------------------------------------
 
 # This Postgresql is used for Management Portal and App config, postgres password should be same in them

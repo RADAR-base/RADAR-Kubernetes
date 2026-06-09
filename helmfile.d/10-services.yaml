@@ -1007,3 +1007,33 @@ releases:
       - name: garmin.userRepositoryClientSecret
         value: {{ dig "garmin" "userRepositoryClientSecret" (dig "oauth_clients" "radar_push_endpoint" "client_secret" "" .Values.management_portal) .Values.radar_push_endpoint }}
 
+  - name: radar-backend-monitor
+    chart: radar/radar-backend
+    version: {{ .Values.radar_backend_monitor._chart_version }}
+    installed: {{ .Values.radar_backend_monitor._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_backend_monitor._extra_timeout }}
+    needs:
+      - catalog-server
+    <<: *logFailedRelease
+    values:
+      - "../etc/radar-backend-monitor/values.yaml"
+      - {{ .Values.radar_backend_monitor | toYaml | indent 8 | trim }}
+    set:
+      - name: kafka_num_brokers
+        value: {{ .Values.kafka_num_brokers }}
+
+  - name: radar-backend-stream
+    chart: radar/radar-backend
+    version: {{ .Values.radar_backend_monitor._chart_version }}
+    installed: {{ .Values.radar_backend_stream._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_backend_stream._extra_timeout }}
+    needs:
+      # When catalog server is 'ready', kafka can be used.
+      - catalog-server
+    <<: *logFailedRelease
+    values:
+      - "../etc/radar-backend-stream/values.yaml"
+      - {{ .Values.radar_backend_stream | toYaml | indent 8 | trim }}
+    set:
+      - name: kafka_num_brokers
+        value: {{ .Values.kafka_num_brokers }}
