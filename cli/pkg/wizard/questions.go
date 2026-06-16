@@ -10,7 +10,7 @@ import (
 )
 
 func collectBasics(a *Answers) error {
-	return huh.NewForm(
+	return runForm(huh.NewForm(
 		huh.NewGroup(
 			huh.NewInput().
 				Title("Server hostname").
@@ -38,11 +38,11 @@ func collectBasics(a *Answers) error {
 				Placeholder("default").
 				Value(&a.KubeContext),
 		),
-	).Run()
+	))
 }
 
 func collectProfile(a *Answers) error {
-	return huh.NewForm(
+	return runForm(huh.NewForm(
 		huh.NewGroup(
 			huh.NewSelect[string]().
 				Title("Deployment profile").
@@ -55,22 +55,22 @@ func collectProfile(a *Answers) error {
 				).
 				Value(&a.Profile),
 		),
-	).Run()
+	))
 }
 
 func collectKafka(a *Answers) error {
-	return huh.NewForm(
+	return runForm(huh.NewForm(
 		huh.NewGroup(
 			huh.NewConfirm().
 				Title("Use Confluent Cloud instead of local Kafka?").
 				Description("Confluent Cloud is a fully managed Kafka service — no brokers to operate.\nRequires an active Confluent Cloud account with a cluster already provisioned.\nChoose 'No' to deploy Kafka inside your cluster (recommended for self-hosted setups).").
 				Value(&a.UseConfluent),
 		),
-	).Run()
+	))
 }
 
 func collectConfluentCredentials(a *Answers) error {
-	return huh.NewForm(
+	return runForm(huh.NewForm(
 		huh.NewGroup(
 			huh.NewInput().
 				Title("Confluent Cloud bootstrap server URL").
@@ -87,24 +87,26 @@ func collectConfluentCredentials(a *Answers) error {
 				Password(true).
 				Value(&a.ConfluentSecret),
 		),
-	).Run()
+	))
 }
 
 func collectFeatures(a *Answers) error {
-	return huh.NewForm(
+	return runForm(huh.NewForm(
 		huh.NewGroup(
 			huh.NewMultiSelect[string]().
-				Title("Data source integrations").
-				Description("Select the wearable/data integrations to enable.\nEach selection will prompt for the required API credentials on the next screen.\nYou can enable more integrations later by re-running radarctl init.").
+				Title("Data sources and dashboards").
+				Description("Select the integrations to enable.\nEach selection will prompt for any required API credentials on the next screen.\nYou can enable more integrations later by re-running radarctl init.").
 				Options(
 					huh.NewOption("Fitbit — wearable activity and health data via OAuth2", "fitbit"),
 					huh.NewOption("Garmin — wearable activity data via consumer API", "garmin"),
-					huh.NewOption("REDCap — survey and clinical data via REST API", "redcap"),
+					huh.NewOption("Oura — Oura ring data via OAuth2", "oura"),
+					huh.NewOption("aRMT + HealthKit — questionnaires/tasks app + iOS health data (enables appserver)", "armt"),
+					huh.NewOption("Realtime dashboards — kSQL + Grafana + JDBC connector for live analytics", "realtime_dashboards"),
 					huh.NewOption("Upload portal — manual file uploads (no extra credentials needed)", "upload"),
 				).
 				Value(&a.Features),
 		),
-	).Run()
+	))
 }
 
 func collectFeatureSecrets(a *Answers) error {
@@ -113,11 +115,20 @@ func collectFeatureSecrets(a *Answers) error {
 	}
 
 	descriptions := map[string]string{
-		"fitbit_client_id":       "The OAuth2 Client ID from your Fitbit developer application.\nCreate one at dev.fitbit.com → Manage → Register an App.",
-		"fitbit_client_secret":   "The OAuth2 Client Secret for your Fitbit application.\nFound alongside the Client ID in your Fitbit developer app settings.",
-		"garmin_consumer_key":    "The Consumer Key from your Garmin Health API application.\nRequest access at developer.garmin.com → Health API.",
-		"garmin_consumer_secret": "The Consumer Secret for your Garmin Health API application.\nFound alongside the Consumer Key in your Garmin developer settings.",
-		"redcap_token":           "A REDCap API token with export rights on the target project.\nGenerate one in REDCap under My Profile → API → Request API Token.",
+		"fitbit_client_id":         "The OAuth2 Client ID from your Fitbit developer application.\nCreate one at dev.fitbit.com → Manage → Register an App.",
+		"fitbit_client_secret":     "The OAuth2 Client Secret for your Fitbit application.\nFound alongside the Client ID in your Fitbit developer app settings.",
+		"garmin_consumer_key":      "The Consumer Key from your Garmin Health API application.\nRequest access at developer.garmin.com → Health API.",
+		"garmin_consumer_secret":   "The Consumer Secret for your Garmin Health API application.\nFound alongside the Consumer Key in your Garmin developer settings.",
+		"oura_api_client":          "The OAuth2 Client ID from your Oura Cloud application.\nCreate one at cloud.ouraring.com → My Applications → Create New Application.",
+		"oura_api_secret":          "The OAuth2 Client Secret for your Oura application.\nShown once when the application is created — retrieve from your records if lost.",
+		"armt_firebase_json_path": "Absolute path to your Firebase service-account JSON file.\n\n" +
+			"What this is: the private key that authorises radar-appserver to act on behalf of\nthe Firebase project backing your aRMT mobile app.\n\n" +
+			"Why it's needed:\n" +
+			"  • Push notifications — delivering scheduled questionnaires/tasks to participants.\n" +
+			"  • Crashlytics — capturing aRMT app crashes for debugging user-facing issues.\n" +
+			"  • Event tracking — measuring engagement (questionnaire opens, completion rates).\n\n" +
+			"How to get it: Firebase Console → Project settings → Service accounts → Generate\nnew private key. Save the .json file locally and paste its absolute path here.\n" +
+			"The file will be copied into etc/radar-appserver/firebase-adminsdk.json.",
 	}
 
 	for _, feature := range a.Features {
@@ -133,7 +144,7 @@ func collectFeatureSecrets(a *Answers) error {
 			if p.Mask {
 				input = input.Password(true)
 			}
-			if err := huh.NewForm(huh.NewGroup(input)).Run(); err != nil {
+			if err := runForm(huh.NewForm(huh.NewGroup(input))); err != nil {
 				return err
 			}
 			a.Secrets[p.SecretKey] = val
@@ -143,14 +154,14 @@ func collectFeatureSecrets(a *Answers) error {
 }
 
 func collectAuth(a *Answers) error {
-	if err := huh.NewForm(
+	if err := runForm(huh.NewForm(
 		huh.NewGroup(
 			huh.NewConfirm().
 				Title("Enable Ory Hydra/Kratos (OAuth2/OIDC identity management)?").
 				Description("Deploys Ory Kratos (user identity) and Ory Hydra (OAuth2/OIDC provider).\nRequired for participant authentication in the RADAR mobile app and management portal.\nRecommended for all production deployments.").
 				Value(&a.EnableKratos),
 		),
-	).Run(); err != nil {
+	)); err != nil {
 		return err
 	}
 	if a.EnableKratos {
@@ -160,18 +171,18 @@ func collectAuth(a *Answers) error {
 }
 
 func collectStorage(a *Answers) error {
-	if err := huh.NewForm(huh.NewGroup(
+	if err := runForm(huh.NewForm(huh.NewGroup(
 		huh.NewConfirm().
 			Title("Use external S3 instead of local MinIO?").
 			Description("MinIO is an S3-compatible object store deployed inside your cluster — no external account needed.\nChoose external S3 if you want to store collected data in AWS S3 or another S3-compatible service (e.g. Wasabi, Backblaze B2).").
 			Value(&a.UseExternalS3),
-	)).Run(); err != nil {
+	))); err != nil {
 		return err
 	}
 	if !a.UseExternalS3 {
 		return nil
 	}
-	return huh.NewForm(huh.NewGroup(
+	return runForm(huh.NewForm(huh.NewGroup(
 		huh.NewInput().
 			Title("S3 bucket name").
 			Description("The name of the pre-existing S3 bucket RADAR will write data to.\nThe bucket must already exist — radarctl does not create it.").
@@ -192,11 +203,11 @@ func collectStorage(a *Answers) error {
 			Description("The secret access key corresponding to the access key ID above.").
 			Password(true).
 			Value(&a.S3SecretKey),
-	)).Run()
+	)))
 }
 
 func collectMonitoring(a *Answers) error {
-	return huh.NewForm(huh.NewGroup(
+	return runForm(huh.NewForm(huh.NewGroup(
 		huh.NewConfirm().
 			Title("Enable Prometheus + Grafana monitoring?").
 			Description("Deploys kube-prometheus-stack: Prometheus for metrics collection and Grafana for dashboards.\nIncludes pre-built dashboards for Kafka, JVM, and Kubernetes cluster health.\nRecommended for production — adds ~2 CPU / 4 GB RAM to cluster requirements.").
@@ -205,7 +216,7 @@ func collectMonitoring(a *Answers) error {
 			Title("Enable Graylog + Elasticsearch log aggregation?").
 			Description("Deploys Graylog with an Elasticsearch backend for centralised log search and alerting.\nUseful for debugging and audit trails across all services.\nNote: Elasticsearch is resource-heavy — adds ~4 CPU / 8 GB RAM to requirements.").
 			Value(&a.EnableGraylog),
-	)).Run()
+	)))
 }
 
 func storageSummary(a *Answers) string {
@@ -251,7 +262,7 @@ func collectConfirm(a *Answers) error {
 			"  Auth:        Ory Kratos + Hydra (always enabled)\n"+
 			"  Storage:     %s\n"+
 			"  Monitoring:  %s\n\n"+
-			"Files to write: etc/production.yaml, etc/secrets.yaml, environments.yaml",
+			"Files to write: etc/production.yaml, etc/secrets.yaml",
 		a.ServerName, a.MaintainerEmail, a.Profile,
 		kafkaSummary(a), featuresSummary(a), storageSummary(a), monitoringSummary,
 	)
@@ -259,11 +270,11 @@ func collectConfirm(a *Answers) error {
 	pterm.Info.Println(summary)
 
 	var proceed bool
-	if err := huh.NewForm(huh.NewGroup(
+	if err := runForm(huh.NewForm(huh.NewGroup(
 		huh.NewConfirm().
 			Title("Proceed and write configuration files?").
 			Value(&proceed),
-	)).Run(); err != nil {
+	))); err != nil {
 		return err
 	}
 	if !proceed {
@@ -323,8 +334,6 @@ func runInteractive(a *Answers) (*Answers, error) {
 	a.EnableKratos = true
 	a.Features = appendIfMissing(a.Features, "kratos")
 
-	cfg := &config.Config{}
-	a.AppliedMods = config.ApplyDeploymentProfile(cfg, a.Profile)
 	return a, nil
 }
 
@@ -333,7 +342,7 @@ func collectAllFeatureSecrets(a *Answers) error {
 	if a.Secrets == nil {
 		a.Secrets = make(map[string]string)
 	}
-	allFeatures := []string{"fitbit", "garmin", "redcap"}
+	allFeatures := []string{"fitbit", "garmin", "oura", "armt"}
 	for _, feature := range allFeatures {
 		prompts := config.FeatureSecretPrompts(feature)
 		for _, p := range prompts {
@@ -344,7 +353,7 @@ func collectAllFeatureSecrets(a *Answers) error {
 			if p.Mask {
 				input = input.Password(true)
 			}
-			if err := huh.NewForm(huh.NewGroup(input)).Run(); err != nil {
+			if err := runForm(huh.NewForm(huh.NewGroup(input))); err != nil {
 				return err
 			}
 			if val != "" {

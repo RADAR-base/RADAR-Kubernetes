@@ -1,6 +1,7 @@
 package wizard
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 
@@ -21,7 +22,7 @@ func Run(mode Mode, repoRoot string) (*Answers, error) {
 	defaults := loadExistingAnswers(repoRoot)
 	switch mode {
 	case ModeWizard:
-		return runWizard(defaults)
+		return runWizard(defaults, repoRoot)
 	case ModeInteractive:
 		return runInteractive(defaults)
 	case ModeExpert:
@@ -31,7 +32,28 @@ func Run(mode Mode, repoRoot string) (*Answers, error) {
 	}
 }
 
-func runWizard(a *Answers) (*Answers, error) {
+// isLocalProfile returns true for profiles that target a local single-node cluster.
+func isLocalProfile(p string) bool {
+	return p == "dev" || p == "demo"
+}
+
+// errCancelled is returned when the user picks "Cancel setup" from the inter-step
+// navigation prompt. runInit converts this to a clean exit.
+var errCancelled = errors.New("setup cancelled by user")
+
+// step describes one wizard screen plus its visibility predicate. Each step is
+// idempotent: re-running it with the same Answers should just re-prompt with the
+// previous values pre-filled (huh does this automatically since fields bind to
+// Answers pointers).
+type step struct {
+	name string
+	show func(*Answers) bool                          // nil → always shown
+	run  func(*Answers, string) error                 // repoRoot passed through for side effects
+}
+
+// runWizard walks the user through a sequence of screens, with a small navigation
+// prompt between each that lets them go back one screen at a time.
+func runWizard(a *Answers, repoRoot string) (*Answers, error) {
 	if a == nil {
 		a = &Answers{Secrets: make(map[string]string)}
 	}
@@ -39,63 +61,86 @@ func runWizard(a *Answers) (*Answers, error) {
 		a.Secrets = make(map[string]string)
 	}
 
-	steps := []func(*Answers) error{
-		collectBasics,
-		collectProfile,
-		func(a *Answers) error {
-			if a.Profile == "demo" || a.Profile == "dev" {
-				a.UseConfluent = false
-				return nil
+	notLocal := func(a *Answers) bool { return !isLocalProfile(a.Profile) }
+	isLocal := func(a *Answers) bool { return isLocalProfile(a.Profile) }
+	useConfluent := func(a *Answers) bool { return a.UseConfluent }
+	wantsMonitoring := func(a *Answers) bool { return a.Profile != "demo" && !isLocalProfile(a.Profile) }
+
+	steps := []step{
+		{name: "profile", run: func(a *Answers, _ string) error { return collectProfile(a) }},
+		{name: "local-cluster", show: isLocal, run: func(a *Answers, r string) error {
+			// Auto-fill local-profile defaults, then make sure a cluster exists.
+			if a.ServerName == "" {
+				a.ServerName = "localhost"
 			}
-			return collectKafka(a)
-		},
-		func(a *Answers) error {
-			if a.UseConfluent {
-				return collectConfluentCredentials(a)
+			if a.MaintainerEmail == "" {
+				a.MaintainerEmail = "dev@localhost"
 			}
-			return nil
-		},
-		collectFeatures,
-		collectFeatureSecrets,
-		func(a *Answers) error {
-			if a.Profile == "demo" || a.Profile == "dev" {
-				a.UseExternalS3 = false
-				return nil
-			}
-			return collectStorage(a)
-		},
-		func(a *Answers) error {
-			// Demo profile disables monitoring automatically — skip the question.
+			a.UseConfluent = false
+			a.UseExternalS3 = false
 			if a.Profile == "demo" {
 				a.EnablePrometheus = false
 				a.EnableGraylog = false
-				return nil
 			}
-			return collectMonitoring(a)
-		},
-		collectConfirm,
+			return ensureLocalCluster(a, r)
+		}},
+		{name: "basics", show: notLocal, run: func(a *Answers, _ string) error { return collectBasics(a) }},
+		{name: "kafka", show: notLocal, run: func(a *Answers, _ string) error { return collectKafka(a) }},
+		{name: "confluent-credentials", show: useConfluent, run: func(a *Answers, _ string) error { return collectConfluentCredentials(a) }},
+		{name: "features", run: func(a *Answers, _ string) error { return collectFeatures(a) }},
+		{name: "feature-secrets", run: func(a *Answers, _ string) error { return collectFeatureSecrets(a) }},
+		{name: "storage", show: notLocal, run: func(a *Answers, _ string) error { return collectStorage(a) }},
+		{name: "monitoring", show: wantsMonitoring, run: func(a *Answers, _ string) error { return collectMonitoring(a) }},
+		{name: "confirm", run: func(a *Answers, _ string) error { return collectConfirm(a) }},
 	}
 
-	for _, step := range steps {
-		if err := step(a); err != nil {
-			return nil, fmt.Errorf("wizard step failed: %w", err)
+	i := 0
+	for i < len(steps) {
+		s := steps[i]
+		if s.show != nil && !s.show(a) {
+			i++
+			continue
 		}
+		err := s.run(a, repoRoot)
+		if errors.Is(err, huh.ErrUserAborted) {
+			// Esc was pressed inside the form — interpret as "go back". From the
+			// first visible step there is nowhere to go back to, so treat that
+			// as a clean cancel.
+			prev := previousVisibleStep(steps, a, i)
+			if prev == i {
+				return nil, errCancelled
+			}
+			i = prev
+			continue
+		}
+		if err != nil {
+			return nil, fmt.Errorf("step %q failed: %w", s.name, err)
+		}
+		i++
 	}
 
 	// Kratos/Hydra is always enabled — not a user choice.
 	a.EnableKratos = true
 	a.Features = appendIfMissing(a.Features, "kratos")
 
-	cfg := &config.Config{}
-	a.AppliedMods = config.ApplyDeploymentProfile(cfg, a.Profile)
-
 	return a, nil
+}
+
+// previousVisibleStep returns the index of the most recent visible step before
+// `from`. If we're already at the first visible step (or before it), we stay put.
+func previousVisibleStep(steps []step, a *Answers, from int) int {
+	for j := from - 1; j >= 0; j-- {
+		if steps[j].show == nil || steps[j].show(a) {
+			return j
+		}
+	}
+	return from
 }
 
 // SelectMode asks the user to pick wizard/interactive/expert.
 func SelectMode() (Mode, error) {
 	var chosen string
-	err := huh.NewForm(
+	err := runForm(huh.NewForm(
 		huh.NewGroup(
 			huh.NewSelect[string]().
 				Title("How would you like to configure your deployment?").
@@ -106,7 +151,10 @@ func SelectMode() (Mode, error) {
 				).
 				Value(&chosen),
 		),
-	).Run()
+	))
+	if errors.Is(err, huh.ErrUserAborted) {
+		return "", errCancelled
+	}
 	return Mode(chosen), err
 }
 
@@ -119,14 +167,14 @@ func loadExistingAnswers(repoRoot string) *Answers {
 		a.ServerName = cfg.ServerName
 		a.MaintainerEmail = cfg.MaintainerEmail
 		a.KubeContext = cfg.KubeContext
-		a.UseConfluent = cfg.ConfluentCloud
+		a.UseConfluent = cfg.ConfluentCloud.Enabled
 		a.Profile = profileFrom(cfg)
 		a.UseExternalS3 = cfg.UseExternalS3
 		a.S3Bucket = cfg.S3Bucket
 		a.S3Region = cfg.S3Region
-		a.EnablePrometheus = cfg.EnablePrometheus
-		a.EnableGraylog = cfg.EnableGraylog
-		a.EnableKratos = cfg.EnableKratos
+		a.EnablePrometheus = cfg.KubePrometheusStack != nil && cfg.KubePrometheusStack.Install
+		a.EnableGraylog = cfg.Graylog != nil && cfg.Graylog.Install
+		a.EnableKratos = cfg.RadarKratos != nil && cfg.RadarKratos.Install
 	}
 
 	sec, err := config.LoadSecrets(filepath.Join(repoRoot, "etc", "secrets.yaml"))
@@ -148,8 +196,11 @@ func loadExistingAnswers(repoRoot string) *Answers {
 		if sec.GarminConsumerSecret != "" {
 			a.Secrets["garmin_consumer_secret"] = sec.GarminConsumerSecret
 		}
-		if sec.RedcapToken != "" {
-			a.Secrets["redcap_token"] = sec.RedcapToken
+		if sec.OuraAPIClient != "" {
+			a.Secrets["oura_api_client"] = sec.OuraAPIClient
+		}
+		if sec.OuraAPISecret != "" {
+			a.Secrets["oura_api_secret"] = sec.OuraAPISecret
 		}
 		a.S3AccessKey = sec.S3AccessKey
 		a.S3SecretKey = sec.S3SecretKey
@@ -175,4 +226,10 @@ func profileFrom(cfg *config.Config) string {
 		return "staging"
 	}
 	return "production"
+}
+
+// IsCancelled reports whether err came from the user choosing "Cancel setup" in
+// the navigation prompt (so cmd/init.go can exit cleanly without a stack trace).
+func IsCancelled(err error) bool {
+	return errors.Is(err, errCancelled)
 }

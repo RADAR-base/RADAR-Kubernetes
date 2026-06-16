@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -14,6 +15,7 @@ import (
 	"github.com/charmbracelet/huh"
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
 )
 
 var skipPrereqs bool
@@ -57,7 +59,7 @@ func runPrereqsCheck(exec *executor.ShellExecutor) error {
 	// Count how many we can auto-fix.
 	fixable := 0
 	for _, r := range results {
-		if !r.OK && len(r.FixCmds) > 0 {
+		if !r.OK && (len(r.FixCmds) > 0 || r.FixFunc != nil) {
 			fixable++
 		}
 	}
@@ -74,11 +76,14 @@ func runPrereqsCheck(exec *executor.ShellExecutor) error {
 	}
 
 	for _, r := range results {
-		if r.OK || len(r.FixCmds) == 0 {
+		if r.OK || (len(r.FixCmds) == 0 && r.FixFunc == nil) {
 			continue
 		}
 		action := "Installing"
-		if r.NeedsUpgrade {
+		switch {
+		case r.NeedsDowngrade:
+			action = "Replacing"
+		case r.NeedsUpgrade:
 			action = "Upgrading"
 		}
 		spinner, _ := pterm.DefaultSpinner.Start(fmt.Sprintf("%s %s...", action, r.Tool))
@@ -99,6 +104,56 @@ func runPrereqsCheck(exec *executor.ShellExecutor) error {
 	return nil
 }
 
+// runBinInit invokes the upstream bin/init script which creates the canonical
+// scaffolding (environments.yaml, etc/production.yaml, etc/production.yaml.gotmpl,
+// etc/secrets.yaml with random passwords, keystores). We connect stdio to the
+// terminal so its output is visible, and pre-set DNAME so keystore-init doesn't
+// prompt for certificate fields. bin/init is idempotent: it skips files that
+// already exist, so re-running radarctl init won't clobber a configured setup.
+func runBinInit(repoRoot, serverName string) error {
+	scriptPath := filepath.Join(repoRoot, "bin", "init")
+	if _, err := os.Stat(scriptPath); err != nil {
+		return fmt.Errorf("bin/init not found in %s — is this a RADAR-Kubernetes checkout?", repoRoot)
+	}
+
+	// bin/init refuses to proceed when etc/production.yaml exists but is older than
+	// etc/base.yaml (prints a manual-merge warning and exits 1). Touching the file
+	// updates its mtime so the check passes. bin/init is idempotent — it skips files
+	// that already exist — so the content is never overwritten here.
+	prodYAML := filepath.Join(repoRoot, "etc", "production.yaml")
+	if _, err := os.Stat(prodYAML); err == nil {
+		_ = exec.Command("touch", prodYAML).Run()
+	}
+
+	// If secrets.yaml exists but is missing the management_portal section it is
+	// incomplete (written by a previous partial wizard run before bin/init could seed
+	// it from base-secrets.yaml). Remove it so generate-secrets recreates it fully.
+	secPath := filepath.Join(repoRoot, "etc", "secrets.yaml")
+	if isSecretsIncomplete(secPath) {
+		_ = os.Remove(secPath)
+	}
+
+	dname := "CN=" + serverName
+	if serverName == "" {
+		dname = "CN=radar-base"
+	}
+	env := append(os.Environ(), "DNAME="+dname)
+	// bin/util.sh uses `sed -i` with GNU sed syntax, which fails on macOS BSD sed.
+	// If gnu-sed is installed (brew install gnu-sed), shadow the system sed with it.
+	if gnusedPath := gnuSedBinDir(); gnusedPath != "" {
+		env = prependPATH(env, gnusedPath)
+	}
+	cmd := exec.Command(scriptPath)
+	cmd.Dir = repoRoot
+	cmd.Env = env
+	// bin/generate-secrets (called by bin/init) prompts to reset existing secrets.
+	// Auto-answer "n" so a re-run never rotates production passwords.
+	cmd.Stdin = strings.NewReader("n\n")
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
 func runInit(_ *cobra.Command, _ []string) error {
 	repoRoot, err := findRepoRoot()
 	if err != nil {
@@ -106,7 +161,9 @@ func runInit(_ *cobra.Command, _ []string) error {
 	}
 
 	if !skipPrereqs {
-		exec := &executor.ShellExecutor{}
+		// Include managed bin dir in PATH so AutoFix commands (e.g. helm plugin install)
+		// use the managed helm v3 rather than any system-installed helm v4.
+		exec := &executor.ShellExecutor{ExtraEnv: prereqs.ManagedBinEnv()}
 		if err := runPrereqsCheck(exec); err != nil {
 			return err
 		}
@@ -142,6 +199,10 @@ func runInit(_ *cobra.Command, _ []string) error {
 		output.Header("Configuring RADAR-Kubernetes")
 		answers, err = wizard.Run(mode, repoRoot)
 		if err != nil {
+			if wizard.IsCancelled(err) {
+				output.Info("Setup cancelled. Re-run radarctl init to resume.")
+				return nil
+			}
 			return fmt.Errorf("wizard failed: %w", err)
 		}
 	}
@@ -151,32 +212,69 @@ func runInit(_ *cobra.Command, _ []string) error {
 		output.Warning(fmt.Sprintf("Could not save wizard state: %s", err))
 	}
 
+	// Run the upstream bin/init to set up the canonical scaffolding (env files,
+	// production.yaml seeded from base.yaml, secrets.yaml with random passwords,
+	// keystores). It's idempotent — files that already exist are left alone.
+	output.Info("Running bin/init to scaffold config files...")
+	if err := runBinInit(repoRoot, answers.ServerName); err != nil {
+		return fmt.Errorf("bin/init failed: %w", err)
+	}
+
+	// Apply wizard answers as in-place overlays on top of what bin/init produced.
 	w := wizard.NewWriter(repoRoot)
-	if err := w.WriteAnswers(answers); err != nil {
-		return fmt.Errorf("writing config: %w", err)
+	if err := w.ApplyProductionOverlay(answers); err != nil {
+		return fmt.Errorf("applying wizard answers to production.yaml: %w", err)
 	}
-	if err := w.WriteEnvironmentsYAML(answers.AppliedMods); err != nil {
-		return fmt.Errorf("writing environments.yaml: %w", err)
+	if err := w.MergeWizardSecrets(answers); err != nil {
+		return fmt.Errorf("merging wizard secrets: %w", err)
 	}
-
-	output.Success("Configuration written to etc/production.yaml, etc/secrets.yaml, environments.yaml")
-
-	// Run bin/keystore-init if it exists.
-	keystoreInit := filepath.Join(repoRoot, "bin", "keystore-init")
-	if _, err := os.Stat(keystoreInit); err == nil {
-		output.Info("Running bin/keystore-init...")
-		exec := &executor.ShellExecutor{WorkDir: repoRoot}
-		if _, err := exec.Run(keystoreInit); err != nil {
-			output.Warning(fmt.Sprintf("keystore-init failed: %s", err))
-			output.Warning("You may need to run bin/keystore-init manually")
-		} else {
-			output.Success("Keystores initialized")
-		}
-	}
+	output.Success("Applied wizard answers to etc/production.yaml and etc/secrets.yaml")
 
 	// Remove state file after successful write.
 	_ = os.Remove(statePath)
 
 	output.Info("Run `radarctl deploy` to deploy the stack")
 	return nil
+}
+
+// isSecretsIncomplete returns true when the file exists but is missing the
+// management_portal key, which is seeded from base-secrets.yaml by generate-secrets.
+// A missing key means the file was written by a partial wizard run and must be
+// regenerated so helmfile templates can resolve management_portal.oauth_clients.*.
+func isSecretsIncomplete(path string) bool {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return false // doesn't exist — not our concern here
+	}
+	var root map[string]any
+	if err := yaml.Unmarshal(data, &root); err != nil {
+		return true // unparseable — regenerate to be safe
+	}
+	_, hasMP := root["management_portal"]
+	return !hasMP
+}
+
+// gnuSedBinDir returns the directory that contains the GNU sed binary on macOS
+// (installed via `brew install gnu-sed`), or "" if not found.
+func gnuSedBinDir() string {
+	// Homebrew on Apple Silicon installs to /opt/homebrew; Intel Macs use /usr/local.
+	for _, prefix := range []string{"/opt/homebrew", "/usr/local"} {
+		dir := prefix + "/opt/gnu-sed/libexec/gnubin"
+		if info, err := os.Stat(dir + "/sed"); err == nil && !info.IsDir() {
+			return dir
+		}
+	}
+	return ""
+}
+
+// prependPATH returns a copy of env with dir inserted at the front of PATH.
+func prependPATH(env []string, dir string) []string {
+	result := make([]string, 0, len(env))
+	for _, e := range env {
+		if strings.HasPrefix(e, "PATH=") {
+			e = "PATH=" + dir + ":" + e[5:]
+		}
+		result = append(result, e)
+	}
+	return result
 }

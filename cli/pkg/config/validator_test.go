@@ -43,7 +43,7 @@ func TestValidate_DefaultEmail(t *testing.T) {
 
 func TestValidate_FitbitEnabledMissingSecret(t *testing.T) {
 	cfg := validConfig()
-	cfg.EnableFitbit = true
+	cfg.RadarFitbitConnector = &config.ChartToggle{Install: true}
 	sec := validSecrets()
 	sec.FitbitClientID = ""
 	result := config.Validate(cfg, sec)
@@ -61,7 +61,7 @@ func TestValidate_PlaceholderSecretWarning(t *testing.T) {
 
 func TestValidate_ConfluentMissingBootstrap(t *testing.T) {
 	cfg := validConfig()
-	cfg.ConfluentCloud = true
+	cfg.ConfluentCloud = config.ConfluentCloudConfig{Enabled: true}
 	result := config.Validate(cfg, validSecrets())
 	assert.Len(t, result.Errors, 1)
 	assert.Equal(t, "confluent_cloud.bootstrapServerurl", result.Errors[0].Field)

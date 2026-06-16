@@ -2,6 +2,7 @@ package prereqs
 
 import (
 	"fmt"
+	"runtime"
 	"strconv"
 	"strings"
 
@@ -9,13 +10,15 @@ import (
 )
 
 type CheckResult struct {
-	Tool         string
-	OK           bool
-	Version      string
-	Error        string
-	InstallHint  string
-	NeedsUpgrade bool       // true if installed but below minimum version
-	FixCmds      [][]string // commands to run to install or upgrade
+	Tool           string
+	OK             bool
+	Version        string
+	Error          string
+	InstallHint    string
+	NeedsUpgrade   bool       // installed but below minVersion
+	NeedsDowngrade bool       // installed but >= maxVersion
+	FixCmds        [][]string // commands to run to install / upgrade
+	FixFunc        func() error // called instead of FixCmds when non-nil
 }
 
 type toolDef struct {
@@ -24,11 +27,22 @@ type toolDef struct {
 	parseVersion func(string) string
 	installHint  string
 	minVersion   string
-	installCmds  [][]string // commands to install from scratch
-	upgradeCmds  [][]string // commands to upgrade an existing install
+	maxVersion   string     // exclusive upper bound; version must be < this; "" = no limit
+	installCmds  [][]string
+	upgradeCmds  [][]string
+	fixFunc      func() error // overrides FixCmds for complex fixes (e.g. binary download)
 }
 
-var tools = []toolDef{
+var tools []toolDef
+
+func init() {
+	tools = commonTools
+	if runtime.GOOS == "darwin" {
+		tools = append(tools, macTools...)
+	}
+}
+
+var commonTools = []toolDef{
 	{
 		name: "kubectl",
 		args: []string{"version", "--client", "-o", "json"},
@@ -48,15 +62,19 @@ var tools = []toolDef{
 		upgradeCmds: [][]string{{"brew", "upgrade", "kubectl"}},
 	},
 	{
-		name:         "helm",
-		args:         []string{"version", "--short"},
+		// Helmfile v0.169.1 uses `helm version --client --short` which was removed in
+		// Helm v4. Pin to the last compatible v3 release.
+		name: "helm",
+		args: []string{"version", "--short"},
 		parseVersion: func(out string) string { return strings.TrimSpace(out) },
-		installHint:  "https://helm.sh/docs/intro/install/",
+		installHint:  "radarctl will download helm v3.16.3 automatically",
 		minVersion:   "v3",
-		installCmds:  [][]string{{"brew", "install", "helm"}},
-		upgradeCmds:  [][]string{{"brew", "upgrade", "helm"}},
+		maxVersion:   "v4.0.0",
+		fixFunc:      DownloadHelm,
 	},
 	{
+		// RADAR-Kubernetes environments.yaml uses Go template syntax that Helmfile v1
+		// requires the .gotmpl extension for. Pin to the last compatible v0 release.
 		name: "helmfile",
 		args: []string{"--version"},
 		parseVersion: func(out string) string {
@@ -66,10 +84,10 @@ var tools = []toolDef{
 			}
 			return out
 		},
-		installHint: "https://github.com/helmfile/helmfile/releases",
+		installHint: "radarctl will download helmfile v0.169.1 automatically",
 		minVersion:  "v0.169.1",
-		installCmds: [][]string{{"brew", "install", "helmfile"}},
-		upgradeCmds: [][]string{{"brew", "upgrade", "helmfile"}},
+		maxVersion:  "v1.0.0",
+		fixFunc:     DownloadHelmfile,
 	},
 	{
 		name:         "helm diff",
@@ -77,7 +95,6 @@ var tools = []toolDef{
 		parseVersion: func(out string) string { return strings.TrimSpace(out) },
 		installHint:  "helm plugin install https://github.com/databus23/helm-diff",
 		minVersion:   "v3.9.12",
-		// Remove first (best-effort) in case of broken install, then reinstall.
 		installCmds: [][]string{
 			{"helm", "plugin", "remove", "diff"},
 			{"helm", "plugin", "install", "--verify=false", "https://github.com/databus23/helm-diff"},
@@ -131,50 +148,73 @@ var tools = []toolDef{
 	},
 }
 
-// meetsMinVersion returns true if version >= minVersion using simple semver comparison.
-func meetsMinVersion(version, minVersion string) bool {
-	stripV := func(s string) string {
-		return strings.TrimPrefix(strings.TrimSpace(s), "v")
-	}
-	ver := strings.FieldsFunc(stripV(version), func(r rune) bool { return r == '+' || r == '-' })
-	min := strings.FieldsFunc(stripV(minVersion), func(r rune) bool { return r == '+' || r == '-' })
-
-	var verStr, minStr string
-	if len(ver) > 0 {
-		verStr = ver[0]
-	}
-	if len(min) > 0 {
-		minStr = min[0]
-	}
-
-	vParts := strings.Split(verStr, ".")
-	mParts := strings.Split(minStr, ".")
-	for len(vParts) < len(mParts) {
-		vParts = append(vParts, "0")
-	}
-	for len(mParts) < len(vParts) {
-		mParts = append(mParts, "0")
-	}
-
-	for i := range vParts {
-		v, _ := strconv.Atoi(vParts[i])
-		m, _ := strconv.Atoi(mParts[i])
-		if v > m {
-			return true
-		}
-		if v < m {
-			return false
-		}
-	}
-	return true
+var macTools = []toolDef{
+	{
+		// bin/util.sh uses GNU sed syntax; macOS ships BSD sed which is incompatible.
+		name:         "gsed",
+		args:         []string{"--version"},
+		parseVersion: func(out string) string { return strings.TrimSpace(strings.Split(out, "\n")[0]) },
+		installHint:  "brew install gnu-sed",
+		installCmds:  [][]string{{"brew", "install", "gnu-sed"}},
+		upgradeCmds:  [][]string{{"brew", "upgrade", "gnu-sed"}},
+	},
 }
 
-// Check runs all prerequisite checks and returns one result per tool.
-func Check(exec executor.Executor) []CheckResult {
+// semverCmp compares two version strings, returning -1, 0, or +1.
+func semverCmp(a, b string) int {
+	clean := func(s string) string {
+		s = strings.TrimPrefix(strings.TrimSpace(s), "v")
+		if i := strings.IndexAny(s, "+-"); i >= 0 {
+			s = s[:i]
+		}
+		return s
+	}
+	aParts := strings.Split(clean(a), ".")
+	bParts := strings.Split(clean(b), ".")
+	for len(aParts) < len(bParts) {
+		aParts = append(aParts, "0")
+	}
+	for len(bParts) < len(aParts) {
+		bParts = append(bParts, "0")
+	}
+	for i := range aParts {
+		av, _ := strconv.Atoi(aParts[i])
+		bv, _ := strconv.Atoi(bParts[i])
+		if av > bv {
+			return 1
+		}
+		if av < bv {
+			return -1
+		}
+	}
+	return 0
+}
+
+func meetsMinVersion(version, min string) bool  { return semverCmp(version, min) >= 0 }
+func belowMaxVersion(version, max string) bool   { return semverCmp(version, max) < 0 }
+
+// Check runs all prerequisite checks. For helmfile it first checks the radarctl-managed
+// binary (~/.radarctl/bin/helmfile) so a previously downloaded v0.x binary takes priority
+// over any system-installed v1+ binary.
+func Check(ex executor.Executor) []CheckResult {
 	results := make([]CheckResult, 0, len(tools))
 	for _, t := range tools {
 		toolName := strings.Fields(t.name)[0]
-		out, err := exec.Run(toolName, t.args...)
+
+		// Prefer managed binaries when present (helmfile and helm are pinned to v0.x/v3.x).
+		bin := toolName
+		switch toolName {
+		case "helmfile":
+			if p := ManagedHelmfilePath(); p != "" {
+				bin = p
+			}
+		case "helm":
+			if p := ManagedHelmPath(); p != "" {
+				bin = p
+			}
+		}
+
+		out, err := ex.Run(bin, t.args...)
 		if err != nil {
 			errMsg := "not found"
 			for _, line := range strings.Split(err.Error(), "\n") {
@@ -190,32 +230,42 @@ func Check(exec executor.Executor) []CheckResult {
 				Error:       errMsg,
 				InstallHint: t.installHint,
 				FixCmds:     t.installCmds,
+				FixFunc:     t.fixFunc,
 			})
 			continue
 		}
+
 		version := t.parseVersion(out)
-		r := CheckResult{
-			Tool:    t.name,
-			OK:      true,
-			Version: version,
-		}
-		if t.minVersion != "" && !meetsMinVersion(version, t.minVersion) {
+		r := CheckResult{Tool: t.name, OK: true, Version: version}
+
+		switch {
+		case t.maxVersion != "" && !belowMaxVersion(version, t.maxVersion):
+			r.OK = false
+			r.NeedsDowngrade = true
+			r.Error = fmt.Sprintf("version %s is incompatible — need < %s (radarctl will install a compatible version to ~/.radarctl/bin/)", version, t.maxVersion)
+			r.InstallHint = t.installHint
+			r.FixFunc = t.fixFunc
+		case t.minVersion != "" && !meetsMinVersion(version, t.minVersion):
 			r.OK = false
 			r.NeedsUpgrade = true
 			r.Error = fmt.Sprintf("version %s found, need >= %s", version, t.minVersion)
 			r.InstallHint = t.installHint
 			r.FixCmds = t.upgradeCmds
+			r.FixFunc = t.fixFunc
 		}
+
 		results = append(results, r)
 	}
 	return results
 }
 
-// AutoFix runs the fix commands for a failed check result.
-// Intermediate commands are best-effort (errors ignored); only the last must succeed.
-func AutoFix(exec executor.Executor, result CheckResult) error {
+// AutoFix runs the fix for a failed check result. FixFunc takes priority over FixCmds.
+func AutoFix(ex executor.Executor, result CheckResult) error {
+	if result.FixFunc != nil {
+		return result.FixFunc()
+	}
 	for i, cmd := range result.FixCmds {
-		_, err := exec.Run(cmd[0], cmd[1:]...)
+		_, err := ex.Run(cmd[0], cmd[1:]...)
 		if err != nil && i == len(result.FixCmds)-1 {
 			return fmt.Errorf("%w", err)
 		}

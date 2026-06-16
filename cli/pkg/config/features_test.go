@@ -12,7 +12,31 @@ func TestApplyFeature_Fitbit(t *testing.T) {
 	cfg := &config.Config{}
 	err := config.ApplyFeature(cfg, "fitbit")
 	require.NoError(t, err)
-	assert.True(t, cfg.EnableFitbit)
+	require.NotNil(t, cfg.RadarFitbitConnector)
+	assert.True(t, cfg.RadarFitbitConnector.Install)
+}
+
+func TestApplyFeature_Oura(t *testing.T) {
+	cfg := &config.Config{}
+	require.NoError(t, config.ApplyFeature(cfg, "oura"))
+	require.NotNil(t, cfg.RadarOuraConnector)
+	assert.True(t, cfg.RadarOuraConnector.Install)
+	assert.True(t, cfg.RadarRestSourcesAuthBackend.Install)
+}
+
+func TestApplyFeature_ARMT(t *testing.T) {
+	cfg := &config.Config{}
+	require.NoError(t, config.ApplyFeature(cfg, "armt"))
+	require.NotNil(t, cfg.RadarAppserver)
+	assert.True(t, cfg.RadarAppserver.Install)
+}
+
+func TestApplyFeature_RealtimeDashboards(t *testing.T) {
+	cfg := &config.Config{}
+	require.NoError(t, config.ApplyFeature(cfg, "realtime_dashboards"))
+	require.NotNil(t, cfg.KsqlServer)
+	require.NotNil(t, cfg.RadarGrafana)
+	require.NotNil(t, cfg.RadarJdbcConnectorRealtimeDashboard)
 }
 
 func TestApplyFeature_Unknown(t *testing.T) {
@@ -31,19 +55,14 @@ func TestFeatureSecretPrompts_Fitbit(t *testing.T) {
 
 func TestApplyDeploymentProfile_Dev(t *testing.T) {
 	cfg := &config.Config{}
-	mods := config.ApplyDeploymentProfile(cfg, "dev")
+	config.ApplyDeploymentProfile(cfg, "dev")
 	assert.False(t, cfg.EnableTLS)
 	assert.True(t, cfg.DevDeployment)
-	assert.Contains(t, mods, "mods/minimal.yaml")
-	assert.Contains(t, mods, "mods/localdev.yaml")
-	assert.Contains(t, mods, "mods/disable_tls.yaml")
-	assert.Contains(t, mods, "mods/fast_deploy.yaml")
 }
 
 func TestApplyDeploymentProfile_Production(t *testing.T) {
 	cfg := &config.Config{}
-	mods := config.ApplyDeploymentProfile(cfg, "production")
+	config.ApplyDeploymentProfile(cfg, "production")
 	assert.True(t, cfg.EnableTLS)
 	assert.False(t, cfg.DevDeployment)
-	assert.Empty(t, mods)
 }

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -10,6 +11,7 @@ import (
 	"github.com/RADAR-base/RADAR-Kubernetes/cli/pkg/helmfile"
 	"github.com/RADAR-base/RADAR-Kubernetes/cli/pkg/kubectl"
 	"github.com/RADAR-base/RADAR-Kubernetes/cli/pkg/output"
+	"github.com/RADAR-base/RADAR-Kubernetes/cli/pkg/prereqs"
 	"github.com/RADAR-base/RADAR-Kubernetes/cli/pkg/status"
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
@@ -44,7 +46,12 @@ func runDeploy(_ *cobra.Command, _ []string) error {
 		return err
 	}
 
-	exec := &executor.ShellExecutor{WorkDir: repoRoot}
+	// Guard: environments.yaml must exist (created by bin/init via radarctl init).
+	if _, err := os.Stat(filepath.Join(repoRoot, "environments.yaml")); os.IsNotExist(err) {
+		return &ExitError{Code: 2, Message: "environments.yaml not found — run `radarctl init` first to set up configuration files"}
+	}
+
+	exec := &executor.ShellExecutor{WorkDir: repoRoot, ExtraEnv: prereqs.ManagedBinEnv()}
 	hfRunner := helmfile.NewRunner(exec, repoRoot, "default")
 
 	// 1. Validate config
@@ -108,9 +115,13 @@ func runDeploy(_ *cobra.Command, _ []string) error {
 	// 3. Show diff summary + confirmation (skip in JSON mode)
 	if !isJSON() {
 		output.Info("Computing changes...")
-		diff, _ := hfRunner.Diff(deploySelector)
-		updated, installed, removed := helmfile.ParseDiffSummary(diff)
-		pterm.Info.Printf("%d releases will be updated, %d installed, %d removed\n", updated, installed, removed)
+		diff, diffErr := hfRunner.Diff(deploySelector)
+		if diffErr != nil {
+			output.Warning(fmt.Sprintf("Could not compute diff: %s", diffErr))
+		} else {
+			updated, installed, removed := helmfile.ParseDiffSummary(diff)
+			pterm.Info.Printf("%d releases will be updated, %d installed, %d removed\n", updated, installed, removed)
+		}
 
 		if !deployYes {
 			pterm.Print("Proceed with deployment? [y/N] ")

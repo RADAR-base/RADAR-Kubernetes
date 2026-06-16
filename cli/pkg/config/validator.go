@@ -49,17 +49,24 @@ func Validate(cfg *Config, sec *Secrets) ValidationResult {
 		})
 	}
 
-	if cfg.ConfluentCloud && sec.ConfluentCloud.BootstrapServer == "" {
+	if cfg.ConfluentCloud.Enabled && sec.ConfluentCloud.BootstrapServer == "" {
 		result.Errors = append(result.Errors, ValidationError{
 			Field:   "confluent_cloud.bootstrapServerurl",
 			Message: "required when confluent_cloud is enabled",
 		})
 	}
 
-	if cfg.EnableFitbit && sec.FitbitClientID == "" {
+	if cfg.RadarFitbitConnector != nil && cfg.RadarFitbitConnector.Install && sec.FitbitClientID == "" {
 		result.Errors = append(result.Errors, ValidationError{
 			Field:   "fitbit_client_id",
 			Message: "required when Fitbit integration is enabled",
+		})
+	}
+
+	if cfg.RadarOuraConnector != nil && cfg.RadarOuraConnector.Install && sec.OuraAPIClient == "" {
+		result.Errors = append(result.Errors, ValidationError{
+			Field:   "oura_api_client",
+			Message: "required when Oura integration is enabled",
 		})
 	}
 
@@ -67,7 +74,8 @@ func Validate(cfg *Config, sec *Secrets) ValidationResult {
 		"fitbit_client_id":     sec.FitbitClientID,
 		"fitbit_client_secret": sec.FitbitClientSecret,
 		"garmin_consumer_key":  sec.GarminConsumerKey,
-		"redcap_token":         sec.RedcapToken,
+		"oura_api_client":      sec.OuraAPIClient,
+		"oura_api_secret":      sec.OuraAPISecret,
 	}
 	for field, val := range secretFields {
 		if val != "" && isPlaceholder(val) {
