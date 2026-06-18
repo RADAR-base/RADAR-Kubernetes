@@ -6,6 +6,7 @@
 * [Development Guide](#development-guide)
   * [Table of Contents](#table-of-contents)
   * [Development automation](#development-automation)
+    * [Prerequisites](#prerequisites)
         * [Containerd](#containerd)
   * [Adding a new component to RADAR-Kuberentes](#adding-a-new-component-to-radar-kuberentes)
   * [Testing the changes](#testing-the-changes)
@@ -16,6 +17,40 @@
 
 This repository can be used for development automation for instance on a k3s or k3d (dockerized k3s) cluster. The
 example below shows how to deploy on a k3d cluster.
+
+### Prerequisites
+
+The following tools must be installed on your machine before running the steps below:
+
+- [Docker](https://www.docker.com/products/docker-desktop/) — provides the container runtime for k3d. Allocate enough
+  memory to Docker Desktop (12 GB or more is recommended) so the cluster can fit all the default RADAR-base components.
+- [k3d](https://github.com/k3d-io/k3d#get) — runs k3s in Docker.
+- [kubectl](https://kubernetes.io/docs/tasks/tools/) — Kubernetes CLI.
+- [helm](https://helm.sh/docs/intro/install/) and [helmfile](https://github.com/helmfile/helmfile#installation) — chart
+  management used by this repository.
+- A JDK that provides `keytool` — used by `./bin/init` to generate the ManagementPortal keystore. On macOS:
+
+  ```shell
+  brew install openjdk
+  # Homebrew's openjdk is keg-only, so add it to your PATH (zsh shown):
+  echo 'export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"' >> ~/.zshrc
+  ```
+
+- [yq](https://github.com/mikefarah/yq) — used by `./bin/generate-secrets`. On macOS: `brew install yq`.
+
+The local k3d workflow described below has been verified against the following tool versions. Newer versions are
+likely to work but may not match the cluster-side compatibility matrix listed in the main [README](../README.md);
+fall back to those if you run into issues.
+
+| Tool     | Version                        |
+|----------|--------------------------------|
+| Docker   | 29.2.1                         |
+| k3d      | v5.9.0 (bundles k3s v1.35.5+k3s1) |
+| kubectl  | v1.35.1                        |
+| Helm     | v3.20.0                        |
+| Helmfile | 0.169.1                        |
+| OpenJDK  | 26.0.1                         |
+| yq       | v4.53.3                        |
 
 1. Install k3d (see [here](https://github.com/k3d-io/k3d#get))
 2. Create a k3d cluster that is configured to run RADAR-base:
@@ -50,6 +85,15 @@ k3d cluster create my-test-cluster --config=dev/k3d-dev-containerd.yaml
 - set _dev_deployment_ to _true_
 - (optional) enable/disable components as needed with the __install_ fields
 
+   When toggling components, keep in mind these cross-component dependencies. Enabling the consumer without its
+   backing service will leave the consumer pod in `CrashLoopBackOff`:
+
+   | Component | Required dependency |
+   |---|---|
+   | `management_portal` | A PostgreSQL backend. Either `postgresql._install: true` **or** `cloudnative_postgresql._install: true` (the latter also requires `cloudnativepg_operator`). |
+   | `radar_s3_connector` | An S3-compatible object store at the configured `s3Endpoint`. For local development, enable the bundled MinIO with `minio._install: true`. |
+   | `radar_output` | Same as `radar_s3_connector` — needs a reachable S3 endpoint for both `source` and `target`. |
+
 5. Install RADAR-Kubernetes on the k3d cluster:
 
 ```shell
@@ -57,6 +101,27 @@ helmfile sync
 ```
 
 When installation is complete, you can access the applications at `http://localhost`.
+
+### Stopping and restarting the cluster
+
+The k3d cluster can be stopped to free up host resources without losing state, and started again later. All deployed
+applications, persistent volumes and configuration are preserved across a stop/start cycle.
+
+```shell
+# Stop the cluster (containers are stopped but not removed)
+k3d cluster stop my-test-cluster
+
+# Start the cluster again
+k3d cluster start my-test-cluster
+```
+
+After a restart you may see pods in `Unknown` or transient `CrashLoopBackOff` states for a minute or two while
+dependencies (CoreDNS, Kafka, catalog-server, etc.) come back up. Most pods recover on their own; if one stays stuck,
+delete it and the controller will recreate it, for example:
+
+```shell
+kubectl delete pod <pod-name>
+```
 
 ## Adding a new component to RADAR-Kuberentes
 
@@ -91,6 +156,20 @@ installation faster if you only select your component to install:
 
 ```
 helmfile apply --file helmfile.d/name-of-the-helmfile.yaml --selector name=name-of-the-component
+```
+
+When you are iterating on a single release and just want to apply your `etc/production.yaml` changes for it without
+running a full `helmfile sync`, the selector flag works with `sync` too (and you do not need to point at a specific
+helmfile — helmfile will find the matching release across `helmfile.d/`):
+
+```shell
+helmfile -l name=<release-name> sync
+```
+
+For example, after enabling MinIO in `etc/production.yaml`:
+
+```shell
+helmfile -l name=minio sync
 ```
 
 You can also use other the helmfile commands like `helmfile template` and `helmfile diff` to see what is being applied
