@@ -38,19 +38,8 @@ The following tools must be installed on your machine before running the steps b
 
 - [yq](https://github.com/mikefarah/yq) — used by `./bin/generate-secrets`. On macOS: `brew install yq`.
 
-The local k3d workflow described below has been verified against the following tool versions. Newer versions are
-likely to work but may not match the cluster-side compatibility matrix listed in the main [README](../README.md);
-fall back to those if you run into issues.
-
-| Tool     | Version                        |
-|----------|--------------------------------|
-| Docker   | 29.2.1                         |
-| k3d      | v5.9.0 (bundles k3s v1.35.5+k3s1) |
-| kubectl  | v1.35.1                        |
-| Helm     | v3.20.0                        |
-| Helmfile | 0.169.1                        |
-| OpenJDK  | 26.0.1                         |
-| yq       | v4.53.3                        |
+For supported versions of the cluster-side tooling (Kubernetes, K3s, kubectl, Helm, Helmfile, yq), see the
+[Software Compatibility](../README.md#software-compatibility) section of the main README.
 
 1. Install k3d (see [here](https://github.com/k3d-io/k3d#get))
 2. Create a k3d cluster that is configured to run RADAR-base:
@@ -84,15 +73,6 @@ k3d cluster create my-test-cluster --config=dev/k3d-dev-containerd.yaml
 - set _kubeContext_ to _k3d-my-test-cluster_
 - set _dev_deployment_ to _true_
 - (optional) enable/disable components as needed with the __install_ fields
-
-   When toggling components, keep in mind these cross-component dependencies. Enabling the consumer without its
-   backing service will leave the consumer pod in `CrashLoopBackOff`:
-
-   | Component | Required dependency |
-   |---|---|
-   | `management_portal` | A PostgreSQL backend. Either `postgresql._install: true` **or** `cloudnative_postgresql._install: true` (the latter also requires `cloudnativepg_operator`). |
-   | `radar_s3_connector` | An S3-compatible object store at the configured `s3Endpoint`. For local development, enable the bundled MinIO with `minio._install: true`. |
-   | `radar_output` | Same as `radar_s3_connector` — needs a reachable S3 endpoint for both `source` and `target`. |
 
 5. Install RADAR-Kubernetes on the k3d cluster:
 
