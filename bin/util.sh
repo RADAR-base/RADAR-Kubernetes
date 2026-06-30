@@ -47,7 +47,8 @@ copy_template_if_absent() {
 
 create_production_yaml() {
   copy_template_if_absent etc/production.yaml etc/base.yaml
-  sed -i "/_chart_version/d" etc/production.yaml
+  # `-i.bak` is portable across GNU sed (Linux) and BSD sed (macOS), which requires an explicit backup-suffix argument for in-place edits. The .bak file is removed after.
+  sed -i.bak "/_chart_version/d" etc/production.yaml && rm -f etc/production.yaml.bak
 }
 
 # Copies the template (defined by the given config file with suffix
