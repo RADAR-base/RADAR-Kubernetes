@@ -22,7 +22,7 @@ var (
 	deployDryRun   bool
 	deploySelector string
 	deployYes      bool
-	deployNoAtomic bool
+	deployAtomic   bool
 )
 
 var deployCmd = &cobra.Command{
@@ -37,7 +37,7 @@ func init() {
 	deployCmd.Flags().BoolVar(&deployDryRun, "dry-run", false, "Render templates only, do not apply")
 	deployCmd.Flags().StringVar(&deploySelector, "selector", "", "Deploy only releases matching this selector (e.g. name=mongodb)")
 	deployCmd.Flags().BoolVarP(&deployYes, "yes", "y", false, "Skip confirmation prompt")
-	deployCmd.Flags().BoolVar(&deployNoAtomic, "no-atomic", false, "Disable automatic rollback on failure")
+	deployCmd.Flags().BoolVar(&deployAtomic, "atomic", true, "Roll back failed releases automatically (use --atomic=false to keep pods alive for debugging)")
 }
 
 func runDeploy(_ *cobra.Command, _ []string) error {
@@ -143,7 +143,7 @@ func runDeploy(_ *cobra.Command, _ []string) error {
 		progress, _ = pterm.DefaultSpinner.Start("Starting deployment...")
 	}
 
-	err = hfRunner.SyncWithCallback(deploySelector, !deployNoAtomic, func(line string) {
+	err = hfRunner.SyncWithCallback(deploySelector, deployAtomic, func(line string) {
 		rel := helmfile.ParseReleaseFromLine(line)
 		if rel != "" {
 			releaseStatuses[rel] = "syncing"
@@ -159,6 +159,9 @@ func runDeploy(_ *cobra.Command, _ []string) error {
 		}
 		if !isJSON() {
 			output.Error(err.Error())
+			if deployAtomic {
+				output.Info("Tip: run with --atomic=false to keep failed pods alive for inspection (kubectl logs, kubectl describe)")
+			}
 		} else {
 			output.PrintJSON(map[string]any{"status": "failed", "error": err.Error()})
 		}
