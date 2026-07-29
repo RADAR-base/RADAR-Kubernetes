@@ -86,6 +86,10 @@ ksql_server:
   prometheus:
     jmx:
       enabled: false
+  ksql:
+    prometheus:
+      jmx:
+        enabled: false
 radar_jdbc_connector_realtime_dashboard:
   timescaledb:
     cluster:
@@ -104,14 +108,6 @@ radar_jdbc_connector_grafana:
       cluster:
         monitoring:
           enabled: false
-gateway:
-  serviceMonitor:
-    enabled: false
-ksql_server:
-  ksql:
-    prometheus:
-      jmx:
-        enabled: false
 radar_kafka_stack:
   metrics:
     enabled: false

@@ -14,7 +14,7 @@ function catch_errors() {
 check_command_exists() {
   version_flag=${2:---version}
   if /usr/bin/env bash -c "command -v "$1" > /dev/null 2>&1"; then
-    echo "$1 version: $("$1" $version_flag)"
+    echo "$1 version: $("$1" $version_flag 2>/dev/null)"
   else
     echo "RADAR Platform cannot start without $1. Please, install $1 and then try again"
     exit 1
