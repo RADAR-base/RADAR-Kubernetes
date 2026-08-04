@@ -1037,3 +1037,21 @@ releases:
     set:
       - name: kafka_num_brokers
         value: {{ .Values.kafka_num_brokers }}
+
+  - name: radar-jdbc-connector-rule-engine
+    chart: ../../../radar-helm-charts/charts/radar-jdbc-connector
+#    chart: radar/radar-jdbc-connector
+    version: {{ .Values.radar_jdbc_source_connector_rule_engine._chart_version }}
+    installed: {{ .Values.radar_jdbc_source_connector_rule_engine._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_jdbc_source_connector_rule_engine._extra_timeout }}
+    {{- if or .Values.radar_kafka_stack._install .Values.cp_schema_registry._install }}
+    needs:
+      {{ if .Values.radar_kafka_stack._install }}- radar-kafka{{ end }}
+      {{ if .Values.cp_schema_registry._install }}- cp-schema-registry{{ end }}
+    {{- end }}
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.radar_jdbc_source_connector_rule_engine | toYaml | indent 8 | trim }}
+    set:
+      - name: kafka_num_brokers
+        value: {{ .Values.kafka_num_brokers }}

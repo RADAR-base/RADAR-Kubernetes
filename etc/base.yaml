@@ -197,6 +197,32 @@ radar_backend_stream:
   replicaCount: 1
 
 
+radar_jdbc_source_connector_rule_engine:
+  _install: false
+  _chart_version: 0.11.2
+  _extra_timeout: 0
+  fullnameOverride: radar-jdbc-source-connector-rule-engine
+  replicaCount: 1
+  mode: source
+  source:
+    name: jdbc-connector-rule-engine
+    schema: public
+    tableWhitelist: config
+    topicPrefix: rule_engine_
+  jdbc:
+    urlSecret:
+      name: radar-cloudnative-postgresql-appconfig
+      key: jdbc-uri
+    userSecret:
+      name: radar-cloudnative-postgresql-appconfig
+      key: username
+    passwordSecret:
+      name: radar-cloudnative-postgresql-appconfig
+      key: password
+    dialect: PostgreSqlDatabaseDialect
+  timescaledb:
+    enabled: false
+
 # --------------------------------------------------------- 10-managementportal.yaml ---------------------------------------------------------
 
 # This Postgresql is used for Management Portal and App config, postgres password should be same in them
