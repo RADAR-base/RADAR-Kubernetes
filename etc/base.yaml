@@ -207,8 +207,16 @@ radar_jdbc_source_connector_rule_engine:
   source:
     name: jdbc-connector-rule-engine
     schema: public
-    tableWhitelist: config
-    topicPrefix: rule_engine_
+    topicPrefix: rule_engine_config
+    topicCleanupPolicy: compact
+    mode: timestamp+incrementing
+    incrementingColumnName: id
+    timestampColumnName: create_timestamp
+    # Select config items the 'intervention_rules' client_id (uses PostgreSQL large objects conversion).
+    # Query must be wrapped in a named 'SELECT' clause, because the JDBC connector adds its own 'WHERE' clause.
+    query: select * from (SELECT id, client_id, scope, name, convert_from(lo_get(value::oid), 'UTF8') AS value, create_timestamp, version from config WHERE client_id = 'intervention_rules') as config_selection
+    # Log compaction will flatten the message queue based on these key-fields.
+    keyField: client_id, scope, name
   jdbc:
     urlSecret:
       name: radar-cloudnative-postgresql-appconfig
