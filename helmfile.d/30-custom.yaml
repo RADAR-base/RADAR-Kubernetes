@@ -1,0 +1,18 @@
+bases:
+- ../environments.yaml
+
+---
+
+{{ readFile "../etc/helmfile-templates.yaml" }}
+
+releases:
+  - name: headlamp
+    namespace: headlamp
+    chart: radar/headlamp
+    version: {{ .Values.headlamp._chart_version }}
+    installed: {{ .Values.headlamp._install }}
+    timeout: {{ add .Values.base_timeout .Values.headlamp._extra_timeout }}
+    disableValidation: true
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.headlamp | toYaml | indent 8 | trim }}

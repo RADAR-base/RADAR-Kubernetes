@@ -699,3 +699,8 @@ radar_mockserver:
   _install: false
   _chart_version: 0.1.3
   _extra_timeout: 0
+
+headlamp:
+  _install: false
+  _chart_version: 1.0.0
+  _extra_timeout: 0
