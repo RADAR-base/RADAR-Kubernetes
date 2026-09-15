@@ -329,7 +329,7 @@ releases:
 
   - name: radar-console
     #chart: radar/radar-console
-    chart: ../../radar-helm-charts/charts/radar-console
+    chart: ../../../radar-helm-charts/charts/radar-console
     version: {{ .Values.radar_console._chart_version }}
     installed: {{ .Values.radar_console._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_console._extra_timeout }}
@@ -345,7 +345,8 @@ releases:
         value: {{ .Values.server_name }}
 
   - name: app-config
-    chart: radar/app-config
+#    chart: radar/app-config
+    chart: ../../../radar-helm-charts/charts/app-config
     version: {{ .Values.app_config._chart_version }}
     installed: {{ .Values.app_config._install }}
     timeout: {{ add .Values.base_timeout .Values.app_config._extra_timeout }}
@@ -522,7 +523,8 @@ releases:
         value: {{ .Values.grafana_metrics_endpoint_password }}
 
   - name: data-dashboard-backend
-    chart: radar/data-dashboard-backend
+#    chart: radar/data-dashboard-backend
+    chart: ../../../radar-helm-charts/charts/data-dashboard-backend
     version: {{ .Values.data_dashboard_backend._chart_version }}
     installed: {{ .Values.data_dashboard_backend._install }}
     timeout: {{ add .Values.base_timeout .Values.data_dashboard_backend._extra_timeout }}
@@ -1008,7 +1010,8 @@ releases:
         value: {{ dig "garmin" "userRepositoryClientSecret" (dig "oauth_clients" "radar_push_endpoint" "client_secret" "" .Values.management_portal) .Values.radar_push_endpoint }}
 
   - name: radar-backend-monitor
-    chart: radar/radar-backend
+#    chart: radar/radar-backend
+    chart: ../../../radar-helm-charts/charts/radar-backend
     version: {{ .Values.radar_backend_monitor._chart_version }}
     installed: {{ .Values.radar_backend_monitor._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_backend_monitor._extra_timeout }}
@@ -1023,7 +1026,8 @@ releases:
         value: {{ .Values.kafka_num_brokers }}
 
   - name: radar-backend-stream
-    chart: radar/radar-backend
+#    chart: radar/radar-backend
+    chart: ../../../radar-helm-charts/charts/radar-backend
     version: {{ .Values.radar_backend_monitor._chart_version }}
     installed: {{ .Values.radar_backend_stream._install }}
     timeout: {{ add .Values.base_timeout .Values.radar_backend_stream._extra_timeout }}
