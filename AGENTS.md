@@ -163,3 +163,14 @@ then services — that scans each repo's dependencies with [Trivy](https://trivy
 CVE bumps, rebuilds to verify, and stages (but never pushes without confirmation) a release branch per repo. See
 that file for the full, current procedure — don't duplicate it here; this section just points at it so the two
 don't drift out of sync.
+
+### Kotlin 1.9 → 2.3 migration
+
+Implemented as the `kotlin-migration` skill (`.claude/skills/kotlin-migration/SKILL.md`): the same
+shared-libraries-first ordering over the component inventory, but scoped to bumping the Kotlin language/compiler
+version (and plugins version-locked to it) in whichever repos actually contain Kotlin source, rebuilding to
+verify, and staging (never pushing without confirmation) a migration branch per repo. Unlike `platform-upgrade`,
+this migration's failure modes aren't known in advance — the skill file is an explicitly living/self-updating
+document with a "known issues & fixes" playbook that every run is expected to add to, and it stops to ask the user
+for advice whenever it hits friction not already covered by that playbook. See that file for the full, current
+procedure and the current state of the playbook — don't duplicate either here.
