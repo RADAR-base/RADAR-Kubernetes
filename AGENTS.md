@@ -154,39 +154,12 @@ Implications for agents:
   `etc/base-secrets.yaml` and `bin/generate-secrets` if auto-generated; component defaults in an `etc/<name>/`
   folder if needed.
 
-### Automated security patching (planned)
+### Automated security patching
 
-Goal: a skill/agent that can autonomously patch known vulnerabilities across the RADAR-base microservice fleet
-listed in [Component inventory & local checkouts](#component-inventory--local-checkouts) above — local checkout,
-vulnerability scan with [Trivy](https://trivy.dev), dependency version upgrade, and PR creation. Not yet
-implemented as a skill; the workflow below is the intended design.
-
-The intended workflow for an agent/skill doing automated dependency-vulnerability patching across this fleet:
-
-1. For a given component, resolve its local checkout path from the component inventory table (verify it exists
-   and is a git repo pointed at the expected `origin` before doing anything — do not assume the sibling directory
-   is correct).
-2. Fetch and check out a fresh branch from the repo's **default branch** (`main` or `master` — do not build on
-   whatever feature/release branch happens to be checked out locally; run `gh repo view <org>/<repo> --json
-   defaultBranchRef` or `git remote show origin` to confirm it, since these checkouts are routinely left on
-   in-progress feature or release branches). If the repo also has a `dev`/`develop` branch, compare it against the
-   default branch first (e.g. `git log --oneline <default>..dev`); if `dev` is ahead (has commits not yet on
-   `main`/`master`), branch from `dev` instead so the patch lands on top of the most current code.
-3. Run a vulnerability scan (e.g. `trivy fs .` for dependency manifests, `trivy config .` for the Dockerfile, or
-   `trivy image` against a built image) and/or check the repo's open Snyk-labelled issues
-   (`is:issue state:open label:Snyk` on GitHub) as a second source of known vulnerabilities.
-4. Upgrade the flagged dependency version(s) in the relevant manifest — `build.gradle`/`build.gradle.kts` (Gradle,
-   most services; check for a `gradle.properties`/version catalog too), `package.json`/lockfile (npm, for
-   `radar-home` and `radar-self-enrolment-ui`), or the `Dockerfile` base image — to the minimum version that
-   resolves the flagged CVE(s), preferring the smallest safe version bump over a major-version jump unless the fix
-   requires it.
-5. Build/compile locally to confirm the bump doesn't break the project (`./gradlew build` or `npm ci && npm run
-   build`, as applicable) before opening a PR.
-6. Open a PR against the component's own repo (not this repo) via `gh pr create`, scoped to that one dependency
-   bump, with the CVE ID(s) and severity in the description.
-7. If the vulnerability is in a shared library (`radar-jersey`, `radar-commons`, `radar-commons-android`,
-   `RADAR-Schemas`), patch and release the library first, then follow up with version-bump PRs in each Gradle
-   consumer that pins an affected version.
-8. This repo (`RADAR-Kubernetes`) is only touched afterwards, and only if a patch requires a new chart version or
-   image tag bump in `etc/base.yaml` (`_chart_version`) — most dependency patches land purely in the component
-   repo and don't require any change here.
+Implemented as the `platform-upgrade` skill (`.claude/skills/platform-upgrade/SKILL.md`): an ordered sweep over
+the RADAR-base microservice fleet from
+[Component inventory & local checkouts](#component-inventory--local-checkouts) above — shared libraries first,
+then services — that scans each repo's dependencies with [Trivy](https://trivy.dev), auto-fixes same-major-version
+CVE bumps, rebuilds to verify, and stages (but never pushes without confirmation) a release branch per repo. See
+that file for the full, current procedure — don't duplicate it here; this section just points at it so the two
+don't drift out of sync.
