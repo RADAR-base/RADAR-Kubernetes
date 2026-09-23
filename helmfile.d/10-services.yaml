@@ -418,10 +418,6 @@ releases:
     set:
       - name: serverName
         value: {{ .Values.server_name }}
-      - name: kratosPublicUrl
-        value: https://{{ .Values.server_name }}/kratos
-      - name: kratosBrowserUrl
-        value: https://{{ .Values.server_name }}/kratos
 
   - name: radar-appserver-postgresql
     chart: radar/radar-postgresql
