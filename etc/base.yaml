@@ -226,6 +226,14 @@ management_portal:
   _chart_version: 1.7.0
   _extra_timeout: 210
   replicaCount: 1  # should be 1
+  # Chart 1.7.0 no longer defaults to the CloudNativePG secret; these were the chart defaults up to 1.6.x.
+  postgres:
+    urlSecret:
+      name: radar-cloudnative-postgresql-managementportal
+    userSecret:
+      name: radar-cloudnative-postgresql-managementportal
+    passwordSecret:
+      name: radar-cloudnative-postgresql-managementportal
   managementportal:
     catalogue_server_enable_auto_import: true
     common_privacy_policy_url: http://info.thehyve.nl/radar-cns-privacy-policy
