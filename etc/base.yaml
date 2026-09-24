@@ -340,7 +340,7 @@ radar_rest_sources_authorizer:
 
 radar_rest_sources_backend:
   _install: false
-  _chart_version: 1.5.12
+  _chart_version: 1.5.13
   _extra_timeout: 0
   replicaCount: 1
   restSourceClients:
@@ -348,10 +348,6 @@ radar_rest_sources_backend:
       enable: "false"
     garmin:
       enable: "false"
-  restSourceClientSubscriptions:
-    googlehealth:
-      # Chart 1.5.12 enables this by default, but no released app version supports it yet.
-      enabled: false
   # -- Remove when running with ory hydra/kratos setups
   public_key_endpoints: []
   # -- Remove when running with ory hydra/kratos setups
@@ -678,7 +674,7 @@ ccSchemaRegistryProxy:
 
 radar_push_endpoint:
   _install: false
-  _chart_version: 0.6.8
+  _chart_version: 0.6.9
   _extra_timeout: 180
   replicaCount: 1
   adminProperties: {}
