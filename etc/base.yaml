@@ -340,6 +340,10 @@ radar_rest_sources_backend:
       enable: "false"
     garmin:
       enable: "false"
+  restSourceClientSubscriptions:
+    googlehealth:
+      # Chart 1.5.12 enables this by default, but no released app version supports it yet.
+      enabled: false
   # -- Remove when running with ory hydra/kratos setups
   public_key_endpoints: []
   # -- Remove when running with ory hydra/kratos setups
