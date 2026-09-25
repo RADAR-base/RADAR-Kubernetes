@@ -51,6 +51,12 @@ From repository root (this directory):
 - Run by tag (if you add tags like @playwright):
   `behave --tags=@playwright`
 
+### UI scenarios in the default run
+
+`management_portal_login.feature` signs in through the Management Portal's own login page (internal IDP and
+authserver, the default in this release). It runs as part of a plain `behave` run, so CI needs the Playwright
+browser installed (`python -m playwright install chromium`).
+
 ### Scenarios that need Ory Kratos/Hydra (`@ory`)
 
 The UI login scenarios in `user_authentication.feature` are tagged `@ory`. They test the login flow of the
