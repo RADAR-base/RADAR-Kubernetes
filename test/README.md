@@ -55,7 +55,7 @@ From repository root (this directory):
 
 `management_portal_login.feature` signs in through the Management Portal's own login page (internal IDP and
 authserver, the default in this release). It runs as part of a plain `behave` run, so CI needs the Playwright
-browser installed (`python -m playwright install chromium`).
+browser installed (`python3 -m playwright install chromium`).
 
 ### Scenarios that need Ory Kratos/Hydra (`@ory`)
 
