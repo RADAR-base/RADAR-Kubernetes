@@ -1,5 +1,10 @@
 image:
   repository: bitnamilegacy/minio
+clientImage:
+  repository: bitnamilegacy/minio-client
+volumePermissions:
+  image:
+    repository: bitnamilegacy/os-shell
 ## @param mode MinIO&reg; server mode (`standalone` or `distributed`)
 ## ref: https://docs.minio.io/docs/distributed-minio-quickstart-guide
 ##
