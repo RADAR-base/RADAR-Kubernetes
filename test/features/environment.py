@@ -1,6 +1,7 @@
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import sync_playwright, expect
 from pages.management_portal_page import ManagementPortalPage
 from pages.login_page import LoginPage
+from pages.mp_login_page import MpLoginPage
 
 def before_all(context):
     context.cache = {
@@ -21,27 +22,32 @@ def before_all(context):
         "database": {},
         "storage": {},
     }
-    context.playwright = None
-    context.browser = None
+    # Created here, at the root of the context, so that a browser started in a scenario hook
+    # outlives that scenario (behave removes attributes set during a scenario when it ends).
+    context.browser_state = {"playwright": None, "browser": None}
     context.page = None
 
-def start_browser(context):
-    # Playwright supports two variations of the API: synchronous and asynchronous.
-    # Currently using the synchronous one for simplicity, which could be changed to `async_playwright` if needed
-    context.playwright = sync_playwright().start()
-    dev_mode = context.config.userdata.get("dev_mode", "").lower() == "true"
-    context.browser = context.playwright.chromium.launch(headless=(not dev_mode))
+def get_browser(context):
+    state = context.browser_state
+    if state["browser"] is None:
+        # Playwright supports two variations of the API: synchronous and asynchronous.
+        # Currently using the synchronous one for simplicity, which could be changed to `async_playwright` if needed
+        state["playwright"] = sync_playwright().start()
+        dev_mode = context.config.userdata.get("dev_mode", "").lower() == "true"
+        state["browser"] = state["playwright"].chromium.launch(headless=(not dev_mode))
+        # Redirects through the login pages can take a while on a busy test cluster
+        expect.set_options(timeout=int(context.config.userdata.get("timeout_s", 10)) * 1000)
+    return state["browser"]
 
 def before_scenario(context, scenario):
     if "playwright" in scenario.effective_tags:
         # Start the browser only when a @playwright scenario actually runs, so that test runs
-        # without UI scenarios (e.g. the default run, which excludes @ory) don't need a browser installed.
-        if context.browser is None:
-            start_browser(context)
+        # without UI scenarios don't need a browser installed.
         dev_mode = context.config.userdata.get("dev_mode", "").lower() == "true"
-        context.page = context.browser.new_page()
+        context.page = get_browser(context).new_page()
         context.login_page = LoginPage(context.page, dev_mode)
         context.management_portal_page = ManagementPortalPage(context.page, dev_mode)
+        context.mp_login_page = MpLoginPage(context.page, dev_mode)
 
 def after_scenario(context, scenario):
     if context.page:
@@ -49,7 +55,8 @@ def after_scenario(context, scenario):
         context.page = None
 
 def after_all(context):
-    if context.browser:
-        context.browser.close()
-    if context.playwright:
-        context.playwright.stop()
+    state = context.browser_state
+    if state["browser"]:
+        state["browser"].close()
+    if state["playwright"]:
+        state["playwright"].stop()
