@@ -680,6 +680,9 @@ velero:
   _chart_version: 0.4.2
   _extra_timeout: 0
   objectStorageBackupReplicaCount: 1
+  mc_image:
+    registry: docker.io
+    repository: bitnamilegacy/minio-client
   backup:
     address: s3.amazon.com  # protocol should not be specified
     bucket: radar-base-backups
