@@ -37,7 +37,9 @@ jobs:
           ./.github/ci_config/bin/install-dependencies
 
       - name: Install Python dependencies
-        run: pip install -r test/features/requirements.txt
+        run: |
+          pip install -r test/features/requirements.txt
+          python -m playwright install chromium
 
       - name: Prepare the environment (add secrets and enable installation of all components)
         run: |

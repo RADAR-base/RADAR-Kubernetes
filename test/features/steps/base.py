@@ -32,6 +32,15 @@ def get_secret(*path_elements, context):
             context.cache["secrets"] = yaml.safe_load(file)
     return reduce(operator.getitem, path_elements, context.cache["secrets"])
 
+def get_credential_value(context, value):
+    if value.startswith("$"):
+        var_name = value[1:] # Get name without the $
+        user_val = context.config.userdata.get(var_name.lower())
+        if user_val:
+            return user_val
+        raise ValueError(f"Could not resolve placeholder: {value}")
+    return value
+
 def format_url(path, context):
     return f'{context.config.userdata["url"]}/{path}'
 
