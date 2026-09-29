@@ -20,6 +20,7 @@ radar_output:
     index:
       fullSyncInterval: 5 # seconds
       emptyDirectorySyncInterval: 5 # seconds
+      incrementalSyncInterval: 5 # seconds
 radar_rest_sources_backend:
   _install: true
   restSourceClients:

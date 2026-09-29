@@ -605,7 +605,7 @@ s3_proxy:
 
 radar_output:
   _install: true
-  _chart_version: 1.2.8
+  _chart_version: 1.2.11
   _extra_timeout: 0
   replicaCount: 1
   source:
