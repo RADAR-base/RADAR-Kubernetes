@@ -39,12 +39,15 @@ def get_mp_token(context):
     if context.cache["management_portal_token"] is not None:
         return context.cache["management_portal_token"]
     mp_admin_password = get_secret('management_portal', 'managementportal', 'common_admin_password', context=context)
+    # Management Portal 3.x requires the frontend client's secret; 2.x also accepted it without.
+    mp_frontend_client_secret = get_secret('management_portal', 'managementportal', 'frontend_client_secret', context=context)
     headers = {
         'Accept': 'application/json',
         'Content-Type': 'application/x-www-form-urlencoded'
     }
     data={
         'client_id': 'ManagementPortalapp',
+        'client_secret': mp_frontend_client_secret,
         'username': 'admin',
         'password': mp_admin_password,
         'grant_type': 'password',
