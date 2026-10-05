@@ -1,8 +1,8 @@
 # SeaweedFS object storage
 
-RADAR-Kubernetes stores the intermediate and output data (and, if enabled, the database backups) in an S3 object
-storage in the cluster. This is minio by default. [SeaweedFS](https://github.com/seaweedfs/seaweedfs) can be used
-instead; it is expected to replace minio in a future release.
+RADAR-Kubernetes by default stores the intermediate and output data (and, if enabled, the database backups) in an 
+S3 object storage in the cluster. This is minio by default. [SeaweedFS](https://github.com/seaweedfs/seaweedfs) can be used instead; it is expected 
+to replace minio in a future release.
 
 <!-- TOC -->
 * [SeaweedFS object storage](#seaweedfs-object-storage)
