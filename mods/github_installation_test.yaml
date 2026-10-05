@@ -49,3 +49,17 @@ redis:
 
 radar_upload_postgresql:
   _install: false
+# Smallest SeaweedFS that passes the e2e tests (on top of mods/minimal.yaml): measured ~200Mi memory for all
+# SeaweedFS pods together and less than 2Mi of data. No admin UI pod.
+radar_seaweedfs:
+  master:
+    persistence:
+      size: 128Mi
+  volume:
+    storage:
+      size: 512Mi
+  filer:
+    persistence:
+      size: 256Mi
+  admin:
+    enabled: false
