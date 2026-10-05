@@ -1,0 +1,17 @@
+# Loaded when object_storage is 'seaweedfs': installs SeaweedFS instead of minio and points the services that use
+# the in-cluster S3 storage to it.
+minio:
+  _install: false
+radar_seaweedfs:
+  _install: true
+radar_s3_connector:
+  s3Endpoint: http://radar-seaweedfs-s3:8333/
+radar_output:
+  source:
+    s3:
+      endpoint: http://radar-seaweedfs-s3:8333/
+  target:
+    s3:
+      endpoint: http://radar-seaweedfs-s3:8333/
+radar_upload_source_connector:
+  s3Endpoint: http://radar-seaweedfs-s3:8333/
