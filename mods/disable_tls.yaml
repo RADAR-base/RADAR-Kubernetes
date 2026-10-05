@@ -64,6 +64,13 @@ minio:
     tls: false
   apiIngress:
     tls: false
+radar_seaweedfs:
+  s3:
+    ingress:
+      tls: false
+  admin:
+    ingress:
+      tls: false
 cp_schema_registry:
   ingress:
     tls: []

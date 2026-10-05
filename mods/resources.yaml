@@ -512,6 +512,32 @@ minio:
 #      cpu: 1
       memory: 2Gi
 
+radar_seaweedfs:
+  master:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      memory: 512Mi
+  volume:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      memory: 2Gi
+  filer:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      memory: 1Gi
+  s3:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+
 kube_prometheus_stack:
   kube-prometheus-stack:
     prometheus-node-exporter:

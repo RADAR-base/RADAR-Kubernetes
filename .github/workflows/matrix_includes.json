@@ -5,6 +5,12 @@
     "runOnBranch": "always"
   },
   {
+    "KUBECTL_VERSION": "v1.34.0-seaweedfs",
+    "K3S_VERSION": "v1.34.3+k3s1",
+    "OBJECT_STORAGE": "seaweedfs",
+    "runOnBranch": "always"
+  },
+  {
     "KUBECTL_VERSION": "v1.33.0",
     "K3S_VERSION": "v1.33.2+k3s1",
     "runOnBranch": "main"

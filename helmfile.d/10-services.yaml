@@ -5,6 +5,16 @@ bases:
 
 {{ readFile "../etc/helmfile-templates.yaml" }}
 
+{{- $objectStorage := .Values | get "object_storage" "minio" }}
+{{- if not (has $objectStorage (list "minio" "seaweedfs")) }}
+{{- fail (printf "object_storage must be 'minio' or 'seaweedfs', not '%s'" $objectStorage) }}
+{{- end }}
+{{- if and (eq $objectStorage "seaweedfs") .Values.minio._install }}
+{{- fail "object_storage is 'seaweedfs', but mods/seaweedfs.yaml is not loaded: add it to environments.yaml (see environments.yaml.tmpl)" }}
+{{- end }}
+{{- /* S3 endpoint of the in-cluster object storage, for services whose endpoint is not set in etc/base.yaml. */}}
+{{- $objectStorageEndpoint := ternary "http://radar-seaweedfs-s3:8333" "http://minio:9000" (eq $objectStorage "seaweedfs") }}
+
 releases:
   - name: mongodb
     namespace: graylog
@@ -212,9 +222,10 @@ releases:
     set:
       - name: ingress.hosts
         values: [ {{ .Values.server_name }} ]
+      {{- $objectStorageConsole := or .Values.minio._install (and .Values.radar_seaweedfs._install (dig "admin" "enabled" false .Values.radar_seaweedfs)) }}
       - name: s3.enabled
-        value: {{ dig "s3" "enabled" .Values.minio._install .Values.radar_home }}
-      {{ if dig "s3" "enabled" .Values.minio._install .Values.radar_home }}
+        value: {{ dig "s3" "enabled" $objectStorageConsole .Values.radar_home }}
+      {{ if dig "s3" "enabled" $objectStorageConsole .Values.radar_home }}
       - name: s3.url
         value: {{ dig "s3" "url" (printf "https://s3.%s/login" .Values.server_name) .Values.radar_home }}
       {{ end }}
@@ -271,6 +282,8 @@ releases:
     values:
       - {{ .Values.cloudnative_postgresql | toYaml | indent 8 | trim }}
     set:
+      - name: cluster.backups.endpointURL
+        value: {{ dig "cluster" "backups" "endpointURL" $objectStorageEndpoint .Values.cloudnative_postgresql }}
       - name: cluster.backups.s3.accessKey
         value: {{ .Values.s3_access_key }}
       - name: cluster.backups.s3.secretKey
@@ -563,6 +576,8 @@ releases:
         value: grafana-timescaledb
       - name: timescaledb.cluster.recovery.clusterName
         value: grafana-timescaledb-cluster
+      - name: timescaledb.cluster.backups.endpointURL
+        value: {{ dig "timescaledb" "cluster" "backups" "endpointURL" $objectStorageEndpoint .Values.radar_jdbc_connector_grafana }}
       - name: timescaledb.cluster.backups.s3.accessKey
         value: {{ .Values.s3_access_key }}
       - name: timescaledb.cluster.backups.s3.secretKey
@@ -594,6 +609,8 @@ releases:
         value: data-dashboard-timescaledb
       - name: timescaledb.cluster.recovery.clusterName
         value: data-dashboard-timescaledb-cluster
+      - name: timescaledb.cluster.backups.endpointURL
+        value: {{ dig "timescaledb" "cluster" "backups" "endpointURL" $objectStorageEndpoint .Values.radar_jdbc_connector_data_dashboard_backend }}
       - name: timescaledb.cluster.backups.s3.accessKey
         value: {{ .Values.s3_access_key }}
       - name: timescaledb.cluster.backups.s3.secretKey
@@ -625,6 +642,8 @@ releases:
         value: realtime-dashboard-timescaledb
       - name: timescaledb.cluster.recovery.clusterName
         value: realtime-dashboard-timescaledb-cluster
+      - name: timescaledb.cluster.backups.endpointURL
+        value: {{ dig "timescaledb" "cluster" "backups" "endpointURL" $objectStorageEndpoint .Values.radar_jdbc_connector_realtime_dashboard }}
       - name: timescaledb.cluster.backups.s3.accessKey
         value: {{ .Values.s3_access_key }}
       - name: timescaledb.cluster.backups.s3.secretKey
@@ -821,6 +840,47 @@ releases:
       - name: metrics.prometheusRule.enabled
         value: {{ .Values.kube_prometheus_stack._install }}
 
+  - name: seaweedfs-operator
+    chart: radar/seaweedfs-operator
+    version: {{ .Values.seaweedfs_operator._chart_version }}
+    installed: {{ .Values.radar_seaweedfs._install }}
+    timeout: {{ add .Values.base_timeout .Values.seaweedfs_operator._extra_timeout }}
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.seaweedfs_operator | toYaml | indent 8 | trim }}
+    set:
+      - name: serviceMonitor.enabled
+        value: {{ .Values.kube_prometheus_stack._install }}
+      - name: grafanaDashboard.enabled
+        value: {{ .Values.kube_prometheus_stack._install }}
+
+  - name: radar-seaweedfs
+    chart: radar/radar-seaweedfs
+    version: {{ .Values.radar_seaweedfs._chart_version }}
+    installed: {{ .Values.radar_seaweedfs._install }}
+    timeout: {{ add .Values.base_timeout .Values.radar_seaweedfs._extra_timeout }}
+    needs:
+      - seaweedfs-operator
+    <<: *logFailedRelease
+    values:
+      - {{ .Values.radar_seaweedfs | toYaml | indent 8 | trim }}
+    set:
+      - name: s3.identities.radar.credentials.accessKey
+        value: {{ .Values.s3_access_key }}
+      - name: s3.identities.radar.credentials.secretKey
+        value: {{ .Values.s3_secret_key }}
+      # The ingresses would use the same host names as minio.
+      - name: s3.ingress.enabled
+        value: {{ and (dig "s3" "ingress" "enabled" false .Values.radar_seaweedfs) (not .Values.minio._install) }}
+      - name: s3.ingress.host
+        value: "api.s3.{{ .Values.server_name }}"
+      - name: admin.ingress.enabled
+        value: {{ and (dig "admin" "ingress" "enabled" false .Values.radar_seaweedfs) (not .Values.minio._install) }}
+      - name: admin.ingress.host
+        value: "s3.{{ .Values.server_name }}"
+      - name: metrics.enabled
+        value: {{ .Values.kube_prometheus_stack._install }}
+
   - name: radar-s3-connector
     chart: radar/radar-s3-connector
     version: {{ .Values.radar_s3_connector._chart_version }}
@@ -830,6 +890,7 @@ releases:
       # When catalog server is 'ready', kafka can be used.
       - catalog-server
       {{ if .Values.minio._install }}- minio{{ end }}
+      {{ if .Values.radar_seaweedfs._install }}- radar-seaweedfs{{ end }}
     <<: *logFailedRelease
     values:
       - {{ .Values.radar_s3_connector | toYaml | indent 8 | trim }}
@@ -869,6 +930,7 @@ releases:
       {{ if .Values.redis._install }}- redis{{ end }}
       {{ if .Values.radar_redis._install }}- radar-redis{{ end }}
       {{ if .Values.minio._install }}- minio{{ end }}
+      {{ if .Values.radar_seaweedfs._install }}- radar-seaweedfs{{ end }}
     values:
       - {{ .Values.radar_output | toYaml | indent 8 | trim }}
     set:
@@ -933,6 +995,7 @@ releases:
     needs:
       - management-portal
       - radar-upload-connect-backend
+      {{ if .Values.radar_seaweedfs._install }}- radar-seaweedfs{{ end }}
       {{ if .Values.cp_schema_registry._install }}- cp-schema-registry{{ end }}
       {{ if .Values.radar_kafka_stack._install }}- radar-kafka{{ end }}
     values:

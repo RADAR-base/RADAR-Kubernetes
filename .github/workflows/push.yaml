@@ -45,6 +45,8 @@ jobs:
           cp etc/base-secrets.yaml etc/secrets.yaml
           sed -i "/secrets.yaml/a \      - ../.github/ci_config/secrets.yaml.gotmpl" environments.yaml
           sed -i '/_install: /s/false/true/' etc/production.yaml
+          # SeaweedFS replaces minio when a test sets object_storage to 'seaweedfs', it is not installed next to it.
+          yq -i '.radar_seaweedfs._install = false' etc/production.yaml
           # Deploy a minimal deployment accessible on 'localhost:80' with monitoring enabled
           sed -i '/enable_logging_monitoring: /s/false/true/' etc/production.yaml
           sed -i '/server_name: /s/example.com/localhost/' etc/production.yaml
@@ -111,6 +113,10 @@ jobs:
       - name: Set kubeContext
         run: |
           sed -i "s/kubeContext: .*/kubeContext: k3d-${{ matrix.KUBECTL_VERSION }}/" etc/production.yaml
+
+      - name: Set object storage
+        run: |
+          yq -i '.object_storage = "${{ matrix.OBJECT_STORAGE || 'minio' }}"' etc/production.yaml
 
       - name: Install RADAR-Kubernetes
         env:

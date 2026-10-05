@@ -26,8 +26,13 @@ enable_logging_monitoring: false
 # Enable TLS redirection and retrieval of Let's Encrypt certificates.
 # Can be disabled when TLS termination is handled upstream of the on-cluster Nginx reverse proxy.
 enable_tls: true
+# Docker images of Minio object storage are available via paid subscriptions by Minio. RADAR-base
+# will deprecate Minio and try Seaweedfs as replacement. In order to deploy and test Seaweedfs set value
+# to 'seaweedfs'. Note: switching an existing installation does not copy the data; it is strongly disencouraged to
+# switch on a running deployment (see docs/seaweedfs.md).
+object_storage: minio
 
-# Minimal deployment for development (disables TLS, monitoring and logging, sets kafka and minio brokers to 1).
+# Minimal deployment for development (disables TLS, monitoring and logging, sets kafka and object storage replicas to 1).
 dev_deployment: false
 # E2e test deployment (applies very fast application loop timings for tests).
 e2e_test: false
@@ -216,7 +221,7 @@ cloudnative_postgresql:
     backups:
     # Set to 'true' for storing backups in S3 object store.
       enabled: false
-    # Uncomment and update when running on AWS S3.
+    # Defaults to the in-cluster object storage (see object_storage). Uncomment and update when running on AWS S3.
     #  endpointURL: https://s3.eu-central-1.amazonaws.com
     #  s3:
     #    bucket: postgresql-backups
@@ -451,7 +456,7 @@ radar_jdbc_connector_grafana:
       backups:
       # Set to 'true' for storing backups in S3 object store.
         enabled: false
-      # Uncomment and update when running on AWS S3.
+      # Defaults to the in-cluster object storage (see object_storage). Uncomment and update when running on AWS S3.
       #  endpointURL: https://s3.eu-central-1.amazonaws.com
       #  s3:
       #    bucket: postgresql-backups
@@ -478,7 +483,7 @@ radar_jdbc_connector_data_dashboard_backend:
       # Set to 'true' for storing backups in S3 object store.
       backups:
         enabled: false
-      # Uncomment and update when running on AWS S3.
+      # Defaults to the in-cluster object storage (see object_storage). Uncomment and update when running on AWS S3.
       #  endpointURL: https://s3.eu-central-1.amazonaws.com
       #  s3:
       #    bucket: postgresql-backups
@@ -505,7 +510,7 @@ radar_jdbc_connector_realtime_dashboard:
       # Set to 'true' for storing backups in S3 object store.
       backups:
         enabled: false
-      # Uncomment and update when running on AWS S3.
+      # Defaults to the in-cluster object storage (see object_storage). Uncomment and update when running on AWS S3.
       #  endpointURL: https://s3.eu-central-1.amazonaws.com
       #  s3:
       #    bucket: postgresql-backups
@@ -584,6 +589,38 @@ minio:
     ##     policies:
     ##       - read-output
     users: []
+
+seaweedfs_operator:
+  _chart_version: 0.1.43
+  _extra_timeout: 0
+
+# SeaweedFS S3 object storage, installed instead of minio when object_storage is 'seaweedfs'.
+# Set _install to 'true' to run it next to minio, e.g. to copy the data before switching (see docs/seaweedfs.md).
+# Its S3 API and admin UI ingresses are only enabled when minio is not installed.
+radar_seaweedfs:
+  _install: false
+  _chart_version: 0.1.0
+  _extra_timeout: 210
+  volume:
+    # Number of volume servers. With the default replication ("001"), every file is stored on two of them.
+    replicas: 2
+    storage:
+      # PVC size of each volume server.
+      size: 20Gi
+  s3:
+    # S3 API at https://api.s3.<server_name>, using s3_access_key and s3_secret_key.
+    ingress:
+      enabled: true
+    # Extra S3 identities can be added here, with their credentials in etc/secrets.yaml. E.g. read-only access to
+    # the output data:
+    # identities:
+    #   read-output:
+    #     actions: ["Read:radar-output-storage", "List:radar-output-storage"]
+  admin:
+    # SeaweedFS admin UI at https://s3.<server_name>, user 'admin'.
+    enabled: true
+    ingress:
+      enabled: true
 
 radar_s3_connector:
   # set to true if radar-s3-connector should be installed

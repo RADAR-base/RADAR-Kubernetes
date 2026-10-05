@@ -6,6 +6,9 @@ environments:
       - ../etc/production.yaml.gotmpl
       - ../etc/secrets.yaml
       - ../mods/confluent_kafka.yaml
+    {{ if eq (.Values | get "object_storage" "minio") "seaweedfs" }}
+      - ../mods/seaweedfs.yaml
+    {{ end }}
     {{ if not .Values.enable_tls }}
       - ../mods/disable_tls.yaml
     {{ end }}

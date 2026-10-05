@@ -34,6 +34,17 @@ minio:
   mode: standalone
   persistence:
     size: 1Gi
+radar_seaweedfs:
+  # Single server per component, without replication
+  replication: "000"
+  master:
+    replicas: 1
+  volume:
+    replicas: 1
+    storage:
+      size: 1Gi
+  filer:
+    replicas: 1
 elasticsearch:
   replicas: 1
   minimumMasterNodes: 1
