@@ -82,9 +82,9 @@ to get started.
 Currently RADAR-Kubernetes is tested and supported on following component versions:
 | Component | Version |
 | ---- | ------- |
-| Kubernetes | v1.30, v1.31, v1.32 and v1.33 |
-| K3s | v1.30.6+k3s1, v1.31.10+k3s1, v1.32.6+k3s1 and v1.33.2+k3s1 |
-| Kubectl | v1.30, v1.31, v1.32 and v1.33 |
+| Kubernetes | v1.30, v1.31, v1.32, v1.33, v1.34, v1.35, v1.36 and v1.37 |
+| K3s | v1.30.14+k3s1, v1.31.10+k3s1, v1.32.6+k3s1, v1.33.2+k3s1, v1.34.3+k3s1, v1.35.9+k3s1, v1.36.5+k3s1 and v1.37.1+k3s1 |
+| Kubectl | v1.30, v1.31, v1.32, v1.33, v1.34, v1.35, v1.36 and v1.37 |
 | Helm | v3.16.3 |
 | Helm diff | 3.9.12 |
 | Helmfile | v0.169.1 |
