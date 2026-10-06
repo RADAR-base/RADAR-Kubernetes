@@ -32,6 +32,15 @@ def get_secret(*path_elements, context):
             context.cache["secrets"] = yaml.safe_load(file)
     return reduce(operator.getitem, path_elements, context.cache["secrets"])
 
+def get_credential_value(context, value):
+    if value.startswith("$"):
+        var_name = value[1:] # Get name without the $
+        user_val = context.config.userdata.get(var_name.lower())
+        if user_val:
+            return user_val
+        raise ValueError(f"Could not resolve placeholder: {value}")
+    return value
+
 def format_url(path, context):
     return f'{context.config.userdata["url"]}/{path}'
 
@@ -39,12 +48,15 @@ def get_mp_token(context):
     if context.cache["management_portal_token"] is not None:
         return context.cache["management_portal_token"]
     mp_admin_password = get_secret('management_portal', 'managementportal', 'common_admin_password', context=context)
+    # Management Portal 3.x requires the frontend client's secret; 2.x also accepted it without.
+    mp_frontend_client_secret = get_secret('management_portal', 'managementportal', 'frontend_client_secret', context=context)
     headers = {
         'Accept': 'application/json',
         'Content-Type': 'application/x-www-form-urlencoded'
     }
     data={
         'client_id': 'ManagementPortalapp',
+        'client_secret': mp_frontend_client_secret,
         'username': 'admin',
         'password': mp_admin_password,
         'grant_type': 'password',

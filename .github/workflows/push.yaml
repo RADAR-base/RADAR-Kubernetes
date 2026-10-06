@@ -39,6 +39,9 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r test/features/requirements.txt
 
+      - name: Install the Playwright browser for the UI tests
+        run: python3 -m playwright install chromium
+
       - name: Prepare the environment (add secrets and enable installation of all components)
         run: |
           DNAME='CN=CI,O=TheHyve,L=Utrecht,C=NL' ./bin/init
