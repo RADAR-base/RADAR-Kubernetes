@@ -17,9 +17,9 @@ releases:
       - "../etc/mongodb/values.yaml"
       - {{ .Values.mongodb | toYaml | indent 8 | trim }}
     set:
-      {{ if .Values.mongodb.registry_server }}
+      {{ if dig "registry_server" "" .Values.mongodb }}
       - name: global.imageRegistry
-        value: {{ .Values.registry }}/{{ .Values.mongodb.registry_server }}
+        value: {{ .Values.registry }}/{{ dig "registry_server" "" .Values.mongodb }}
       {{ end }}
 
   - name: elasticsearch
@@ -33,9 +33,9 @@ releases:
       - "../etc/elasticsearch/values.yaml"
       - {{ .Values.elasticsearch | toYaml | indent 8 | trim }}
     set:
-      {{ if .Values.elasticsearch.registry_server }}
+      {{ if dig "registry_server" "" .Values.elasticsearch }}
       - name: image
-        value: {{ .Values.registry }}/{{ .Values.elasticsearch.registry_server }}/{{ .Values.elasticsearch.image }}
+        value: {{ .Values.registry }}/{{ dig "registry_server" "" .Values.elasticsearch }}/{{ dig "image" "docker.elastic.co/elasticsearch/elasticsearch" .Values.elasticsearch }}
       {{ end }}
 
   - name: graylog
@@ -66,11 +66,11 @@ releases:
       - name: graylog.ingress.tls[0].hosts
         values: ["graylog.{{ .Values.server_name }}"]
         {{- end }}
-      {{ if .Values.graylog.registry_server }}
+      {{ if dig "registry_server" "" .Values.graylog }}
       - name: graylog.image.repository
-        value: {{ .Values.registry }}/{{ .Values.graylog.registry_server }}/{{ .Values.graylog.graylog.image.repository }}
+        value: {{ .Values.registry }}/{{ dig "registry_server" "" .Values.graylog }}/{{ dig "graylog" "image" "repository" "graylog/graylog" .Values.graylog }}
       - name: graylog.init.image.repository
-        value: {{ .Values.registry }}/{{ .Values.graylog.registry_server }}/{{ .Values.graylog.graylog.init.image.repository }}
+        value: {{ .Values.registry }}/{{ dig "registry_server" "" .Values.graylog }}/{{ dig "graylog" "init" "image" "repository" "alpine" .Values.graylog }}
       {{ end }}
 
   - name: fluent-bit
@@ -87,9 +87,9 @@ releases:
     set:
       - name: server_name
         value: {{ .Values.server_name }}
-      {{ if .Values.fluent_bit.registry_server }}
+      {{ if dig "registry_server" "" .Values.fluent_bit }}
       - name: image.repository
-        value: {{ .Values.registry }}/{{ .Values.fluent_bit.registry_server }}/{{ .Values.fluent_bit.image.repository }}
+        value: {{ .Values.registry }}/{{ dig "registry_server" "" .Values.fluent_bit }}/{{ dig "image" "repository" "cr.fluentbit.io/fluent/fluent-bit" .Values.fluent_bit }}
       {{ end }}
 
   - name: ingress-nginx
@@ -168,11 +168,11 @@ releases:
       - name: ingress.tls[0].hosts
         values: ["{{ .Values.server_name }}"]
       {{- end }}
-      {{ if .Values.cp_schema_registry.registry_server }}
+      {{ if dig "registry_server" "" .Values.cp_schema_registry }}
       - name: image
-        value: {{ .Values.registry }}/{{ .Values.cp_schema_registry.registry_server }}/{{ .Values.cp_schema_registry.image }}
+        value: {{ .Values.registry }}/{{ dig "registry_server" "" .Values.cp_schema_registry }}/{{ dig "image" "confluentinc/cp-schema-registry" .Values.cp_schema_registry }}
       - name: prometheus.jmx.image
-        value: {{ .Values.registry }}/{{ .Values.cp_schema_registry.registry_server }}/{{ .Values.cp_schema_registry.prometheus.jmx.image }}
+        value: {{ .Values.registry }}/{{ dig "registry_server" "" .Values.cp_schema_registry }}/{{ dig "prometheus" "jmx" "image" "solsson/kafka-prometheus-jmx-exporter@sha256" .Values.cp_schema_registry }}
       {{ end }}
 
   - name: radar-kafka
@@ -226,9 +226,9 @@ releases:
       - name: schema_registry
         value: {{ .Values.confluent_cloud.cc.schemaRegistryUrl }}
       {{ end }}
-      {{ if .Values.catalog_server.registry_server }}
+      {{ if dig "registry_server" "" .Values.catalog_server }}
       - name: image.registry
-        value: {{ .Values.registry }}/{{ .Values.catalog_server.registry_server }}
+        value: {{ .Values.registry }}/{{ dig "registry_server" "" .Values.catalog_server }}
       {{ end }}
 
   - name: radar-home
@@ -270,9 +270,9 @@ releases:
       - name: logging.url
         value: {{ dig "logging" "url" (printf "https://graylog.%s/" .Values.server_name) .Values.radar_home }}
       {{ end }}
-      {{ if .Values.radar_home.registry_server }}
+      {{ if dig "registry_server" "" .Values.radar_home }}
       - name: image.registry
-        value: {{ .Values.registry }}/{{ .Values.radar_home.registry_server }}
+        value: {{ .Values.registry }}/{{ dig "registry_server" "" .Values.radar_home }}
       {{ end }}
 
   - name: postgresql
@@ -360,9 +360,9 @@ releases:
       - name: oauth_clients.grafana_dashboard.redirect_uri
         values:
           - "https://dashboard.{{ .Values.server_name }}/login/generic_oauth"
-      {{ if .Values.management_portal.registry_server }}
+      {{ if dig "registry_server" "" .Values.management_portal }}
       - name: image.registry
-        value: {{ .Values.registry }}/{{ .Values.management_portal.registry_server }}
+        value: {{ .Values.registry }}/{{ dig "registry_server" "" .Values.management_portal }}
       {{ end }}
 
   - name: app-config
@@ -504,9 +504,9 @@ releases:
     values:
       - {{ .Values.data_dashboard_timescaledb | toYaml | indent 8 | trim }}
     set:
-      {{ if .Values.data_dashboard_timescaledb.registry_server }}
+      {{ if dig "registry_server" "" .Values.data_dashboard_timescaledb }}
       - name: postgresql.global.imageRegistry
-        value: {{ .Values.registry }}/{{ .Values.data_dashboard_timescaledb.registry_server }}
+        value: {{ .Values.registry }}/{{ dig "registry_server" "" .Values.data_dashboard_timescaledb }}
       {{ end }}
 
   - name: grafana-metrics-timescaledb
@@ -518,9 +518,9 @@ releases:
     values:
       - {{ .Values.grafana_metrics_timescaledb | toYaml | indent 8 | trim }}
     set:
-      {{ if .Values.grafana_metrics_timescaledb.registry_server }}
+      {{ if dig "registry_server" "" .Values.grafana_metrics_timescaledb }}
       - name: postgresql.global.imageRegistry
-        value: {{ .Values.registry }}/{{ .Values.grafana_metrics_timescaledb.registry_server }}
+        value: {{ .Values.registry }}/{{ dig "registry_server" "" .Values.grafana_metrics_timescaledb }}
       {{ end }}
 
   - name: realtime-dashboard-timescaledb
@@ -532,9 +532,9 @@ releases:
     values:
       - {{ .Values.realtime_dashboard_timescaledb | toYaml | indent 8 | trim }}
     set:
-      {{ if .Values.realtime_dashboard_timescaledb.registry_server }}
+      {{ if dig "registry_server" "" .Values.realtime_dashboard_timescaledb }}
       - name: postgresql.global.imageRegistry
-        value: {{ .Values.registry }}/{{ .Values.realtime_dashboard_timescaledb.registry_server }}
+        value: {{ .Values.registry }}/{{ dig "registry_server" "" .Values.realtime_dashboard_timescaledb }}
       {{ end }}
 
   - name: radar-grafana
@@ -556,9 +556,9 @@ releases:
         value: {{ .Values.grafana_metrics_endpoint_username }}
       - name: "grafana.grafana\\.ini.metrics.basic_auth_password"
         value: {{ .Values.grafana_metrics_endpoint_password }}
-      {{ if .Values.radar_grafana.registry_server }}
+      {{ if dig "registry_server" "" .Values.radar_grafana }}
       - name: grafana.image.registry
-        value: {{ .Values.registry }}/{{ .Values.radar_grafana.registry_server }}
+        value: {{ .Values.registry }}/{{ dig "registry_server" "" .Values.radar_grafana }}
       {{ end }}
 
   - name: data-dashboard-backend
@@ -628,9 +628,9 @@ releases:
         value: {{ .Values.s3_access_key }}
       - name: timescaledb.cluster.recovery.s3.secretKey
         value: {{ .Values.s3_secret_key }}
-      {{ if .Values.radar_jdbc_connector_grafana.registry_server }}
+      {{ if dig "registry_server" "" .Values.radar_jdbc_connector_grafana }}
       - name: image.registry
-        value: {{ .Values.registry }}/{{ .Values.radar_jdbc_connector_grafana.registry_server }}
+        value: {{ .Values.registry }}/{{ dig "registry_server" "" .Values.radar_jdbc_connector_grafana }}
       {{ end }}
 
   - name: radar-jdbc-connector-data-dashboard
@@ -663,9 +663,9 @@ releases:
         value: {{ .Values.s3_access_key }}
       - name: timescaledb.cluster.recovery.s3.secretKey
         value: {{ .Values.s3_secret_key }}
-      {{ if .Values.radar_jdbc_connector_data_dashboard_backend.registry_server }}
+      {{ if dig "registry_server" "" .Values.radar_jdbc_connector_data_dashboard_backend }}
       - name: image.registry
-        value: {{ .Values.registry }}/{{ .Values.radar_jdbc_connector_data_dashboard_backend.registry_server }}
+        value: {{ .Values.registry }}/{{ dig "registry_server" "" .Values.radar_jdbc_connector_data_dashboard_backend }}
       {{ end }}
 
   - name: radar-jdbc-connector-realtime-dashboard
@@ -698,9 +698,9 @@ releases:
         value: {{ .Values.s3_access_key }}
       - name: timescaledb.cluster.recovery.s3.secretKey
         value: {{ .Values.s3_secret_key }}
-      {{ if .Values.radar_jdbc_connector_realtime_dashboard.registry_server }}
+      {{ if dig "registry_server" "" .Values.radar_jdbc_connector_realtime_dashboard }}
       - name: image.registry
-        value: {{ .Values.registry }}/{{ .Values.radar_jdbc_connector_realtime_dashboard.registry_server }}
+        value: {{ .Values.registry }}/{{ dig "registry_server" "" .Values.radar_jdbc_connector_realtime_dashboard }}
       {{ end }}
 
   - name: radar-fitbit-connector
@@ -729,9 +729,9 @@ releases:
       {{- end }}
       - name: oauthClientSecret
         value: {{ dig "radar_fitbit_connector" "client_secret" "" .Values.management_portal.oauth_clients }}
-      {{ if .Values.radar_fitbit_connector.registry_server }}
+      {{ if dig "registry_server" "" .Values.radar_fitbit_connector }}
       - name: image.registry
-        value: {{ .Values.registry }}/{{ .Values.radar_fitbit_connector.registry_server }}
+        value: {{ .Values.registry }}/{{ dig "registry_server" "" .Values.radar_fitbit_connector }}
       {{ end }}
 
   - name: radar-rest-sources-authorizer
@@ -747,9 +747,9 @@ releases:
         values: [{{ .Values.server_name }}]
       - name: serverName
         value: {{ .Values.server_name }}
-      {{ if .Values.radar_rest_sources_authorizer.registry_server }}
+      {{ if dig "registry_server" "" .Values.radar_rest_sources_authorizer }}
       - name: image.registry
-        value: {{ .Values.registry }}/{{ .Values.radar_rest_sources_authorizer.registry_server }}
+        value: {{ .Values.registry }}/{{ dig "registry_server" "" .Values.radar_rest_sources_authorizer }}
       {{ end }}
 
   - name: radar-rest-sources-backend
@@ -789,9 +789,9 @@ releases:
         value: {{ dig "restSourceClients" "garmin" "clientSecret" (dig "garmin" "consumerSecret" "" .Values.radar_push_endpoint) .Values.radar_rest_sources_backend }}
       - name: client_secret
         value: {{ dig "client_secret" (dig "oauth_clients" "radar_rest_sources_auth_backend" "client_secret" "" .Values.management_portal) .Values.radar_rest_sources_backend }}
-      {{ if .Values.radar_rest_sources_backend.registry_server }}
+      {{ if dig "registry_server" "" .Values.radar_rest_sources_backend }}
       - name: image.registry
-        value: {{ .Values.registry }}/{{ .Values.radar_rest_sources_backend.registry_server }}
+        value: {{ .Values.registry }}/{{ dig "registry_server" "" .Values.radar_rest_sources_backend }}
       {{ end }}
 
   - name: radar-oura-connector
@@ -818,9 +818,9 @@ releases:
       {{- end }}
       - name: oauthClientSecret
         value: {{ dig "radar_oura_connector" "client_secret" "" .Values.management_portal.oauth_clients }}
-      {{ if .Values.radar_oura_connector.registry_server }}
+      {{ if dig "registry_server" "" .Values.radar_oura_connector }}
       - name: image.registry
-        value: {{ .Values.registry }}/{{ .Values.radar_oura_connector.registry_server }}
+        value: {{ .Values.registry }}/{{ dig "registry_server" "" .Values.radar_oura_connector }}
       {{ end }}
 
   - name: radar-gateway
@@ -850,9 +850,9 @@ releases:
       - name: bootstrapServers
         value: {{ .Values.confluent_cloud.cc.bootstrapServerurl }}
       {{ end }}
-      {{ if .Values.radar_gateway.registry_server }}
+      {{ if dig "registry_server" "" .Values.radar_gateway }}
       - name: image.registry
-        value: {{ .Values.registry }}/{{ .Values.radar_gateway.registry_server }}
+        value: {{ .Values.registry }}/{{ dig "registry_server" "" .Values.radar_gateway }}
       {{ end }}
 
   - name: radar-integration
@@ -868,9 +868,9 @@ releases:
         values: [{{ .Values.server_name }}]
       - name: oauth_client_secret
         value: {{ dig "oauth_client_secret" (dig "oauth_clients" "radar_redcap_integrator" "client_secret" "" .Values.management_portal) .Values.radar_integration }}
-      {{ if .Values.radar_integration.registry_server }}
+      {{ if dig "registry_server" "" .Values.radar_integration }}
       - name: image.registry
-        value: {{ .Values.registry }}/{{ .Values.radar_integration.registry_server }}
+        value: {{ .Values.registry }}/{{ dig "registry_server" "" .Values.radar_integration }}
       {{ end }}
 
   - name: redis
@@ -936,9 +936,9 @@ releases:
         value: {{ dig "bucketAccessKey" .Values.s3_access_key .Values.radar_s3_connector }}
       - name: bucketSecretKey
         value: {{ dig "bucketSecretKey" .Values.s3_secret_key .Values.radar_s3_connector }}
-      {{ if .Values.radar_s3_connector.registry_server }}
+      {{ if dig "registry_server" "" .Values.radar_s3_connector }}
       - name: image.registry
-        value: {{ .Values.registry }}/{{ .Values.radar_s3_connector.registry_server }}
+        value: {{ .Values.registry }}/{{ dig "registry_server" "" .Values.radar_s3_connector }}
       {{ end }}
 
   - name: s3-proxy
@@ -977,9 +977,9 @@ releases:
         value: {{ dig "target" "s3" "accessToken" .Values.s3_access_key .Values.radar_output }}
       - name: target.s3.secretKey
         value: {{ dig "target" "s3" "secretKey" .Values.s3_secret_key .Values.radar_output }}
-      {{ if .Values.radar_output.registry_server }}
+      {{ if dig "registry_server" "" .Values.radar_output }}
       - name: image.registry
-        value: {{ .Values.registry }}/{{ .Values.radar_output.registry_server }}
+        value: {{ .Values.registry }}/{{ dig "registry_server" "" .Values.radar_output }}
       {{ end }}
 
   - name: radar-upload-postgresql
@@ -1090,8 +1090,8 @@ releases:
       {{ end }}
       - name: garmin.userRepositoryClientSecret
         value: {{ dig "garmin" "userRepositoryClientSecret" (dig "oauth_clients" "radar_push_endpoint" "client_secret" "" .Values.management_portal) .Values.radar_push_endpoint }}
-      {{ if .Values.radar_push_endpoint.registry_server }}
+      {{ if dig "registry_server" "" .Values.radar_push_endpoint }}
       - name: image.registry
-        value: {{ .Values.registry }}/{{ .Values.radar_push_endpoint.registry_server }}
+        value: {{ .Values.registry }}/{{ dig "registry_server" "" .Values.radar_push_endpoint }}
       {{ end }}
 
