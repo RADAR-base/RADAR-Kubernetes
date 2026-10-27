@@ -936,9 +936,9 @@ releases:
         value: {{ dig "bucketAccessKey" .Values.s3_access_key .Values.radar_s3_connector }}
       - name: bucketSecretKey
         value: {{ dig "bucketSecretKey" .Values.s3_secret_key .Values.radar_s3_connector }}
-      {{ if .Values.radar_s.registry_server3_connector }}
+      {{ if .Values.radar_s3_connector.registry_server }}
       - name: image.registry
-        value: {{ .Values.registry }}/{{ .Values.radar_s.registry_server3_connector }}
+        value: {{ .Values.registry }}/{{ .Values.radar_s3_connector.registry_server }}
       {{ end }}
 
   - name: s3-proxy
