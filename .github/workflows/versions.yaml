@@ -20,7 +20,7 @@ jobs:
         with:
           install-helm-plugins: no
           install-kubectl: no
-          helmfile-version: 0.67.0
+          helmfile-version: v0.169.1
           helm-version: v3.17.3
 
       - name: Update versions.md
