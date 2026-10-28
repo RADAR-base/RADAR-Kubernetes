@@ -20,6 +20,12 @@ releases:
         value: {{ dig "local" "accessKey" .Values.s3_access_key .Values.velero }}
       - name: local.secretKey
         value: {{ dig "local" "secretKey" .Values.s3_secret_key .Values.velero }}
+      {{ if .Values.velero.registry_server }}
+      - name: velero.image.repository
+        value: {{ .Values.registry }}/{{ .Values.velero.registry_server }}/{{ dig "velero" "image" "repository" "velero/velero" .Values.velero }}
+      - name: velero.kubectl.image.repository
+        value: {{ .Values.registry }}/{{ .Values.velero.registry_server }}/{{ dig "velero" "kubectl" "image" "repository" "docker.io/bitnami/kubectl" .Values.velero }}
+      {{ end }}
 
   - name: radar-nifi
     namespace: default
@@ -38,3 +44,7 @@ releases:
         value: nifi.{{ .Values.server_name }}
       - name: nifi-cluster.cluster.nifiProperties.webProxyHosts[1]
         value: nifi.{{ .Values.server_name }}:{{ ternary 443 80 .Values.dev_deployment }}
+      {{ if .Values.radar_nifi.registry_server }}
+      - name: nifi-cluster.cluster.image.repository
+        value: {{ .Values.registry }}/{{ .Values.radar_nifi.registry_server }}/{{ dig "nifi-cluster" "cluster" "image" "repository" "apache/nifi" .Values.radar_nifi }}
+      {{ end }}
