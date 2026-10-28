@@ -220,6 +220,36 @@ and [helm-secrets](https://github.com/jkroepke/helm-secrets) but it's outside th
    nano etc/secrets.yaml
    ```
 
+#### Using an image registry mirror / pull-through cache
+
+By default, each chart pulls its image directly from its own upstream registry (`ghcr.io` or
+`docker.io`). If you'd rather route image pulls through your own registry mirror or pull-through
+cache (e.g. an AWS ECR pull-through cache) — to avoid Docker Hub/GHCR rate limits — you can set two
+values in `etc/production.yaml`:
+
+- A top-level `registry` key with your mirror/cache's host, for example:
+
+  ```yaml
+  registry: <account-id>.dkr.ecr.<region>.amazonaws.com
+  ```
+
+- A per-service `registry_server` key, set on whichever services you want routed through the
+  mirror, naming the sub-path/alias your mirror uses for that image's upstream (e.g. a
+  pull-through cache rule name for `ghcr.io` vs one for `docker.io`):
+
+  ```yaml
+  catalog_server:
+    registry_server: radar-base-ghcr
+  mongodb:
+    registry_server: radar-base-docker-hub
+  ```
+
+When `registry_server` is set for a service, its corresponding `helmfile.d` release definition
+overrides that chart's image registry (or, for charts without a native `image.registry` field,
+rebuilds the full image path) to `<registry>/<registry_server>/<original-repository>`. Leaving
+`registry_server` unset for a service keeps that chart's own upstream default untouched, so this is
+entirely opt-in per service.
+
 ### Install
 
 Once all configuration files are ready, the RADAR-Kubernetes can be deployed on a Kubernetes cluster.
