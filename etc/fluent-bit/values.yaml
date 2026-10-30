@@ -32,6 +32,8 @@ config:
         Name grep
         match *
         Exclude log Elasticsearch built-in security features are not enabled
+        # Blank lines become GELF messages with an empty short_message, which Graylog rejects with a stack trace.
+        Exclude log ^\s*$
 
     [FILTER]
         Name kubernetes

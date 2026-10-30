@@ -555,7 +555,7 @@ kube_prometheus_stack:
         resources:
           requests:
             cpu: 50m
-            memory: 768Gi
+            memory: 768Mi
           limits:
             memory: 1Gi
     grafana:
